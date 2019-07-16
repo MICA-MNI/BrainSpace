@@ -34,6 +34,8 @@
         <script type="text/javascript" src="../_static/jquery.js"></script>
         <script type="text/javascript" src="../_static/underscore.js"></script>
         <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.js"></script>
+        <script type="text/javascript" src="../_static/sphinx_tabs/tabs.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -42,6 +44,10 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/tabs.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Welcome to BrainSpace’s documentation!" href="../index.html" /> 
@@ -161,6 +167,78 @@
             
   <div class="section" id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-0-0 docutils container">
+<div class="docutils container">
+MATLAB</div>
+</div>
+<div class="item sphinx-data-tab-0-1 docutils container">
+<div class="docutils container">
+Python3</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-0-0 active docutils container">
+<p>This toolbox has been tested with MATLAB versions R2017a and R2018b, it likely throws errors with MATLAB R2016a or older. An example script using sample data exists at /matlab/sample_run.m. What follows is an explanation of how to run standard gradient analyses.</p>
+<p>Start MATLAB and begin by adding the toolbox path.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">addpath</span><span class="p">(</span><span class="s1">&#39;/path/to/micasoft/BrainSpace/matlab&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Next, we create the Gradient object and fit the model to our data. Assume that <cite>my_control_group</cite> is an input data matrix of which we want to compute the gradients.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">Gradient</span><span class="p">(</span> <span class="s1">&#39;kernel&#39;</span><span class="p">,</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="o">...</span>
+              <span class="s1">&#39;manifold&#39;</span><span class="p">,</span><span class="s1">&#39;DE&#39;</span><span class="p">,</span> <span class="o">...</span>
+              <span class="s1">&#39;alignment&#39;</span><span class="p">,</span><span class="n">false</span><span class="p">,</span> <span class="o">...</span>
+              <span class="s1">&#39;random_state&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span>
+              <span class="s1">&#39;n_components&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">my_control_group</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This will run a gradient analysis using the normalized angle kernel and diffusion embedding as manifold learning. See <cite>help Gradient</cite> for a full description of all arguments and their options. The gradients are stored inside <cite>G.gradients{1}.embeddings</cite>, where the first column is the first gradient, the second column the second gradient etcetera.
+Imagine that we had a patient and a control group, with the patient data stored in <cite>my_patient_group</cite>, and wanted to compare these. We’d run this as follows:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">G2</span> <span class="o">=</span> <span class="n">Gradient</span><span class="p">(</span> <span class="s1">&#39;kernel&#39;</span><span class="p">,</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="o">...</span>
+               <span class="s1">&#39;manifold&#39;</span><span class="p">,</span><span class="s1">&#39;DE&#39;</span><span class="p">,</span> <span class="o">...</span>
+               <span class="s1">&#39;alignment&#39;</span><span class="p">,</span><span class="n">true</span><span class="p">,</span> <span class="o">...</span>
+               <span class="s1">&#39;random_state&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">...</span>
+               <span class="s1">&#39;n_components&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+<span class="n">G</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">fit</span><span class="p">({</span><span class="n">my_control_group</span><span class="p">,</span><span class="n">my_patient_group</span><span class="p">});</span>
+</pre></div>
+</div>
+<p>Note that we set the alignment option to <cite>true</cite> here to enable alignment across the groups. The unaligned gradients are stored in G.gradients{1}.embeddings for controls and G.gradients{2}.embeddings for patients (in the same order as they are provided) and the aligned results are stored in G.aligned{1} and G.aligned{2} for controls and patients, respectively.</p>
+<p>It is recommended to visually inspect gradients both before and after alignment, as alignments may fail when the unaligned gradients are vastly different. To do this, we need a surface on which the plot the gradient data. Lets assume our patient/control data matrices can be plotted on the same template surface, that our data is on both left and right hemispheres, and that left comes before right in our data matrix.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">surface_left</span> <span class="o">=</span> <span class="n">convert_surface</span><span class="p">(</span><span class="s1">&#39;/path/to/my/left/surface/template&#39;</span><span class="p">);</span> <span class="o">%</span> <span class="n">Reads</span> <span class="n">the</span> <span class="n">surface</span> <span class="ow">and</span> <span class="n">converts</span> <span class="n">it</span> <span class="n">to</span> <span class="n">SurfStat</span> <span class="nb">format</span><span class="o">.</span>
+<span class="n">surface_right</span> <span class="o">=</span> <span class="n">convert_surface</span><span class="p">(</span><span class="s1">&#39;/path/to/my/right/surface/template&#39;</span><span class="p">);</span>
+<span class="n">target_gradient</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">h</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">=</span> <span class="n">data_on_surface</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">aligned</span><span class="p">{</span><span class="mi">1</span><span class="p">}(:,</span><span class="n">target_gradient</span><span class="p">),</span> <span class="p">{</span><span class="n">surface_left</span><span class="p">,</span><span class="n">surface_right</span><span class="p">});</span> <span class="o">%</span> <span class="n">Plots</span> <span class="n">the</span> <span class="n">gradients</span> <span class="n">of</span> <span class="n">the</span> <span class="n">control</span> <span class="n">group</span><span class="o">.</span>
+<span class="n">h</span><span class="p">{</span><span class="mi">2</span><span class="p">}</span> <span class="o">=</span> <span class="n">data_on_surface</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">aligned</span><span class="p">{</span><span class="mi">2</span><span class="p">}(:,</span><span class="n">target_gradient</span><span class="p">),</span> <span class="p">{</span><span class="n">surface_left</span><span class="p">,</span><span class="n">surface_right</span><span class="p">});</span> <span class="o">%</span> <span class="n">Plots</span> <span class="n">the</span> <span class="n">gradients</span> <span class="n">of</span> <span class="n">the</span> <span class="n">patient</span> <span class="n">group</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Note that convert_surface will also read MATLAB/Gifti surfaces. For advanced MATLAB figure manipulation, all generated handles are returned in a structure. This function can also handle parcellated data. Let <cite>parcellation</cite> be a vector where each unique number denotes a parcel.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">h</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">=</span> <span class="n">data_on_surface</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">aligned</span><span class="p">{</span><span class="mi">1</span><span class="p">}(:,</span><span class="n">target_gradient</span><span class="p">),</span> <span class="p">{</span><span class="n">surface_left</span><span class="p">,</span><span class="n">surface_right</span><span class="p">},</span> <span class="n">parcellation</span><span class="p">);</span> <span class="o">%</span> <span class="n">Plots</span> <span class="n">the</span> <span class="n">parcellated</span> <span class="n">gradients</span> <span class="n">of</span> <span class="n">the</span> <span class="n">control</span> <span class="n">group</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>There are two other plotting functions. For simplicity we’ll only show these for the control group. The first plots gradients in 3D space and colorcodes each point by their location</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="n">gradient_in_euclidean</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">aligned</span><span class="p">{</span><span class="mi">1</span><span class="p">}(:,</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>The second creates a scree plot of variance explained. This is only supported for principal component analysis and diffusion embedding.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">h</span> <span class="o">=</span> <span class="n">scree_plot</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">gradients</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span><span class="o">.</span><span class="n">metadata</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>In case you want to create null data for significance testing, we provide two options: spin testing and Moran spectral randomization. To run spin-test we require the spheres of the left/right hemispheres and some feature vector (e.g. cortical thickness) for which we want to create null data. Let sphere_left and sphere_right be these spheres and feature_vector_left and feature_vector_right be the feature vectors for the left and right spheres.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">null_data</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">spintest</span><span class="p">({</span><span class="n">feature_vector_left</span><span class="p">,</span><span class="n">feature_vector_right</span><span class="p">},</span> <span class="p">{</span><span class="n">sphere_left</span><span class="p">,</span><span class="n">sphere_right</span><span class="p">},</span> <span class="mi">1000</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Note that this function also works with only one sphere and one feature vector, but not with more than 2.</p>
+<p>Similarly null data can be created with Moran spectral randomization as follows</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">surfaces</span> <span class="o">=</span> <span class="n">combine_surfaces</span><span class="p">(</span><span class="n">surface_left</span><span class="p">,</span><span class="n">surface_right</span><span class="p">);</span>
+<span class="n">null_data</span> <span class="o">=</span> <span class="n">G</span><span class="o">.</span><span class="n">MSR</span><span class="p">([</span><span class="n">feature_vector_left</span><span class="p">;</span><span class="n">feature_vector_right</span><span class="p">],</span><span class="s1">&#39;surface&#39;</span><span class="p">,</span><span class="n">surfaces</span><span class="p">,</span><span class="s1">&#39;permutationnumber&#39;</span><span class="p">,</span><span class="mi">1000</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>blablabla</p>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-0-1 docutils container">
+M4TL4B RUL3S</div>
+</div>
 </div>
 
 
