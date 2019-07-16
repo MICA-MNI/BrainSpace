@@ -10,6 +10,8 @@ Welcome to BrainSpace's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   pages/mypage
+
 
 
 Indices and tables
@@ -18,3 +20,6 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+* :ref:`mypage`
+
+test 1 2 3
