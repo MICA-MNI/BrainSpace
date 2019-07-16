@@ -7,10 +7,10 @@ Welcome to BrainSpace's documentation!
 ======================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
-   pages/mypage
+   pages/tutorials
 
 
 
@@ -20,6 +20,5 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-* :ref:`mypage`
 
 test 1 2 3
