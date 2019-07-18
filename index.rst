@@ -20,5 +20,6 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+* :ref:`pages/tutorials`
+* :ref:`tutorials`
 
-test 1 2 3
