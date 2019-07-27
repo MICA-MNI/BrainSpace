@@ -1,0 +1,156 @@
+"""
+Surface plotting functions.
+"""
+
+# Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
+# License: BSD 3 clause
+
+
+import numpy as np
+import matplotlib as mpl
+
+from vtkmodules.vtkFiltersGeneralPython import vtkTransformFilter
+from vtkmodules.vtkCommonTransformsPython import vtkTransform
+
+from .base import Plotter
+from .colormaps import colormaps
+
+from ..vtk_interface.wrappers import wrap_vtk
+from ..vtk_interface.decorators import wrap_input
+from ..vtk_interface.pipeline import serial_connect
+
+
+orientations = {'lateral': (0, -90, -90),
+                'medial': (0, 90, 90),
+                'ventral': (0, 180, 0),
+                'dorsal': (0, 0, 0)}
+
+
+def plot_surf(surfs, layout, array_name=None, view=None, share=None,
+              nan_color=(0, 0, 0, 1), cmap_name=None, size=(400, 400),
+              interactive=True, embed_nb=False):
+
+    layout = np.atleast_2d(layout)
+    array_name = np.broadcast_to(array_name, layout.shape)
+    view = np.broadcast_to(view, layout.shape)
+    cmap_name = np.broadcast_to(cmap_name, layout.shape)
+
+    nrow, ncol = layout.shape
+
+    # Compute data ranges
+    n_vals = np.full_like(layout, 256, dtype=np.uint)
+    min_rg = np.full_like(layout, np.nan, dtype=np.float)
+    max_rg = np.full_like(layout, np.nan, dtype=np.float)
+    is_discrete = np.zeros_like(layout, dtype=np.bool)
+    vals = np.full_like(layout, None, dtype=np.object)
+    for i in range(layout.size):
+        s = surfs[layout.flat[i]]
+        if s is None:
+            continue
+
+        if array_name.flat[i] not in s.PointData.keys():
+            continue
+        array = s.PointData[array_name.flat[i]]
+
+        if not np.issubdtype(array.dtype, np.floating):
+            is_discrete.flat[i] = True
+            vals.flat[i] = np.unique(array)
+            n_vals.flat[i] = vals.flat[i].size
+
+        min_rg.flat[i] = np.nanmin(array)
+        max_rg.flat[i] = np.nanmax(array)
+
+    # Build lookup tables
+    if share in ['both', 'b']:
+        min_rg[:] = np.nanmin(min_rg)
+        max_rg[:] = np.nanmax(max_rg)
+
+        # Assume everything is discrete
+        if is_discrete.all():
+            v = np.concatenate([v for v in vals if v is not None])
+            n_vals[:] = np.unique(v).size
+
+    elif share in ['row', 'r']:
+        min_rg[:] = np.nanmin(min_rg, axis=1, keepdims=True)
+        max_rg[:] = np.nanmax(max_rg, axis=1, keepdims=True)
+        is_discrete_row = is_discrete.all(axis=1)
+        for i, dr in enumerate(is_discrete_row):
+            if dr:
+                v = np.concatenate([v for v in vals[i] if v is not None])
+                n_vals[i, :] = np.unique(v).size
+
+    elif share in ['col', 'c']:
+        min_rg[:] = np.nanmin(min_rg, axis=0, keepdims=True)
+        max_rg[:] = np.nanmax(max_rg, axis=0, keepdims=True)
+        is_discrete_col = is_discrete.all(axis=0)
+        for i, dc in enumerate(is_discrete_col):
+            if dc:
+                v = np.concatenate([v for v in vals[:, i] if v is not None])
+                n_vals[i, :] = np.unique(v).size
+
+    p = Plotter(n_rows=nrow, n_cols=ncol, try_qt=False, size=size)
+    for k in range(layout.size):
+        ren1 = p.AddRenderer(row=k // ncol, col=k % ncol, background=(1, 1, 1))
+        s = surfs[layout.flat[k]]
+        if s is None:
+            continue
+
+        ac1 = ren1.AddActor()
+        if view.flat[k] is not None:
+            ac1.orientation = orientations[view.flat[k]]
+
+        # Only interpolate if floating
+        interpolate = not is_discrete.flat[k]
+        m1 = ac1.SetMapper(InputDataObject=s, ColorMode='MapScalars',
+                           ScalarMode='UsePointFieldData',
+                           InterpolateScalarsBeforeMapping=interpolate,
+                           UseLookupTableScalarRange=True)
+
+        if array_name.flat[k] is None:
+            m1.ScalarVisibility = False
+        else:
+            m1.ArrayName = array_name.flat[k]
+
+        # Set lookuptable
+        if cmap_name.flat[k] is not None:
+            if cmap_name.flat[k] in colormaps:
+                table = colormaps[cmap_name.flat[k]]
+            else:
+                cmap = mpl.cm.get_cmap(cmap_name.flat[k])
+                table = cmap(np.linspace(0, 1, n_vals.flat[k])) * 255
+                table = table.astype(np.uint8)
+            lut1 = m1.SetLookupTable(NumberOfTableValues=n_vals.flat[k],
+                                     Range=(min_rg.flat[k], max_rg.flat[k]),
+                                     Table=table)
+            if nan_color is not None:
+                lut1.NanColor = nan_color
+            lut1.Build()
+
+        ren1.ResetCamera()
+
+    return p.show(interactive=interactive, embed_nb=embed_nb)
+
+
+@wrap_input(only_args=[0, 1])
+def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
+                     cmap_name=None, size=(400, 400), interactive=True,
+                     embed_nb=False):
+
+    # trans_lh = vtkTransform()
+    # trans_lh.Translate(*-np.asarray(surf_lh.center))
+    #
+    # trans_rh = vtkTransform()
+    # trans_rh.Translate(*-np.asarray(surf_rh.center))
+    #
+    # tf = wrap_vtk(vtkTransformFilter(), transform=trans_lh)
+    # surf_lh = lia.serial_connect(surf_lh, tf)
+    #
+    # tf = wrap_vtk(vtkTransformFilter(), transform=trans_rh)
+    # surf_rh = lia.serial_connect(surf_rh, tf)
+
+    surfs = {'lh': surf_lh, 'rh': surf_rh}
+    layout = ['lh', 'lh', 'rh', 'rh']
+    view = ['medial', 'lateral', 'lateral', 'medial']
+    return plot_surf(surfs, layout, array_name=array_name, nan_color=nan_color,
+                     view=view, cmap_name=cmap_name, size=size,
+                     interactive=interactive, embed_nb=embed_nb)
