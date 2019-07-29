@@ -6,17 +6,42 @@
 Welcome to BrainSpace's documentation!
 ======================================
 
+BrainSpace is a lightweight cross-platform toolbox primarily intended for
+macroscale gradient mapping and analysis. The current version of BrainSpace is
+available in Python and Matlab, programming languages widely used by the
+neuroimaging and network neuroscience communities. The toolbox also contains
+several maps that allow for exploratory analysis of gradient correspondence
+with several features, together with tools to generate spatial null models.
+
+
 .. toctree::
-   :maxdepth: 2
-   :caption: TABLE OF CONTENTS:
+   :maxdepth: 1
+   :caption: Table of Contents:
 
+   pages/install
+   pages/getting_started
    pages/tutorials
-   api_python/brainspace
+   python_doc/index_python
 
 
-.. * Indices and tables
-.. * ==================
+Authors
+-------
 
-.. * * :ref:`genindex`
-.. * * :ref:`modindex`
-.. * * :ref:`search`
+- Reinder Vos de Wael, MICA Lab - Montreal Neurological Institute
+- Oualid Benkarim, MICA Lab - Montreal Neurological Institute
+- Boris Bernhardt, MICA Lab - Montreal Neurological Institute
+
+
+License
+-------
+
+The BrainSpace source code is available under the Revised BSD (3-Clause) license
+
+
+Support
+-------
+
+If you have problems installing the software or questions about usage,
+documentation or something else related to BrainSpace, you can post to our
+mailing list Mail.
+

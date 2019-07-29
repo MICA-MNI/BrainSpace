@@ -66,7 +66,7 @@ def _select_writer(otype):
 
 
 def load_surface(ipth, itype=None, return_data=True, update=True):
-    """ Reads data.
+    """ Read surface data.
 
     Parameters
     ----------
@@ -97,7 +97,7 @@ def load_surface(ipth, itype=None, return_data=True, update=True):
 
 
 def save_surface(ifilter, opth, oformat=None, otype=None):
-    """ Writes data.
+    """ Write surface data.
 
     Parameters
     ----------

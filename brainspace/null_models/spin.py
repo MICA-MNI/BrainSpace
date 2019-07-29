@@ -1,5 +1,5 @@
 """
-Implementation of Moran spectral randomization.
+Implementation of Spin permutations.
 """
 
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
@@ -17,11 +17,11 @@ from sklearn.base import BaseEstimator
 from ..mesh import mesh_elements as me
 
 
-def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=1000,
+def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
                           random_state=None):
     """ Generate rotational spins based on points that lie on a sphere.
 
-    The code is adapted from netneurotools [3].
+    The code is adapted from netneurotools [3]_.
 
 
     Parameters
@@ -38,24 +38,24 @@ def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=1000,
         and rotated ones. If true, the Hungarian algorithm is used.
         Default is False.
     n_rep : int, optional
-        Number of random rotations. Default is 1000.
+        Number of random rotations. Default is 100.
     random_state : int or None, optional
         Random state. Default is None.
 
     Returns
     -------
-    Result : dict of ndarrays
+    result : dict[str, ndarray]
         Spin indices for left points (and also right, if provided).
 
     References
     ----------
-    [1] Alexander-Bloch A, Shou H, Liu S, Satterthwaite TD, Glahn DC,
-    Shinohara RT, Vandekar SN and Raznahan A (2018). On testing for spatial
-    correspondence between maps of human brain structure and function.
-    NeuroImage, 178:540-51.
-    [2] Blaser R and Fryzlewicz P (2016). Random Rotation Ensembles.
-    Journal of Machine Learning Research, 17(4): 1–26.
-    [3] https://netneurotools.readthedocs.io
+    .. [1] Alexander-Bloch A, Shou H, Liu S, Satterthwaite TD, Glahn DC,
+        Shinohara RT, Vandekar SN and Raznahan A (2018). On testing for spatial
+        correspondence between maps of human brain structure and function.
+        NeuroImage, 178:540-51.
+    .. [2] Blaser R and Fryzlewicz P (2016). Random Rotation Ensembles.
+        Journal of Machine Learning Research, 17(4): 1–26.
+    .. [3] https://netneurotools.readthedocs.io
 
     """
 
@@ -103,7 +103,7 @@ class SpinRandomization(BaseEstimator):
     ----------
     unique : bool, optional
         Whether to enforce a one-to-one correspondence between original points
-        and rotated ones. If true, the Hungarian algorithm is used.
+        and rotated ones. If True, the Hungarian algorithm is used.
         Default is False.
     n_rep : int, optional
         Number of randomizations. Default is 100.
@@ -112,11 +112,15 @@ class SpinRandomization(BaseEstimator):
 
     Attributes
     ----------
-    spin_lh_ : 2D ndarray, shape (n, n_rep)
+    spin_lh_ : 2D ndarray, shape (n_lh, n_rep)
         Spin indices for points in left hemisphere.
-    spin_rh_ : 2D ndarray, shape (n, n_rep)
+    spin_rh_ : 2D ndarray, shape (n_rh, n_rep)
         Spin indices for points in right hemisphere. Only if user provides
         right hemisphere points. None, otherwise.
+
+    See Also
+    --------
+    :class:`.MoranSpectralRandomization`
 
     Notes
     -----
@@ -135,12 +139,12 @@ class SpinRandomization(BaseEstimator):
 
         Parameters
         ----------
-        points_lh : BSPolyData or 2D ndarray, shape = (nl, 3)
-            Sphere for the left hemisphere. If ndarray, each row is a vertex in
-            the sphere.
-        points_rh : BSPolyData or 2D ndarray, shape = (nr, 3), optional
-            Sphere for the right hemisphere. If ndarray, each row is a vertex in
-            the sphere. Default is None.
+        points_lh : BSPolyData or 2D ndarray, shape = (n_lh, 3)
+            Sphere for the left hemisphere. If ndarray, each row must
+            represent a vertex in the sphere.
+        points_rh : BSPolyData or 2D ndarray, shape = (n_rh, 3), optional
+            Sphere for the right hemisphere. If ndarray, row must
+            represent a vertex in the sphere. Default is None.
 
         Returns
         -------
@@ -165,25 +169,25 @@ class SpinRandomization(BaseEstimator):
         return self
 
     def randomize(self, x_lh, x_rh=None):
-        """ Generate random samples from `x`.
+        """ Generate random samples from `x_lh` and `x_rh`.
 
         Parameters
         ----------
-        x_lh : 1D or 2D ndarray, shape = (nl,) or (nl, n_feat)
-        Array of variables arranged in columns, where `n_feat` is the number
-        of variables.
-        x_rh : 1D or 2D ndarray, shape = (nr,) or (nr, n_feat), optional
-        Array of variables arranged in columns for the right hemisphere, where
-        `n_feat` is the number of variables. Default is None.
+        x_lh : 1D or 2D ndarray, shape = (n_lh,) or (n_lh, n_feat)
+            Array of variables arranged in columns, where `n_feat` is the number
+            of variables.
+        x_rh : 1D or 2D ndarray, shape = (n_rh,) or (n_rh, n_feat), optional
+            Array of variables arranged in columns for the right hemisphere.
+            Default is None.
 
         Returns
         -------
-        rand_lh : ndarray, shape = (n_rep, n_feat, n)
-            Permutations of `x_rh`. If `n_feat` is 1, shape = (n_rep, n).
+        rand_lh : ndarray, shape = (n_rep, n_feat, n_lh)
+            Permutations of `x_rh`. If ``n_feat == 1``, shape = (n_rep, n_lh).
 
-        rand_lh : ndarray, shape = (n_rep, n_feat, n)
-            Permutations of `x_rh`. If `n_feat` is 1, shape = (n_rep, n).
-            None if ``x_rh=None``. Only if `spin_rh_` is not None.
+        rand_lh : ndarray, shape = (n_rep, n_feat, n_rh)
+            Permutations of `x_rh`. If ``n_feat == 1``, shape = (n_rep, n_rh).
+            None if `x_rh` is None. Only if `spin_rh_` is not None.
 
         """
 

@@ -20,7 +20,7 @@ def get_points(surf, mask=None):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
     mask : 1D ndarray, optional
         Binary mask. If specified, only get points within the mask.
@@ -37,7 +37,7 @@ def get_points(surf, mask=None):
     return pts if mask is None else pts[mask]
 
 
-@wrap_input
+@wrap_input()
 def get_cells(surf):
     """Get surface cells.
 

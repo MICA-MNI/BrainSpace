@@ -1,5 +1,5 @@
 """
-Cluster surface mesh points.
+Clustering and sampling of surface mesh points.
 """
 
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
@@ -28,29 +28,29 @@ def cluster_points(surf, n_clusters=100, is_size=False, mask=None,
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
-    n_clusters : int
-        Number of clusters.
+    n_clusters : int, optional
+        Number of clusters. Default is 100.
     is_size : bool, optional
         If True, interpret `n_clusters` as cluster size. Default is False.
     mask : 1D ndarray, optional
-        Mask for surface points. Points with False values are discarded from
-        clustering. Default is None.
+        Mask for surface points. Points outside the mask (i.e., False) are
+        discarded from clustering. Default is None.
     with_centers : bool, optional
         If True, an array of labels with the closest points to the centroid of
         each cluster is returned. Default is True.
     random_state : int, RandomState instance or None, optional
          Random number generation. Use int to make randomness deterministic.
     approach : {'kmeans', 'ward'}, optional
-        Clustering method: k_means or hierarchical with ward linkage.
-        Hierarchical clustering is faster but k_means provides better results.
+        Clustering method: k-means or hierarchical with ward linkage.
+        Hierarchical clustering is faster but k-means provides better results.
         Default is 'kmeans'.
     n_init : int, optional
-        Number of k_means repetitions. Only used when `approach='kmeans'`.
+        Number of k-means repetitions. Only used when ``approach == 'kmeans'``.
         Default is 3.
     n_jobs : int or None, optional
-        The number of parallel jobs. Only used when `approach='kmeans'`.
+        The number of parallel jobs. Only used when ``approach == 'kmeans'``.
         Default is 1.
 
     Returns
@@ -66,7 +66,7 @@ def cluster_points(surf, n_clusters=100, is_size=False, mask=None,
     Notes
     -----
     Valid cluster labels start from 1. If the mask is provided, zeros are
-    assigned to points not included in the mask.
+    assigned to the points outside the mask.
 
     """
 
@@ -129,29 +129,29 @@ def cluster_points(surf, n_clusters=100, is_size=False, mask=None,
 
 def sample_points_clustering(surf, keep=0.1, mask=None, random_state=None,
                              approach='kmeans', n_init=3, n_jobs=1):
-    """Sample equidistant points from a surface mesh.
+    """Sample equidistant points from surface based on clustering.
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
-    keep : non-negative float or int, optional
-        If float, indicates percentage of points to sample. Must be
-        ``0<keep<1``. If int, is the number of points to sample. Default is 0.1.
+    keep : float or int, optional
+        If float, percentage of points to sample. Must be ``0 < keep < 1``.
+        If int, number of points to sample. Default is 0.1.
     mask : 1D ndarray, optional
-        Mask for surface points. Points with False values are discarded from
-        sampling. Default is None.
+        Mask for surface points. Points outside the mask (i.e., False) are
+        discarded from clustering. Default is None.
     random_state : int, RandomState instance or None, optional
          Random number generation. Default is None.
     approach : {'kmeans', 'ward'}, optional
-        Sampling approach: k_means or hierarchical with ward linkage.
-        Hierarchical is faster but k_means provides better results.
+        Sampling approach: k-means or hierarchical with ward linkage.
+        Hierarchical is faster but k-means provides better results.
         Default is 'kmeans'.
     n_init : int, optional
-        Number of k_means repetitions. Only used when `approach='kmeans'`.
+        Number of k-means repetitions. Only used when ``approach == 'kmeans'``.
         Default is 3.
     n_jobs : int or None, optional
-        The number of parallel jobs. Only used when `approach='kmeans'`.
+        The number of parallel jobs. Only used when ``approach == 'kmeans'``.
         Default is 1.
 
     Returns
@@ -160,9 +160,14 @@ def sample_points_clustering(surf, keep=0.1, mask=None, random_state=None,
         Array with sampled points marked with 1 in their corresponding
         positions. The rest is 0.
 
+    See Also
+    --------
+    :func:`cluster_points`
+    :func:`sample_points_decimation`
+
     Notes
     -----
-    This method is first clusters the surface points and then selects the points
+    This method first clusters the surface points and then selects the points
     closest to the centroids as the sampled points.
 
     """
@@ -183,18 +188,18 @@ def sample_points_clustering(surf, keep=0.1, mask=None, random_state=None,
 
 
 def sample_points_decimation(surf, keep=0.1, mask=None, n_jobs=1):
-    """Sample points from surface.
+    """Sample points from surface based on surface decimation.
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
-    keep : int or float
-        Percentage of points to sample. Must be ``0<keep<1``.
-        Default is 0.1.
+    keep : float or int, optional
+        If float, percentage of points to sample. Must be ``0 < keep < 1``.
+        If int, number of points to sample. Default is 0.1.
     mask : 1D ndarray, optional
-        Mask for surface points. Points with False values are discarded from
-        sampling. Default is None.
+        Mask for surface points. Points outside the mask (i.e., False) are
+        discarded from sampling. Default is None.
     n_jobs : int, optional
         Number of jobs. Default is 1.
 
@@ -208,6 +213,10 @@ def sample_points_decimation(surf, keep=0.1, mask=None, n_jobs=1):
     -----
     In this method, sampling is based on mesh decimation. Number of sampled
     points will most probably not coincide with the requested number.
+
+    See Also
+    --------
+    :func:`sample_points_clustering`
 
     """
 

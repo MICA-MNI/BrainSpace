@@ -263,7 +263,7 @@ def map_pointdata_to_celldata(surf, point_data, red_func='mean',
 @append_vtk(to='point')
 def compute_point_area(surf, cell_area=None, area_as='one_third',
                        append=False, array_name='point_area'):
-    """Compute point area (as one third of areas of adjacent cells).
+    """Compute point area from its adjacent cells.
 
     Parameters
     ----------
@@ -369,7 +369,7 @@ def get_labeling_border(surf, labeling, append=False, array_name='border'):
 @append_vtk(to='point')
 def get_parcellation_centroids(surf, labeling, non_centroid=0,
                                append=False, array_name='centroids'):
-    """Get labeling borders.
+    """Compute parcels centroids.
 
     Parameters
     ----------

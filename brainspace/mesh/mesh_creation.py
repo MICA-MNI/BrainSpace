@@ -21,20 +21,20 @@ from ..vtk_interface.decorators import wrap_input
 
 
 def build_polydata(points, cells=None):
-    """Build PolyData from points and cells.
+    """Build surface (polyData) from points and cells.
 
     Parameters
     ----------
     points : ndarray, shape = (n_points, 3)
         Array of points.
     cells : ndarray, shape = (n_cells, nd), optional
-        Array of cells. Cell can be vertex (nd=1), line (nd=2) or poly (nd=3).
-        Default is None (no topology information).
+        Array of cells. Cells can be vertex (nd=1), line (nd=2) or
+        triangle (nd=3). Default is None (no topology information).
 
     Returns
     -------
     output : BSPolyData
-        Returns PolyData.
+        Returns surface (polyData).
 
     Notes
     -----

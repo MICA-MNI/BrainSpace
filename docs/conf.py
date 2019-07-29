@@ -51,6 +51,8 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.autosectionlabel',
     # 'sphinxcontrib.apidoc',
 ]
 
@@ -60,8 +62,33 @@ extensions = [
 # apidoc_separate_modules = True
 
 napoleon_google_docstring = False
-napoleon_use_param = False
+napoleon_numpy_docstring = True
+napoleon_use_param = True
 napoleon_use_ivar = True
+napoleon_use_rtype = False
+
+autosummary_generate = True
+
+
+# from unittest.mock import MagicMock
+#
+#
+# class Mock(MagicMock):
+#     @classmethod
+#     def __getattr__(cls, name):
+#             return MagicMock()
+#
+#
+# MOCK_MODULES = ['vtk']
+# sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3/', None),
+    'numpy': ('http://docs.scipy.org/doc/numpy/', None),
+    'sklearn': ('http://scikit-learn.org/stable', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
+}
 
 
 # Add any paths that contain templates here, relative to this directory.

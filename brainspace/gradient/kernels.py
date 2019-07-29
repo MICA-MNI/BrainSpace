@@ -12,22 +12,31 @@ from sklearn.metrics.pairwise import cosine_similarity, rbf_kernel
 from .utils import dominant_set
 
 
-def compute_affinity(x, kernel=None, sparsity=.1, gamma=None):
+def compute_affinity(x, kernel=None, sparsity=.9, gamma=None):
     """Compute affinity matrix.
 
     Parameters
     ----------
     x : 2D ndarray, shape = (n_samples, n_feat)
         Input matrix.
-    kernel : {'pearson', 'spearman', 'cosine', 'normalized_angle', 'gaussian'}
+    kernel : {'pearson', 'spearman', 'cosine', 'normalized_angle', 'gaussian'}\
         or None, optional.
-        Kernel function. If None, only sparisify. Default is None.
+        Kernel function. If None, only sparsify. Default is None. Valid options:
+
+        - If 'pearson', use Pearson's correlation coefficient.
+        - If 'spearman', use Spearman's rank correlation coefficient.
+        - If 'cosine', use cosine similarity.
+        - If 'normalized_angle': use normalized angle between two vectors. This
+          option is based on cosine similarity but provides similarities bounded
+          between 0 and 1.
+        - If 'gaussian', use Gaussian kernel or RBF.
+
     sparsity : float, optional
-        Only keep top ``n_feat*sparsity`` elements for each row. Zero-out
-        the rest. Default is 0.1.
+        Proportion of smallest elements to zero-out for each row.
+        Default is 0.9.
     gamma : float or None, optional
-        Inverse kernel width. Only used if ``kernel`` == 'gaussian'.
-        If None, ``gamma=1/n_feat``. Default is None.
+        Inverse kernel width. Only used if ``kernel == 'gaussian'``.
+        If None, ``gamma = 1./n_feat``. Default is None.
 
     Returns
     -------
@@ -36,7 +45,7 @@ def compute_affinity(x, kernel=None, sparsity=.1, gamma=None):
     """
 
     if sparsity:
-        x = dominant_set(x, k=sparsity, is_thresh=False, as_sparse=False)
+        x = dominant_set(x, k=1-sparsity, is_thresh=False, as_sparse=False)
 
     if kernel is None:
         return x

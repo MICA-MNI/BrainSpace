@@ -22,12 +22,12 @@ def compute_mem(a, spectrum='nonzero', tol=1e-10):
 
     Parameters
     ----------
-    a : 2D ndarray or sparse matrix
-        The affinity matrix. Square matrix of spatial weights.
+    a : 2D ndarray or sparse matrix, shape = (n_vertices, n_vertices)
+        Spatial weight matrix.
     spectrum : {'all', 'nonzero'}, optional
         Eigenvalues/vectors to select. If 'all', recover all eigenvectors
-        except one. Otherwise, select all except non-zero eigenvectors.
-        Default is 'nonzero'.
+        except the smallest one. Otherwise, select all except non-zero
+        eigenvectors. Default is 'nonzero'.
     tol : float, optional
         Minimum value for an eigenvalue to be considered non-zero.
         Default is 1e-10.
@@ -35,18 +35,17 @@ def compute_mem(a, spectrum='nonzero', tol=1e-10):
     Returns
     -------
     w : 1D ndarray, shape (n_components,)
-        Eigenvalues of the `a` matrix in descending order.
-        Where ``n_components = n - 1`` if ``spectrum = 'all'`` or
-        ``n_components = n - n_zero`` if ``spectrum = 'nonzero'``, `n`
-        is the size of `a` and `n_zero` the number of zero eigenvalues.
-    v : 2D ndarray, shape (n, n_components)
-        Eigenvectors of the affinity matrix in same order.
+        Eigenvalues in descending order. With ``n_components = n_vertices - 1``
+        if ``spectrum == 'all'`` and ``n_components = n_vertices - n_zero`` if
+        ``spectrum == 'nonzero'``, and `n_zero` is number of zero eigenvalues.
+    v : 2D ndarray, shape (n_vertices, n_components)
+        Eigenvectors of the weight matrix in same order.
 
     References
     ----------
-    [1]  Wagner H.H. and Dray S. (2015). Generating spatially constrained
-    null models for irregularly spaced data using Moran spectral randomization
-    methods. Methods in Ecology and Evolution, 6(10):1169-78.
+    .. [1]  Wagner H.H. and Dray S. (2015). Generating spatially constrained
+        null models for irregularly spaced data using Moran spectral
+        randomization methods. Methods in Ecology and Evolution, 6(10):1169-78.
 
     """
 
@@ -112,18 +111,18 @@ def compute_mem(a, spectrum='nonzero', tol=1e-10):
 
 def spectral_randomization(x, mem, n_rep=100, method='singleton', joint=False,
                            random_state=None):
-    """ Moran spectral randomization.
+    """ Generate random samples from `x` based on Moran spectral randomization.
 
     Parameters
     ----------
-    x : 1D or 2D ndarray, shape = (n,) or (n, n_feat)
+    x : 1D or 2D ndarray, shape = (n_vertices,) or (n_vertices, n_feat)
         Array of variables arranged in columns, where `n_feat` is the number
         of variables.
-    mem : 2D ndarray, shape = (n, nv)
+    mem : 2D ndarray, shape = (n_vertices, nv)
         Moran eigenvectors map, where `nv` is the number of eigenvectors
         arranged in columns.
     n_rep : int, optional
-        Number of randomizations. Default is 100.
+        Number of random samples. Default is 100.
     method : {'singleton, 'pair'}, optional
         Procedure to generate the random samples. Default is 'singleton'.
     joint : boolean, optional
@@ -134,14 +133,14 @@ def spectral_randomization(x, mem, n_rep=100, method='singleton', joint=False,
 
     Returns
     -------
-    output : ndarray, shape = (n_rep, n_feat, n)
-        Array of randomizations. If `n_feat` is 1, shape = (n_rep, n).
+    output : ndarray, shape = (n_rep, n_feat, n_vertices)
+        Random samples. If ``n_feat == 1``, shape = (n_rep, n_vertices).
 
     References
     ----------
-    [1]  Wagner H.H. and Dray S. (2015). Generating spatially constrained
-    null models for irregularly spaced data using Moran spectral randomization
-    methods. Methods in Ecology and Evolution, 6(10):1169-78.
+    .. [1]  Wagner H.H. and Dray S. (2015). Generating spatially constrained
+        null models for irregularly spaced data using Moran spectral
+        randomization methods. Methods in Ecology and Evolution, 6(10):1169-78.
 
     """
 
@@ -222,7 +221,11 @@ class MoranSpectralRandomization(BaseEstimator):
     mev_ : 1D ndarray, shape (n_components,)
         Eigenvalues of the weight matrix in descending order.
     mem_ : 2D ndarray, shape (n_vertices, n_components)
-        Eigenvectors of the affinity matrix in same order.
+        Eigenvectors of the weight matrix in same order.
+
+    See Also
+    --------
+    :class:`.SpinRandomization`
 
     """
 
@@ -237,13 +240,15 @@ class MoranSpectralRandomization(BaseEstimator):
         self.tol = tol
         self.random_state = random_state
 
-    def fit(self, affinity):
+    def fit(self, w):
         """ Compute Moran eigenvectors map.
 
         Parameters
         ----------
-        affinity : 2D ndarray or BSPolyData
-            Spatial weight matrix as an array or surface mesh.
+        w : 2D ndarray or BSPolyData
+            Spatial weight matrix or surface. If surface, the weight matrix is
+            built based on the inverse geodesic distance between each vertex and
+            the vertices in its `n_ring`.
 
         Returns
         -------
@@ -253,14 +258,13 @@ class MoranSpectralRandomization(BaseEstimator):
         """
 
         # If surface is provided instead of affinity
-        if not isinstance(affinity, np.ndarray):
-            affinity = me.get_ring_distance(affinity, n_ring=self.n_ring,
-                                            metric='geodesic')
-            affinity.data **= -1  # inverse of distance
+        if not isinstance(w, np.ndarray):
+            w = me.get_ring_distance(w, n_ring=self.n_ring, metric='geodesic')
+            w.data **= -1  # inverse of distance
             # s /= np.nansum(s, axis=1, keepdims=True)  # normalize rows
             # s = s.tocoo(copy=False)
 
-        self.mev_, self.mem_ = compute_mem(affinity, spectrum=self.spectrum,
+        self.mev_, self.mem_ = compute_mem(w, spectrum=self.spectrum,
                                            tol=self.tol)
         return self
 
@@ -269,14 +273,14 @@ class MoranSpectralRandomization(BaseEstimator):
 
         Parameters
         ----------
-        x : 1D or 2D ndarray, shape = (n,) or (n, n_feat)
-        Array of variables arranged in columns, where `n_feat` is the number
-        of variables.
+        x : 1D or 2D ndarray, shape = (n_vertices,) or (n_vertices, n_feat)
+            Array of variables arranged in columns, where `n_feat` is the number
+            of variables.
 
         Returns
         -------
-        output : ndarray, shape = (n_rep, n_feat, n)
-            Array of randomizations. If `n_feat` is 1, shape = (n_rep, n).
+        output : ndarray, shape = (n_rep, n_feat, n_vertices)
+            Random samples. If ``n_feat == 1``, shape = (n_rep, n_vertices).
 
         """
 

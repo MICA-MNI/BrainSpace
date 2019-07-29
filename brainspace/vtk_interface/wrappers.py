@@ -371,7 +371,7 @@ class BSPointSet(dsa.PointSet, BSDataSet):
 class BSPolyData(dsa.PolyData, BSPointSet):
 
     def get_cells2D(self):
-        if not self.has_unique_cell_type():
+        if not self.has_unique_cell_type:
             raise ValueError('PolyData has different types of cells.')
         cells = self.Polygons
         return cells.reshape(-1, cells[0] + 1)[:, 1:]
@@ -517,10 +517,34 @@ class BSRenderer(BSVTKObjectWrapper):
 
 
 def is_wrapper(obj):
+    """ Check if `obj` is a wrapper.
+
+    Parameters
+    ----------
+    obj : object
+        Any object.
+
+    Returns
+    -------
+    res : bool
+        True if `obj` is a VTK wrapper. False, otherwise.
+    """
     return isinstance(obj, BSVTKObjectWrapper)
 
 
 def is_vtk(obj):
+    """ Check if `obj` is a vtk object.
+
+    Parameters
+    ----------
+    obj : object
+        Any object.
+
+    Returns
+    -------
+    res : bool
+        True if `obj` is a VTK object. False, otherwise.
+    """
     return isinstance(obj, vtkObjectBase)
 
 
@@ -567,11 +591,11 @@ def BSWrapVTKObject(obj):
 
 
 def wrap_vtk(obj, return_input=False, **kwargs):
-    """Wrap input object to BSVTKObjectWrapper.
+    """Wrap input object to BSVTKObjectWrapper or one of its subclasses.
 
     Parameters
     ----------
-    obj : vtkObjc¡ect or BSVTKObjectWrapper
+    obj : vtkObjctect or BSVTKObjectWrapper
         Input object.
     return_input : bool, optional
         If True, also return original data. Otherwise, only return warped

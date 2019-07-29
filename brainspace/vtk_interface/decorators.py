@@ -323,6 +323,7 @@ def append_vtk(to='point'):
     """
 
     def _wrapper_decorator(func):
+        @functools.wraps(func)
         def _wrapper_append(surf, *args, **kwargs):
             kwds = _get_default_args(func)
             kwds.update(kwargs)

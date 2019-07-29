@@ -39,7 +39,8 @@ def diffusion_mapping(adj, n_components=None, alpha=0, diffusion_time=0,
     alpha : float, optional
         Anisotropic diffusion parameter, ``0 <= alpha <= 1``. Default is 0.
     diffusion_time : int, optional
-        Diffusion time or scale. Default is 0.
+        Diffusion time or scale. If ``diffusion_time==0`` use multi-scale
+        diffusion maps [2]_. Default is 0.
     random_state : int or None, optional
         Random state. Default is None.
 
@@ -53,14 +54,10 @@ def diffusion_mapping(adj, n_components=None, alpha=0, diffusion_time=0,
 
     References
     ----------
-    [1] Coifman, R.R.; S. Lafon. (2006). "Diffusion maps". Applied and
-    Computational Harmonic Analysis 21: 5-30. doi:10.1016/j.acha.2006.04.006
-    [2] https://jlmelville.github.io/smallvis/spectral.html
-    [3] https://github.com/satra/mapalign/tree/master/mapalign
-    [4] Joseph W.R., Peter E.F., Ann B.L., Chad M.S. Accurate parameter
-    estimation for star formation history in galaxies using SDSS spectra.
-    [5] https://cran.r-project.org/web/packages/diffusionMap/index.html
-
+    .. [1] Coifman, R.R.; S. Lafon. (2006). "Diffusion maps". Applied and
+        Computational Harmonic Analysis 21: 5-30. doi:10.1016/j.acha.2006.04.006
+    .. [2] Joseph W.R., Peter E.F., Ann B.L., Chad M.S. Accurate parameter
+        estimation for star formation history in galaxies using SDSS spectra.
     """
 
     rs = check_random_state(random_state)
@@ -139,7 +136,7 @@ def diffusion_mapping(adj, n_components=None, alpha=0, diffusion_time=0,
     w, v = w[1:], v[:, 1:]
 
     if diffusion_time <= 0:
-        # use  multi-scale diffusion map, ref [4,5]
+        # use multi-scale diffusion map, ref [4]
         # considers all scales: t=1,2,3,...
         w /= (1 - w)
     else:
@@ -148,7 +145,7 @@ def diffusion_mapping(adj, n_components=None, alpha=0, diffusion_time=0,
 
     if auto_n_comp:
         # Choose n_comp to coincide with a 95 % drop-off
-        # in the eigenvalue multipliers, ref [4, 5]
+        # in the eigenvalue multipliers, ref [4]
         lambda_ratio = w / w[0]
 
         # If all eigenvalues larger than 0.05, select all
@@ -194,11 +191,11 @@ def laplacian_eigenmaps(adj, n_components=8, norm_laplacian=True,
 
     References
     ----------
-    [1] Belkin, M. and Niyogi, P. (2003). Laplacian Eigenmaps for dimensionality
-    reduction and data representation. Neural Computation 15(6): 1373-96.
-    doi:10.1162/089976603321780317
-    [2] https://scikit-learn.org/stable/modules/generated/
-    sklearn.manifold.spectral_embedding.html
+    .. [1] Belkin, M. and Niyogi, P. (2003). Laplacian Eigenmaps for
+        dimensionality reduction and data representation.
+        Neural Computation 15(6): 1373-96. doi:10.1162/089976603321780317
+    .. [2] https://scikit-learn.org/stable/modules/generated/\
+        sklearn.manifold.spectral_embedding.html
 
     """
 
@@ -281,7 +278,8 @@ class DiffusionMaps(Embedding):
     alpha : float, optional
         Anisotropic diffusion parameter, ``0 <= alpha <= 1``. Default is 0.
     diffusion_time : int, optional
-        Diffusion time or scale. Default is 0.
+        Diffusion time or scale.  If ``diffusion_time==0`` use multi-scale
+        diffusion maps [2]_. Default is 0.
     random_state : int or None, optional
         Random state. Default is None.
 
@@ -292,6 +290,18 @@ class DiffusionMaps(Embedding):
     maps_ : 2D ndarray, shape (n, n_components)
         Eigenvectors of the affinity matrix in same order. Where `n` is
         the number of rows of the affinity matrix.
+
+    See Also
+    --------
+    :class:`.LaplacianEigenmaps`
+    :class:`.PCAMaps`
+
+    References
+    ----------
+    .. [1] Coifman, R.R.; S. Lafon. (2006). "Diffusion maps". Applied and
+        Computational Harmonic Analysis 21: 5-30. doi:10.1016/j.acha.2006.04.006
+    .. [2] Joseph W.R., Peter E.F., Ann B.L., Chad M.S. Accurate parameter
+        estimation for star formation history in galaxies using SDSS spectra.
 
     """
 
@@ -346,6 +356,11 @@ class LaplacianEigenmaps(Embedding):
         Eigenvectors of the affinity matrix in same order. Where `n` is
         the number of rows of the affinity matrix.
 
+    See Also
+    --------
+    :class:`.DiffusionMaps`
+    :class:`.PCAMaps`
+
     """
 
     def __init__(self, n_components=2, norm_laplacian=True, random_state=None):
@@ -392,6 +407,11 @@ class PCAMaps(Embedding):
         Explained variance for first principal component in descending order.
     maps_ : 2D ndarray, shape (n, n_components)
         Projection of input data onto the principal components.
+
+    See Also
+    --------
+    :class:`.DiffusionMaps`
+    :class:`.LaplacianEigenmaps`
 
     """
     def __init__(self, n_components=2, random_state=None):

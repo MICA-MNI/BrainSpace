@@ -1,5 +1,7 @@
 import numpy as np
 
+from sklearn.base import BaseEstimator
+
 from .alignment import ProcrustesAlignment
 from .kernels import compute_affinity
 from .embedding import PCAMaps, LaplacianEigenmaps, DiffusionMaps
@@ -27,8 +29,8 @@ def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
         Inverse kernel width. Only used if ``kernel`` == 'gaussian'.
         If None, ``gamma=1/n_feat``. Default is None.
     sparsity : float, optional
-        Only keep top ``n_feat*sparsity`` elements for each row. Zero-out
-        the rest. Default is 0.1.
+        Proportion of smallest elements to zero-out for each row.
+        Default is 0.9.
     kwargs : kwds, optional
         Additional keyword parameters passed to the embedding approach.
 
@@ -40,8 +42,8 @@ def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
         Gradients (i.e., eigenvectors) in same order.
     """
 
-    a = compute_affinity(x, kernel=kernel, sparsity=1-sparsity, gamma=gamma)
-    print('Sparsity:', np.count_nonzero(a)/a.size)
+    a = compute_affinity(x, kernel=kernel, sparsity=sparsity, gamma=gamma)
+    # print('Sparsity:', np.count_nonzero(a)/a.size)
 
     kwds_emb = {'n_components': n_components, 'random_state': random_state}
     kwds_emb.update(kwargs)
@@ -53,12 +55,13 @@ def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
             app = LaplacianEigenmaps(**kwds_emb)
         else:
             app = DiffusionMaps(**kwds_emb)
-
+    else:
+        app.set_params(**kwds_emb)
     app.fit(a)
     return app.lambdas_, app.maps_
 
 
-class GradientMaps(object):
+class GradientMaps(BaseEstimator):
     """Gradient maps.
 
     Parameters
@@ -66,15 +69,27 @@ class GradientMaps(object):
     n_gradients : int, optional
         Number of gradients. Default is 2.
     approach : {'dm', 'le', 'pca'} or object
-        Embedding approach. If object. it can be an instance of PCAMaps,
-        LaplacianEigenmaps or DiffusionMaps.
+        Embedding approach. It can be a string or instance:
+
+        - 'dm' or :class:`.DiffusionMaps`: embedding using diffusion maps.
+        - 'le' or :class:`.LaplacianEigenmaps`: embedding using Laplacian
+          eigenmaps.
+        - 'pca' or :class:`.PCAMaps`: embedding using PCA.
+
     kernel : {'pearson', 'spearman', 'cosine', 'normalized_angle', 'gaussian'}
         or None, optional.
         Kernel function to build the affinity matrix.
     align : {'procrustes', 'manifold'}, object or None
         Alignment approach. Only used when two or more datasets are provided.
-        If None, no alignment is peformed. If object, an instance of
-        ProcrustesAlignment. Default is None.
+        If None, no alignment is peformed. If `object`, it accepts an instance
+        of :class:`.ProcrustesAlignment`. Default is None.
+
+        - If 'procrustes', datasets are aligned using generalized procrustes
+          analysis.
+        - If 'manifold', datasets are embedded simultaneously based on a joint
+          afinity matrix built from the individual datasets. This option is only
+          available for 'dm' and 'le' approaches.
+
     random_state : int or None, optional
         Random state. Default is None.
 
@@ -108,11 +123,11 @@ class GradientMaps(object):
         x : 2D ndarray or list of arrays, shape = (n_samples, n_feat)
             Input matrix or list of matrices.
         gamma : float or None, optional
-            Inverse kernel width. Only used if ``kernel`` == 'gaussian'.
+            Inverse kernel width. Only used if ``kernel == 'gaussian'``.
             If None, ``gamma=1/n_feat``. Default is None.
         sparsity : float, optional
-            Only keep top ``n_feat*sparsity`` elements for each row. Zero-out
-            the rest. Default is 0.1.
+            Proportion of smallest elements to zero-out for each row.
+            Default is 0.9.
         n_iter : int, optional
             Number of iterations for procrustes alignment. Default is 10.
         kwargs : kwds, optional

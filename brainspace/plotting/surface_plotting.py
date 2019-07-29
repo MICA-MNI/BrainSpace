@@ -27,8 +27,53 @@ orientations = {'lateral': (0, -90, -90),
 
 
 def plot_surf(surfs, layout, array_name=None, view=None, share=None,
-              nan_color=(0, 0, 0, 1), cmap_name=None, size=(400, 400),
+              nan_color=(0, 0, 0, 1), cmap_name='viridis', size=(400, 400),
               interactive=True, embed_nb=False):
+    """Plot surfaces arranged according to the `layout`.
+
+    Parameters
+    ----------
+    surfs : dict[str, vtkPolyData or BSPolyData]
+        Dictionary of surfaces.
+    layout : ndarray, shape = (n_rows, n_cols)
+        Array of surface keys in `surfs`.
+    array_name : ndarray, optional
+        Names of point data array to plot for each layout entry.
+        Default is None.
+    view : ndarray, optional
+        View for each each layout entry. Possible views are {'lateral',
+        'medial', 'ventral', 'dorsal'}. If None, use default view.
+        Default is None.
+    share : {'row', 'col', 'both'} or None, optional
+        If ``share == 'row'``, point data for surfaces in the same row share
+        same data range. If ``share == 'col'``, the same but for columns.
+        If ``share == 'both'``, all data shares same range. Default is None.
+    nan_color : tuple of int
+        Color for nan values.
+    cmap_name : str, optional
+        Color map name (from matplotlib). Default is 'viridis'.
+    size : tuple, optional
+        Window size. Default is (400, 400).
+    interactive : bool, optional
+        Whether to enable interaction. Default is True.
+    embed_nb : bool, optional
+        Whether to embed figure in notebook. Only used if running in a notebook.
+        Default is False.
+
+    Returns
+    -------
+    figure : Ipython.Image or None
+        Figure to plot.
+
+    See Also
+    --------
+    :func:`plot_hemispheres`
+
+    Notes
+    -----
+    Shapes of ``array_name`` and ``view`` must be the equal or brodcastable to
+    the shape of ``layout``.
+    """
 
     layout = np.atleast_2d(layout)
     array_name = np.broadcast_to(array_name, layout.shape)
@@ -133,8 +178,40 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
 @wrap_input(only_args=[0, 1])
 def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
-                     cmap_name=None, size=(400, 400), interactive=True,
+                     cmap_name='viridis', size=(400, 400), interactive=True,
                      embed_nb=False):
+    """Plot left and right hemispheres in lateral and medial views.
+
+    Parameters
+    ----------
+    surf_lh : vtkPolyData or BSPolyData
+        Left hemisphere.
+    surf_rh : vtkPolyData or BSPolyData
+        Right hemisphere.
+    array_name : str, optional
+        Name of point data array to plot. Default is None.
+    nan_color : tuple of int
+        Color for nan values.
+    cmap_name : str, optional
+        Color map name (from matplotlib). Default is 'viridis'.
+    size : tuple, optional
+        Window size. Default is (400, 400).
+    interactive : bool, optional
+        Whether to enable interaction. Default is True.
+    embed_nb : bool, optional
+        Whether to embed figure in notebook. Only used if running in a notebook.
+        Default is False.
+
+    Returns
+    -------
+    figure : Ipython.Image or None
+        Figure to plot.
+
+    See Also
+    --------
+    :func:`plot_surf`
+
+    """
 
     # trans_lh = vtkTransform()
     # trans_lh.Translate(*-np.asarray(surf_lh.center))
