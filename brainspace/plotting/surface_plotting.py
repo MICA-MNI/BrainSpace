@@ -7,7 +7,7 @@ Surface plotting functions.
 
 
 import numpy as np
-import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 from vtkmodules.vtkFiltersGeneralPython import vtkTransformFilter
 from vtkmodules.vtkCommonTransformsPython import vtkTransform
@@ -27,8 +27,8 @@ orientations = {'lateral': (0, -90, -90),
 
 
 def plot_surf(surfs, layout, array_name=None, view=None, share=None,
-              nan_color=(0, 0, 0, 1), cmap_name='viridis', size=(400, 400),
-              interactive=True, embed_nb=False):
+              nan_color=(0, 0, 0, 1), cmap_name='viridis', color=(0, 0, 0.5),
+              size=(400, 400), interactive=True, embed_nb=False):
     """Plot surfaces arranged according to the `layout`.
 
     Parameters
@@ -79,6 +79,9 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
     array_name = np.broadcast_to(array_name, layout.shape)
     view = np.broadcast_to(view, layout.shape)
     cmap_name = np.broadcast_to(cmap_name, layout.shape)
+
+    if color is None:
+        color = (1, 1, 1)
 
     nrow, ncol = layout.shape
 
@@ -140,7 +143,7 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         if s is None:
             continue
 
-        ac1 = ren1.AddActor()
+        ac1 = ren1.AddActor(color=color)
         if view.flat[k] is not None:
             ac1.orientation = orientations[view.flat[k]]
 
@@ -161,7 +164,7 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
             if cmap_name.flat[k] in colormaps:
                 table = colormaps[cmap_name.flat[k]]
             else:
-                cmap = mpl.cm.get_cmap(cmap_name.flat[k])
+                cmap = plt.get_cmap(cmap_name.flat[k])
                 table = cmap(np.linspace(0, 1, n_vals.flat[k])) * 255
                 table = table.astype(np.uint8)
             lut1 = m1.SetLookupTable(NumberOfTableValues=n_vals.flat[k],
@@ -178,8 +181,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
 @wrap_input(only_args=[0, 1])
 def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
-                     cmap_name='viridis', size=(400, 400), interactive=True,
-                     embed_nb=False):
+                     cmap_name='viridis', color=(0, 0, 0.5), size=(400, 400),
+                     interactive=True, embed_nb=False):
     """Plot left and right hemispheres in lateral and medial views.
 
     Parameters
@@ -227,7 +230,7 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
 
     surfs = {'lh': surf_lh, 'rh': surf_rh}
     layout = ['lh', 'lh', 'rh', 'rh']
-    view = ['medial', 'lateral', 'lateral', 'medial']
+    view = ['lateral', 'medial', 'medial', 'lateral']
     return plot_surf(surfs, layout, array_name=array_name, nan_color=nan_color,
-                     view=view, cmap_name=cmap_name, size=size,
+                     view=view, cmap_name=cmap_name, color=color, size=size,
                      interactive=interactive, embed_nb=embed_nb)

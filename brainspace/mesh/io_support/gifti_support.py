@@ -36,7 +36,7 @@ def _read_gifti(ipth):
             # random array names
             s.append_array(a1.data, name=None, at='p')
 
-    return s
+    return s.VTKObject
 
 
 @wrap_input(only_args=0)
