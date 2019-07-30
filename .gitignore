@@ -2,3 +2,7 @@ docs/_build
 docs/_generated
 .ipynb_checkpoints
 *.ipynb
+
+*.egg-info
+build
+dist
