@@ -230,7 +230,11 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
 
     surfs = {'lh': surf_lh, 'rh': surf_rh}
     layout = ['lh', 'lh', 'rh', 'rh']
-    view = ['lateral', 'medial', 'medial', 'lateral']
+    view = ['medial', 'lateral', 'medial', 'lateral']
+    if isinstance(array_name, list):
+        layout = [layout] * len(array_name)
+        array_name = np.asarray(array_name)[:, None]
+
     return plot_surf(surfs, layout, array_name=array_name, nan_color=nan_color,
                      view=view, cmap_name=cmap_name, color=color, size=size,
                      interactive=interactive, embed_nb=embed_nb)
