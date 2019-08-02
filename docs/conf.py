@@ -53,6 +53,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosectionlabel',
+    # 'sphinx_gallery.gen_gallery',
     # 'sphinxcontrib.apidoc',
 ]
 
@@ -70,17 +71,11 @@ napoleon_use_rtype = False
 autosummary_generate = True
 
 
-# from unittest.mock import MagicMock
-#
-#
-# class Mock(MagicMock):
-#     @classmethod
-#     def __getattr__(cls, name):
-#             return MagicMock()
-#
-#
-# MOCK_MODULES = ['vtk']
-# sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
+# sphinx_gallery_conf = {
+#      'examples_dirs': '../brainspace/examples',
+#      'gallery_dirs': 'auto_examples',
+#      # 'plot_gallery': 'False',
+# }
 
 
 intersphinx_mapping = {

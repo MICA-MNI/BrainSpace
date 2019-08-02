@@ -1,5 +1,5 @@
 docs/_build
-docs/_generated
+docs/generated
 .ipynb_checkpoints
 *.ipynb
 

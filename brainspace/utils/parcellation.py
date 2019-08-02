@@ -54,7 +54,6 @@ def relabel(lab, new_labels=None):
     """
 
     if isinstance(new_labels, dict):
-        # new_lab = np.empty_like(lab)
         new_lab = lab.copy()
         for l1, l2 in new_labels.items():
             new_lab[lab == l1] = l2
@@ -223,7 +222,7 @@ def map_to_mask(values, mask, fill=0, axis=0):
     return mapped
 
 
-def map_to_labels(source_val, target_lab, source_lab=None):
+def map_to_labels(source_val, target_lab, mask=None, fill=0, source_lab=None):
     """Map data in source to target according to their labels.
 
     Target labels are sorted in ascending order, such that the smallest label
@@ -231,20 +230,30 @@ def map_to_labels(source_val, target_lab, source_lab=None):
 
     Parameters
     ----------
-    source_val : array_like
+    source_val : 1D ndarray
         Source array of values.
-    target_lab : array_like
+    target_lab : 1D ndarray
         Target labels.
-    source_lab : array_like, optional
+    mask : 1D ndarray, optional
+        If mask is not None, only consider target labels in mask.
+    fill : float, optional
+        Value used to fill elements outside the mask. Only used if mask is not
+        None. Default is 0.
+    source_lab : 1D ndarray, optional
         Source labels. If None, it takes the same unique labels
         as the target label in ascending order. Default is None.
 
     Returns
     -------
-    target_val : ndarray
+    target_val : 1D ndarray
         Target array with corresponding source values.
 
     """
+
+    if mask is not None:
+        target_lab2 = target_lab[mask]
+        labs2 = map_to_labels(source_val, target_lab2, source_lab=source_lab)
+        return map_to_mask(labs2, mask, fill=fill)
 
     source_val = np.asarray(source_val)
     uq_tl, idx_tl = np.unique(target_lab, return_inverse=True)
