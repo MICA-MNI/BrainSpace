@@ -33,10 +33,10 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
     Parameters
     ----------
-    surfs : dict[str, vtkPolyData or BSPolyData]
+    surfs : dict[str, BSPolyData]
         Dictionary of surfaces.
     layout : ndarray, shape = (n_rows, n_cols)
-        Array of surface keys in `surfs`.
+        Array of surface keys in `surfs`. Specifies how window is arranged.
     array_name : ndarray, optional
         Names of point data array to plot for each layout entry.
         Default is None.
@@ -48,22 +48,25 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         If ``share == 'row'``, point data for surfaces in the same row share
         same data range. If ``share == 'col'``, the same but for columns.
         If ``share == 'both'``, all data shares same range. Default is None.
-    nan_color : tuple of int
-        Color for nan values.
+    nan_color : tuple
+        Color for nan values. Default is (0, 0, 0, 1).
     cmap_name : str, optional
         Color map name (from matplotlib). Default is 'viridis'.
+    color : tuple
+        Default color if `array_name` is not provided. Default is (0, 0, 0.5).
     size : tuple, optional
         Window size. Default is (400, 400).
     interactive : bool, optional
         Whether to enable interaction. Default is True.
     embed_nb : bool, optional
-        Whether to embed figure in notebook. Only used if running in a notebook.
-        Default is False.
+        Whether to embed figure in notebook. Only used if running in a
+        notebook. Default is False.
 
     Returns
     -------
-    figure : Ipython.Image or None
-        Figure to plot.
+    figure : Ipython Image or panel or None
+        Figure to plot. None if using vtk for rendering (i.e.,
+        ``embed_nb == False``).
 
     See Also
     --------
@@ -71,8 +74,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
     Notes
     -----
-    Shapes of ``array_name`` and ``view`` must be the equal or brodcastable to
-    the shape of ``layout``.
+    Shapes of `array_name` and `view` must be the equal or broadcastable to
+    the shape of `layout`.
     """
 
     layout = np.atleast_2d(layout)
@@ -191,24 +194,28 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
         Left hemisphere.
     surf_rh : vtkPolyData or BSPolyData
         Right hemisphere.
-    array_name : str, optional
+    array_name : str or list of str, optional
         Name of point data array to plot. Default is None.
-    nan_color : tuple of int
-        Color for nan values.
+    nan_color : tuple
+        Color for nan values. Default is (0, 0, 0, 1).
     cmap_name : str, optional
         Color map name (from matplotlib). Default is 'viridis'.
+    color : tuple
+        Default color if `array_name` is not provided. Default is (0, 0, 0.5).
     size : tuple, optional
         Window size. Default is (400, 400).
     interactive : bool, optional
         Whether to enable interaction. Default is True.
     embed_nb : bool, optional
-        Whether to embed figure in notebook. Only used if running in a notebook.
-        Default is False.
+        Whether to embed figure in notebook. Only used if running in a
+        notebook. Default is False.
+
 
     Returns
     -------
-    figure : Ipython.Image or None
-        Figure to plot.
+    figure : Ipython Image or panel or None
+        Figure to plot. None if using vtk for rendering (i.e.,
+        ``embed_nb == False``).
 
     See Also
     --------

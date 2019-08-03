@@ -162,7 +162,27 @@ def _unwrap_output_data(data):
 
 
 def wrap_input(only_args=None, skip_args=None):
-    """ Decorator to wrap function arguments.
+    """Decorator to wrap the arguments of a function.
+
+    An object is wrapped only if it is an instance of :class:`vtkObject`
+    or one of its subclasses.
+
+    Parameters
+    ----------
+    only_args : int, str or list of int and str, optional
+        List of positional indices (integers) and keys as strings (for keyword
+        args) to wrap. This has preference over `skip_args`.
+        Default is None.
+    skip_args : int, str or list of int and str, optional
+        List of positional indices (integers) and keys as strings (for keyword
+        args) to skip from wrapping. Not used if `only_args` is not None.
+        Default is None. If both are None, try to wrap all arguments.
+
+    See Also
+    --------
+    :func:`wrap_output`
+    :func:`wrap_func`
+    :func:`unwrap_input`
     """
 
     def _wrapper_decorator(func):
@@ -178,7 +198,22 @@ def wrap_input(only_args=None, skip_args=None):
 
 
 def wrap_output(func):
-    """ Decorator to wrap function output.
+    """Decorator to wrap output of function.
+
+    The output is wrapped only if is an instance of :class:`vtkObject`
+    or one of its subclasses.
+
+    Parameters
+    ----------
+    func : callable
+        Function whose output is wrapped.
+
+    See Also
+    --------
+    :func:`wrap_input`
+    :func:`wrap_func`
+    :func:`unwrap_output`
+
     """
 
     @functools.wraps(func)
@@ -189,7 +224,27 @@ def wrap_output(func):
 
 
 def unwrap_input(only_args=None, skip_args=None):
-    """ Decorator to unwrap function arguments.
+    """Decorator to unwrap input arguments of function.
+
+    An object is unwrapped only if it is an instance of
+    :class:`.BSVTKObjectWrapper` or one of its subclasses.
+
+    Parameters
+    ----------
+    only_args : int, str or list of int and str, optional
+        List of positional indices (integers) and keys as strings (for keyword
+        args) to unwrap. This has preference over `skip_args`.
+        Default is None.
+    skip_args : int, str or list of int and str, optional
+        List of positional indices (integers) and keys as strings (for keyword
+        args) to skip from unwrapping. Not used if `only_args` is not None.
+        Default is None. If both are None, try to unwrap all arguments.
+
+    See Also
+    --------
+    :func:`unwrap_output`
+    :func:`unwrap_func`
+    :func:`wrap_input`
     """
 
     def _wrapper_decorator(func):
@@ -205,7 +260,21 @@ def unwrap_input(only_args=None, skip_args=None):
 
 
 def unwrap_output(func):
-    """ Decorator to unwrap function output.
+    """Decorator to unwrap output of function.
+
+    The output is unwrapped only if is an instance of
+    :class:`.BSVTKObjectWrapper` or one of its subclasses.
+
+    Parameters
+    ----------
+    func : callable
+        Function whose output is unwrapped.
+
+    See Also
+    --------
+    :func:`unwrap_input`
+    :func:`unwrap_func`
+    :func:`wrap_output`
     """
 
     @functools.wraps(func)
@@ -216,7 +285,10 @@ def unwrap_output(func):
 
 
 def wrap_func(inp=True, out=True, only_args=None, skip_args=None):
-    """ Decorator to wrap both arguments and output of a function.
+    """Decorator to wrap both arguments and output of a function.
+
+    An object is wrapped only if it is an instance of :class:`vtkObject`
+    or one of its subclasses.
 
     Parameters
     ----------
@@ -233,6 +305,11 @@ def wrap_func(inp=True, out=True, only_args=None, skip_args=None):
         args) to skip from wrapping. Not used if `only_args` is not None.
         Default is None. If both are None, try to wrap all arguments.
 
+    See Also
+    --------
+    :func:`wrap_input`
+    :func:`wrap_output`
+    :func:`unwrap_func`
     """
 
     def _wrapper_decorator(func):
@@ -253,7 +330,10 @@ def wrap_func(inp=True, out=True, only_args=None, skip_args=None):
 
 
 def unwrap_func(inp=True, out=True, only_args=None, skip_args=None):
-    """ Decorator to unwrap both arguments and output of a function.
+    """Decorator to unwrap both arguments and output of a function.
+
+    An object is unwrapped only if it is an instance of
+    :class:`.BSVTKObjectWrapper` or one of its subclasses.
 
     Parameters
     ----------
@@ -270,6 +350,11 @@ def unwrap_func(inp=True, out=True, only_args=None, skip_args=None):
         args) to skip from unwrapping. Not used if `only_args` is not None.
         Default is None. If both are None, try to unwrap all arguments.
 
+    See Also
+    --------
+    :func:`unwrap_input`
+    :func:`unwrap_output`
+    :func:`wrap_func`
     """
 
     def _wrapper_decorator(func):
@@ -300,7 +385,7 @@ def append_vtk(to='point'):
 
     Parameters
     ----------
-    to : str, {'point', 'cell', 'field'}, optional
+    to : {'point', 'cell', 'field'}, optional
         Append data to PointData, CellData or FieldData. Default is 'point'.
 
     Returns
@@ -310,15 +395,24 @@ def append_vtk(to='point'):
 
     Notes
     -----
-    All functions using this decorator must
-        1. Return an ndarray. The size of the array must be
-            consistent with the data it will be appended to (e.g., number of
-            points if to='point'), except for FieldData.
-        2. Have the following 2 key-value arguments:
-            1. append : bool, optional
-                If True, append data to surface. Otherwise, return data.
-            2. array_name : str, optional
-                Array names of data.
+    All functions using this decorator must:
+
+    - Return an ndarray. The size of the array must be consistent with
+      the data it will be appended to (e.g., number of points if
+      ``to == 'point'``), except for FieldData.
+
+    - Have the following 2 key-value arguments:
+
+      #. append (bool, optional)
+          If True, append data to surface. Otherwise, return data.
+
+      #. array_name (str, optional)
+          Array names of data.
+
+    See Also
+    --------
+    :func:`.compute_cell_area`
+    :func:`.get_n_adjacent_cells`
 
     """
 

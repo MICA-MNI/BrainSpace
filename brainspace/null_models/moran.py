@@ -43,9 +43,9 @@ def compute_mem(a, spectrum='nonzero', tol=1e-10):
 
     References
     ----------
-    .. [1]  Wagner H.H. and Dray S. (2015). Generating spatially constrained
-        null models for irregularly spaced data using Moran spectral
-        randomization methods. Methods in Ecology and Evolution, 6(10):1169-78.
+    * Wagner H.H. and Dray S. (2015). Generating spatially constrained
+      null models for irregularly spaced data using Moran spectral
+      randomization methods. Methods in Ecology and Evolution, 6(10):1169-78.
 
     """
 
@@ -138,9 +138,9 @@ def spectral_randomization(x, mem, n_rep=100, method='singleton', joint=False,
 
     References
     ----------
-    .. [1]  Wagner H.H. and Dray S. (2015). Generating spatially constrained
-        null models for irregularly spaced data using Moran spectral
-        randomization methods. Methods in Ecology and Evolution, 6(10):1169-78.
+    * Wagner H.H. and Dray S. (2015). Generating spatially constrained
+      null models for irregularly spaced data using Moran spectral
+      randomization methods. Methods in Ecology and Evolution, 6(10):1169-78.
 
     """
 

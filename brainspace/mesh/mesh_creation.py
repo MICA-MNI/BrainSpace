@@ -21,7 +21,7 @@ from ..vtk_interface.decorators import wrap_input
 
 
 def build_polydata(points, cells=None):
-    """Build surface (polyData) from points and cells.
+    """Build surface (PolyData) from points and cells.
 
     Parameters
     ----------
@@ -34,7 +34,12 @@ def build_polydata(points, cells=None):
     Returns
     -------
     output : BSPolyData
-        Returns surface (polyData).
+        Returns surface (PolyData).
+
+    See Also
+    --------
+    :func:`to_vertex`
+    :func:`to_lines`
 
     Notes
     -----
@@ -75,7 +80,7 @@ def build_polydata(points, cells=None):
 
 
 def to_vertex(surf):
-    """Convert a PolyData of cells to only vertices on each point.
+    """Convert all cells in PolyData to vertex cells.
 
     Parameters
     ----------
@@ -87,6 +92,11 @@ def to_vertex(surf):
     output : BSPolyData
         PolyData with vertex points.
 
+    See Also
+    --------
+    :func:`to_lines`
+    :func:`build_polydata`
+
     """
 
     return serial_connect(surf, vtkVertexGlyphFilter())
@@ -94,7 +104,7 @@ def to_vertex(surf):
 
 @wrap_input(only_args=0)
 def to_lines(surf):
-    """Convert a PolyData with cells to lines.
+    """Convert all cells in PolyData to lines.
 
     Parameters
     ----------
@@ -106,6 +116,10 @@ def to_lines(surf):
     output : BSPolyData
         PolyData with lines.
 
+    See Also
+    --------
+    :func:`to_vertex`
+    :func:`build_polydata`
     """
 
     edges = get_edges(surf)

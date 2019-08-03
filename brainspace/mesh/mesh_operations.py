@@ -115,7 +115,7 @@ def _surface_mask(surf, mask, use_cell=False):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
     mask : str or ndarray
         Binary boolean or integer array. Zero or False elements are
@@ -151,11 +151,11 @@ def drop_points(surf, array_name, low=-np.inf, upp=np.inf):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
-    array_name : str or ndarray
-        Array used to perform selection. If str, it must be an
-        array in PointData of the surface.
+    array_name : str or 1D ndarray
+        Array used to perform selection. If str, it must be an array in
+        the PointData attributes of the PolyData.
     low : float or -np.inf
         Lower threshold. Default is -np.inf.
     upp : float or np.inf
@@ -163,8 +163,14 @@ def drop_points(surf, array_name, low=-np.inf, upp=np.inf):
 
     Returns
     -------
-    surf_selected : vtkPolyData or VTKObjectWrapper
+    surf_selected : vtkPolyData or BSPolyData
         PolyData after thresholding.
+
+    See Also
+    --------
+    :func:`drop_cells`
+    :func:`select_points`
+    :func:`mask_points`
 
     """
 
@@ -178,11 +184,11 @@ def drop_cells(surf, array_name, low=-np.inf, upp=np.inf):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
-    array_name : str or ndarray
-        Array used to perform selection. If str, it must be an
-        array in CellData of the surface.
+    array_name : str or 1D ndarray
+        Array used to perform selection. If str, it must be an array in
+        the CellData attributes of the PolyData.
     low : float or -np.inf
         Lower threshold. Default is -np.inf.
     upp : float or np.inf
@@ -190,8 +196,14 @@ def drop_cells(surf, array_name, low=-np.inf, upp=np.inf):
 
     Returns
     -------
-    surf_selected : vtkPolyData or VTKObjectWrapper
+    surf_selected : vtkPolyData or BSPolyData
         PolyData after thresholding.
+
+    See Also
+    --------
+    :func:`drop_points`
+    :func:`select_cells`
+    :func:`mask_cells`
 
     """
 
@@ -206,11 +218,11 @@ def select_points(surf, array_name, low=-np.inf, upp=np.inf):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
-    array_name : str or ndarray
-        Array used to perform selection. If str, it must be an
-        array in PointData of the surface.
+    array_name : str or 1D ndarray
+        Array used to perform selection. If str, it must be an array in
+        the PointData attributes of the PolyData.
     low : float or -np.inf
         Lower threshold. Default is -np.inf.
     upp : float or np.inf
@@ -218,8 +230,14 @@ def select_points(surf, array_name, low=-np.inf, upp=np.inf):
 
     Returns
     -------
-    surf_selected : vtkPolyData or VTKObjectWrapper
+    surf_selected : vtkPolyData or BSPolyData
         PolyData after selection.
+
+    See Also
+    --------
+    :func:`select_cells`
+    :func:`drop_points`
+    :func:`mask_points`
 
     """
 
@@ -233,11 +251,11 @@ def select_cells(surf, array_name, low=-np.inf, upp=np.inf):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
-    array_name : str or ndarray
-        Array used to perform selection. If str, it must be an
-        array in CellData of the surface.
+    array_name : str or 1D ndarray
+        Array used to perform selection. If str, it must be an array in
+        the CellData attributes of the PolyData.
     low : float or -np.inf
         Lower threshold. Default is -np.inf.
     upp : float or np.inf
@@ -245,8 +263,14 @@ def select_cells(surf, array_name, low=-np.inf, upp=np.inf):
 
     Returns
     -------
-    surf_selected : vtkPolyData or VTKObjectWrapper
+    surf_selected : vtkPolyData or BSPolyData
         PolyData after selection.
+
+    See Also
+    --------
+    :func:`select_points`
+    :func:`drop_cells`
+    :func:`mask_cells`
 
     """
 
@@ -261,15 +285,21 @@ def mask_points(surf, mask):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
-    mask : ndarray
+    mask : 1D ndarray
         Binary boolean array. Zero elements are discarded.
 
     Returns
     -------
-    surf_masked : vtkPolyData or VTKObjectWrapper
+    surf_masked : vtkPolyData or BSPolyData
         PolyData after masking.
+
+    See Also
+    --------
+    :func:`mask_cells`
+    :func:`drop_points`
+    :func:`select_points`
 
     """
 
@@ -283,15 +313,21 @@ def mask_cells(surf, mask):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
-    mask : ndarray
+    mask : 1D ndarray
         Binary boolean array. Zero elements are discarded.
 
     Returns
     -------
-    surf_masked : vtkPolyData or VTKObjectWrapper
+    surf_masked : vtkPolyData or BSPolyData
         PolyData after masking.
+
+    See Also
+    --------
+    :func:`mask_points`
+    :func:`drop_cells`
+    :func:`select_cells`
 
     """
 

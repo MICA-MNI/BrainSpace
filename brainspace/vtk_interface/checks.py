@@ -13,6 +13,18 @@ from vtkmodules.vtkCommonDataModelPython import vtkCellTypes
 
 
 def get_cell_types(surf):
+    """Get cell types of `surf`.
+
+    Parameters
+    ----------
+    surf : BSDataSet
+        Input data.
+
+    Returns
+    -------
+    cell_types : 1D ndarray
+        Array of cell types.
+    """
     lid = vtkCellTypes()
     surf.GetCellTypes(lid)
     types = [lid.GetCellType(i) for i in range(lid.GetNumberOfTypes())]
@@ -20,16 +32,52 @@ def get_cell_types(surf):
 
 
 def get_number_of_cell_types(surf):
+    """Get number of cell types of `surf`.
+
+    Parameters
+    ----------
+    surf : BSDataSet
+        Input data.
+
+    Returns
+    -------
+    int
+        Number of cell types.
+    """
     lid = vtkCellTypes()
     surf.GetCellTypes(lid)
     return lid.GetNumberOfTypes()
 
 
 def has_unique_cell_type(surf):
+    """Check if `surf` has a unique cell type.
+
+    Parameters
+    ----------
+    surf : BSDataSet
+        Input data.
+
+    Returns
+    -------
+    bool
+        True if `surf` has a unique cell type. False, otherwise.
+    """
     return get_cell_types(surf).size == 1
 
 
 def has_only_triangle(surf):
+    """Check if `surf` has only triangles.
+
+    Parameters
+    ----------
+    surf : BSDataSet
+        Input data.
+
+    Returns
+    -------
+    bool
+        True if `surf` has only triangles. False, otherwise.
+    """
     ct = get_cell_types(surf)
     if ct.size != 1:
         return False
@@ -37,6 +85,18 @@ def has_only_triangle(surf):
 
 
 def has_only_line(surf):
+    """Check if `surf` has only lines.
+
+    Parameters
+    ----------
+    surf : BSDataSet
+        Input data.
+
+    Returns
+    -------
+    bool
+        True if `surf` has only lines. False, otherwise.
+    """
     ct = get_cell_types(surf)
     if ct.size != 1:
         return False
@@ -44,6 +104,18 @@ def has_only_line(surf):
 
 
 def has_only_vertex(surf):
+    """Check if `surf` has only vertex cells.
+
+    Parameters
+    ----------
+    surf : BSDataSet
+        Input data.
+
+    Returns
+    -------
+    bool
+        True if `surf` has only vertex cells. False, otherwise.
+    """
     ct = get_cell_types(surf)
     if ct.size != 1:
         return False

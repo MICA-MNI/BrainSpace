@@ -19,51 +19,50 @@ re_get = 'Get(?P<getter>[A-Z0-9].*)'
 re_method = re.compile('|'.join([re_state, re_set, re_get]))
 
 
-def get_vtk_methods(cls):
-    """ Retrieve Set and Get methods from vtk class.
+def get_vtk_methods(obj):
+    """ Retrieve Set and Get methods from vtk class or instance.
 
     Parameters
     ----------
-    cls : type
-        VTK class.
+    obj : type or object
+        VTK class or object.
 
     Returns
     -------
     methods : dict
-        Dictionary with set and get methods
-        E.g., {{'set': {'colormode': 'SetColorMode'}, ...}, {'get': ...}
-        The user can use colormode=1 as a kwd arg and it translates to
-        obj.SetColorMode(1)
+        Dictionary with set and get methods.
 
     Notes
     -----
-    State methods (see vtkMethodParser) can be used with options. For example,
-    from vtk.vtkPolyDataMapper we also include the base method with the options:
-    ...
-    colormodetodefault: 'SetColorModeToDefault',
-    colormodetodirectscalars: 'SetColorModeToDirectScalars',
-    colormodetomapscalars: 'SetColorModeToMapScalars',
-    'colormode': {'name': 'SetColorMode',
-                  'options':
-                        {'default': 'SetColorModeToDefault',
-                        'directscalars': 'SetColorModeToDirectScalars',
-                        'mapscalars': 'SetColorModeToMapScalars'}
-    ...
+    State methods (see vtkMethodParser) can also be used with options.
 
-    This can be used as follows:
-        Methods that accept no args can be used as strings or key-word args:
-            colormodetomapscalars=None -> obj.SetColorModeToMapScalars()
-            'colormodetomapscalars' -> obj.SetColorModeToMapScalars()
-        For state methods, there is an additional way:
-            colormode='mapscalars'     -> obj.SetColorModeToMapScalars()
-        When there is also a method that accepts the mode, we can use:
-            colormode=1             -> obj.SetColorMode(1)
+    Examples
+    --------
+    >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+    >>> from brainspace.vtk_interface.base import get_vtk_methods
+    >>> vtk_map = get_vtk_methods(vtkPolyDataMapper)
+    >>> vtk_map.keys()
+    dict_keys(['set', 'get'])
+
+    Check setter (state) methods for color mode:
+
+    >>> vtk_map['set']['colormode']
+    {'name': 'SetColorMode',
+     'options': {
+        'default': 'SetColorModeToDefault',
+        'directscalars': 'SetColorModeToDirectScalars',
+        'mapscalars': 'SetColorModeToMapScalars'}}
+
+    Check getter methods for array name:
+
+    >>> vtk_map['get']['arrayname']
+    'GetArrayName'
 
     """
 
     lm = {k: dict() for k in ['set', 'get']}
     state_methods = defaultdict(dict)
-    for m in dir(cls):
+    for m in dir(obj):
         r = re_method.match(m)
         if r is None:
             continue
@@ -100,13 +99,34 @@ def call_vtk(obj, method, args=None):
     args : None ot tuple or list
         Arguments to be passed to the method.
         If None, the method is called with no arguments.
-        When None is needed to be passed to the method, use a tuple: (None,)
-        method=(None,)
 
     Returns
     -------
     result : Any
         Return the results of invoking `method` with `args` on `obj`.
+
+    Notes
+    -----
+    Use a tuple to pass a None to the method: (None,).
+
+    Examples
+    --------
+    >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+    >>> from brainspace.vtk_interface.base import call_vtk
+    >>> m = vtkPolyDataMapper()
+
+    Get array id of the mapper:
+
+    >>> call_vtk(m, 'GetArrayId', args=None)
+    -1
+    >>> m.GetArrayId()
+    -1
+
+    Set array id of the mapper to 2:
+
+    >>> call_vtk(m, 'SetArrayId', args=(2,)) # same as m.SetArrayId(2)
+    >>> m.GetArrayId()
+    2
 
     """
 
@@ -173,17 +193,66 @@ class BSVTKObjectWrapperMeta(type):
 
 
 class BSVTKObjectWrapper(VTKObjectWrapper, metaclass=BSVTKObjectWrapperMeta):
-    """Superclass for classes that wrap VTK objects with Python objects.
-    This class holds a reference to the wrapped VTK object. It also
-    forwards unresolved methods to the underlying object by overloading
-    __getattr__.
+    """Base class for all classes that wrap VTK objects.
 
     Adapted from dataset_adapter, with additional setVTK and getVTK methods.
     Create an instance if class is passed instead of object.
 
-    This class also supports all VTK setters and getters to be used like
-    properties dropping the 'get'/'set' prefix, e.g., self.opacity = 0.5
-    And it is case insensitive.
+    This class holds a reference to the wrapped VTK object. It also
+    forwards unresolved methods to the underlying object by overloading
+    __getattr__. This class also supports all VTK setters and getters to be
+    used like properties/attributes dropping the get/set prefix. This is case
+    insensitive.
+
+    Parameters
+    ----------
+    vtkobject : type or object
+        VTK class or object.
+    kwargs : optional keyword parameters
+        Parameters used to invoke set methods on the vtk object.
+
+    Attributes
+    ----------
+    VTKObject : vtkObject
+        A VTK object.
+
+    Examples
+    --------
+    >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+    >>> from brainspace.vtk_interface.base import BSVTKObjectWrapper
+    >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+    >>> m1
+    <brainspace.vtk_interface.base.BSVTKObjectWrapper at 0x7f38a4b70198>
+    >>> m1.VTKObject
+    (vtkRenderingOpenGL2Python.vtkOpenGLPolyDataMapper)0x7f38a4bee888
+
+    Passing class and additional keyword arguments:
+
+    >>> m2 = BSVTKObjectWrapper(vtkPolyDataMapper, arrayId=3,
+    ...                         colorMode='mapScalars')
+    >>> # Get color name, these are all the same
+    >>> m2.VTKObject.GetColorModeAsString()
+    'MapScalars'
+    >>> m2.GetColorModeAsString()
+    'MapScalars'
+    >>> m2.colorModeAsString
+    'MapScalars'
+    >>> # Get array id
+    >>> m2.VTKObject.GetArrayId()
+    3
+    >>> m2.GetArrayId()
+    3
+    >>> m2.arrayId
+    3
+
+    We can change array id and color mode as follows:
+
+    >>> m2.arrayId = 0
+    >>> m2.VTKObject.GetArrayId()
+    0
+    >>> m2.colorMode = 'default'
+    >>> m2.VTKObject.GetColorModeAsString()
+    'Default'
 
     """
 
@@ -229,17 +298,21 @@ class BSVTKObjectWrapper(VTKObjectWrapper, metaclass=BSVTKObjectWrapperMeta):
     def __getattr__(self, name):
         """ Forwards unknown attribute requests to vtk object.
 
-        Two possible options:
-            1. e.g., self.GetOpacity(), normal behaviour. Becomes:
-                self.VTKObject.GetOpacity() -> forwards to VTKObject
-            2. self.opacity. Becomes:
-                self.VTKObject.GetOpacity()
+        Examples
+        --------
+        >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+        >>> from brainspace.vtk_interface.base import BSVTKObjectWrapper
+        >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+        >>> m1.GetArrayId() # same as self.VTKObject.GetArrayId()
+        -1
+        >>> self.arrayId  # same as self.VTKObject.GetArrayId()
+        -1
 
         """
 
         # We are here cause name is not in self
         # First forward to vtkobject
-        # If it doesn't exist, look for it in vtkmap, find its corresponding
+        # If it doesn't exist, look for it in vtk_map, find its corresponding
         # vtk name and forward again
         try:
             return super().__getattr__(name)
@@ -249,8 +322,16 @@ class BSVTKObjectWrapper(VTKObjectWrapper, metaclass=BSVTKObjectWrapperMeta):
     def __setattr__(self, name, value):
         """ Forwards unknown set requests to vtk object.
 
-        For example:
-            self.opacity = .5, becomes self.VTKObject.SetOpacity(.5)
+        Examples
+        --------
+        >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+        >>> from brainspace.vtk_interface.base import BSVTKObjectWrapper
+        >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+        >>> m1.GetArrayId()
+        -1
+        >>> self.arrayId = 3  # same as self.VTKObject.SetArrayId(3)
+        >>> m1.GetArrayId()
+        3
 
         """
 
@@ -262,26 +343,34 @@ class BSVTKObjectWrapper(VTKObjectWrapper, metaclass=BSVTKObjectWrapperMeta):
             self._handle_call('set', name, value)
 
     def setVTK(self, *args, **kwargs):
-        """ Invoke VTK set methods on the current `VTKObject`.
+        """ Invoke set methods on the vtk object.
 
         Parameters
         ----------
-        args : str
-            Method that require no arguments.
-        kwargs : dict
+        args : list of str
+            Setter methods that require no arguments.
+        kwargs : list of keyword-value arguments
             key-word arguments can be use for methods that require arguments.
             When several arguments are required, use a tuple.
             Methods that require no arguments can also be used here using
             None as the argument.
 
-            self.setVTK(opacity=.3) --> self.VTKObject.SetOpacity(.3)
-            self.setVTK(numberofiterations=10) -->
-                            self.VTKObject.SetNumberOfIterations(10)
-
         Returns
         -------
         self : BSVTKObjectWrapper object
             Return self.
+
+        Examples
+        --------
+        >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+        >>> from brainspace.vtk_interface.base import BSVTKObjectWrapper
+        >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+        >>> m1.setVTK(arrayId=3, colorMode='mapScalars')
+        <brainspace.vtk_interface.base.BSVTKObjectWrapper at 0x7f38a4ace320>
+        >>> m1.arrayId
+        3
+        >>> m1.colorModeAsString
+        'MapScalars'
 
         """
 
@@ -292,30 +381,35 @@ class BSVTKObjectWrapper(VTKObjectWrapper, metaclass=BSVTKObjectWrapperMeta):
         return self
 
     def getVTK(self, *args, **kwargs):
-        """ Invoke VTK get methods on the vtk object.
+        """ Invoke get methods on the vtk object.
 
         Parameters
         ----------
-        args : str
+        args : list of str
             Method that require no arguments.
-
-            self.getVTK('opacity') --> self.VTKObject.GetOpacity()
-
-        kwargs : dict
+        kwargs : list of keyword-value arguments
             key-word arguments can be use for methods that require arguments.
             When several arguments are required, use a tuple.
             Methods that require no arguments can also be used here using
             None as the argument.
-
-            self.getVTK(opacity=None) --> self.VTKObject.GetOpacity()
-            self.getVTK(inputPortInformation=1) -->
-                            self.VTKObject.GetGetInputPortInformation(1)
 
         Returns
         -------
         results : dict
             Dictionary of results where the keys are the method names and
             the values the results.
+
+        Examples
+        --------
+        >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+        >>> from brainspace.vtk_interface.base import BSVTKObjectWrapper
+        >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+        >>> m1.getVTK('arrayId', colorModeAsString=None)
+        {'arrayId': -1, 'colorModeAsString': 'Default'}
+        >>> m1.getVTK('colorModeAsString', arrayId=None)
+        {'colorModeAsString': 'Default', 'arrayId': -1}
+        >>> m1.getVTK(numberOfInputConnections=0)
+        {'numberOfInputConnections': 0}
 
         """
 
@@ -327,4 +421,5 @@ class BSVTKObjectWrapper(VTKObjectWrapper, metaclass=BSVTKObjectWrapperMeta):
 
     @property
     def vtk_map(self):
+        """dict: Dictionary of vtk setter and getter methods."""
         return self._vtk_map[self.VTKObject.__vtkname__]

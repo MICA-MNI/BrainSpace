@@ -107,7 +107,7 @@ def to_data(ftr, port=0):
 
     Parameters
     ----------
-    ftr : vtkAlgorithm or BSAlgorithm
+    ftr : vtkAlgorithm or :class:`.BSAlgorithm`
         Input filter.
     port : int, optional
         Port to get data from. When port is -1, refers to all ports.
@@ -143,24 +143,24 @@ def get_output(ftr, as_data=True, update=True, port=0):
 
     Parameters
     ----------
-    ftr : vtkAlgorithm or BSAlgorithm
+    ftr : vtkAlgorithm or :class:`.BSAlgorithm`
         Input filter.
     as_data : bool, optional
-        Return data as BSDataObject instead of BSAlgorithm. If True, the filter
-        is automatically updated. Default is True.
+        Return data as BSDataObject instead of :class:`.BSAlgorithm`. If True,
+        the filter is automatically updated. Default is True.
     update : bool, optional
         Update filter. Only used when `as_data` is False. Default is True.
     port : int or None, optional
         Output port to update or get data from. Only used when input is
         vtkAlgorithm. When port is -1, refers to all ports. When None, call
-        Update() with no argument. Not used, when `ftr` is a sink
+        Update() with no arguments. Not used, when `ftr` is a sink
         (i.e., 0 output ports), call Update(). Default is 0.
 
     Returns
     -------
     poly : BSAlgorithm or BSDataObject
         Returns filter or its output. If port is -1, returns all outputs in a
-        list if ``as_data=True``.
+        list if ``as_data == True``.
 
     """
 
@@ -243,33 +243,97 @@ def serial_connect(*filters, as_data=True, update=True, port=0):
     Parameters
     ----------
     *filters : sequence of tuple or list
-        Input filters to serially connect. Each input takes the one of the
+        Input filters to serially connect. Each input takes one of the
         following formats:
-        0. First filter in sequence: (f0, op=0)
-            0.0. `f0` is the first filter: vtkAlgorithm, BSAlgorithm,
-            vtkDataObject or BSDataObject
-            0.1. `op` is the output port of `f0`: int, optional. Default is 0.
-        1. Last filter in sequence: (ic=None, ip=0, fn)
-            1.0. `ic` is the input connection index: int, optional.
-                Default is False.
-            1.1. `ip` is the input port: int, optional. Must be specified when
-                `ic` is not None. Default is 0.
-            1.2. `fn` is the last filter: vtkAlgorithm or BSAlgorithm
-        2. Intermediate filters: (ic=None, ip=0, fi, op=0)
+
+        #. First filter in sequence: ``(f0, op=0)``
+
+            * `f0` (vtkAlgorithm, :class:`.BSAlgorithm`, vtkDataObject or
+              :class:`.BSDataObject`) - This is the first filter.
+            * `op` (int, optional) - This is the output port of `f0`.
+              Default is 0.
+
+        #. Last filter in sequence: ``(ic=None, ip=0, fn)``
+
+            * `ic` (int, optional) - This is the input connection of the
+              input port `ip` of filter `fn`. Default is None.
+            * `ip` (int, optional) - This is the input port of `fn`. Must be
+              specified when `ic` is not None. Default is 0.
+            * `fn` (vtkAlgorithm or :class:`.BSAlgorithm`) - This is the last
+              filter.
+
+        #. Intermediate filters: ``(ic=None, ip=0, fi, op=0)``
+
+            * `ic` (int, optional) - This is the input connection of the
+              input port `ip` of filter `fi`. Default is None.
+            * `ip` (int, optional) - This is the input port of `fi`. Must be
+              specified when `ic` is not None. Default is 0.
+            * `fi` (vtkAlgorithm or :class:`.BSAlgorithm`) - This is the filter.
+            * `op` (int, optional) - This is the output port of `fi`.
+              Default is 0.
+
     as_data : bool, optional
         Return data instead of filter. If True, last filter is automatically
         updated. Default is True.
     update : bool, optional
-        Update last filter. Only used when `as_data` is False, Default is True.
+        Update last filter. Only used when ``as_data == False``.
+        Default is True.
     port : int, optional
         Port to update or get data from. When port is -1, refers to all ports.
         Default is 0.
 
     Returns
     -------
-    output : BSAlgorithm, BSDataObject
+    output : BSAlgorithm or BSDataObject
         Last filter or its output.
 
+    Examples
+    --------
+
+    In VTK:
+
+    >>> # point source
+    >>> ps = vtk.vtkPointSource()
+    >>> ps.SetNumberOfPoints(100)
+    >>> # delauny
+    >>> dn = vtk.vtkDelaunay2D()
+    >>> dn.SetTolerance(0.01)
+    >>> dn.SetInputConnection(0, ps.GetOutputPort(0))
+    >>> # smooth
+    >>> sf = vtk.vtkWindowedSincPolyDataFilter()
+    >>> sf.SetInputConnection(0, dn.GetOutputPort(0))
+    >>> sf.SetNumberOfIterations(20)
+    >>> # update and get output
+    >>> sf.Update()
+    >>> sf.GetOutput(0)
+    (vtkCommonDataModelPython.vtkPolyData)0x7f0134fffb28
+
+    With `serial_connect` function:
+
+    >>> from brainspace.vtk_interface.pipeline import serial_connect
+    >>> # point source
+    >>> ps = vtk.vtkPointSource()
+    >>> ps.SetNumberOfPoints(100)
+    >>> # delauny
+    >>> dn = vtk.vtkDelaunay2D()
+    >>> dn.SetTolerance(0.01)
+    >>> # smooth
+    >>> sf = vtk.vtkWindowedSincPolyDataFilter()
+    >>> sf.SetNumberOfIterations(20)
+    >>> # Connection
+    >>> serial_connect((ps, 0), (None, 0, dn, 0), (None, 0, sf), as_data=True,
+    ...                port=0)
+    <brainspace.vtk_interface.wrappers.BSPolyData at 0x7f0134efb048>
+    >>> # This can be shortened, since no input connection is needed
+    >>> serial_connect((ps, 0), (0, dn, 0), (0, sf), as_data=True, port=0)
+    <brainspace.vtk_interface.wrappers.BSPolyData at 0x7f0134ee9128>
+    >>> # And shortened even further since the default input and output
+    >>> # ports are 0
+    >>> serial_connect((ps,), (dn,), (sf,), as_data=True, port=0)
+    <brainspace.vtk_interface.wrappers.BSPolyData at 0x7f0134ee92b0>
+    >>> # This is the same
+    >>> serial_connect(ps, dn, sf)
+    <brainspace.vtk_interface.wrappers.BSPolyData at 0x7f0134eee898>
     """
 
     prev_f, prev_op = _map_input_filter(filters[0])

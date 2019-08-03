@@ -22,7 +22,7 @@ from sklearn.decomposition import PCA
 from .utils import is_symmetric, make_symmetric
 
 
-def diffusion_mapping(adj, n_components=None, alpha=0, diffusion_time=0,
+def diffusion_mapping(adj, n_components=None, alpha=0.5, diffusion_time=0,
                       random_state=None):
     """Compute diffusion map of affinity matrix.
 
@@ -32,15 +32,15 @@ def diffusion_mapping(adj, n_components=None, alpha=0, diffusion_time=0,
         Affinity matrix.
     n_components : int or None, optional
         Number of eigenvectors. If None, selection of `n_comp` is based
-        on 95% drop-off in eigenvalues. See ref [3,4,5]. When ``n_comp=None``,
+        on 95% drop-off in eigenvalues. When `n_comp` is None,
         the maximum number of eigenvectors is restricted to
         ``n_comp <= sqrt(n)``, where `n` is the number of rows of `adj`.
         Default is None.
     alpha : float, optional
-        Anisotropic diffusion parameter, ``0 <= alpha <= 1``. Default is 0.
+        Anisotropic diffusion parameter, ``0 <= alpha <= 1``. Default is 0.5.
     diffusion_time : int, optional
-        Diffusion time or scale. If ``diffusion_time==0`` use multi-scale
-        diffusion maps [2]_. Default is 0.
+        Diffusion time or scale. If ``diffusion_time == 0`` use multi-scale
+        diffusion maps. Default is 0.
     random_state : int or None, optional
         Random state. Default is None.
 
@@ -54,10 +54,10 @@ def diffusion_mapping(adj, n_components=None, alpha=0, diffusion_time=0,
 
     References
     ----------
-    .. [1] Coifman, R.R.; S. Lafon. (2006). "Diffusion maps". Applied and
-        Computational Harmonic Analysis 21: 5-30. doi:10.1016/j.acha.2006.04.006
-    .. [2] Joseph W.R., Peter E.F., Ann B.L., Chad M.S. Accurate parameter
-        estimation for star formation history in galaxies using SDSS spectra.
+    * Coifman, R.R.; S. Lafon. (2006). "Diffusion maps". Applied and
+      Computational Harmonic Analysis 21: 5-30. doi:10.1016/j.acha.2006.04.006
+    * Joseph W.R., Peter E.F., Ann B.L., Chad M.S. Accurate parameter
+      estimation for star formation history in galaxies using SDSS spectra.
     """
 
     rs = check_random_state(random_state)
@@ -191,11 +191,9 @@ def laplacian_eigenmaps(adj, n_components=8, norm_laplacian=True,
 
     References
     ----------
-    .. [1] Belkin, M. and Niyogi, P. (2003). Laplacian Eigenmaps for
-        dimensionality reduction and data representation.
-        Neural Computation 15(6): 1373-96. doi:10.1162/089976603321780317
-    .. [2] https://scikit-learn.org/stable/modules/generated/\
-        sklearn.manifold.spectral_embedding.html
+    * Belkin, M. and Niyogi, P. (2003). Laplacian Eigenmaps for
+      dimensionality reduction and data representation.
+      Neural Computation 15(6): 1373-96. doi:10.1162/089976603321780317
 
     """
 
@@ -276,10 +274,10 @@ class DiffusionMaps(Embedding):
     n_components : int or None, optional
         Number of eigenvectors. Default is 2.
     alpha : float, optional
-        Anisotropic diffusion parameter, ``0 <= alpha <= 1``. Default is 0.
+        Anisotropic diffusion parameter, ``0 <= alpha <= 1``. Default is 0.5.
     diffusion_time : int, optional
-        Diffusion time or scale.  If ``diffusion_time==0`` use multi-scale
-        diffusion maps [2]_. Default is 0.
+        Diffusion time or scale.  If ``diffusion_time == 0`` use multi-scale
+        diffusion maps. Default is 0.
     random_state : int or None, optional
         Random state. Default is None.
 
@@ -298,10 +296,10 @@ class DiffusionMaps(Embedding):
 
     References
     ----------
-    .. [1] Coifman, R.R.; S. Lafon. (2006). "Diffusion maps". Applied and
-        Computational Harmonic Analysis 21: 5-30. doi:10.1016/j.acha.2006.04.006
-    .. [2] Joseph W.R., Peter E.F., Ann B.L., Chad M.S. Accurate parameter
-        estimation for star formation history in galaxies using SDSS spectra.
+    * Coifman, R.R.; S. Lafon. (2006). "Diffusion maps". Applied and
+      Computational Harmonic Analysis 21: 5-30. doi:10.1016/j.acha.2006.04.006
+    * Joseph W.R., Peter E.F., Ann B.L., Chad M.S. Accurate parameter
+      estimation for star formation history in galaxies using SDSS spectra.
 
     """
 
@@ -397,14 +395,14 @@ class PCAMaps(Embedding):
     Parameters
     ----------
     n_components : int or None, optional
-        Number of eigenvectors. Default is 2.
+        Number of principal components. Default is 2.
     random_state : int or None, optional
         Random state. Default is None.
 
     Attributes
     ----------
     lambdas_ : 1D ndarray, shape (n_components,)
-        Explained variance for first principal component in descending order.
+        Explained variance for first principal components in descending order.
     maps_ : 2D ndarray, shape (n, n_components)
         Projection of input data onto the principal components.
 

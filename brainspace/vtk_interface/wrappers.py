@@ -12,7 +12,7 @@ import numpy as np
 from vtkmodules.util.numpy_support import numpy_to_vtk, vtk_to_numpy
 from vtkmodules.numpy_interface import dataset_adapter as dsa
 from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
-from vtkmodules.vtkCommonCorePython import vtkObjectBase, vtkLookupTable
+from vtkmodules.vtkCommonCorePython import vtkObject, vtkLookupTable
 from vtkmodules.vtkRenderingCorePython import vtkMapper
 
 from .checks import (get_cell_types, get_number_of_cell_types,
@@ -25,6 +25,25 @@ from .decorators import wrap_output, unwrap_input
 
 def _generate_random_string(size=20, n_reps=10, exclude_list=None,
                             random_state=None):
+    """Generate random string.
+
+    Parameters
+    ----------
+    size : int, optional
+        String length. Default is 20.
+    n_reps : int, optional
+        Number of attempts to generate string that in not in `exclude_list`.
+        Default is 10.
+    exclude_list : list of str, optional
+        List of string to exclude. Default is None.
+    random_state : int or None, optional
+        Random state. Default is None.
+
+    Returns
+    -------
+    str
+        Random string.
+    """
 
     if isinstance(random_state, np.random.RandomState):
         r = random_state
@@ -44,121 +63,209 @@ def _generate_random_string(size=20, n_reps=10, exclude_list=None,
 
 
 class BSAlgorithm(BSVTKObjectWrapper):
+    """Wrapper for vtkAlgorithm.
+
+    """
 
     def __init__(self, vtkobject, **kwargs):
         super().__init__(vtkobject, **kwargs)
 
     @property
     def nip(self):
+        """int: Returns number of input ports"""
         return self.GetNumberOfInputPorts()
 
     @property
     def nop(self):
+        """int: Returns number of output ports"""
         return self.GetNumberOfOutputPorts()
 
     @property
     def nic(self):
+        """int: Returns number of total input connections"""
         return self.GetTotalNumberOfInputConnections()
 
     @property
     def is_source(self):
+        """bool: Returns True if self is a source. False, otherwise."""
         return self.nip == 0
 
     @property
     def is_sink(self):
+        """bool: Returns True if self is a sink. False, otherwise."""
         return self.nop == 0
 
     @property
     def is_filter(self):
+        """bool: Returns True if self is a filter. False, otherwise.
+
+        A filter that is not a source nor a sink.
+        """
         return not (self.is_source and self.is_sink)
 
     @wrap_output
     def GetInputDataObject(self, *args):
+        """Return input data object.
+
+        Wraps the `GetInputDataObject` method of `vtkAlgorithm` to return
+        a wrapped object.
+
+        Parameters
+        ----------
+        args : list of arguments
+            Arguments to be passed to the `GetInputDataObject` method of the
+            vtk object.
+
+        Returns
+        -------
+        data : BSVTKObjectWrapper
+            Data object after wrapping.
+        """
         return self.VTKObject.GetInputDataObject(*args)
 
     @wrap_output
     def GetOutputDataObject(self, *args):
+        """Return output data object.
+
+        Wraps the `GetOutputDataObject` method of `vtkAlgorithm` to return
+        a wrapped object.
+
+        Parameters
+        ----------
+        args : list of arguments
+            Arguments to be passed to the `GetOutputDataObject` method of the
+            vtk object.
+
+        Returns
+        -------
+        data : BSVTKObjectWrapper
+            Data object after wrapping.
+        """
         return self.VTKObject.GetOutputDataObject(*args)
 
     @unwrap_input(skip_args=0)
     def SetInputDataObject(self, *args):
+        """Set input data object.
+
+        Wraps the `SetInputDataObject` method of `vtkAlgorithm` to
+        accept a vtk object or a wrapped object.
+
+        Parameters
+        ----------
+        args : list of arguments
+            Arguments to be passed to the `SetInputDataObject` method of the
+            vtk object.
+        """
         self.VTKObject.SetInputDataObject(*args)
 
     @unwrap_input(skip_args=0)
     def AddInputDataObject(self, *args):
+        """Set input data object.
+
+        Wraps the `AddInputDataObject` function of `vtkAlgorithm` to
+        accept a vtk object or a wrapped object.
+
+
+        Parameters
+        ----------
+        args : list of arguments
+            Arguments to be passed to the `AddInputDataObject` method of the
+            vtk object.
+        """
         self.VTKObject.AddInputDataObject(*args)
 
 
 # Wrap vtk data objects from dataset_adapter
 class BSDataObject(dsa.DataObject, BSVTKObjectWrapper):
+    """Wrapper for vtkDataObject."""
+
     def __init__(self, vtkobject=None):
         super().__init__(vtkobject)
 
     @property
     def field_keys(self):
+        """list of str: Returns keys of field data."""
         return self.FieldData.keys()
 
     @property
     def n_field_data(self):
+        """int: Returns number of entries in field data."""
         return len(self.FieldData.keys())
 
 
 class BSTable(dsa.Table, BSDataObject):
+    """Wrapper for vtkTable."""
     pass
 
 
 class BSCompositeDataSet(dsa.CompositeDataSet, BSDataObject):
+    """Wrapper for vtkCompositeDataSet."""
     pass
 
 
 class BSDataSet(dsa.DataSet, BSDataObject):
+    """Wrapper for vtkDataSet."""
 
     @property
     def point_keys(self):
+        """list of str: Returns keys of point data."""
         return self.PointData.keys()
 
     @property
     def cell_keys(self):
+        """list of str: Returns keys of cell data."""
         return self.CellData.keys()
 
     @property
     def n_point_data(self):
+        """int: Returns number of entries in point data."""
         return len(self.PointData.keys())
 
     @property
     def n_cell_data(self):
+        """int: Returns number of entries in cell data."""
         return len(self.CellData.keys())
 
     @property
     def n_points(self):
+        """int: Returns number of points."""
         return self.GetNumberOfPoints()
 
     @property
     def n_cells(self):
+        """int: Returns number of cells."""
         return self.GetNumberOfCells()
 
     @property
     def cell_types(self):
+        """list of int: Returns cell types of the object."""
         return get_cell_types(self)
 
     @property
     def number_of_cell_types(self):
+        """int: Returns number of cell types."""
         return get_number_of_cell_types(self)
 
     @property
     def has_unique_cell_type(self):
+        """bool: Returns True if object has a unique cell type.
+        False, otherwise."""
         return has_unique_cell_type(self)
 
     @property
     def has_only_triangle(self):
+        """bool: Returns True if object has only triangles. False, otherwise."""
         return has_only_triangle(self)
 
     @property
     def has_only_line(self):
+        """bool: Returns True if object has only lines. False, otherwise."""
         return has_only_line(self)
 
     @property
     def has_only_vertex(self):
+        """bool: Returns True if object has only vertex cells.
+        False, otherwise."""
         return has_only_vertex(self)
 
     def append_array(self, array, name=None, at=None, convert_bool='warn',
@@ -193,7 +300,6 @@ class BSDataSet(dsa.DataSet, BSDataObject):
         -------
         name : str
             Array name used to append the array to the dataset.
-
         """
 
         # Check bool
@@ -265,8 +371,6 @@ class BSDataSet(dsa.DataSet, BSDataObject):
 
         Parameters
         ----------
-        surf : vtkDataset or BSDataSet
-            Input surface.
         name : str, list of str or None, optional
             Array name to remove. If None, remove all arrays. Default is None.
         at : {'point', 'cell', 'field', 'p', 'c', 'f'} or None, optional.
@@ -303,12 +407,12 @@ class BSDataSet(dsa.DataSet, BSDataObject):
             ----------
             name : str, list of str or None, optional
                 Array names. If None, return all arrays. Cannot be None
-                if ``at=None``. Default is None.
+                if ``at == None``. Default is None.
             at : {'point', 'cell', 'field', 'p', 'c', 'f'} or None, optional.
                 Attributes to get the array from. Points (i.e., 'point' or 'p'),
                 cells (i.e., 'cell' or 'c') or field (i.e., 'field' or 'f').
                 If None, get array name from all attributes that have an array
-                with the same array name. Cannot be None if ``name=None``.
+                with the same array name. Cannot be None if ``name == None``.
                 Default is None.
             return_name : bool, optional
                 Whether to return array names too. Default is False.
@@ -319,7 +423,7 @@ class BSDataSet(dsa.DataSet, BSDataObject):
                 Data arrays. None is returned if `name` does not exist.
 
             names : str or list of str
-                Names of returned arrays. Only if ``return_name=True``.
+                Names of returned arrays. Only if ``return_name == True``.
 
             """
 
@@ -365,12 +469,26 @@ class BSDataSet(dsa.DataSet, BSDataObject):
 
 
 class BSPointSet(dsa.PointSet, BSDataSet):
+    """Wrapper for vtkPointSet."""
     pass
 
 
 class BSPolyData(dsa.PolyData, BSPointSet):
+    """Wrapper for vtkPolyData."""
 
     def get_cells2D(self):
+        """Return cells as a 2D ndarray.
+
+        Returns
+        -------
+        cells : 2D ndraay, shape = (n_points, n)
+            PolyData cells.
+
+        Raises
+        ------
+        ValueError
+            If PolyData has different cell types.
+        """
         if not self.has_unique_cell_type:
             raise ValueError('PolyData has different types of cells.')
         cells = self.Polygons
@@ -378,33 +496,56 @@ class BSPolyData(dsa.PolyData, BSPointSet):
 
 
 class BSUnstructuredGrid(dsa.UnstructuredGrid, BSPointSet):
+    """Wrapper for vtkUnstructuredGrid."""
     pass
 
 
 class BSGraph(dsa.Graph, BSDataObject):
+    """Wrapper for vtkUnstructuredGrid."""
     pass
 
 
 class BSMolecule(dsa.Molecule, BSDataObject):
+    """Wrapper for vtkMolecule."""
     pass
 
 
 class BSLookupTable(BSVTKObjectWrapper):
+    """Wrapper for vtkLookupTable."""
+
     def __init__(self, vtkobject=None, **kwargs):
         super().__init__(vtkobject=vtkobject, **kwargs)
 
     def SetTable(self, table):
+        """Set table.
+
+        Wraps the `SetTable` method of `vtkLookupTable` to accept an ndarray.
+
+        Parameters
+        ----------
+        table : vtkUnsignedCharArray or ndarray, shape = (n, 4)
+            Table array used to map scalars to colors.
+        """
         if isinstance(table, np.ndarray):
             table = numpy_to_vtk(table)
         self.VTKObject.SetTable(table)
 
     def GetTable(self):
+        """Get table.
+
+        Wraps the `GetTable` method of `vtkLookupTable` to return an ndarray.
+
+        Returns
+        ----------
+        table : ndarray, shape = (n, 4)
+            Table array used to map scalars to colors.
+        """
         table = self.VTKObject.GetTable()
         return vtk_to_numpy(table)
 
     @property
     def n_values(self):
-        # return self.numberoftablevalues
+        """int: Returns number of table values."""
         return self.VTKObject.GetNumberOfTableValues()
 
     @n_values.setter
@@ -413,6 +554,7 @@ class BSLookupTable(BSVTKObjectWrapper):
 
     @property
     def n_colors(self):
+        """int: Returns number of colors."""
         return self.VTKObject.GetNumberOfColors()
 
     @n_colors.setter
@@ -421,19 +563,52 @@ class BSLookupTable(BSVTKObjectWrapper):
 
 
 class BSMapper(BSAlgorithm):
-
+    """Wrapper for vtkLookupTable."""
     def __init__(self, vtkobject=None, **kwargs):
         super().__init__(vtkobject=vtkobject, **kwargs)
 
     @wrap_output
     def GetInput(self):
+        """Get input.
+
+        Wraps the `GetInput` method of `vtkMapper` to return a
+        wrapped object.
+
+        Returns
+        -------
+        data : BSVTKObjectWrapper
+            Data object after wrapping.
+        """
         return self.VTKObject.GetInput()
 
     @wrap_output
     def GetInputAsDataSet(self):
+        """Get input as dataset.
+
+        Wraps the `GetInputAsDataSet` method of `vtkMapper` to return a
+        wrapped object.
+
+        Returns
+        -------
+        data : BSVTKObjectWrapper
+            Data object after wrapping.
+        """
         return self.VTKObject.GetInputAsDataSet()
 
     def SetLookupTable(self, lut=None, **kwargs):
+        """Set lookup table.
+
+        Wraps the `SetLookupTable` method of `vtkMapper` to accept a
+        `vtkLookupTable` or BSLookupTable.
+
+        Parameters
+        ----------
+        lut : vtkLookupTable or BSLookupTable, optional
+            Lookup table. If None, the lookup table is created.
+            Default is None.
+        kwargs : optional keyword arguments
+            Arguments are use to set the lookup table.
+        """
         if lut is None:
             lut = BSLookupTable(**kwargs)
         else:
@@ -444,28 +619,84 @@ class BSMapper(BSAlgorithm):
 
     @wrap_output
     def GetLookupTable(self):
+        """Get lookup table.
+
+        Wraps the `GetLookupTable` method of `vtkMapper` to return a
+        BSLookupTable.
+
+        Returns
+        -------
+        lut : BSLookupTable
+            Wrapped lookup table.
+        """
         return self.VTKObject.GetLookupTable()
 
     def SetArrayName(self, name):
+        """Set array id.
+
+        Wraps the `SetArrayName` method of `vtkMapper` such that the access
+        mode is changed to accept setting the array name.
+
+        Parameters
+        ----------
+        name : str
+            Array name.
+        """
         self.VTKObject.SetArrayAccessMode(1)
         self.VTKObject.SetArrayName(name)
 
     def SetArrayId(self, idx):
+        """Set array id.
+
+        Wraps the `SetArrayId` method of `vtkMapper` such that the access
+        mode is changed to accept setting the array id.
+
+        Parameters
+        ----------
+        idx : int
+            Array id.
+        """
         self.VTKObject.SetArrayAccessMode(0)
         self.VTKObject.SetArrayId(idx)
 
 
 class BSPolyDataMapper(BSMapper):
-
+    """Wrapper for vtkPolyDataMapper."""
     def __init__(self, vtkobject=None, **kwargs):
         super().__init__(vtkobject=vtkobject, **kwargs)
 
     @unwrap_input(skip_args=0)
-    def SetInputData(self, polyData):
-        self.VTKObject.SetInputData(polyData)
+    def SetInputData(self, poly_data):
+        """Set input data.
+
+        Wraps the `SetInput` method of `vtkPolyDataMapper` to accept
+        a vtkPolyData of BSPolyData.
+
+        Parameters
+        ----------
+        poly_data : vtkPolyData or BSPolyData
+            Input poly data.
+        """
+        self.VTKObject.SetInputData(poly_data)
 
 
 class BSActor(BSVTKObjectWrapper):
+    """Wrapper for vtkActor.
+
+    Unresolved requests are forwarded to its property.
+
+    Examples
+    --------
+    >>> from brainspace.vtk_interface.wrappers import BSActor
+    >>> a = BSActor()
+    >>> a.GetProperty().GetOpacity()
+    1.0
+    >>> a.GetOpacity() # It is forwarded to the property
+    1.0
+    >>> a.opacity = .5
+    >>> a.VTKObject.GetProperty().GetOpacity()
+    0.5
+    """
 
     def __init__(self, vtkobject=None, **kwargs):
         super().__init__(vtkobject=vtkobject, **kwargs)
@@ -490,6 +721,19 @@ class BSActor(BSVTKObjectWrapper):
             self._property.__setattr__(name, value)
 
     def SetMapper(self, mapper=None, **kwargs):
+        """Set mapper.
+
+        Wraps the `SetMapper` method of `vtkActor` to accept a
+        `vtkMapper` or BSMapper.
+
+        Parameters
+        ----------
+        mapper : vtkMapper or BSMapper, optional
+            Mapper. If None, the mapper is created. Default is None.
+        kwargs : optional keyword arguments
+            Arguments are used to set the mapper.
+        """
+
         if mapper is None:
             mapper = BSPolyDataMapper(vtkobject=mapper, **kwargs)
         else:
@@ -500,17 +744,50 @@ class BSActor(BSVTKObjectWrapper):
 
     @wrap_output
     def GetMapper(self):
+        """Get mapper.
+
+        Wraps the `GetMapper` method of `vtkActor` to return a BSMapper.
+
+        Returns
+        -------
+        mapper : BSMapper
+            Actor's mapper.
+        """
         return self.VTKObject.GetMapper()
 
     def GetProperty(self):
+        """Get property.
+
+        Wraps the `GetProperty` method of `vtkActor` to return a wrapped
+        property.
+
+        Returns
+        -------
+        prop : BSVTKObjectWrapper
+            Actor's property.
+        """
         return self._property
 
 
 class BSRenderer(BSVTKObjectWrapper):
+    """Wrapper for vtkRenderer."""
+
     def __init__(self, vtkobject=None, **kwargs):
         super().__init__(vtkobject=vtkobject, **kwargs)
 
     def AddActor(self, actor=None, **kwargs):
+        """Set mapper.
+
+        Wraps the `AddActor` method of `vtkRenderer` to accept a
+        `vtkActor` or BSActor.
+
+        Parameters
+        ----------
+        actor : vtkActor or BSActor, optional
+            Actor. If None, the actor is created. Default is None.
+        kwargs : optional keyword arguments
+            Arguments are used to set the actor.
+        """
         actor = BSActor(vtkobject=actor, **kwargs)
         self.VTKObject.AddActor(actor.VTKObject)
         return actor
@@ -545,14 +822,29 @@ def is_vtk(obj):
     res : bool
         True if `obj` is a VTK object. False, otherwise.
     """
-    return isinstance(obj, vtkObjectBase)
+    return isinstance(obj, vtkObject)
 
 
 def BSWrapVTKObject(obj):
-    """Returns a Numpy friendly wrapper of a vtk objects."""
+    """Wraps a vtk object.
+
+    Parameters
+    ----------
+    obj : object
+        Any object.
+
+    Returns
+    -------
+    wrapped : None or BSVTKObjectWrapper
+        Wrapped object. Returns None if `obj` is None.
+    """
 
     if obj is None or is_wrapper(obj):
         return obj
+
+    if type(obj) == type:
+        obj = obj()
+
     if not is_vtk(obj):
         raise ValueError('Unknown object type: {0}'.format(type(obj)))
 
@@ -590,16 +882,13 @@ def BSWrapVTKObject(obj):
     return BSVTKObjectWrapper(obj)
 
 
-def wrap_vtk(obj, return_input=False, **kwargs):
+def wrap_vtk(obj, **kwargs):
     """Wrap input object to BSVTKObjectWrapper or one of its subclasses.
 
     Parameters
     ----------
-    obj : vtkObjctect or BSVTKObjectWrapper
+    obj : vtkObject or BSVTKObjectWrapper
         Input object.
-    return_input : bool, optional
-        If True, also return original data. Otherwise, only return warped
-        object. Default is False.
     kwargs : kwds, optional
         Additional keyword parameters are passed to vtk object.
 
@@ -607,12 +896,9 @@ def wrap_vtk(obj, return_input=False, **kwargs):
     -------
     wrapper : BSVTKObjectWrapper
         The wrapped object.
-    obj : vtkObject or BSVTKObjectWrapper
-        The input object. Only provided if `return_input` is True.
-
     """
 
     wobj = BSWrapVTKObject(obj)
     if len(kwargs) > 0:
         wobj.setVTK(**kwargs)
-    return (wobj, obj) if return_input else wobj
+    return wobj

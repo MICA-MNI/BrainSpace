@@ -29,16 +29,16 @@ def compute_cell_area(surf, append=False, array_name='cell_area'):
     surf : vtkPolyData or BSPolyData
         Input surface.
     append : bool, optional
-        If True, append array to cell data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to cell data attributes of input surface
+        and return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's cell data. Only used if
-        ``append=True``.
+        Array name to append to surface's cell data attributes. Only used if
+        ``append == True``. Default is 'cell_area'.
 
     Returns
     -------
     output : vtkPolyData, BSPolyData or ndarray
-        Return ndarray if `append` is False. Otherwise, return input surface
+        Return ndarray if ``append == False``. Otherwise, return input surface
         with the new array.
 
     """
@@ -62,16 +62,16 @@ def compute_cell_center(surf, append=False, array_name='cell_center'):
     surf : vtkPolyData or BSPolyData
         Input surface.
     append : bool, optional
-        If True, append array to cell data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to cell data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's cell data. Only used if
-        ``append=True``.
+        Array name to append to surface's cell data attributes. Only used if
+        ``append == True``. Default is 'cell_center'.
 
     Returns
     -------
     output : vtkPolyData, BSPolyData or ndarray
-        Return ndarray if `append` is False. Otherwise, return input surface
+        Return ndarray if ``append == False``. Otherwise, return input surface
         with the new array.
 
     """
@@ -88,16 +88,16 @@ def get_n_adjacent_cells(surf, append=False, array_name='point_ncells'):
     surf : vtkPolyData or BSPolyData
         Input surface.
     append : bool, optional
-        If True, append array to cell data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to cell data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's cell data. Only used if
-        ``append=True``.
+        Array name to append to surface's point data attributes. Only used if
+        ``append == True``. Default is 'point_ncells'.
 
     Returns
     -------
     output : vtkPolyData, BSPolyData or ndarray
-        Return ndarray if `append` is False. Otherwise, return input surface
+        Return ndarray if ``append == False``. Otherwise, return input surface
         with the new array.
 
     """
@@ -115,25 +115,26 @@ def map_celldata_to_pointdata(surf, cell_data, red_func='mean',
     surf : vtkPolyData or BSPolyData
         Input surface.
     cell_data : str, 1D ndarray
-        Array with cell data. If str, it is in `surf.CellData[cell_data]`.
-        If ndarray, use this array as cell data.
-    red_func : {'sum', 'mean', 'mode', 'one_third', 'min', 'max'} or callable,
-        optional.
+        Array with cell data. If str, it must be in cell data attributes
+        of `surf`.
+    red_func : str or callable, optional.
         Function used to compute point data from data of neighboring
-        cells. Default is 'mean'.
+        cells. If str, options are {'sum', 'mean', 'mode', 'one_third', 'min',
+        'max'}. Default is 'mean'.
     dtype : dtype, optional
-        Dtype of new array. Default is None.
+        Data type of new array. If None, use the same data type of cell data
+        array. Default is None.
     append: bool, optional
-        If True, append array to point data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to point data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's point data. Only used if
-        ``append=True``.
+        Array name to append to surface's point data attributes. Only used if
+        ``append == True``. Default is None.
 
     Returns
     -------
     output : vtkPolyData, BSPolyData or ndarray
-        Return ndarray if `append` is False. Otherwise, return input surface
+        Return ndarray if ``append == False``. Otherwise, return input surface
         with the new array.
 
     """
@@ -192,27 +193,28 @@ def map_pointdata_to_celldata(surf, point_data, red_func='mean',
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
     point_data : str, 1D ndarray
-        Array with point data. If str, it is in `surf.PointData[cell_data]`.
-        If ndarray, use this array as point data.
+        Array with point data. If str, it is in the point data attributes
+        of `surf`. If ndarray, use this array as point data.
     red_func : {'sum', 'mean', 'mode', 'min', 'max'} or callable, optional
         Function used to compute data of each cell from data of its points.
         Default is 'mean'.
     dtype : dtype, optional
-        Dtype of new array. Default is None.
+        Data type of new array. If None, use the same data type of point data
+        array. Default is None.
     append: bool, optional
-        If True, append array to cell data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to cell data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's cell data. Only used if
-        ``append=True``.
+        Array name to append to surface's cell data attributes. Only used if
+        ``append == True``. Default is None.
 
     Returns
     -------
-    output : vtkPolyData, VTKObjectWrapper or ndarray
-        Return ndarray if `append` is False. Otherwise, return input surface
+    output : vtkPolyData, BSPolyData or ndarray
+        Return ndarray if ``append == False``. Otherwise, return input surface
         with the new array.
 
     """
@@ -267,27 +269,27 @@ def compute_point_area(surf, cell_area=None, area_as='one_third',
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
     cell_area : str, 1D ndarray or None, optional
-        Array with cell areas. If str, it is in `surf.CellData[cell_area]`.
-        If ndarray, use this array. If None, compute cell areas.
+        Array with cell areas. If str, it must be in the cell data attributes
+        of `surf`. If None, cell areas are computed first.
         Default is None.
     area_as : {'one_third', 'sum', 'mean'}, optional
         Compute point area as 'one_third', 'sum' or 'mean' of adjacent cells.
         Default is 'one_third'.
     append : bool, optional
-        If True, append array to point data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to point data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's point data. Only used if
-        ``append=True``.
+        Array name to append to surface's point data attributes. Only used if
+        ``append == True``. Default is 'point_area'.
 
     Returns
     -------
-    output : vtkPolyData, VTKObjectWrapper or ndarray
-        Return ndarray if `append` is False. Otherwise, return input surface
-        with the new array.
+    output : vtkPolyData, BSPolyData or ndarray
+        1D array with point area. Return ndarray if ``append == False``.
+        Otherwise, return input surface with the new array.
 
     """
 
@@ -306,20 +308,20 @@ def get_connected_components(surf, append=False, array_name='components'):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
     append : bool, optional
-        If True, append array to point data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to point data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's point data. Only used if
-        ``append=True``. Default is 'components'.
+        Array name to append to surface's point data attributes. Only used if
+        ``append == True``. Default is 'components'.
 
     Returns
     -------
-    output : vtkPolyData, VTKObjectWrapper or ndarray
-        A 1D array with with different labels for each connected component.
-        Return array if `append` is False. Otherwise, return input surface
+    output : vtkPolyData, BSPolyData or ndarray
+        1D array with different labels for each connected component.
+        Return ndarray if ``append == False``. Otherwise, return input surface
         with the new array.
 
     """
@@ -336,23 +338,24 @@ def get_labeling_border(surf, labeling, append=False, array_name='border'):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
     labeling : str, 1D ndarray
-        Array with labels. If str, it is in `surf.PointData[labeling]`.
-        If ndarray, use this array as the labeling.
+        Array with labels. If str, it must be in the point data
+        attributes of `surf`.
     append : bool, optional
-        If True, append array to point data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to point data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's point data. Only used if
-        ``append=True``.
+        Array name to append to surface's point data attributes. Only used if
+        ``append == True``. Default is 'border'.
 
     Returns
     -------
-    output : vtkPolyData, VTKObjectWrapper or ndarray
-        A 1D array with ones in the borders. Return array if `append`
-        is False. Otherwise, return input surface with the new array.
+    output : vtkPolyData, BSPolyData or ndarray
+        A 1D array with ones in the borders. Return array if
+        ``append == False``. Otherwise, return input surface with the
+        new array.
 
     """
 
@@ -373,27 +376,27 @@ def get_parcellation_centroids(surf, labeling, non_centroid=0,
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
     labeling : str, 1D ndarray
-        Array with labels. If str, it is in `surf.PointData[labeling]`.
-        If ndarray, use this array as the labeling.
+        Array with labels. If str, it must be in the point data
+        attributes of `surf`. If ndarray, use this array as the labeling.
     non_centroid : int, optional
         Label assigned to non-centroid points. Default is 0.
     append : bool, optional
-        If True, append array to point data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to point data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's point data. Only used if
-        ``append=True``.
+        Array name to append to surface's point data attributes. Only used if
+        ``append == True``. Default is 'centroids'.
 
     Returns
     -------
-    output : vtkPolyData, VTKObjectWrapper or ndarray
+    output : vtkPolyData, BSPolyData or ndarray
         A 1D array with the centroids assigned to their corresponding labels
-        and the rest of points assigned `no_label`.
-        Return array if ``append=False``. Otherwise, return input surface
-        with the new array.
+        and the rest of points assigned `non_centroid`. Return array if
+        ``append == False``. Otherwise, return input surface with the
+        new array.
 
     """
     if isinstance(labeling, str):
@@ -427,11 +430,12 @@ def propagate_labeling(surf, labeling, no_label=np.nan, mask=None, alpha=0.99,
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkPolyData or BSPolyData
         Input surface.
     labeling : str, 1D ndarray
-        Array with initial labels. If str, it is in `surf.PointData[labeling]`.
-        If ndarray, use this array as the initial labeling.
+        Array with initial labels. If str, it must be in the point data
+        attributes of `surf`. If ndarray, use this array as the initial
+        labeling.
     no_label : int or np.nan, optional
         Value for unlabeled points. Default is np.nan.
     mask : 1D ndarray, optional
@@ -444,29 +448,30 @@ def propagate_labeling(surf, labeling, no_label=np.nan, mask=None, alpha=0.99,
     tol :  float, optional
         Convergence tolerance. Default is 0.001.
     n_ring : positive int, optional
-        Consider points in n_ring to label the unlabeled points.
+        Consider points in the n-th ring to label the unlabeled points.
         Default is 1.
     mode : {'connectivity', 'distance'}, optional
-        Propagation based on connectivity of geodesic distance. Default is
+        Propagation based on connectivity or geodesic distance. Default is
         'connectivity'.
     append : bool, optional
-        If True, append array to point data of input surface and return surface.
-        Otherwise, only return array.
+        If True, append array to point data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
     array_name : str, optional
-        Array name to append to surface's point data. Only used if
-        ``append=True``.
+        Array name to append to surface's point data attributes. Only used if
+        ``append == True``. Default is 'propagated'.
 
     Returns
     -------
-    output : vtkPolyData, VTKObjectWrapper or ndarray
-        A 1D array with the propagated labeling. Return array if `append`
-        is False. Otherwise, return input surface with the new array.
+    output : vtkPolyData, BSPolyData or ndarray
+        A 1D array with the propagated labeling. Return array if
+        ``append == False``. Otherwise, return input surface with the
+        new array.
 
     References
     ----------
-    [1] Zhou, D., Bousquet, O., Lal, T. N., Weston, J., & Schölkopf, B. (2004).
-    Learning with local and global consistency. Advances in neural information
-    processing systems, 16(16), 321-328.
+    * Zhou, D., Bousquet, O., Lal, T. N., Weston, J., & Schölkopf, B. (2004).
+      Learning with local and global consistency. Advances in neural
+      information processing systems, 16(16), 321-328.
 
     """
 
@@ -530,34 +535,6 @@ def propagate_labeling(surf, labeling, no_label=np.nan, mask=None, alpha=0.99,
 
 def smooth_array(surf, point_data, n_iter=10, mask=None, include_self=True,
                  kernel='gaussian', sigma=1):
-    """Map point data to cell data.
-
-    Parameters
-    ----------
-    surf : vtkPolyData or VTKObjectWrapper
-        Input surface.
-    point_data : str, 1D ndarray
-        Array with point data. If str, it is in `surf.PointData[cell_data]`.
-        If ndarray, use this array as point data.
-    red_func : {'sum', 'mean', 'mode', 'min', 'max'} or callable, optional
-        Function used to compute data of each cell from data of its points.
-        Default is 'mean'.
-    dtype : dtype, optional
-        Dtype of new array. Default is None.
-    append: bool, optional
-        If True, append array to cell data of input surface and return surface.
-        Otherwise, only return array.
-    array_name : str, optional
-        Array name to append to surface's cell data. Only used if
-        ``append=True``.
-
-    Returns
-    -------
-    output : vtkPolyData, VTKObjectWrapper or ndarray
-        Return ndarray if `append` is False. Otherwise, return input surface
-        with the new array.
-
-    """
 
     if isinstance(point_data, str):
         pd = surf.get_array(name=point_data, at='p')

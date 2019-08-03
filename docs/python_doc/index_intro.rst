@@ -371,7 +371,7 @@ This often makes the code very cumbersome. Let's see a dummy example: ::
 
     >>> # Smooth convex hull
     >>> smooth_filter = vtk.vtkWindowedSincPolyDataFilter()
-    >>> smooth_filter.SetInputConnection(delny.GetOutputPort())
+    >>> smooth_filter.SetInputConnection(delauny.GetOutputPort())
     >>> smooth_filter.SetNumberOfIterations(20)
     >>> smooth_filter.FeatureEdgeSmoothingOn()
     >>> smooth_filter.NonManifoldSmoothingOn()

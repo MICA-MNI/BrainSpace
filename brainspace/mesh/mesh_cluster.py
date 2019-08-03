@@ -140,11 +140,11 @@ def sample_points_clustering(surf, keep=0.1, mask=None, random_state=None,
         If int, number of points to sample. Default is 0.1.
     mask : 1D ndarray, optional
         Mask for surface points. Points outside the mask (i.e., False) are
-        discarded from clustering. Default is None.
+        discarded from sampling. Default is None.
     random_state : int, RandomState instance or None, optional
          Random number generation. Default is None.
     approach : {'kmeans', 'ward'}, optional
-        Sampling approach: k-means or hierarchical with ward linkage.
+        Clustering approach: k-means or hierarchical with ward linkage.
         Hierarchical is faster but k-means provides better results.
         Default is 'kmeans'.
     n_init : int, optional

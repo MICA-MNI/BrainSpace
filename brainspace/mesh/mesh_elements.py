@@ -20,7 +20,7 @@ def get_points(surf, mask=None):
 
     Parameters
     ----------
-    surf : vtkPolyData or BSPolyData
+    surf : vtkDataSet or BSDataSet
         Input surface.
     mask : 1D ndarray, optional
         Binary mask. If specified, only get points within the mask.
@@ -31,19 +31,24 @@ def get_points(surf, mask=None):
     points : ndarray, shape (n_points, 3)
         Array of points.
 
+    See Also
+    --------
+    :func:`get_cells`
+    :func:`get_edges`
+
     """
 
     pts = surf.Points
     return pts if mask is None else pts[mask]
 
 
-@wrap_input()
+@wrap_input(only_args=0)
 def get_cells(surf):
     """Get surface cells.
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
 
     Returns
@@ -51,6 +56,16 @@ def get_cells(surf):
     cells : ndarray, shape (n_cells, nd)
         Array of cells. The value of nd depends on the topology. If vertex
         (nd=1), line (nd=2) or poly (nd=3). Each element is a point id.
+
+    Raises
+    ------
+    ValueError
+        If `surf` contains different cell types.
+
+    See Also
+    --------
+    :func:`get_points`
+    :func:`get_edges`
 
     """
 
@@ -65,7 +80,7 @@ def get_extent(surf):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
 
     Returns
@@ -84,7 +99,7 @@ def get_point2cell_connectivity(surf, dtype=np.uint8):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
     dtype : dtype, optional
         Data type. Default is uint8.
@@ -97,7 +112,13 @@ def get_point2cell_connectivity(surf, dtype=np.uint8):
 
     Notes
     -----
-    This function returns the transpose of func::get_cell2point_connectivity.
+    This function returns the transpose of :func:`get_cell2point_connectivity`.
+
+    See Also
+    --------
+    :func:`get_cell2point_connectivity`
+    :func:`get_cell_point_neighbors`
+    :func:`get_cell_edge_neighbors`
 
     """
 
@@ -118,7 +139,7 @@ def get_cell2point_connectivity(surf, dtype=np.uint8):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
     dtype : dtype, optional
         Data type. Default is uint8.
@@ -129,9 +150,15 @@ def get_cell2point_connectivity(surf, dtype=np.uint8):
         The connectivity matrix. The (i,j) entry is 1 if the i-th cell
         uses the j-th point.
 
+    See Also
+    --------
+    :func:`get_point2cell_connectivity`
+    :func:`get_cell_point_neighbors`
+    :func:`get_cell_edge_neighbors`
+
     Notes
     -----
-    This function returns the transpose of func::get_point2cell_connectivity.
+    This function returns the transpose of :func:`get_point2cell_connectivity`.
 
     """
 
@@ -143,7 +170,7 @@ def get_cell_point_neighbors(surf, include_self=True, dtype=np.uint8):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
     include_self : bool, optional
         If True, set diagonal elements to 1. Default is True.
@@ -153,8 +180,14 @@ def get_cell_point_neighbors(surf, include_self=True, dtype=np.uint8):
     Returns
     -------
     output : sparse matrix, shape (n_cells, n_cells)
-        The connectivity matrix. The (i,j) entry is 1 if
-        cells i and j share a point.
+        The connectivity matrix. The (i,j) entry is 1 if cells i and j share
+        a point.
+
+    See Also
+    --------
+    :func:`get_point2cell_connectivity`
+    :func:`get_cell2point_connectivity`
+    :func:`get_cell_edge_neighbors`
 
     """
 
@@ -172,7 +205,7 @@ def get_cell_edge_neighbors(surf, include_self=True, dtype=np.uint8):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
     include_self : bool, optional
         If True, set diagonal elements to 1. Default is True.
@@ -182,8 +215,14 @@ def get_cell_edge_neighbors(surf, include_self=True, dtype=np.uint8):
     Returns
     -------
     output : sparse matrix, shape (n_cells, n_cells)
-        The connectivity matrix. The (i,j) entry is 1 if
-        cells i and j share an edge.
+        The connectivity matrix. The (i,j) entry is 1 if cells i and j share
+        an edge.
+
+    See Also
+    --------
+    :func:`get_point2cell_connectivity`
+    :func:`get_cell2point_connectivity`
+    :func:`get_cell_point_neighbors`
 
     """
 
@@ -202,7 +241,7 @@ def get_immediate_adjacency(surf, include_self=True, mask=None, dtype=np.uint8):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
     include_self : bool, optional
         If True, set diagonal elements to 1. Default is True.
@@ -217,11 +256,16 @@ def get_immediate_adjacency(surf, include_self=True, mask=None, dtype=np.uint8):
     adj : sparse matrix, shape (n_points, n_points)
         Immediate adjacency matrix.
 
+    See Also
+    --------
+    :func:`get_ring_adjacency`
+    :func:`get_immediate_distance`
+    :func:`get_ring_distance`
+
     Notes
     -----
     Immediate adjacency: set to one all entries of points that
     share and edge with current point.
-
     """
 
     adj = get_point2cell_connectivity(surf, dtype=np.bool)
@@ -241,7 +285,7 @@ def get_ring_adjacency(surf, n_ring=1, include_self=True, mask=None,
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
     n_ring : int, optional
         Size of neighborhood. Default is 1.
@@ -257,7 +301,13 @@ def get_ring_adjacency(surf, n_ring=1, include_self=True, mask=None,
     Returns
     -------
     adj : sparse matrix, shape (n_points, n_points)
-        Adjacency matrix.
+        Adjacency matrix in `n_ring` ring.
+
+    See Also
+    --------
+    :func:`get_immediate_adjacency`
+    :func:`get_immediate_distance`
+    :func:`get_ring_distance`
 
     """
 
@@ -280,7 +330,7 @@ def get_edges(surf, mask=None):
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
     mask : 1D ndarray, optional
         Binary mask. If specified, only use points within the mask.
@@ -290,6 +340,11 @@ def get_edges(surf, mask=None):
     -------
     edges : ndarray, shape (n_edges, 2)
         Array of edges. Each element is a point id.
+
+    See Also
+    --------
+    :func:`get_points`
+    :func:`get_cells`
 
     """
 
@@ -306,13 +361,13 @@ def get_immediate_distance(surf, metric='euclidean', mask=None,
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
     mask : 1D ndarray, optional
         Binary mask. If specified, only use points within the mask.
         Default is None.
     metric : {'euclidean', 'sqeuclidean'}, optional
-        Distance metric. Default is 'geodesic'.
+        Distance metric. Default is 'euclidean'.
     dtype : dtype, optional
         Data type. Default is float32.
 
@@ -320,6 +375,12 @@ def get_immediate_distance(surf, metric='euclidean', mask=None,
     -------
     dist : sparse matrix, shape (n_points, n_points)
         Immediate distance matrix.
+
+    See Also
+    --------
+    :func:`get_immediate_adjacency`
+    :func:`get_ring_adjacency`
+    :func:`get_ring_distance`
 
     Notes
     -----
@@ -351,7 +412,7 @@ def get_ring_distance(surf, n_ring=1, metric='geodesic', mask=None,
 
     Parameters
     ----------
-    surf : vtkPolyData or VTKObjectWrapper
+    surf : vtkDataSet or BSDataSet
         Input surface.
     n_ring : int, optional
         Size of neighborhood. Default is 1.
@@ -366,7 +427,13 @@ def get_ring_distance(surf, n_ring=1, metric='geodesic', mask=None,
     Returns
     -------
     dist : sparse matrix, shape (n_points, n_points)
-        Distance matrix.
+        Distance matrix in `n_ring` ring..
+
+    See Also
+    --------
+    :func:`get_immediate_adjacency`
+    :func:`get_ring_adjacency`
+    :func:`get_immediate_distance`
 
     Notes
     -----

@@ -69,7 +69,7 @@ def generalized_procrustes(data, reference=None, n_iter=10, tol=1e-5,
         Tolerance for stopping criteria. Default is 1e-5.
     return_reference : bool, optional
         Whether to return the reference dataset built in the last iteration.
-        DEfault is False.
+        Default is False.
     verbose : bool, optional
         Verbosity. Default is False.
 
@@ -79,7 +79,7 @@ def generalized_procrustes(data, reference=None, n_iter=10, tol=1e-5,
         Aligned datsets.
     reference : 2D ndarray, shape = (n_samples, n_feat)
         Reference dataset built in the last iteration. Only if
-        ``return_reference=True``.
+        ``return_reference == True``.
     """
 
     if n_iter <= 0:

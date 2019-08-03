@@ -66,15 +66,16 @@ def _select_writer(otype):
 
 
 def load_surface(ipth, itype=None, return_data=True, update=True):
-    """ Read surface data.
+    """Read surface data.
+
+    See `itype` for supported file types.
 
     Parameters
     ----------
     ipth : str
         Input filename.
-    itype : str, optional
-        Input file type. If None, it is deduced from input filename.
-        Default is None.
+    itype : {'ply', 'stl', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
+        Input file type. If None, it is deduced from `ipth`. Default is None.
     return_data : bool, optional
         Whether to return data instead of filter. Default is False
     update : bool, optional
@@ -85,6 +86,16 @@ def load_surface(ipth, itype=None, return_data=True, update=True):
     -------
     output : BSAlgorithm or BSPolyData
         Surface as a filter or BSPolyData.
+
+    Notes
+    -----
+    Function can read FreeSurfer geometry data in binary ('fs') and ascii
+    ('asc') format. Gifti surfaces can also be loaded if nibabel is installed.
+
+    See Also
+    --------
+    :func:`save_surface`
+
     """
 
     if itype is None:
@@ -97,7 +108,9 @@ def load_surface(ipth, itype=None, return_data=True, update=True):
 
 
 def save_surface(ifilter, opth, oformat=None, otype=None):
-    """ Write surface data.
+    """Write surface data.
+
+    See `otype` for supported file types.
 
     Parameters
     ----------
@@ -108,9 +121,17 @@ def save_surface(ifilter, opth, oformat=None, otype=None):
     oformat : {'ascii', 'binary'}, optional
         File format. Defaults to writer's default format.
         Only used when writer accepts format. Default is None.
-    otype : str, optional
-        File type. If None, type is deduced from output filename's extension.
-        Default is None.
+    otype : {'ply', 'stl', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
+        File type. If None, type is deduced from `opth`. Default is None.
+
+    Notes
+    -----
+    Function can save data in FreeSurfer binary ('fs') and ascii ('asc')
+    format. Gifti surfaces can also be saved if nibabel is installed.
+
+    See Also
+    --------
+    :func:`load_surface`
 
     """
     if otype is None:

@@ -43,8 +43,8 @@ def relabel(lab, new_labels=None):
         Array to relabel.
     new_labels: array_like or dict, optional
         New labels. If dict, provide new label for each label in input array.
-        If array_like, mapping is performed in ascending order. If None, relabel
-        consecutively, starting from 0. Default is None.
+        If array_like, mapping is performed in ascending order. If None,
+        relabel consecutively, starting from 0. Default is None.
 
     Returns
     -------
@@ -78,7 +78,7 @@ def find_label_correspondence(lab1, lab2):
 
     Returns
     -------
-    map_labels : dict
+    dict
         Dictionary with label correspondences between first and second arrays.
 
     Notes
@@ -99,44 +99,6 @@ def find_label_correspondence(lab1, lab2):
     ridx, cidx = linear_sum_assignment(cost)
 
     return dict(zip(u1[ridx], u2[cidx]))
-
-
-# def find_label_correspondence_old(lab1, lab2):
-#     """Find label correspondences.
-#
-#
-#     Parameters
-#     ----------
-#     lab1 : array_like
-#         First array of labels.
-#     lab2 : array_like
-#         Second array of labels.
-#
-#     Returns
-#     -------
-#     map_labels : dict
-#         Dictionary with label correspondences between first and second arrays.
-#
-#     Notes
-#     -----
-#     Correspondences are based on largest overlap using the Hungarian algorithm.
-#
-#     """
-#
-#     u1, idx1 = np.unique(lab1, return_inverse=True)
-#     u2, idx2 = np.unique(lab2, return_inverse=True)
-#
-#     if u1.size != u2.size:
-#         raise ValueError('Arrays do not have the same number of labels.')
-#
-#     upairs, n_overlap = np.unique(list(zip(idx1, idx2)), axis=0,
-#                                   return_counts=True)
-#
-#     cost = np.full((u1.size, u1.size), len(lab1), dtype=np.float32)
-#     cost[tuple([*upairs.T])] /= n_overlap
-#     ridx, cidx = linear_sum_assignment(cost)
-#
-#     return dict(zip(u1[ridx], u2[cidx]))
 
 
 def relabel_by_overlap(lab, ref_lab):
@@ -184,26 +146,22 @@ def map_to_mask(values, mask, fill=0, axis=0):
 
     Parameters
     ----------
-    values : 1D or 2D ndarray
+    values : ndarray, shape = (n_rows, n_cols) or (n_cols,)
         Source array of values.
-    mask : 1D ndarray
-        Mask of boolean values. Data is mapped to True positions.
-        If `values` is 2D, the mask is applied for each row.
+    mask : 1D ndarray, shape = (n_mask,)
+        Mask of boolean values. Data is mapped to mask.
+        If `values` is 2D, the mask is applied according to `axis`.
     fill : float, optional
-        Value used to fill elements outside the mask.
-        Default is 0.
+        Value used to fill elements outside the mask. Default is 0.
     axis : {0, 1}, optional
-        If `axis=0` map rows. Otherwise, map columns.
-        Default is 0.
+        If ``axis == 0`` map rows. Otherwise, map columns. Default is 0.
 
     Returns
     -------
     output : ndarray
         Values mapped to mask. If `values` is 1D, shape (n_mask,).
-        When `values` is 2D, shape (n_rows, n_mask) if axis=0 and
-        (n_mask, n_cols) otherwise. Where n_rows and n_cols are the
-        number of rows and columns of `values` and n_mask is the size
-        of the mask.
+        When `values` is 2D, shape (n_rows, n_mask) if ``axis == 0`` and
+        (n_mask, n_cols) otherwise.
 
     """
 
@@ -226,7 +184,7 @@ def map_to_labels(source_val, target_lab, mask=None, fill=0, source_lab=None):
     """Map data in source to target according to their labels.
 
     Target labels are sorted in ascending order, such that the smallest label
-    indexes value at position 0
+    indexes the value at position 0 in `source_lab`.
 
     Parameters
     ----------
@@ -287,13 +245,13 @@ def reduce_by_labels(values, labels, weights=None, target_labels=None,
     values : 1D or 2D ndarray
         Array of values.
     labels : 1D ndarray
-        Labels to group by values.
+        Labels used summarize values.
     weights : 1D ndarray, optional
         Weights associated with labels. Only used when `red_op` is
-        'average', 'mean', 'sum' and 'mode'. Default is None.
+        'average', 'mean', 'sum' or 'mode'. Default is None.
     target_labels : 1D ndarray, optional
         Target labels. Arrange new array following the ordering of labels
-        in the `target_labeles`. When None, new array is arranged in ascending
+        in the `target_labels`. When None, new array is arranged in ascending
         order of source labels. Default is None.
     red_op : str or callable, optional
         How to summarize data. If str, options are: {'min', 'max', 'sum',
@@ -301,27 +259,21 @@ def reduce_by_labels(values, labels, weights=None, target_labels=None,
         a 1D array of values, an array of weights (or None), and return a
         scalar value. Default is 'mean'.
     dtype : dtype
-        Dtype of output array. Default is float.
+        Data type of output array. Default is float.
     axis : {0, 1}, optional
-        If `axis=0` apply to each row (therefore, reducing number of columns
-        per row). Otherwise, to each column (reducing number of rows per
-        column). Default is 0.
+        If ``axis == 0``, apply to each row (therefore, reducing number of
+        columns per row). Otherwise, to each column (reducing number of rows
+        per column). Default is 0.
 
     Returns
     -------
     target_values : ndarray
         Summarized target values.
 
-    Notes
-    -----
-    This method is similar to scipy's labeled_comprehension, although it does
-    not accept weights.
-
-    Examples
-    --------
-    TODO: examples and check axis arg
-    TODO: return 1D array when input is 1D
     """
+
+    # TODO: examples and check axis arg
+    # TODO: return 1D array when input is 1D
 
     values2d = np.atleast_2d(values)
     if target_labels is None:

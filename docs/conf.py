@@ -53,6 +53,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.autosectionlabel',
+    'sphinx.ext.doctest',
     # 'sphinx_gallery.gen_gallery',
     # 'sphinxcontrib.apidoc',
 ]
@@ -62,11 +63,15 @@ extensions = [
 # # apidoc_excluded_paths = ['mesh/io_support']
 # apidoc_separate_modules = True
 
-napoleon_google_docstring = False
-napoleon_numpy_docstring = True
-napoleon_use_param = True
-napoleon_use_ivar = True
-napoleon_use_rtype = False
+# napoleon_google_docstring = False
+# napoleon_numpy_docstring = True
+# napoleon_include_init_with_doc = False
+# napoleon_include_special_with_doc = False
+# napoleon_use_param = True
+# napoleon_use_ivar = True
+# napoleon_use_rtype = False
+
+add_function_parentheses = False
 
 autosummary_generate = True
 
@@ -75,6 +80,7 @@ autosummary_generate = True
 #      'examples_dirs': '../brainspace/examples',
 #      'gallery_dirs': 'auto_examples',
 #      # 'plot_gallery': 'False',
+#      'thumbnail_size': (250, 250)
 # }
 
 
@@ -195,5 +201,10 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+
+doctest_global_setup = """\
+import numpy as np
+np.random.seed(1234)\
+"""
 
 
