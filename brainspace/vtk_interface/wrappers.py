@@ -14,6 +14,7 @@ from vtkmodules.numpy_interface import dataset_adapter as dsa
 from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
 from vtkmodules.vtkCommonCorePython import vtkObject, vtkLookupTable
 from vtkmodules.vtkRenderingCorePython import vtkMapper
+from vtkmodules.vtkCommonDataModelPython import vtkDataSet
 
 from .checks import (get_cell_types, get_number_of_cell_types,
                      has_unique_cell_type, has_only_triangle,
@@ -874,6 +875,9 @@ def BSWrapVTKObject(obj):
 
     if isinstance(obj, vtkLookupTable):
         return BSLookupTable(obj)
+
+    if isinstance(obj, vtkDataSet):
+        return BSDataSet(obj)
 
     if isinstance(obj, vtkAlgorithm):
         return BSAlgorithm(obj)

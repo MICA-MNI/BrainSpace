@@ -10,17 +10,21 @@ import warnings
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
+from PIL import Image
+
+from ..vtk_interface import wrap_vtk
+from ..vtk_interface.decorators import wrap_input
+
+from vtkmodules.vtkCommonCorePython import vtkCommand
+from vtkmodules.vtkIOImagePython import vtkPNGWriter
 from vtkmodules.vtkRenderingOpenGL2Python import \
     vtkXRenderWindowInteractor as vtkRenderWindowInteractor
-from vtkmodules.vtkIOImagePython import vtkPNGWriter
 from vtkmodules.vtkRenderingCorePython import (vtkWindowToImageFilter,
                                                vtkRenderWindow)
-
 from vtkmodules import qt as vtk_qt
 
-from ..vtk_interface.base import BSVTKObjectWrapper
 from ..vtk_interface.wrappers import BSRenderer
-from ..vtk_interface.pipeline import serial_connect
+from ..vtk_interface.pipeline import get_output
 
 
 # for display bugs due to older intel integrated GPUs
@@ -43,10 +47,9 @@ except ImportError:
 
 
 try:
-    from PyQt5.QtCore import pyqtSignal
     from vtkmodules.qt.QVTKRenderWindowInteractor import \
         QVTKRenderWindowInteractor
-    from PyQt5 import QtCore, QtGui
+    from PyQt5 import QtGui
     from PyQt5.QtWidgets import QVBoxLayout, QFrame, QMainWindow
     has_pyqt = True
 except ImportError:
@@ -76,24 +79,51 @@ def in_notebook():
     return is_nb
 
 
-def _create_grid(nrows, ncols):
-    dx, dy = 1 / ncols, 1 / nrows
-    x_min = np.tile(np.arange(0, 1, dx), nrows)
+def _create_grid(nrow, ncol):
+    dx, dy = 1 / ncol, 1 / nrow
+    x_min = np.tile(np.arange(0, 1, dx), nrow)
     x_max = x_min + dx
-    y_min = np.repeat(np.arange(0, 1, dy), ncols)[::-1]
+    y_min = np.repeat(np.arange(0, 1, dy), ncol)[::-1]
     y_max = y_min + dy
-    g = np.vstack([x_min, y_min, x_max, y_max]).T.ravel()
-    return as_strided(g, shape=(nrows, ncols, 4), strides=(4*8*ncols, 4*8, 8))
+    g = np.column_stack([x_min, y_min, x_max, y_max])
+
+    strides = (4*g.itemsize*ncol, 4*g.itemsize, g.itemsize)
+    return as_strided(g, shape=(nrow, ncol, 4), strides=strides)
 
 
-class BasePlotter(BSVTKObjectWrapper):
+# def _capture_as_array(ren_win, scale=None, transparent_bg=True):
+#     scale = (1, 1) if scale is None else scale
+#     bg = 'RGBA' if transparent_bg else 'RGB'
+#
+#     w2if = wrap_vtk(vtkWindowToImageFilter, readFrontBuffer=False,
+#                     input=ren_win, scale=scale, inputBufferType=bg)
+#
+#     img = get_output(w2if)
+#     array = img.get_array(name='ImageScalars', at='p')
+#     shape = img.dimensions[::-1][1:] + (-1,)
+#     return array.reshape(shape)[::-1]
+#
+#     # writer = wrap_vtk(vtkPNGWriter, writeToMemory=True,
+#     #                   inputConnection=w2if.outputPort)
+#     # writer.Write()
+#     # data = memoryview(writer.result).tobytes()
+#     # from IPython.display import Image
+#     # return Image(data)
 
-    def __init__(self, n_rows=1, n_cols=1, iren=None, vtkobject=None, **kwargs):
-        if vtkobject is None:
-            vtkobject = vtkRenderWindow()
-        super().__init__(vtkobject=vtkobject, **kwargs)
 
-        self.iren = vtkRenderWindowInteractor() if iren is None else iren
+class BasePlotter(object):
+
+    @wrap_input(only_args=['ren_win', 'iren'])
+    def __init__(self, n_rows=1, n_cols=1, ren_win=None, iren=None, **kwargs):
+
+        self.ren_win = ren_win
+        if self.ren_win is None:
+            self.ren_win = wrap_vtk(vtkRenderWindow)
+        self.ren_win.setVTK(**kwargs)
+
+        self.iren = iren
+        if self.iren is None:
+            self.iren = wrap_vtk(vtkRenderWindowInteractor)
 
         self.n_rows = n_rows
         self.n_cols = n_cols
@@ -129,15 +159,20 @@ class BasePlotter(BSVTKObjectWrapper):
 
         renderer = BSRenderer(vtkobject=renderer, **kwargs)
         renderer.SetViewport(*bounds)
-        self.VTKObject.AddRenderer(renderer.VTKObject)
+        self.ren_win.AddRenderer(renderer.VTKObject)
 
         self.renderers[self.n_renderers] = renderer
         self.bounds[self.n_renderers] = bounds
         self.n_renderers += 1
         return renderer
 
+    def __getattr__(self, name):
+        """Forwards unknown attribute requests to RenderWindow."""
+        return getattr(self.ren_win, name)
+
     def show(self, interactive=True, embed_nb=False, scale=None,
              transparent_bg=True):
+
         if self.n_renderers == 0:
             raise ValueError('No renderers available.')
 
@@ -153,78 +188,109 @@ class BasePlotter(BSVTKObjectWrapper):
                           "'n_rows=1' and 'n_cols=1'")
 
         if embed_nb:
-            self.SetOffScreenRendering(True)
+            self.ren_win.SetOffScreenRendering(True)
         else:
-            self.SetOffScreenRendering(False)
+            self.ren_win.SetOffScreenRendering(False)
+
+            self.iren.SetRenderWindow(self.ren_win.VTKObject)
+            self.iren.Initialize()
             if not interactive:
                 self.iren.SetInteractorStyle(None)
-            self.iren.SetRenderWindow(self.VTKObject)
+            self.iren.AddObserver(vtkCommand.ExitEvent, self.close)
 
-        self.Render()
+        self.ren_win.Render()
 
         if embed_nb and interactive:
             try:
-                width, height = self.GetSize()
-                disp = pn.pane.VTK(self.VTKObject, width=width, height=height)
-                return disp
+                return self._render_panel()
             except:
                 pass
 
         if embed_nb:
-            w2if = vtkWindowToImageFilter()
-            w2if.ReadFrontBufferOff()
-            w2if.SetInput(self.VTKObject)
-            if scale is not None:
-                w2if.SetScale(*scale)
-            if transparent_bg:
-                w2if.SetInputBufferTypeToRGBA()
-            else:
-                w2if.SetInputBufferTypeToRGB()
-            w2if.Modified()
-            w2if.Update()
-
-            # Not working (tilted) when window width != height
-            # import PIL.Image
-            # img = lia.get_output(w2if, as_data=True)
-            # shape = img.GetDimensions()[:-1] + (-1,)
-            # img = img.PointData['ImageScalars'].reshape(shape)[::-1]
-            # disp = IPython.display.display(PIL.Image.fromarray(img))
-            # return disp
-
-            writer = vtkPNGWriter()
-            writer.SetWriteToMemory(1)
-            serial_connect(w2if, writer, update=True, as_data=False)
-            data = memoryview(writer.GetResult()).tobytes()
-            from IPython.display import Image
-            return Image(data)
+            return self._capture_image(scale=scale,
+                                       transparent_bg=transparent_bg)
 
         self.iren.Start()
         return None
 
+    def close(self, *args):
+        try:
+            if hasattr(self, 'panel'):
+                del self.panel
+        except:
+            pass
+        self.ren_win.Finalize()
+        # self.iren.RemoveAllObservers()
+        self.iren.TerminateApp()
 
-class Plotter(object):
+    def _render_panel(self):
+        w, h = self.ren_win.GetSize()
+        self.panel = pn.pane.VTK(self.ren_win.VTKObject, width=w, height=h)
+        return self.panel
+
+    def _capture_image(self, scale=None, transparent_bg=True):
+        self.ren_win.Render()
+        scale = (1, 1) if scale is None else scale
+        bg = 'RGBA' if transparent_bg else 'RGB'
+
+        w2if = wrap_vtk(vtkWindowToImageFilter, readFrontBuffer=False,
+                        input=self.ren_win.VTKObject, scale=scale,
+                        inputBufferType=bg)
+
+        img = get_output(w2if)
+        array = img.get_array(name='ImageScalars', at='p')
+        shape = img.dimensions[::-1][1:] + (-1,)
+        return Image.fromarray(array.reshape(shape)[::-1])
+
+    def _display_notebook(self, scale=None, transparent_bg=True):
+        return self._capture_image(scale=scale, transparent_bg=transparent_bg)
+
+    def screenshot(self, filename=None, scale=None, transparent_bg=True):
+        if not self.active:
+            raise ValueError("Cannot take screenshot. Call 'show' first.")
+
+        img = self._capture_image(scale=scale, transparent_bg=transparent_bg)
+        if filename is None:
+            return img
+        img.save(filename)
+
+    def Render(self):
+        self.ren_win.Render()
+        if hasattr(self, 'panel'):
+            self.panel.param.trigger('object')
+
+
+def _get_qt_app():
+    app = None
+
+    if in_ipython():
+        from IPython import get_ipython
+        ipython = get_ipython()
+        ipython.magic('gui qt')
+
+        from IPython.external.qt_for_kernel import QtGui
+        app = QtGui.QApplication.instance()
+
+    if app is None:
+        from PyQt5.QtWidgets import QApplication
+        app = QApplication.instance()
+        if not app:
+            app = QApplication([''])
+
+    return app
+
+
+class Plotter(BasePlotter):
 
     def __init__(self, n_rows=1, n_cols=1, try_qt=True, **kwargs):
         self.try_qt = try_qt
         self.use_qt = has_pyqt and try_qt
 
+        # Prepare qt
+        iren = None
+        ren_win = None
         if self.use_qt:
-            self.app = None
-
-            if in_ipython():
-                from IPython import get_ipython
-                ipython = get_ipython()
-                ipython.magic('gui qt')
-
-                from IPython.external.qt_for_kernel import QtGui
-                self.app = QtGui.QApplication.instance()
-
-            if self.app is None:
-                from PyQt5.QtWidgets import QApplication
-                self.app = QApplication.instance()
-                if not self.app:
-                    self.app = QApplication([''])
-
+            self.app = _get_qt_app()
             self.app_window = QMainWindow()
 
             self.frame = QFrame()
@@ -232,72 +298,49 @@ class Plotter(object):
 
             self.qt_ren = QVTKRenderWindowInteractor(parent=self.frame)
 
-            #################################
-            # ################################
-            rw = self.qt_ren.GetRenderWindow()
-            self.iren = rw.GetInteractor()
-            self.ren_win = BasePlotter(n_rows=n_rows, n_cols=n_cols,
-                                       iren=self.iren, vtkobject=rw)
-            self.ren_win.setVTK(**kwargs)
-            #################################################################
-
             self.vlayout = QVBoxLayout()
             self.vlayout.addWidget(self.qt_ren)
 
             self.frame.setLayout(self.vlayout)
             self.app_window.setCentralWidget(self.frame)
 
-        else:
-            self.ren_win = BasePlotter(n_rows=n_rows, n_cols=n_cols, **kwargs)
-            self.iren = self.ren_win.iren
+            ren_win = wrap_vtk(self.qt_ren.GetRenderWindow())
+            iren = ren_win.GetInteractor()
 
-            # self.iren.AddObserver("ExitEvent", self.quit) # SegFault!
+        super().__init__(n_rows=n_rows, n_cols=n_cols, ren_win=ren_win,
+                         iren=iren, **kwargs)
 
-        # Without this -> Qt window disappears!!
+        # Exit with 'q' and 'e'
         self.iren.AddObserver("KeyPressEvent", self.key_quit)
 
-    def __getattr__(self, name):
-        try:
-            return getattr(self.ren_win, name)
-        except AttributeError:
-            return getattr(self.iren, name)
-
-    def show(self, interactive=True, embed_nb=False):
+    def show(self, interactive=True, embed_nb=False, scale=None,
+             transparent_bg=True):
         embed_nb = embed_nb and in_notebook()
         if embed_nb and interactive and not has_panel:
             interactive = False
 
         if self.use_qt and not embed_nb:
-            try:
-                self.iren.Initialize()
-                self.app_window.show()
-                self.qt_ren.show()
-            except:
-                pass
-        return self.ren_win.show(interactive=interactive, embed_nb=embed_nb)
+            self.iren.Initialize()
+            if not interactive:
+                self.iren.SetInteractorStyle(None)
+            self.app_window.show()
+            self.qt_ren.show()
+        else:
+            return super().show(interactive=interactive, embed_nb=embed_nb,
+                                scale=scale, transparent_bg=transparent_bg)
 
     def key_quit(self, obj=None, event=None):
         try:
             key = self.iren.GetKeySym().lower()
-            if key == 'q':
-                self.quit()
+            if key in ['q', 'e']:
+                self.close()
         except:
             pass
 
-    def quit(self, *args):
-
-        # Close the window
-        self.ren_win.Finalize()
-
-        # Remove observers
-        self.iren.RemoveAllObservers()
-
-        # Stop the interactor
-        self.iren.TerminateApp()
-
-        # Is this even needed
+    def close(self, *args):
+        super().close()
         if self.use_qt:
-            self.app.quit()
+            self.app_window.close()
 
 
 class GridPlotter(Plotter):
