@@ -118,7 +118,10 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
         # Assume everything is discrete
         if is_discrete.all():
-            v = np.concatenate([v for v in vals if v is not None])
+            v = np.concatenate([v for v in vals.ravel() if v is not None])
+            # print(np.concatenate(vals.ravel()))
+            print(np.unique(v))
+            print(n_vals.shape)
             n_vals[:] = np.unique(v).size
 
     elif share in ['row', 'r']:
@@ -178,6 +181,7 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
             lut1.Build()
 
         ren1.ResetCamera()
+        ren1.GetActiveCamera().Zoom(1.2)
 
     return p.show(interactive=interactive, embed_nb=embed_nb)
 
