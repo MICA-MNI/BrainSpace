@@ -56,7 +56,13 @@ To install with ``conda``: ::
 
 
 
-Matlab installation
+MATLAB installation
 -------------------
 This toolbox has been tested with MATLAB versions R2017a and R2018b, it likely
 throws errors with MATLAB R2016a or older.
+
+To install the MATLAB toolbox simply download the package and run the following in MATLAB: ::
+
+    addpath('/path/to/BrainSpace/matlab/')
+
+

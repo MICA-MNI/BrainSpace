@@ -30,7 +30,11 @@ Let's start by loading the data:
    .. code-tab:: matlab
 
          addpath('/path/to/micasoft/BrainSpace/matlab');
-
+         pth = '/media/oualid/hd500/oualid/BrainSpace/brainspace_data/surfaces';
+         surf_lh = convert_surface([pth filesep 'conte69_64k_left_hemisphere.gii']);
+         surf_rh = convert_surface([pth filesep 'conte69_64k_right_hemisphere.gii']);
+         size(surf_lh.coord,2)
+         size(surf_rh.coord,2)
 
 We can plot the surfaces:
 
@@ -45,7 +49,7 @@ We can plot the surfaces:
 
    .. code-tab:: matlab
 
-        addpath('/path/to/micasoft/BrainSpace/matlab');
+        plot_hemispheres(ones(64984,1),{surf_lh,surf_rh}); 
 
 
 .. image:: ../_static/getting_started00.png
@@ -66,8 +70,8 @@ And also load the input matrix:
 
    .. code-tab:: matlab
 
-        addpath('/path/to/micasoft/BrainSpace/matlab');
-
+        tmp = load('my_data_file');
+        m = tmp.name_of_my_data_field; 
 
 To compute the gradients of `m`. Next, we create the `GradientMaps` object and
 fit the model to our data:
@@ -94,7 +98,13 @@ fit the model to our data:
 
    .. code-tab:: matlab
 
-        addpath('/path/to/micasoft/BrainSpace/matlab');
+        % Create gradient mapper using diffusion maps and normalized angle
+        gm = GradientMaps('kernel','na','manifold',dm','n_components',2);
+
+        % Fit the data with this gradient mapper.
+        gm = gm.fit(m);
+
+        gm %% TO DO: Add output.         
 
 
 We can visually inspect the gradients:
@@ -117,8 +127,8 @@ We can visually inspect the gradients:
 
 
    .. code-tab:: matlab
-
-        addpath('/path/to/micasoft/BrainSpace/matlab');
+        % Plot the first gradient on the cortical surface. 
+        plot_hemispheres(gm.gradients{1}(:,1), {surf_lh,surf_rh});
 
 
 .. image:: ../_static/getting_started00.png
