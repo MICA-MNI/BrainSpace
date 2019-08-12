@@ -18,7 +18,7 @@ Main Functions
    plot_hemispheres
    scree_plot
    
-Support Function
+Support Functions
 ------------------
 .. toctree::
     :maxdepth: 1

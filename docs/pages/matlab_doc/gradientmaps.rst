@@ -15,10 +15,10 @@ Usage
     gm = GradientMaps(varargin_1);
     gm = gm.fit({data_matrix_1,...,data_matrix_n},varargin_2);
 
-    - *varargin_1*: a set of name-value pairs (see below).
-    - *gm*: the GradientMaps object. 
-    - *data_matrix_n*: the input feature matrix
-    - *varargin_2*: a set of name-value pairs (see below).
+- *varargin_1*: a set of name-value pairs (see below).
+- *gm*: the GradientMaps object. 
+- *data_matrix_n*: the input feature matrix
+- *varargin_2*: a set of name-value pairs (see below).
 
 Name-Value Pairs
 ---------------
