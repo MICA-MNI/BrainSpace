@@ -8,7 +8,6 @@ Initialization
 A basic ``GradientMaps`` object can initialized by simply running it without arguments i.e. ``gm = GradientMaps();``. However, several name-value pairs can be provided to alter its behavior.  
 - kernel (default: 'normalized angle')
   - 'none', ''
-     - Does not apply a kernel. This requires that the input matrices are already symmetric. 
   - 'pearson', 'p'
   - 'spearman', 'sm'
   - 'gaussian', 'g'
@@ -47,28 +46,28 @@ Properties
   - n_components
     The number of components that will be returned (Default: 2).
 - gradients
-  The gradients property is a cell array containing the (unaligned) gradients of each input matrix. Each cell is an n-by-m matrix why n is the number of datapoints and m the number of components. In joint embedding the gradients of all data sets are computed simultaneously, and thus no unaligned gradients are stored. 
+  - The gradients property is a cell array containing the (unaligned) gradients of each input matrix. Each cell is an n-by-m matrix why n is the number of datapoints and m the number of components. In joint embedding the gradients of all data sets are computed simultaneously, and thus no unaligned gradients are stored. 
 - aligned
-  The aligned property is a cell array of identical dimensions to the gradients property. If an alignment was requested, then the aligned data are stored here. 
+  - The aligned property is a cell array of identical dimensions to the gradients property. If an alignment was requested, then the aligned data are stored here. 
 - lambda
-  Stores the variance explained (for PCA) or the eigenvalues (for LE and DM). Note that all computed lambdas are provided even if this is more than the number of requested components. 
+  - Stores the variance explained (for PCA) or the eigenvalues (for LE and DM). Note that all computed lambdas are provided even if this is more than the number of requested components. 
 
 Methods
 -------------
-- fit({data_matrix_1,data_matrix_2,...,data_matrix_n},varargin)
-  Uses the settings set in the methods to compute the gradients of all provided data matrices. ``varargin`` can be used to provide name-value pairs to modify the behavior of the fitting process. The following name-value pairs are allowed:
-  - sparsity (default: 90)
-    Sets the sparsity at which the data matrix is thresholded. 
-  - tolerance (default: 1e-6)
-    Floating point errors may cause the kernel to output asymmetric matrices. This number denotes the amount of asymmetry that is allowed before an error is thrown. 
-  - gamma (default: 1 / number_of_data_points)
-    The gamma parameter used in the Gaussian kernel. 
-  - alpha (default: 0.5)
-    The alpha paramter used in diffusion embedding.
-  - diffusiontime (default: 0)
-    The diffusion time used in diffusion embedding. Leave at 0 for automatic estimation.
-  - niterations (default: 100)
-    The number of iterations in Procrustes analysis.
-  - first_alignment_target (default: gradients of the first data matrix)
-    The target for alignment for the first iteration of Procrustes analysis.
+- ``fit({data_matrix_1,data_matrix_2,...,data_matrix_n},varargin)``
+  - Uses the settings set in the methods to compute the gradients of all provided data matrices. ``varargin`` can be used to provide name-value pairs to modify the behavior of the fitting process. The following name-value pairs are allowed:
+     - sparsity (default: 90)
+       Sets the sparsity at which the data matrix is thresholded. 
+     - tolerance (default: 1e-6)
+       Floating point errors may cause the kernel to output asymmetric matrices. This number denotes the amount of asymmetry that is allowed before an error is thrown. 
+     - gamma (default: 1 / number_of_data_points)
+       The gamma parameter used in the Gaussian kernel. 
+     - alpha (default: 0.5)
+       The alpha paramter used in diffusion embedding.
+     - diffusiontime (default: 0)
+       The diffusion time used in diffusion embedding. Leave at 0 for automatic estimation.
+     - niterations (default: 100)
+       The number of iterations in Procrustes analysis.
+     - first_alignment_target (default: gradients of the first data matrix)
+       The target for alignment for the first iteration of Procrustes analysis.
 
