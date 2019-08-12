@@ -533,43 +533,89 @@ def propagate_labeling(surf, labeling, no_label=np.nan, mask=None, alpha=0.99,
     return new_labeling
 
 
-def smooth_array(surf, point_data, n_iter=10, mask=None, include_self=True,
-                 kernel='gaussian', sigma=1):
+@append_vtk(to='point')
+def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
+                 relax=0.2, sigma=None, append=False, array_name=None):
+    """Propagate labeling on surface points.
+
+    Parameters
+    ----------
+    surf : vtkPolyData or BSPolyData
+        Input surface.
+    point_data : str, 1D ndarray
+        Input array to smooth. If str, it must be in the point data
+        attributes of `surf`. If ndarray, use this array.
+    n_iter : int, optional
+        Number of smoothing iterations. Default is 5.
+    mask : 1D ndarray, optional
+        Binary mask. If specified, smoothing is only performed on points
+        within the mask. Default is None.
+    kernel : {'uniform', 'gaussian', 'inverse_distance'}, optional
+        Smoothing kernel. Default is 'gaussian'.
+    relax : float, optional
+        Relaxation factor, contribution of neighboring points such that
+        ``0 < relax < 1``. Default is 0.2.
+    sigma :  float, optional
+        Gaussian kernel width. If None, use standard deviation of egde lengths.
+        Default is None.
+    append : bool, optional
+        If True, append array to point data attributes of input surface and
+        return surface. Otherwise, only return array. Default is False.
+    array_name : str, optional
+        Array name to append to surface's point data attributes. Only used if
+        ``append == True``. Default is None.
+
+    Returns
+    -------
+    output : vtkPolyData, BSPolyData or ndarray
+        A 1D array with the smoothed data. Return array if
+        ``append == False``. Otherwise, return input surface with the
+        new array.
+
+    """
+
+    if relax <= 0 or relax >= 1:
+        raise ValueError('Relaxation factor must be between 0 and 1.')
 
     if isinstance(point_data, str):
-        pd = surf.get_array(name=point_data, at='p')
+        point_data = surf.get_array(name=point_data, at='p')
 
-    # adj = me.get_immediate_adjacency(surf)
-    # d = me.get_immediate_distance(surf)
-    # d.setdiag(0)
+    if mask is not None:
+        pd = point_data[mask]
+    else:
+        pd = point_data
+
     if kernel == 'uniform':
-        w = me.get_immediate_adjacency(surf, include_self=include_self)
+        w = me.get_immediate_adjacency(surf, include_self=False, mask=mask,
+                                       dtype=np.float)
     elif kernel == 'gaussian':
-        w = me.get_immediate_distance(surf, metric='sqeuclidean')
-        # w.setdiag(0)
+        w = me.get_immediate_distance(surf, metric='sqeuclidean', mask=mask)
+        if sigma is None:
+            # sigma = w.data.mean() + 3 * w.data.std()
+            sigma = w.data.std()
         w.data *= -.5 / (sigma*sigma)
-        w.data[:] = np.exp(w.data)
-        if include_self:
-            w.setdiag(1)
+        np.exp(w.data, w.data)
     elif kernel == 'inverse_distance':
-        w = me.get_immediate_distance(surf, metric='euclidean')
+        w = me.get_immediate_distance(surf, metric='euclidean', mask=mask)
         w.data **= -1
-        if include_self:
-            w.setdiag(0)
+    else:
+        raise ValueError("Unknown kernel: {0}".format(kernel))
 
-    lam = 1
-    mu = lam
-    norm = w.sum(axis=1)
-    alpha = np.ones(pd.shape)
-    alpha[norm > 0] = 1 - lam
+    w = w.tocoo(copy=False)
+    ws = w.sum(axis=1).A1
+    w.data *= relax/ws[w.row]
 
-    beta = np.zeros(pd.shape)
-    beta[norm > 0] = lam / norm[norm > 0]
+    retain = np.ones(pd.shape)
+    retain[ws > 0] -= relax
 
     spd = pd.copy()
     for i in range(n_iter):
-        spd = alpha * spd + beta * w.dot(spd)
+        wp = w.dot(spd)
+        spd *= retain
+        spd += wp
+
+    if mask is not None:
+        spd = map_to_mask(spd, mask=mask)
+        spd[mask] = point_data[mask]
 
     return spd
-
-

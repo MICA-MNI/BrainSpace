@@ -35,13 +35,12 @@ Authors
 License
 -------
 
-The BrainSpace source code is available under the Revised BSD (3-Clause) license
+The BrainSpace source code is available under the BSD (3-Clause) license.
 
 
 Support
 -------
 
 If you have problems installing the software or questions about usage,
-documentation or something else related to BrainSpace, you can post to our
-mailing list Mail.
-
+documentation or something else related to BrainSpace, you can post to the
+Issues section of our repository.

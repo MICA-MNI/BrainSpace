@@ -343,6 +343,7 @@ def get_edges(surf, mask=None):
 
     See Also
     --------
+    :func:`get_edge_length`
     :func:`get_points`
     :func:`get_cells`
 
@@ -353,6 +354,91 @@ def get_edges(surf, mask=None):
     adj_ud = sps.triu(adj, k=1, format='coo')
     edges = np.column_stack([adj_ud.row, adj_ud.col])
     return edges
+
+
+def get_edge_length(surf, metric='euclidean', mask=None):
+    """Get surface edge lengths.
+
+    Parameters
+    ----------
+    surf : vtkDataSet or BSDataSet
+        Input surface.
+    metric : {'euclidean', 'sqeuclidean'}, optional
+        Distance metric. Default is 'euclidean'.
+    mask : 1D ndarray, optional
+        Binary mask. If specified, only use points within the mask.
+        Default is None.
+
+    Returns
+    -------
+    edges : ndarray, shape (n_edges, 2)
+        Array of edges. Each element is a point id.
+
+    See Also
+    --------
+    :func:`get_edges`
+    :func:`get_immediate_distance`
+
+    """
+
+    points = get_points(surf, mask=mask)
+    edges = get_edges(surf, mask=mask)
+
+    dif = points[edges[:, 0]] - points[edges[:, 1]]
+    d = np.einsum('ij,ij->i', dif, dif)
+    if metric == 'euclidean':
+        d **= .5
+    return d
+
+
+def get_border_cells(surf):
+    """Get cells in boundary.
+
+    Cells in boundary have one boundary edge.
+
+    Parameters
+    ----------
+    surf : vtkDataSet or BSDataSet
+        Input surface.
+
+    Returns
+    -------
+    edges : 1D ndarray
+        Array of cells in border.
+
+    See Also
+    --------
+    :func:`get_edges`
+    :func:`get_immediate_distance`
+
+    """
+
+    ce = get_cell_edge_neighbors(surf, include_self=False)
+    return np.where(ce.getnnz(axis=1) < 3)[0]
+
+
+def get_border_edges(surf):
+    """Get edges in border.
+
+    Parameters
+    ----------
+    surf : vtkDataSet or BSDataSet
+        Input surface.
+
+    Returns
+    -------
+    edges : 2D ndarray, shape = (n_edges, 2)
+        Array of edges in border. Each element is a point id.
+
+    See Also
+    --------
+    :func:`get_edges`
+    :func:`get_immediate_distance`
+
+    """
+
+    ce = get_cell_edge_neighbors(surf, include_self=False)
+    return np.where(ce.getnnz(axis=1) < 3)[0]
 
 
 def get_immediate_distance(surf, metric='euclidean', mask=None,
@@ -389,8 +475,8 @@ def get_immediate_distance(surf, metric='euclidean', mask=None,
 
     """
 
-    n_pts = surf.GetNumberOfPoints() if mask is None else np.count_nonzero(mask)
     points = get_points(surf, mask=mask)
+    n_pts = points.shape[0]
     edges = get_edges(surf, mask=mask)
 
     dif = points[edges[:, 0]] - points[edges[:, 1]]

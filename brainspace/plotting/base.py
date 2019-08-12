@@ -141,7 +141,7 @@ class BasePlotter(object):
         if row is None or isinstance(row, tuple):
             row = slice(None) if row is None else slice(*row)
         else:
-            row = slice(row, row+1)
+            row = slice(row, row + 1)
         if col is None or isinstance(col, tuple):
             col = slice(None) if col is None else slice(*col)
         else:
@@ -214,11 +214,11 @@ class BasePlotter(object):
         return None
 
     def close(self, *args):
-        try:
-            if hasattr(self, 'panel'):
-                del self.panel
-        except:
-            pass
+        # try:
+        #     if hasattr(self, 'panel'):
+        #         del self.panel
+        # except:
+        #     pass
         self.ren_win.Finalize()
         # self.iren.RemoveAllObservers()
         self.iren.TerminateApp()
@@ -256,8 +256,8 @@ class BasePlotter(object):
 
     def Render(self):
         self.ren_win.Render()
-        if hasattr(self, 'panel'):
-            self.panel.param.trigger('object')
+        # if hasattr(self, 'panel'):
+        #     self.panel.param.trigger('object')
 
 
 def _get_qt_app():

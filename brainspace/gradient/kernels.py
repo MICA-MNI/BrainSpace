@@ -6,9 +6,13 @@ Kernels.
 # License: BSD 3 clause
 
 
+import warnings
+
 import numpy as np
 from scipy.stats import rankdata
+
 from sklearn.metrics.pairwise import cosine_similarity, rbf_kernel
+
 from .utils import dominant_set
 
 
@@ -44,10 +48,15 @@ def compute_affinity(x, kernel=None, sparsity=.9, gamma=None):
         Affinity matrix.
     """
 
-    if sparsity:
+    if sparsity is not None:
         x = dominant_set(x, k=1-sparsity, is_thresh=False, as_sparse=False)
 
     if kernel is None:
+        mask_neg = x < 0
+        if mask_neg.any():
+            x[mask_neg] = 0
+            warnings.warn('The matrix contains negative values and will '
+                          'be zeroed-out.')
         return x
 
     if kernel in {'pearson', 'spearman'}:
@@ -68,5 +77,11 @@ def compute_affinity(x, kernel=None, sparsity=.9, gamma=None):
 
     else:
         raise ValueError("Unknown kernel '{0}'.".format(kernel))
+
+    mask_neg = a < 0
+    if mask_neg.any():
+        a[mask_neg] = 0
+        warnings.warn('The matrix contains negative values and will '
+                      'be zeroed-out.')
 
     return a
