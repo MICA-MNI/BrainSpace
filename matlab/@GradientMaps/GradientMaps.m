@@ -96,9 +96,9 @@ classdef GradientMaps
                                     obj.method.kernel = 'Spearman';
                                 case 'gaussian'
                                     obj.method.kernel = 'Gaussian';
-                                case {'cs','cosine','cosine similarity','cossim'}
+                                case {'cs','cosine','cosine similarity','cossim','cosine_similarity'}
                                     obj.method.kernel = 'Cosine Similarity';
-                                case {'na','normalized angle','normalizedangle','normangle'}
+                                case {'na','normalized angle','normalizedangle','normangle','normalized_angle'}
                                     obj.method.kernel = 'Normalized Angle';
                                 otherwise
                                     error('Unknown kernel. Valid kernels are: ''none'', ''pearson'', ''spearman'', ''Gaussian'', ''cosine similarity'', and ''normalized angle''');
@@ -106,22 +106,22 @@ classdef GradientMaps
                             change_string{end+1} = (['Set the kernel to: ' obj.method.kernel '.']);
                         end
                         
-                    case 'manifold'
+                    case 'approach'
                         if isa(varargin{ii+1},'function_handle')
-                            obj.method.manifold = varargin{ii+1};
-                            change_string{end+1} = ('Set the manifold to a custom function handle.');
+                            obj.method.approach = varargin{ii+1};
+                            change_string{end+1} = ('Set the approach to a custom function handle.');
                         else
                             switch lower(varargin{ii+1})
                                 case {'pca','principalcomponentananalysis','principal component analysis'}
-                                    obj.method.manifold = 'Principal Component Analysis';
+                                    obj.method.approach = 'Principal Component Analysis';
                                 case {'dm','diffusion embedding','diffusionembedding','diffemb'}
-                                    obj.method.manifold = 'Diffusion Embedding';
+                                    obj.method.approach = 'Diffusion Embedding';
                                 case {'le','laplacian eigenmap','laplacian eigenmaps','lapeig','laplacianeigenmaps','laplacianeigenmap'}
-                                    obj.method.manifold = 'Laplacian Eigenmap';
+                                    obj.method.approach = 'Laplacian Eigenmap';
                                 otherwise
-                                    error('Unknown manifold method. Valid manifolds are: ''principal component analysis'', ''diffusion embedding'', and ''laplacian eigenmap''');
+                                    error('Unknown approach. Valid approaches are: ''principal component analysis'', ''diffusion embedding'', and ''laplacian eigenmap''');
                             end
-                            change_string{end+1} = (['Set the manifold to: ' obj.method.manifold '.']);
+                            change_string{end+1} = (['Set the approach to: ' obj.method.approach '.']);
                         end
                     case 'alignment'
                         if isa(varargin{ii+1},'function_handle')
@@ -134,7 +134,7 @@ classdef GradientMaps
                                 case {'pa','procrustes','procrustes analysis','procrustesanalysis'}
                                     obj.method.alignment = 'Procrustes Analysis';
                                 case {'j','joint','jointalignment'}
-                                    obj.method.alignment = 'Manifold Alignment';
+                                    obj.method.alignment = 'Joint Alignment';
                             end
                             change_string{end+1} = (['Set the alignment to: ' obj.method.alignment '.']);
                         end
@@ -211,10 +211,10 @@ classdef GradientMaps
         % -------------------------------------
         % -------------------------------------
         % -------------------------------------
-        function [embedding, result] = manifolds(obj, data, varargin)
-            % [embedding, result] = MANIFOLDS(obj, data, varargin)
+        function [embedding, result] = approaches(obj, data, varargin)
+            % [embedding, result] = approaches(obj, data, varargin)
             %
-            % Computes the manifold data. This function should not be
+            % Computes the embedded data. This function should not be
             % called directly; it should only be called from the
             % run_analysis method
             %% Check input arguments.
@@ -228,8 +228,8 @@ classdef GradientMaps
             in = p.Results;
             
             % If a custom function, just run the custom function.
-            if isa(obj.method.manifold,'function_handle')
-                embedding = obj.method.manifold(data);
+            if isa(obj.method.approach,'function_handle')
+                embedding = obj.method.approach(data);
                 return
             end
             
@@ -242,12 +242,12 @@ classdef GradientMaps
                 error('Graph is not connected.')
             end
             
-            %% Manifold learning.
+            %% Embedding.
             % Set the random state for reproducibility.
             rng(obj.random_state);
             
             % Run manifold learning
-            switch obj.method.manifold
+            switch obj.method.approach
                 case 'Principal Component Analysis'
                     [~, embedding, ~, ~, result] = pca(data);
                     embedding = embedding(:,1:obj.method.n_components);
@@ -264,41 +264,41 @@ classdef GradientMaps
         end
     end
     %%
-    methods(Access = public)
-        function fit_help(obj)
-            
-            % Kernel arguments
-            if isa(obj.method.kernel,'function_handle')
-                disp('You''ve provided a custom function handle for the kernel, no name-value arguments are accepted.');
-            else
-                disp(['The following are optional name-value pairs to ''fit'' for the ' obj.method.kernel ' kernel.']);
-                if strcmp(obj.method.kernel,'None')
-                    disp('This kernel accepts no additional arguments.');
-                else
-                    disp('This kernel accepts the name ''sparsity'' with a numeric value between [0 100] (default: 90).');
-                    disp('This kernel accepts the name ''tolerance'' with any positive numeric value (default: 1e-6).');
-                end
-                if strcmp(obj.method.kernel,'Gaussian')
-                    disp('This kernel accepts the name ''gamma'' with a numeric value (default: 1/size(data,1)).');
-                end
-            end
-            disp(' ')
-            
-            % Manifold arguments
-            if isa(obj.method.kernel,'function_handle')
-                disp('You''ve provided a custom function handle for the kernel, no name-value arguments are accepted.');
-            else
-                disp(['The following are optional name-value pairs to ''fit'' for the ' obj.method.manifold ' manifold.']);
-                if strcmp(obj.method.manifold,'Principal Component Analysis')
-                    disp('This manifold accepts no additional arguments.');
-                elseif strcmp(obj.method.manifold,'Laplacian Eigenmap')
-                    disp('This manifold accepts no additional arguments.');
-                elseif strcmp(obj.method.manifold,'Diffusion Embedding')
-                    disp('This manifold accepts the name ''alpha'' with a numeric value between [0 1] (default: 0.5).');
-                    disp('This manifold accepts the name ''diffusiontime'' with any positive numeric value or zero (default: 0).');
-                end
-            end
-            disp(' ');
-        end
-    end
+%     methods(Access = public)
+%         function fit_help(obj)
+%             
+%             % Kernel arguments
+%             if isa(obj.method.kernel,'function_handle')
+%                 disp('You''ve provided a custom function handle for the kernel, no name-value arguments are accepted.');
+%             else
+%                 disp(['The following are optional name-value pairs to ''fit'' for the ' obj.method.kernel ' kernel.']);
+%                 if strcmp(obj.method.kernel,'None')
+%                     disp('This kernel accepts no additional arguments.');
+%                 else
+%                     disp('This kernel accepts the name ''sparsity'' with a numeric value between [0 100] (default: 90).');
+%                     disp('This kernel accepts the name ''tolerance'' with any positive numeric value (default: 1e-6).');
+%                 end
+%                 if strcmp(obj.method.kernel,'Gaussian')
+%                     disp('This kernel accepts the name ''gamma'' with a numeric value (default: 1/size(data,1)).');
+%                 end
+%             end
+%             disp(' ')
+%             
+%             % Manifold arguments
+%             if isa(obj.method.kernel,'function_handle')
+%                 disp('You''ve provided a custom function handle for the kernel, no name-value arguments are accepted.');
+%             else
+%                 disp(['The following are optional name-value pairs to ''fit'' for the ' obj.method.approach ' manifold.']);
+%                 if strcmp(obj.method.approach,'Principal Component Analysis')
+%                     disp('This manifold accepts no additional arguments.');
+%                 elseif strcmp(obj.method.approach,'Laplacian Eigenmap')
+%                     disp('This manifold accepts no additional arguments.');
+%                 elseif strcmp(obj.method.approach,'Diffusion Embedding')
+%                     disp('This manifold accepts the name ''alpha'' with a numeric value between [0 1] (default: 0.5).');
+%                     disp('This manifold accepts the name ''diffusiontime'' with any positive numeric value or zero (default: 0).');
+%                 end
+%             end
+%             disp(' ');
+%         end
+%     end
 end

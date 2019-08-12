@@ -1,5 +1,5 @@
 function obj = fit(obj,connectivity_matrix,varargin)
-% Computes the kernel, manifold learning, and alignment according the
+% Computes the kernel, embedding, and alignment according the
 % properties of the calling object. A data matrix or cell array of data
 % matrices is obligatory as input. Valid name-value pairs of optional
 % arguments are as follows:
@@ -25,7 +25,7 @@ function obj = fit(obj,connectivity_matrix,varargin)
 
 % Deal with varargin
 kernel_arg = {};
-manifold_arg = {};
+approach_arg = {};
 alignment_arg = {};
 for ii = 1:2:numel(varargin)
     switch lower(varargin{ii})
@@ -33,8 +33,8 @@ for ii = 1:2:numel(varargin)
             kernel_arg{end+1} = varargin{ii};
             kernel_arg{end+1} = varargin{ii+1};
         case {'diffusiontime','alpha'}
-            manifold_arg{end+1} = varargin{ii};
-            manifold_arg{end+1} = varargin{ii+1};
+            approach_arg{end+1} = varargin{ii};
+            approach_arg{end+1} = varargin{ii+1};
         case {'niterations','first_alignment_target'}
             alignment_arg{end+1} = varargin{ii};
             alignment_arg{end+1} = varargin{ii+1};
@@ -54,10 +54,10 @@ if isa(obj.method.kernel,'char')
 else
     disp(['Kernel: ' func2str(obj.method.kernel)]);
 end
-if isa(obj.method.manifold,'char')
-    disp(['Manifold: ' obj.method.manifold]);
+if isa(obj.method.approach,'char')
+    disp(['Approach: ' obj.method.approach]);
 else
-    disp(['Manifold: ' func2str(obj.method.manifold)]);
+    disp(['Approach: ' func2str(obj.method.approach)]);
 end
 if isa(obj.method.alignment,'char')
     disp(['Alignment: ' obj.method.alignment]);
@@ -65,9 +65,17 @@ else
     disp(['Alignment: ' func2str(obj.method.alignment)]);
 end
 
-% Concatenate matrices for manifold alignment. 
-if strcmp(obj.method.alignment,'Manifold Alignment')
-    tmp = cat(2,connectivity_matrix{:});
+% Concatenate matrices for joint alignment. 
+if strcmp(obj.method.alignment,'Joint Alignment')
+    try
+        tmp = cat(2,connectivity_matrix{:});
+    catch ME
+        if strcmp(ME.identifier,'MATLAB:catenate:dimensionMismatch')
+            error('Joint alignment requires that matrices have the same number of columns.')
+        else
+            rethrow(ME)
+        end
+    end
     size_connectivity = cellfun(@(x)size(x,1),connectivity_matrix);
     clearvars connectivity_matrix
     connectivity_matrix{1} = tmp; 
@@ -79,11 +87,11 @@ for ii = 1:N
     kernel_data = obj.kernels(connectivity_matrix{ii},kernel_arg{:});
 
     % Run the embedding
-    if isa(obj.method.manifold,'char')
+    if isa(obj.method.approach,'char')
         [obj.gradients{ii}, obj.lambda{ii}] = ...
-            manifolds(obj,kernel_data,manifold_arg{:});  
+            approaches(obj,kernel_data,approach_arg{:});  
     else
-        obj.gradients{ii} = obj.method.manifold(kernel_data); 
+        obj.gradients{ii} = obj.method.approach(kernel_data); 
     end
     disp('Stored (unaligned) results in the gradients field.');
     
@@ -94,7 +102,7 @@ end
 if strcmp(obj.method.alignment,'Procrustes Analysis')
     obj.aligned = procrustes_alignment(obj.gradients,alignment_arg{:});
     disp('Stored aligned results in the aligned field.');
-elseif strcmp(obj.method.alignment,'Manifold Alignment')
+elseif strcmp(obj.method.alignment,'Joint Alignment')
     for ii = 1:numel(size_connectivity)
         if ii == 1
             nmin = 1;

@@ -39,11 +39,14 @@ for ii = 1:numel(S)*2
 end
 
 % Add some embelishments
+nomissing = @(x)~isinf(x)&~isnan(x);
+c_min = min(data(nomissing(data)));
+c_max = max(data(nomissing(data)));
 set(h.axes                              , ...
     'Visible'           , 'off'         , ...
     'DataAspectRatio'   , [1 1 1]       , ...
     'PlotBoxAspectRatio', [1 1 1]       , ...
-    'CLim'              , h.axes(1).CLim);
+    'CLim'              , [c_min,c_max] );
 h.axes(1).View = [-90 0];
 h.axes(2).View = [90 0];
 if numel(h.axes) == 4
