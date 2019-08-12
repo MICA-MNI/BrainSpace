@@ -104,8 +104,6 @@ fit the model to our data:
         % Fit the data with this gradient mapper.
         gm = gm.fit(m);
 
-        gm %% TO DO: Add output.         
-
 
 We can visually inspect the gradients:
 

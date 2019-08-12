@@ -58,11 +58,12 @@ To install with ``conda``: ::
 
 MATLAB installation
 -------------------
-This toolbox has been tested with MATLAB versions R2017a and R2018b, it likely
-throws errors with MATLAB R2016a or older.
+This toolbox has been tested with MATLAB versions R2018b, although we expect it to work with versions R2017a and newer. It will definitely throw errors with versions R2016 and older
 
 To install the MATLAB toolbox simply download the package and run the following in MATLAB: ::
 
     addpath('/path/to/BrainSpace/matlab/')
 
-
+If you want to load BrainSpace every time you start MATLAB, type ``edit startup`` and append the above line to the end of thils file.
+    
+If you wish to open gifti files you will also need to install the gifti library (https://www.artefact.tk/software/matlab/gifti/).

@@ -6,5 +6,5 @@ This page contains links to all matlab examples.
    :maxdepth: 1
    :caption: Table of Contents:
 
-   plot_different_parcellations.rst
    plot_embedding_approaches.rst
+   plot_different_parcellations.rst
