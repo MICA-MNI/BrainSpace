@@ -21,9 +21,10 @@ with several features, together with tools to generate spatial null models.
    pages/install
    pages/getting_started
    auto_examples/index
-   python_doc/index_python
    matlab_examples/index
-
+   python_doc/index_python
+   pages/references
+   pages/funding
 
 Authors
 -------

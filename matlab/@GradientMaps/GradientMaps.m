@@ -53,7 +53,7 @@ classdef GradientMaps
             in_fun = @(x) isa(x,'char') || isa(x,'function_handle');
             p = inputParser;
             addParameter(p, 'kernel', 'normalized angle', in_fun);
-            addParameter(p, 'manifold', 'diffusion embedding', in_fun);
+            addParameter(p, 'approach', 'diffusion embedding', in_fun);
             addParameter(p, 'alignment', 'none', in_fun);
             addParameter(p, 'n_components', 2, @isnumeric);
             addParameter(p, 'random_state', 0);
@@ -64,7 +64,7 @@ classdef GradientMaps
             % Set the properties
             obj = obj.set( ...
                 'kernel',       R.kernel, ...
-                'manifold',     R.manifold, ...
+                'approach',     R.approach, ...
                 'alignment',    R.alignment, ...
                 'random_state', R.random_state, ...
                 'n_components', R.n_components);
@@ -148,7 +148,7 @@ classdef GradientMaps
                         change_string{end+1} = ['Set the number of requested components to: ' num2str(varargin{ii+1}) '.'];
                         
                     otherwise
-                        error('Unknown property. Valid properties are: ''connectivitymatrix'', ''kernel'', ''manifold'', and ''nullmodel''.');
+                        error('Unknown property. Valid properties are: ''connectivitymatrix'', ''kernel'', ''approach'', and ''nullmodel''.');
                 end
             end
             for ii = 1:numel(change_string)
