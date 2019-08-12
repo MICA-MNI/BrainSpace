@@ -1,11 +1,29 @@
+.. _gradientmaps:
+
 GradientMaps
 ==============================
 
-The ``GradientsMaps`` object forms the core of the BrainSpace package. It consists of four different properties, and one method. 
+Synopsis
+---------
 
-Initialization
+The core object of the Matlab BrainSpace package.
+
+Usage 
+----------
+::
+
+    gm = GradientMaps(varargin_1);
+    gm = gm.fit({data_matrix_1,...,data_matrix_n},varargin_2);
+
+    - *varargin_1*: a set of name-value pairs (see below).
+    - *gm*: the GradientMaps object. 
+    - *data_matrix_n*: the input feature matrix
+    - *varargin_2*: a set of name-value pairs (see below).
+
+Name-Value Pairs
 ---------------
 A basic ``GradientMaps`` object can initialized by simply running it without arguments i.e. ``gm = GradientMaps();``. However, several name-value pairs can be provided to alter its behavior.  
+
 - kernel (default: 'normalized angle')
   - 'none', ''
   - 'pearson', 'p'
