@@ -35,11 +35,11 @@ def load_parcellation(name, n_parcels=400):
 def load_conte69(as_sphere=False):
     root_pth = dirname(__file__)
     if as_sphere:
-        fname_lh = 'conte69_32k_left_sphere.gii'
-        fname_rh = 'conte69_32k_right_sphere.gii'
+        fname_lh = 'conte69_32k_lh_sphere.gii'
+        fname_rh = 'conte69_32k_rh_sphere.gii'
     else:
-        fname_lh = 'conte69_32k_left_hemisphere.gii'
-        fname_rh = 'conte69_32k_right_hemisphere.gii'
+        fname_lh = 'conte69_32k_lh_hemisphere.gii'
+        fname_rh = 'conte69_32k_rh_hemisphere.gii'
 
     ipth_lh = join(root_pth, 'surfaces', fname_lh)
     ipth_rh = join(root_pth, 'surfaces', fname_rh)
