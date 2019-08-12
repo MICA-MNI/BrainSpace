@@ -131,7 +131,7 @@ class SpinRandomization(BaseEstimator):
         self.n_rep = n_rep
         self.random_state = random_state
 
-    def fit(self, points_lh, points_rh=None):
+    def fit(self, points_lh, points_rh=None, mask_lh=None, mask_rh=None):
         """ Compute spin indices by random rotation.
 
         Parameters
@@ -153,9 +153,14 @@ class SpinRandomization(BaseEstimator):
         # Handle if user provides spheres
         if not isinstance(points_lh, np.ndarray):
             points_lh = me.get_points(points_lh)
+        if mask_lh is not None:
+            points_lh = points_lh[mask_lh]
 
-        if points_rh is not None and not isinstance(points_rh, np.ndarray):
-            points_rh = me.get_points(points_rh)
+        if points_rh is not None:
+            if not isinstance(points_rh, np.ndarray):
+                points_rh = me.get_points(points_rh)
+            if mask_rh is not None:
+                points_rh = points_rh[mask_rh]
 
         spin_idx = generate_spin_samples(points_lh, points_rh=points_rh,
                                          unique=self.unique, n_rep=self.n_rep,

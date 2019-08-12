@@ -227,24 +227,28 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
 
     """
 
-    # trans_lh = vtkTransform()
-    # trans_lh.Translate(*-np.asarray(surf_lh.center))
-    #
-    # trans_rh = vtkTransform()
-    # trans_rh.Translate(*-np.asarray(surf_rh.center))
-    #
-    # tf = wrap_vtk(vtkTransformFilter(), transform=trans_lh)
-    # surf_lh = lia.serial_connect(surf_lh, tf)
-    #
-    # tf = wrap_vtk(vtkTransformFilter(), transform=trans_rh)
-    # surf_rh = lia.serial_connect(surf_rh, tf)
-
     surfs = {'lh': surf_lh, 'rh': surf_rh}
     layout = ['lh', 'lh', 'rh', 'rh']
     view = ['medial', 'lateral', 'medial', 'lateral']
+
     if isinstance(array_name, list):
         layout = [layout] * len(array_name)
-        array_name = np.asarray(array_name)[:, None]
+        array_name2 = []
+        n_pts_lh = surf_lh.n_points
+        for an in array_name:
+            if isinstance(an, np.ndarray):
+                name = surf_lh.append_array(an[:n_pts_lh], at='p')
+                surf_rh.append_array(an[n_pts_lh:], name=name, at='p')
+                array_name2.append(name)
+            else:
+                array_name2.append(an)
+        array_name = np.asarray(array_name2)[:, None]
+    elif isinstance(array_name, np.ndarray):
+        n_pts_lh = surf_lh.n_points
+        array_name = surf_lh.append_array(array_name[:n_pts_lh], at='p')
+        surf_rh.append_array(array_name[n_pts_lh:], name=array_name, at='p')
+
+    # print(array_name, 2)
 
     return plot_surf(surfs, layout, array_name=array_name, nan_color=nan_color,
                      view=view, cmap_name=cmap_name, color=color, size=size,
