@@ -149,7 +149,9 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         if s is None:
             continue
 
-        ac1 = ren1.AddActor(color=color)
+        ac1 = ren1.AddActor(color=color, specular=0.1, specularPower=1,
+                            diffuse=1, ambient=0.05)
+
         if view.flat[k] is not None:
             ac1.orientation = orientations[view.flat[k]]
 
@@ -248,7 +250,8 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
         array_name = surf_lh.append_array(array_name[:n_pts_lh], at='p')
         surf_rh.append_array(array_name[n_pts_lh:], name=array_name, at='p')
 
-    # print(array_name, 2)
+    if isinstance(cmap_name, list):
+        cmap_name = np.asarray(cmap_name)[:, None]
 
     return plot_surf(surfs, layout, array_name=array_name, nan_color=nan_color,
                      view=view, cmap_name=cmap_name, color=color, size=size,

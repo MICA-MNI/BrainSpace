@@ -78,7 +78,7 @@ autosummary_generate = True
 
 # sphinx_gallery_conf = {
 #      'examples_dirs': '../brainspace/examples',
-#      'gallery_dirs': 'auto_examples',
+#      'gallery_dirs': 'auto_examples2',
 #      # 'plot_gallery': 'False',
 #      'thumbnail_size': (250, 250)
 # }

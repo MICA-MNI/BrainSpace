@@ -22,6 +22,7 @@ Support Functions
 ------------------
 .. toctree::
     :maxdepth: 1
+
     full2parcel
     parcel2full
     SurfStatReadSurf1

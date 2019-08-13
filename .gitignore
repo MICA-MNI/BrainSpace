@@ -1,7 +1,6 @@
 docs/_build
 docs/generated
-.ipynb_checkpoints
-*.ipynb
+test_python
 
 *.egg-info
 build

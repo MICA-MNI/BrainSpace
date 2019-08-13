@@ -150,19 +150,28 @@ class SpinRandomization(BaseEstimator):
 
         """
 
+        self.mask_lh = mask_lh
+        self.mask_rh = mask_rh
+
         # Handle if user provides spheres
         if not isinstance(points_lh, np.ndarray):
             points_lh = me.get_points(points_lh)
-        if mask_lh is not None:
-            points_lh = points_lh[mask_lh]
 
+        spin_points_lh = points_lh
+        if mask_lh is not None:
+            spin_points_lh = spin_points_lh[mask_lh]
+
+        spin_points_rh = None
         if points_rh is not None:
             if not isinstance(points_rh, np.ndarray):
                 points_rh = me.get_points(points_rh)
-            if mask_rh is not None:
-                points_rh = points_rh[mask_rh]
 
-        spin_idx = generate_spin_samples(points_lh, points_rh=points_rh,
+            spin_points_rh = points_rh
+            if mask_rh is not None:
+                spin_points_rh = spin_points_rh[mask_rh]
+
+        spin_idx = generate_spin_samples(spin_points_lh,
+                                         points_rh=spin_points_rh,
                                          unique=self.unique, n_rep=self.n_rep,
                                          random_state=self.random_state)
 
@@ -193,7 +202,10 @@ class SpinRandomization(BaseEstimator):
 
         """
 
-        rand_lh = x_lh[self.spin_lh_]
+        if self.mask_lh is None:
+            rand_lh = x_lh[self.spin_lh_]
+        else:
+            rand_lh = x_lh[self.spin_lh_]
         if x_rh is None:
             return rand_lh
 

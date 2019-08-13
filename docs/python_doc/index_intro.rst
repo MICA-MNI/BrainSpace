@@ -536,7 +536,7 @@ subclasses :class:`Plotter` and :class:`GridPlotter`.
 These classes forward unknown set/get requests to :class:`BSRenderWindow`, which
 is a wrapper of :class:`~vtk.vtkRenderWindow`. Let's see a simple example: ::
 
-    >>> ipth = '/media/hd105/___NEW/data_ABIDE/conte_10k_fixed.vtp'
+    >>> ipth = 'path_to_surface'
 
     >>> from brainspace.mesh import mesh_io as mio
     >>> from brainspace.plotting.base import Plotter
