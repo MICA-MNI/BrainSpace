@@ -4,7 +4,7 @@ Getting Started
 ==============================
 
 BrainSpace offers a wide variety of approaches to build gradients. Here we are
-going to through its main features and the basics to start using BrainSpace.
+going to go through the basics to start using BrainSpace.
 
 
 Let's start by loading the data:
@@ -26,11 +26,7 @@ Let's start by loading the data:
    .. code-tab:: matlab
 
          addpath('/path/to/micasoft/BrainSpace/matlab');
-         pth = '/media/oualid/hd500/oualid/BrainSpace/brainspace_data/surfaces';
-         surf_lh = convert_surface([pth filesep 'conte69_64k_left_hemisphere.gii']);
-         surf_rh = convert_surface([pth filesep 'conte69_64k_right_hemisphere.gii']);
-         size(surf_lh.coord,2)
-         size(surf_rh.coord,2)
+         [surf_lh, surf_rh] = load_conte69()
 
 We can plot the surfaces:
 
@@ -54,8 +50,7 @@ We can plot the surfaces:
 
 
 And also load the mean connectivity matrix built from a subset of HCP. The
-package only comes with toy matrices resamples using Schaefer
-(Schaefer et al., 2017) parcellations.
+package only comes with toy matrices using Schaefer parcellations `(Schaefer et al., 2018) <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. Lets load one of them. 
 
 .. tabs::
 
@@ -68,8 +63,8 @@ package only comes with toy matrices resamples using Schaefer
 
    .. code-tab:: matlab
 
-        tmp = load('my_data_file');
-        m = tmp.name_of_my_data_field; 
+        conn_matices = load_group_hcp('schaefer',400);
+        m = conn_matices.schaefer_400; 
 
 To compute the gradients of `m`. Next, we create the `GradientMaps` object and
 fit the model to our data:

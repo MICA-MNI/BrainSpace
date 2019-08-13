@@ -3,7 +3,7 @@ Functional gradients across spatial scales
 To assess consistency of gradient mapping, in this example we will compute the
 gradients across different spatial scales. Specifically we subdivide the conte69
 surface into 100, 200, 300, and 400 parcels based on a functional clustering
-(Schaefer et al., 2017) and built functional gradients from these
+`(Schaefer et al., 2018) <https://academic.oup.com/cercor/article-lookup/doi/10.1093/cercor/bhx179>`_ and built functional gradients from these
 representations.
 
 First, let's load the different parcellations (Schaefer et al., 2017) and
