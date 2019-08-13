@@ -371,7 +371,7 @@ def get_labeling_border(surf, labeling, append=False, array_name='border'):
 
 @append_vtk(to='point')
 def get_parcellation_centroids(surf, labeling, non_centroid=0,
-                               append=False, array_name='centroids'):
+                               mask=None, append=False, array_name='centroids'):
     """Compute parcels centroids.
 
     Parameters
@@ -383,6 +383,9 @@ def get_parcellation_centroids(surf, labeling, non_centroid=0,
         attributes of `surf`. If ndarray, use this array as the labeling.
     non_centroid : int, optional
         Label assigned to non-centroid points. Default is 0.
+    mask : 1D ndarray, optional
+        Binary mask. If specified, only consider points within the mask.
+        Default is None.
     append : bool, optional
         If True, append array to point data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
@@ -402,22 +405,31 @@ def get_parcellation_centroids(surf, labeling, non_centroid=0,
     if isinstance(labeling, str):
         labeling = surf.get_array(name=labeling, at='p')
 
+    if mask is not None:
+        labeling = labeling[mask]
+
     ulab = np.unique(labeling)
     if np.isin(non_centroid, ulab, assume_unique=True):
         raise ValueError("Non-centroid label is a valid label. Please choose "
                          "another label.")
 
     pts = me.get_points(surf)
+    if mask is not None:
+        pts = pts[mask]
+
     centroids = reduce_by_labels(pts, labeling, axis=1, target_labels=ulab)
 
     centroid_labs = np.full_like(labeling, non_centroid)
     idx_pts = np.arange(labeling.size)
-    for i, c in centroids:
+    for i, c in enumerate(centroids):
         mask_parcel = labeling == ulab[i]
         dif = c - pts[mask_parcel]
         idx = np.einsum('ij,ij->i', dif, dif).argmin()
         idx_centroid = idx_pts[mask_parcel][idx]
         centroid_labs[idx_centroid] = ulab[i]
+
+    if mask is not None:
+        centroid_labs = map_to_mask(centroid_labs, mask=mask, fill=non_centroid)
 
     return centroid_labs
 
