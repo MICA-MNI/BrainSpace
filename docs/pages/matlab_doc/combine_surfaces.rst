@@ -14,8 +14,8 @@ Usage
 
     combine_surfaces(S1,S2,format);
 
-- *S1*,*S2*: two surfaces
-- *format*: the output format; either SurfStat (default) or MATLAB.
+- *S1*, *S2*: two surfaces
+- *format*: the output format; either 'SurfStat' (default) or 'MATLAB'.
 
 
 Description 

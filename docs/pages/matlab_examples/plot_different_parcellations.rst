@@ -37,12 +37,9 @@ parcellations to the left and right hemispheres first.
     colormap(h.figure,lines(101))
 
 
-.. image:: examples_figs/schaefer_400.png
-   :scale: 70%
+.. image:: ./example_figs/schaefer_400.png
+   :scale: 30%
    :align: center
-
-
-
 
 
 We have 4 mean connectivity matrices built from each parcellation.
@@ -64,15 +61,8 @@ We have 4 mean connectivity matrices built from each parcellation.
         colormap hot
     end
 
-
-
-
-
-.. * .. image:: /auto_examples/images/sphx_glr_plot_different_parcellations_001.png
-.. *     :class: sphx-glr-single-img
-
-.. image:: examples_figs/connectivity_matrices.png
-   :scale: 70%
+.. image:: ./example_figs/connectivity_matrices.png
+   :scale: 50%
    :align: center
 
 
@@ -96,6 +86,6 @@ Finally, we plot the first gradient of Schaefer_400 as follows:
     plot_hemispheres(G.gradients{4}(:,1),{surf_lh,surf_rh},labelings.schaefer_400);
 
 
-.. image:: examples_figs/schaefer_400_G1.png
-   :scale: 70%
+.. image:: ./example_figs/schaefer_400_G1.png
+   :scale: 30%
    :align: center

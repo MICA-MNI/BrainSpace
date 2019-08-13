@@ -1,6 +1,10 @@
 References
 ==============================
 
+When using BrainSpace, please cite the following manuscript:
+
+ADD BIORXIV HERE ONCE UPLOADED.
+
 The following references used methodology similar, or identical, to those described here: 
 
 * Larivière S, Vos de Wael R, Hong S, Lowe A, Tavakol S, Paquola C, Schrader DS, Bernhardt BC (2019) Multiscale structure-function gradients in the neonatal connectome. Cerebral Cortex. 2019 April 10. doi: 10.1093/cercor/bhz069

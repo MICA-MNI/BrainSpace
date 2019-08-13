@@ -35,8 +35,8 @@ Let's see the parcellation on the surface.
    h = plot_hemispheres(labelings.schaefer_100, {surf_lh,surf_rh});
    colormap(h.figure,lines(101))
 
-.. image:: examples_figs/schaefer_100.png
-   :scale: 70%
+.. image:: ./example_figs/schaefer_100.png
+   :scale: 30%
    :align: center
 
 
@@ -55,7 +55,7 @@ parcellations loaded above.
 
 
 
-.. image:: examples_figs/connectivity_matrix_schaefer_100.png
+.. image:: ./example_figs/connectivity_matrix_schaefer_100.png
    :scale: 70%
    :align: center
 
@@ -88,8 +88,8 @@ Next, for all embedding approaches, we display the first gradient.
 Shown here is the diffusion embedding figure. 
 
 
-.. image:: examples_figs/g1_schaefer_100_na_dm.png
-   :scale: 70%
+.. image:: ./example_figs/g1_schaefer_100_na_dm.png
+   :scale: 30%
    :align: center
 
 
@@ -106,8 +106,8 @@ And the second gradient
     end
 
 
-.. image:: examples_figs/g2_schaefer_100_na_dm.png
-   :scale: 70%
+.. image:: ./example_figs/g2_schaefer_100_na_dm.png
+   :scale: 30%
    :align: center
 
 
