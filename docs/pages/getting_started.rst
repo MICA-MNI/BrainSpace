@@ -50,7 +50,7 @@ We can plot the surfaces:
 
 
 And also load the mean connectivity matrix built from a subset of HCP. The
-package only comes with toy matrices using Schaefer parcellations `(Schaefer et al., 2018) <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. Lets load one of them. 
+package only comes with toy matrices using Schaefer parcellations `(Schaefer et al., 2017) <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. Lets load one of them. 
 
 .. tabs::
 
