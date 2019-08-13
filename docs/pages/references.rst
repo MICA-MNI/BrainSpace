@@ -11,7 +11,7 @@ Functional gradients of the neonatal connectome.
 
 * `Larivière S, Vos de Wael R, Hong S, Lowe A, Tavakol S, Paquola C, Schrader DS, Bernhardt BC (2019) Multiscale structure-function gradients in the neonatal connectome. Cerebral Cortex. 2019 April 10. doi: 10.1093/cercor/bhz069 <https://academic.oup.com/cercor/advance-article/doi/10.1093/cercor/bhz069/5430603>`_
 
-Functional gradient changes in autism.
+Functional gradients in autism.
 
 * `Hong S, Vos de Wael R, Bethlehem R, Lariviere S, Paquola C, DiMartino A, Milham M, Margulies D, Smallwood J, Bernhardt BC (2019) Atypical functional connectome hierarchy in autism. Nature Communications, in press <https://www.nature.com/articles/s41467-019-08944-1>`_
 
@@ -19,8 +19,7 @@ Functional gradients in aging.
 
 * Lowe A, Paquola C, Vos de Wael R, Girn M, Caldairou B, Larivière S, Tavakol S, Royer J, Schrader DV, Bernasconi N, Bernasconi A, Spreng RN, Bernhardt BC (2019) Targeting age-related differences in brain and cognition with multimodal imaging and connectome topography profiling. Human Brain Mapping, in press. 
 
-Functional gradients of the hippocampus.
-
+Meta-analytic co-activation and functional gradients in the hippocampus
 * `Vos de Wael R, Larivière S, Caldairou B, Hong S, Jefferies E, Margulies DS, Smallwood J, Bernasconi N, Bernhardt BC (2018) Anatomical and microstructural determinants of hippocampal subfield functional connectome embedding. PNAS 115(40):10154-10159 <https://www.pnas.org/content/115/40/10154.short>`_.
 
 Gradients of microstructural markers.

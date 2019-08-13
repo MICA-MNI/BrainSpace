@@ -20,8 +20,6 @@ Usage
 - *lambdas*: a vector of lambdas; can be taken from the :ref:`GradientMaps` object. 
 - *handles*: a structure containing the handles of the graphics objects. 
 
-https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/plot_data/scree_plot.m
-
 ------------------
 Description
 ------------------
