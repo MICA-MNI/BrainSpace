@@ -6,4 +6,4 @@ SurfStatReadSurf1
 Synopsis
 ---------
 
-Surface loader for Freesurfer and .obj files. For surface loading please use ``convert_surface.m`` instead.
+Surface loader for Freesurfer and .obj files. For surface loading please use :ref:`convert_surface.m` instead.

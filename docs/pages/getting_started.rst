@@ -3,8 +3,8 @@
 Getting Started
 ==============================
 
-BrainSpace a wide variety of approaches to build gradients. Here we are going to
-its main features and teh basics to start using BrainSpace.
+BrainSpace offers a wide variety of approaches to build gradients. Here we are
+going to through its main features and the basics to start using BrainSpace.
 
 
 Let's start by loading the data:
@@ -13,19 +13,15 @@ Let's start by loading the data:
 
    .. code-tab:: py
 
-        >>> from os.path import join
-        >>> from brainspace.mesh import mesh_io as mio
+        >>> from brainspace.data.base import load_conte69
 
         >>> # Load left and right hemisphere
-        >>> pth = '/media/oualid/hd500/oualid/BrainSpace/brainspace_data/surfaces'
-        >>> surf_lh = mio.load_surface(join(pth, 'conte69_64k_left_hemisphere.gii'))
-        >>> surf_rh = mio.load_surface(join(pth, 'conte69_64k_right_hemisphere.gii'))
-
+        >>> surf_lh, surf_rh = load_conte69()
         >>> surf_lh.n_points
-        33809
+        32492
 
         >>> surf_rh.n_points
-        33809
+        32492
 
    .. code-tab:: matlab
 
@@ -57,16 +53,18 @@ We can plot the surfaces:
    :align: center
 
 
-And also load the input matrix:
+And also load the mean connectivity matrix built from a subset of HCP. The
+package only comes with toy matrices resamples using Schaefer
+(Schaefer et al., 2017) parcellations.
 
 .. tabs::
 
    .. code-tab:: py
 
-        >>> from brainspace.datasets import load_data
-        >>> m = load_data('something')
+        >>> from brainspace.data.base import load_hcp_group
+        >>> m = load_group_hcp('schaefer', n_parcels=400)
         >>> m.shape
-        (n, n)
+        (400, 400)
 
    .. code-tab:: matlab
 
@@ -94,7 +92,7 @@ fit the model to our data:
 
         >>> # The gradients are in
         >>> gm.gradients_.shape
-        (n, 2)
+        (400, 2)
 
    .. code-tab:: matlab
 

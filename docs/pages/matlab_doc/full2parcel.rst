@@ -1,0 +1,23 @@
+.. _full2parcel:
+
+full2parcel
+==============================
+
+Synopsis
+---------
+
+Converts data from a full data matrix to parcellated data.
+
+Usage 
+----------
+::
+
+    parcellated_data = full2parcel(data,parcellation);
+
+- *data*: an n-by-m data matrix.
+- *parcellation*: a 1-by-m parcel vector containing natural numbers.
+- *parcellated_data*: n-by-max(parcellation) matrix containing the mean column of each parcel.
+
+Description
+--------------
+A useful tool for quickly moving data between vertex and parcel level, especially in combination with :ref:`parcel2full`. For more flexible usage, see also :ref:`labelmean`.
