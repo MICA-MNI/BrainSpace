@@ -1,8 +1,11 @@
 from os.path import dirname, join
 import numpy as np
 
+from vtkmodules.vtkFiltersCorePython import vtkPolyDataNormals
+
 from ..mesh.mesh_io import load_surface
 from ..utils.parcellation import reduce_by_labels
+from ..vtk_interface import wrap_vtk, serial_connect
 
 
 def load_holdout_hcp(name, n_parcels=400):
@@ -32,20 +35,35 @@ def load_parcellation(name, n_parcels=400):
     return np.loadtxt(ipth, dtype=np.int)
 
 
-def load_conte69(as_sphere=False):
+def load_mask():
+    root_pth = dirname(__file__)
+    ipth_lh = join(root_pth, 'surfaces/conte69_32k_lh_mask.csv')
+    ipth_rh = join(root_pth, 'surfaces/conte69_32k_rh_mask.csv')
+    mask_lh = np.loadtxt(ipth_lh, dtype=np.bool)
+    mask_rh = np.loadtxt(ipth_rh, dtype=np.bool)
+    return np.concatenate([mask_lh, mask_rh])
+
+
+def load_conte69(as_sphere=False, with_normals=True):
     root_pth = dirname(__file__)
     if as_sphere:
         fname_lh = 'conte69_32k_lh_sphere.gii'
         fname_rh = 'conte69_32k_rh_sphere.gii'
     else:
-        fname_lh = 'conte69_32k_lh_hemisphere.gii'
-        fname_rh = 'conte69_32k_rh_hemisphere.gii'
+        fname_lh = 'conte69_32k_lh.gii'
+        fname_rh = 'conte69_32k_rh.gii'
 
     ipth_lh = join(root_pth, 'surfaces', fname_lh)
     ipth_rh = join(root_pth, 'surfaces', fname_rh)
 
     surf_lh = load_surface(ipth_lh)
     surf_rh = load_surface(ipth_rh)
+
+    if with_normals:
+        nf = wrap_vtk(vtkPolyDataNormals, splitting=False, featureAngle=0.1)
+        surf_lh = serial_connect(surf_lh, nf)
+        nf = wrap_vtk(vtkPolyDataNormals, splitting=False, featureAngle=0.1)
+        surf_rh = serial_connect(surf_rh, nf)
 
     return surf_lh, surf_rh
 
@@ -60,7 +78,7 @@ def load_thickness(parcellation=None, mask=None):
     if parcellation is not None:
         if mask is not None:
             parcellation = parcellation[mask]
-        x = reduce_by_labels(x, parcellation, red_op='mean')
+        x = reduce_by_labels(x, parcellation, red_op='mean')[0]
     return x
 
 
@@ -75,6 +93,6 @@ def load_t1t2(parcellation=None, mask=None):
     if parcellation is not None:
         if mask is not None:
             parcellation = parcellation[mask]
-        x = reduce_by_labels(x, parcellation, red_op='mean')
+        x = reduce_by_labels(x, parcellation, red_op='mean')[0]
 
     return x

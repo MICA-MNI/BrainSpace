@@ -69,7 +69,7 @@ remaining to the right.
 
 
 
-We can also see the connectivity matrix correlsponding to the 100
+We can also see the connectivity matrix corresponding to the 100
 parcellations loaded above.
 
 
