@@ -7,7 +7,7 @@ decomposed using 3 different embedding approaches to obtain the gradients.
 
 We will start by loading the all the data we need for this example. Instead of
 using the original vertex-wise connectivity matrix, we are going to load a
-100x100 matrix based on `Schaefer et al., 2018 <https://academic.oup.com/cercor/article-lookup/doi/10.1093/cercor/bhx179>_` parcellation.
+100x100 matrix based on `Schaefer et al., 2017 <https://academic.oup.com/cercor/article-lookup/doi/10.1093/cercor/bhx179>_` parcellation.
 
 
 .. code-block:: default

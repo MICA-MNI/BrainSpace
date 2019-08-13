@@ -6,12 +6,13 @@ combine_surfaces
 Synopsis
 ---------
 
-Combines two surfaces into a single surface. 
+Combines two surfaces into a single surface (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/surface_manipulation/combine_surfaces.m>`_). 
 
 Usage 
 ----------
 ::
 
+    SC = combine_surfaces(S1,S2);
     SC = combine_surfaces(S1,S2,format);
 
 - *S1*, *S2*: two surfaces

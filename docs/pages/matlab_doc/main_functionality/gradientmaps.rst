@@ -7,7 +7,7 @@ GradientMaps
 Synopsis
 =============
 
-The core object of the Matlab BrainSpace package.
+The core object of the Matlab BrainSpace package (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/%40GradientMaps/GradientMaps.m>`_).
 
 Usage 
 =============

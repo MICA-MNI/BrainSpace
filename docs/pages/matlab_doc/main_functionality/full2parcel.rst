@@ -6,7 +6,7 @@ full2parcel
 Synopsis
 ---------
 
-Converts data from a full data matrix to parcellated data.
+Converts data from a full data matrix to parcellated data (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/surface_manipulation/full2parcel.m>`_).
 
 Usage 
 ----------

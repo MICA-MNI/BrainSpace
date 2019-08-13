@@ -6,7 +6,7 @@ labelmean
 Synopsis
 ---------
 
-Takes the mean of columns with the same label. 
+Takes the mean of columns with the same label (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/labelmean.m>`_). 
 
 Usage 
 ----------

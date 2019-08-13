@@ -6,7 +6,7 @@ parcel2full
 Synopsis
 ---------
 
-Converts data from a parcellated data matrix to full data matrix by assigning each vertex the value of its parcel.
+Converts data from a parcellated data matrix to full data matrix by assigning each vertex the value of its parcel (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/surface_manipulation/parcel2full.m>`_).
 
 Usage 
 ----------

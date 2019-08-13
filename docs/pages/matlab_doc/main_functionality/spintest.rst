@@ -7,14 +7,15 @@ spintest
 ------------------
 Synopsis
 ------------------
-Performs a spin test to generate null data for hypothesis testing.
+Performs a spin test to generate null data for hypothesis testing (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/spintest.m>`_).
 
 ------------------
 Usage
 ------------------
 
 ::
-	 null_data = spintest(data,spheres,permutation_number,varargin)
+
+	null_data = spintest(data,spheres,permutation_number,varargin);
 
 - *data*: An n-by-m matrix of data to be randomised (single sphere) or cell array of n-by-m matrices (two spheres).  
 - *spheres*: Cell array containing spheres. 
@@ -30,5 +31,5 @@ Spin test as described by `(Alexander-Bloch, 2018) <https://www.sciencedirect.co
 Name-Value pairs
 ------------------
 
-- *'parcellation'*, a n-by-1 vector containing the parcellation scheme. 
-- *'type'*, program used to generate the sphers. Either 'FreeSurfer' (default), or 'CIVET'.
+- *'parcellation'*: a n-by-1 vector containing the parcellation scheme. Do not provide for no vertex-level analysis.  
+- *'type'*: program used to generate the spheres. Either 'FreeSurfer' (default), or 'CIVET'.
