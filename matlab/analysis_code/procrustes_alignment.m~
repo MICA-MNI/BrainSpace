@@ -1,4 +1,4 @@
-function f
+function aligned = procrustes_alignment(gradients,varargin)
 
 % Parse input
 p = inputParser;
@@ -57,7 +57,7 @@ catch err
     if strcmp(err.identifier,'MATLAB:catenate:dimensionMismatch')
         warning('Target and source embedding have a different number of dimensions. Attempting to solve anyway.')
     else
-        rethrow(err)
+        throw(err)
     end
 end
 
@@ -82,7 +82,7 @@ for ii = 1:nIterations
         [U,~,V] = svd(target.' * embeddings{jj},0);
         
         % This corresponds with the Satrajit Python code; Numpy seems to do
-        % this implicitly in its svd.
+        % this implicitly in its svd), but is it correct?
         U = U(:, 1:min(size(U,2), size(V,2)));
         V = V(:, 1:min(size(U,2), size(V,2)));
         

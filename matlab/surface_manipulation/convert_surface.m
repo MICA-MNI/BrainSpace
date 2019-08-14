@@ -16,7 +16,15 @@ end
 % If input is a char array, load the file. 
 if ischar(S)
     if endsWith(S,'.gii')
-        S = gifti(S);
+        try
+            S = gifti(S);
+        catch ME
+            if strcmp(ME.identifier,'MATLAB:UndefinedFunction')
+                error('Could not find GIFTI library. Is it installed? If yes, is it on your path?');
+            else
+                rethrow(ME);
+            end
+        end
     elseif endsWith(S, '.mat')
         S = load(S);
     else

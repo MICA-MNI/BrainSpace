@@ -23,7 +23,7 @@ Functional gradients in aging.
 
 * `Lowe A, Paquola C, Vos de Wael R, Girn M, Caldairou B, Larivière S, Tavakol S, Royer J, Schrader DV, Bernasconi N, Bernasconi A, Spreng RN, Bernhardt BC (2019) Targeting age-related differences in brain and cognition with multimodal imaging and connectome topography profiling. Human Brain Mapping, in press. Preprint: <https://www.biorxiv.org/content/10.1101/601146v1>`_
 
-Meta-analytic co-activation and functional gradients in the hippocampus
+Meta-analytic co-activation and functional gradients in the hippocampus.
 
 * `Vos de Wael R, Larivière S, Caldairou B, Hong S, Jefferies E, Margulies DS, Smallwood J, Bernasconi N, Bernhardt BC (2018) Anatomical and microstructural determinants of hippocampal subfield functional connectome embedding. PNAS 115(40):10154-10159 <https://www.pnas.org/content/115/40/10154.short>`_.
 

@@ -11,7 +11,7 @@ function obj = fit(obj,connectivity_matrix,varargin)
 %           - Any numeric
 %       - Gamma (default: 1/number_of_features)
 %           - Any numeric
-%   - Manifold arguments
+%   - Approach arguments
 %       - diffusiontime (default: 0)
 %           - Any positive numeric or zero
 %       - alpha (default: 0.5)
@@ -21,7 +21,8 @@ function obj = fit(obj,connectivity_matrix,varargin)
 %           - Any integer
 %       - first_alignment_target (default: none)
 %           A matrix with equivalent size to that of the gradient matrix.
-
+%
+% For complete documentation please consult our <a href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>
 
 % Deal with varargin
 kernel_arg = {};

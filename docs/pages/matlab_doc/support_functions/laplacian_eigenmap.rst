@@ -12,7 +12,7 @@ Usage
 ----------
 ::
 
-    [gradients, mapping] = laplacian_eigen(data, n_components)
+    [gradients, mapping] = laplacian_eigenmap(data, n_components)
 
 - *data*: the data matrix to perform the laplacian eigenmapping on. 
 - *n_components*: the number of components to return.

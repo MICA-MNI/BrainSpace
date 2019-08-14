@@ -4,34 +4,31 @@ classdef GradientMaps
 % Class definition and constructor for BrainSpace. The following
 % name-value pairs are allowed as input.
 %
-%   - kernel (default: normalized angle)
-%       - 'p','pearson'
-%       - 'sm','spearman'
-%       - 'g','gaussian'
-%       - 'na','normalized angle'
-%       - 'cs','cosine similarity'
-%       - '','none'
-%       - a function handle
-%   - approach (default: diffusion embedding)
-%       - 'dm','diffusion embedding'
-%       - 'le','laplacian eigenmap'
-%       - 'pca','principal component analysis'
-%       - a function handle
-%   - alignment (default: none)
-%       - 'none',''
-%       - 'pa','procrustes analysis'
-%       - 'ja','joint alignment'
-%       - a function handle
-%   - n_components (default: 10)
-%       - Any natural number.
-%   - random_state (default: 0)
-%       - Any valid input for MATLAB's "rng" function.
+%       - kernel (default: normalized angle)
+%           - 'pearson'
+%           - 'spearman'
+%           - 'gaussian'
+%           - 'normalized angle'
+%           - 'cosine similarity'
+%           - 'none'
+%       - manifold (default: diffusion embedding)
+%           - 'diffusion embedding'
+%           - 'laplacian eigenmap'
+%           - 'principal component analysis'
+%       - alignment (default: false)
+%           - true
+%           - false
+%       - n_components (default: 2)
+%           - Any positive integer.
+%       - random_state (default: 0)
+%           - Any valid input for MATLAB's "rng" function.
 %
-% For complete documentation, including descriptions of this object's
-% properties and methods please consult our <a
-% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
 %
-% See also: GRADIENTMAPS.FIT
+% If you use this toolbox, please cite ...
+%
+
+%
+% See also: GRADIENT.FIT
     
     properties (SetAccess = private)
         method
@@ -212,7 +209,7 @@ classdef GradientMaps
         % -------------------------------------
         % -------------------------------------
         % -------------------------------------
-        function [embedding, lambda] = approaches(obj, data, varargin)
+        function [embedding, result] = approaches(obj, data, varargin)
             % [embedding, result] = approaches(obj, data, varargin)
             %
             % Computes the embedded data. This function should not be
@@ -250,18 +247,56 @@ classdef GradientMaps
             % Run manifold learning
             switch obj.method.approach
                 case 'Principal Component Analysis'
-                    [~, embedding, ~, ~, lambda] = pca(data);
+                    [~, embedding, ~, ~, result] = pca(data);
                     embedding = embedding(:,1:obj.method.n_components);
                 case 'Laplacian Eigenmap'
                     disp(['Requested ' num2str(obj.method.n_components) ' components.']);
-                    [embedding, lambda] = laplacian_eigenmap(data, obj.method.n_components);
+                    [embedding, result] = laplacian_eigenmap(data, obj.method.n_components);
                 case 'Diffusion Embedding'
                     disp(['Running with alpha parameter: ' num2str(in.alpha)]);
                     disp(['Running with diffusion time: ' num2str(in.diffusionTime)]);
-                    [embedding, lambda] = diffusion_embedding(data, obj.method.n_components, in.alpha, in.diffusionTime);
+                    [embedding, result] = diffusion_embedding(data, obj.method.n_components, in.alpha, in.diffusionTime);
                 otherwise
                     error('Unknown manifold technique.');
             end
         end
     end
+    %%
+%     methods(Access = public)
+%         function fit_help(obj)
+%             
+%             % Kernel arguments
+%             if isa(obj.method.kernel,'function_handle')
+%                 disp('You''ve provided a custom function handle for the kernel, no name-value arguments are accepted.');
+%             else
+%                 disp(['The following are optional name-value pairs to ''fit'' for the ' obj.method.kernel ' kernel.']);
+%                 if strcmp(obj.method.kernel,'None')
+%                     disp('This kernel accepts no additional arguments.');
+%                 else
+%                     disp('This kernel accepts the name ''sparsity'' with a numeric value between [0 100] (default: 90).');
+%                     disp('This kernel accepts the name ''tolerance'' with any positive numeric value (default: 1e-6).');
+%                 end
+%                 if strcmp(obj.method.kernel,'Gaussian')
+%                     disp('This kernel accepts the name ''gamma'' with a numeric value (default: 1/size(data,1)).');
+%                 end
+%             end
+%             disp(' ')
+%             
+%             % Manifold arguments
+%             if isa(obj.method.kernel,'function_handle')
+%                 disp('You''ve provided a custom function handle for the kernel, no name-value arguments are accepted.');
+%             else
+%                 disp(['The following are optional name-value pairs to ''fit'' for the ' obj.method.approach ' manifold.']);
+%                 if strcmp(obj.method.approach,'Principal Component Analysis')
+%                     disp('This manifold accepts no additional arguments.');
+%                 elseif strcmp(obj.method.approach,'Laplacian Eigenmap')
+%                     disp('This manifold accepts no additional arguments.');
+%                 elseif strcmp(obj.method.approach,'Diffusion Embedding')
+%                     disp('This manifold accepts the name ''alpha'' with a numeric value between [0 1] (default: 0.5).');
+%                     disp('This manifold accepts the name ''diffusiontime'' with any positive numeric value or zero (default: 0).');
+%                 end
+%             end
+%             disp(' ');
+%         end
+%     end
 end

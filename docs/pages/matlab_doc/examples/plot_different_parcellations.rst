@@ -14,14 +14,14 @@ First, let's load the different parcellations and their corresponding mean conne
 
     addpath(genpath('/path/to/BrainSpace/matlab')); 
 
-    # Different parcellations
+    % Different parcellations
     list_parcels = 100:100:400;
 
-    # Load parcellations and mean connectivity matrices
+    % Load parcellations and mean connectivity matrices
     labelings = load_parcellation('schaefer',list_parcels); 
     conn_matices = load_group_hcp('schaefer',list_parcels);
     
-    # and load the conte69 hemisphere surfaces
+    % and load the conte69 hemisphere surfaces
     [surf_lh,surf_rh] = load_conte69();
 
 

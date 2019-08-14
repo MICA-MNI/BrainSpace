@@ -1,18 +1,8 @@
 function [embedding,lambda] = diffusion_embedding(data, n_components, alpha, diffusion_time)
 % DIFFUSION_EMBEDDING   Diffusion embbedding decomposition of input matrix.
 %   embedding = DIFFUSION_EMBEDDING(data,n_components,alpha,diffusion_time)
-%   computes the first n_components diffusion components of matrix data
-%   using parameters alpha and diffusion_time. Variable data must be an
-%   n-by-n symmetric matrix containing only real non-negative values,
-%   n_components is a natural number, alpha is a scalar in range [0,1], and
-%   diffusion_time is a positive scalar. diffusion_time may also be set to
-%   0 for automatic diffusion time estimation.
-%
-%   [embedding,lambda] = DIFFUSION_EMBEDDING(data,n_components,alpha, ...
-%   diffusion_time) also returns the eigenvalues lambda. 
-%
-%   For complete documentation please consult our <a
-%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/diffusion_embedding.html">ReadTheDocs</a>.
+%   computes the diffusion components of n-by-n symmetrc
+
 
 % Parameter for later use.
 sz = size(data);
@@ -42,7 +32,7 @@ psi = bsxfun(@rdivide, eigvec, eigvec(:,1));
 
 % Automatically determines the diffusion time and scales the eigenvalues.
 if diffusion_time == 0
-    % diffusion_time = exp(1 - log(1 - eigval(2:end)) ./ log(eigval(2:end)));
+    diffusion_time = exp(1 - log(1 - eigval(2:end)) ./ log(eigval(2:end)));
     scaled_eigval = eigval(2:end) ./ (1 - eigval(2:end));
 else
     scaled_eigval = eigval(2:end) .^ diffusion_time;

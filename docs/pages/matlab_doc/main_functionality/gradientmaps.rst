@@ -65,8 +65,10 @@ A basic GradientMaps object can initialized by simply running it without argumen
 
 Putting it all together, an example initialization could be: ``gm = GradientMaps('kernel','g','approach','pca','alignment','','random_state',10);``
 
-Methods
--------------
+Public Methods
+---------------
+Public methods are accesible to the end-user. Disregarding the constructor (see initialization section), the GradientMaps class contains one public method. 
+
 fit
    Uses the settings set in the methods to compute the gradients of all provided data matrices. ``varargin`` can be used to provide name-value pairs to modify the behavior of the fitting process. The following name-value pairs are allowed:
       - sparsity (default: 90)
@@ -84,3 +86,12 @@ fit
       - first_alignment_target (default: gradients of the first data matrix)
        The target for alignment for the first iteration of Procrustes analysis.
    Example usage: ``fit({data_matrix_1,data_matrix_2,...,data_matrix_n},'sparsity',75)``
+
+Private Methods
+-----------------
+Private methods are not accesible to the end-user, but are called by other methods i.e. GradientMaps initialization and GradientMaps.fit. The GradientMaps class contains four private methods. As these methods are not intended for user interaction, we only provide a basic explanation here. 
+
+- *set(obj,varargin)*: used for setting properties of the GradientMaps class.
+- *kernels(obj,data,varargin)*: performs kernel computations.
+- *approaches(obj,data,varargin)*: performs dimensionality reduction.
+

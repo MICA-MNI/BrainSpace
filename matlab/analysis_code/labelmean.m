@@ -11,6 +11,10 @@ function out = labelmean(D,L,varargin)
 %   - Updated to allow for missing labels (May 2018).  
 %   - Ignore warning now also ignores the "Found 0s in label vector"
 %       warning. 
+%
+%   For complete documentation please consult our <a
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/labelmean.html">ReadTheDocs</a>.
+
 
 
 % Deal with varargin

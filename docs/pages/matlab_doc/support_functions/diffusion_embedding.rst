@@ -6,7 +6,7 @@ diffusion_embedding
 Synopsis
 ---------
 
-Performs the ldiffusion embedding computations (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/diffusion_embedding.m>`_). 
+Performs the diffusion embedding computations (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/diffusion_embedding.m>`_). 
 
 Usage 
 ----------
@@ -23,4 +23,4 @@ Usage
 
 Description
 --------------
-Performs the diffusion procedure. This implementation is based on the `mapalign package <https://github.com/satra/mapalign>`_ by Satrajid Ghosh 
+Performs the diffusion procedure. This implementation is based on the `mapalign package <https://github.com/satra/mapalign>`_ by Satrajid Ghosh.
