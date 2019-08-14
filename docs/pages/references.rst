@@ -3,9 +3,13 @@ References
 
 When using BrainSpace, please cite the following manuscript:
 
-ADD BIORXIV HERE ONCE UPLOADED.
+* `Vos de Wael R, Benkarim O, Paquola C, Larivière S, Royer J, Tavakol S, Hong S, Margulies D, Smallwood J, Bernhardt BC (2019) BrainSpace: A lightweight toolbox for macroscale gradient mapping and analysis. Preprint here: `
 
 The following references used methodology similar, or identical, to those described here: 
+
+Functional gradients of the adult connectome. 
+
+* `Margulies D, Ghosh SS, Gpulas A, Falkiewicz M, Juntenburg JM, Langs G, Bezgin G, Eickhoff S, Castellanos FX, Petrides M, Jefferies E, Smallwood J (2016) Situating the default-mode network along a principal gradient of macroscale cortical organization. PNAS <https://www.pnas.org/content/113/44/12574>`_
 
 Functional gradients of the neonatal connectome. 
 
@@ -20,6 +24,7 @@ Functional gradients in aging.
 * Lowe A, Paquola C, Vos de Wael R, Girn M, Caldairou B, Larivière S, Tavakol S, Royer J, Schrader DV, Bernasconi N, Bernasconi A, Spreng RN, Bernhardt BC (2019) Targeting age-related differences in brain and cognition with multimodal imaging and connectome topography profiling. Human Brain Mapping, in press. 
 
 Meta-analytic co-activation and functional gradients in the hippocampus
+
 * `Vos de Wael R, Larivière S, Caldairou B, Hong S, Jefferies E, Margulies DS, Smallwood J, Bernasconi N, Bernhardt BC (2018) Anatomical and microstructural determinants of hippocampal subfield functional connectome embedding. PNAS 115(40):10154-10159 <https://www.pnas.org/content/115/40/10154.short>`_.
 
 Gradients of microstructural markers.
