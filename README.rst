@@ -1,5 +1,12 @@
-The contents of README.rst in the parent directory appear here.
+=======================
+BrainSpace
+=======================
 
+BrainSpace is a lightweight cross-platform toolbox primarily intended for
+macroscale gradient mapping and analysis. The current version of BrainSpace is
+available in Python and Matlab, programming languages widely used by the
+neuroimaging and network neuroscience communities. The toolbox also contains
+several maps that allow for exploratory analysis of gradient correspondence
+with several features, together with tools to generate spatial null models.
 
-.. image:: https://img.shields.io/badge/license-GPL--3.0-brightgreen.svg
-	:target: https://www.gnu.org/licenses/gpl-3.0.en.html
+For installation instructions, examples and documentation of BrainSpace see https://brainspace.readthedocs.io/en/latest/.

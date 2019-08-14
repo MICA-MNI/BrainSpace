@@ -3,12 +3,10 @@ Functional gradients across spatial scales
 To assess consistency of gradient mapping, in this example we will compute the
 gradients across different spatial scales. Specifically we subdivide the conte69
 surface into 100, 200, 300, and 400 parcels based on a functional clustering
-(Schaefer et al., 2017) and built functional gradients from these
+`(Schaefer et al., 2017) <https://academic.oup.com/cercor/article-lookup/doi/10.1093/cercor/bhx179>`_ and built functional gradients from these
 representations.
 
-First, let's load the different parcellations (Schaefer et al., 2017) and
-their corresponding mean connectivity matrices. We also load the conte69
-surface. These files are provided with BrainSpace.
+First, let's load the different parcellations and their corresponding mean connectivity matrices. We also load the conte69 surface. These files are provided with BrainSpace.
 
 
 .. code-block:: default
@@ -37,12 +35,9 @@ parcellations to the left and right hemispheres first.
     colormap(h.figure,lines(101))
 
 
-.. image:: examples_figs/schaefer_400.png
-   :scale: 70%
+.. image:: ./example_figs/schaefer_400.png
+   :scale: 30%
    :align: center
-
-
-
 
 
 We have 4 mean connectivity matrices built from each parcellation.
@@ -64,15 +59,8 @@ We have 4 mean connectivity matrices built from each parcellation.
         colormap hot
     end
 
-
-
-
-
-.. * .. image:: /auto_examples/images/sphx_glr_plot_different_parcellations_001.png
-.. *     :class: sphx-glr-single-img
-
-.. image:: examples_figs/connectivity_matrices.png
-   :scale: 70%
+.. image:: ./example_figs/connectivity_matrices.png
+   :scale: 50%
    :align: center
 
 
@@ -96,6 +84,6 @@ Finally, we plot the first gradient of Schaefer_400 as follows:
     plot_hemispheres(G.gradients{4}(:,1),{surf_lh,surf_rh},labelings.schaefer_400);
 
 
-.. image:: examples_figs/schaefer_400_G1.png
-   :scale: 70%
+.. image:: ./example_figs/schaefer_400_G1.png
+   :scale: 30%
    :align: center
