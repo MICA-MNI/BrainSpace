@@ -56,7 +56,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In this example we assess the significance of correlations between the first canonical gradient...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Null models based on spin permutations">
 
 .. only:: html
 
@@ -87,13 +87,13 @@ Examples
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples2_python.zip <//media/oualid/hd500/oualid/BrainSpace/docs/auto_examples2/auto_examples2_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples2_jupyter.zip <//media/oualid/hd500/oualid/BrainSpace/docs/auto_examples2/auto_examples2_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

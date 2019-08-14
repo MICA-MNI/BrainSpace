@@ -79,16 +79,16 @@ class GradientMaps(BaseEstimator):
     kernel : {'pearson', 'spearman', 'cosine', 'normalized_angle', 'gaussian'}
         or None, optional.
         Kernel function to build the affinity matrix.
-    align : {'procrustes', 'manifold'}, object or None
+    alignment : {'procrustes', 'joint'}, object or None
         Alignment approach. Only used when two or more datasets are provided.
         If None, no alignment is peformed. If `object`, it accepts an instance
         of :class:`.ProcrustesAlignment`. Default is None.
 
         - If 'procrustes', datasets are aligned using generalized procrustes
           analysis.
-        - If 'manifold', datasets are embedded simultaneously based on a joint
-          afinity matrix built from the individual datasets. This option is only
-          available for 'dm' and 'le' approaches.
+        - If 'joint', datasets are embedded simultaneously based on a joint
+          affinity matrix built from the individual datasets. This option is
+          only available for 'dm' and 'le' approaches.
 
     random_state : int or None, optional
         Random state. Default is None.
@@ -103,19 +103,20 @@ class GradientMaps(BaseEstimator):
         Aligned gradients in same order.
     """
 
-    def __init__(self, n_gradients=2, approach=None, kernel=None, align=None,
-                 random_state=None):
+    def __init__(self, n_gradients=2, approach=None, kernel=None,
+                 alignment=None, random_state=None):
         self.n_gradients = n_gradients
         self.approach = approach
         self.kernel = kernel
-        self.align = align  # manifold, procrustes or None
+        self.alignment = alignment  # joint, procrustes or None
         self.random_state = random_state
 
         self.gradients_ = None
         self.lambdas_ = None
         self.aligned_ = None
 
-    def fit(self, x, gamma=None, sparsity=0.9, n_iter=10, **kwargs):
+    def fit(self, x, gamma=None, sparsity=0.9, n_iter=10, reference=None,
+            **kwargs):
         """Compute gradients and alignment.
 
         Parameters
@@ -130,6 +131,9 @@ class GradientMaps(BaseEstimator):
             Default is 0.9.
         n_iter : int, optional
             Number of iterations for procrustes alignment. Default is 10.
+        reference : 2D ndarray, optional
+            Initial reference for procrustes alignments. Only used when
+            ``alignment == 'procrustes'``. Default is None.
         kwargs : kwds, optional
             Additional keyword parameters passed to the embedding approach.
 
@@ -151,7 +155,7 @@ class GradientMaps(BaseEstimator):
         # Multiple datasets
         n = len(x)
         lam, grad = [None] * n, [None] * n
-        if self.align == 'manifold':
+        if self.alignment == 'joint':
             self.fit(np.vstack(x), gamma=gamma, sparsity=sparsity, **kwargs)
 
             s = np.cumsum([0] + [x1.shape[0] for x1 in x])
@@ -168,11 +172,13 @@ class GradientMaps(BaseEstimator):
                 lam[i], grad[i] = self.lambdas_, self.gradients_
             self.lambdas_, self.gradients_ = lam, grad
 
-            if self.align == 'procrustes':
-                pa = ProcrustesAlignment(n_iter=n_iter).fit(self.gradients_)
+            if self.alignment == 'procrustes':
+                pa = ProcrustesAlignment(n_iter=n_iter)
+                pa.fit(self.gradients_, reference=reference)
                 self.aligned_ = pa.aligned_
-            elif isinstance(self.align, ProcrustesAlignment):
-                self.aligned_ = self.align.fit(self.gradients_).aligned_
+            elif isinstance(self.alignment, ProcrustesAlignment):
+                self.alignment.fit(self.gradients_, reference=reference)
+                self.aligned_ = self.alignment.fit(self.gradients_).aligned_
             else:
                 self.aligned_ = None
 
