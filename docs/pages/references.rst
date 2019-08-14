@@ -3,7 +3,7 @@ References
 
 When using BrainSpace, please cite the following manuscript:
 
-* `Vos de Wael R, Benkarim O, Paquola C, Larivière S, Royer J, Tavakol S, Hong S, Margulies D, Smallwood J, Bernhardt BC (2019) BrainSpace: A lightweight toolbox for macroscale gradient mapping and analysis. Preprint here: `
+* `Vos de Wael R, Benkarim O, Paquola C, Larivière S, Royer J, Tavakol S, Hong S, Margulies D, Smallwood J, Bernhardt BC (2019) BrainSpace: A lightweight toolbox for macroscale gradient mapping and analysis. Preprint not available yet. <https://mica-mni.github.io>`_
 
 The following references used methodology similar, or identical, to those described here: 
 
@@ -21,7 +21,7 @@ Functional gradients in autism.
 
 Functional gradients in aging. 
 
-* Lowe A, Paquola C, Vos de Wael R, Girn M, Caldairou B, Larivière S, Tavakol S, Royer J, Schrader DV, Bernasconi N, Bernasconi A, Spreng RN, Bernhardt BC (2019) Targeting age-related differences in brain and cognition with multimodal imaging and connectome topography profiling. Human Brain Mapping, in press. 
+* `Lowe A, Paquola C, Vos de Wael R, Girn M, Caldairou B, Larivière S, Tavakol S, Royer J, Schrader DV, Bernasconi N, Bernasconi A, Spreng RN, Bernhardt BC (2019) Targeting age-related differences in brain and cognition with multimodal imaging and connectome topography profiling. Human Brain Mapping, in press. Preprint: <https://www.biorxiv.org/content/10.1101/601146v1>`_
 
 Meta-analytic co-activation and functional gradients in the hippocampus
 
