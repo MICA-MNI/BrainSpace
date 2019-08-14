@@ -5,3 +5,5 @@ test_python
 *.egg-info
 build
 dist
+
+*.m~
