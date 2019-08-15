@@ -9,8 +9,7 @@ representations.
 First, let's load the different parcellations and their corresponding mean connectivity matrices. We also load the conte69 surface. These files are provided with BrainSpace.
 
 
-.. code-block:: default
-
+.. code-block:: matlab
 
     addpath(genpath('/path/to/BrainSpace/matlab')); 
 
@@ -29,7 +28,7 @@ Let's see the different parcellations of the surface. We have to append the
 parcellations to the left and right hemispheres first.
 
 
-.. code-block:: default
+.. code-block:: matlab
 
     h = plot_hemispheres(labelings.schaefer_100, {surf_lh,surf_rh});
     colormap(h.figure,lines(101))
@@ -43,7 +42,7 @@ parcellations to the left and right hemispheres first.
 We have 4 mean connectivity matrices built from each parcellation.
 
 
-.. code-block:: default
+.. code-block:: matlab
 
     h = struct();
     parcel_names = fieldnames(conn_matices);
@@ -68,7 +67,7 @@ Now, we use our GradientMaps class to build one gradient for each connectivity
 matrix. Gradients are the appended to the surfaces.
 
 
-.. code-block:: default
+.. code-block:: matlab
 
     % Fit a gradient for each parcellation scheme. 
     gm = GradientMaps('kernel','normalized angle', ...
@@ -79,7 +78,8 @@ matrix. Gradients are the appended to the surfaces.
 Finally, we plot the first gradient of Schaefer_400 as follows:
 
 
-.. code-block:: default
+.. code-block:: matlab
+    
     % Note that {1} = schaefer_100, {2} = schaefer_200, etc...
     plot_hemispheres(G.gradients{4}(:,1),{surf_lh,surf_rh},labelings.schaefer_400);
 

@@ -10,7 +10,9 @@ using the original vertex-wise connectivity matrix, we are going to load a
 100x100 matrix based on `Schaefer et al., 2017 <https://academic.oup.com/cercor/article-lookup/doi/10.1093/cercor/bhx179>`_ parcellation.
 
 
-.. code-block:: default
+.. code-block:: matlab
+
+    addpath(genpath('/path/to/BrainSpace/matlab')); 
 
     % First load mean connectivity matrix and Schaefer parcellation
     conn_matrix = load_group_hcp('schaefer',100);
@@ -27,8 +29,7 @@ using the original vertex-wise connectivity matrix, we are going to load a
 Let's see the parcellation on the surface. 
 
 
-.. code-block:: default
-
+.. code-block:: matlab
 
    h = plot_hemispheres(labelings.schaefer_100, {surf_lh,surf_rh});
    colormap(h.figure,lines(101))
@@ -38,13 +39,11 @@ Let's see the parcellation on the surface.
    :align: center
 
 
-
-
 We can also see the connectivity matrix corresponding to the 100
 parcellations loaded above.
 
 
-.. code-block:: default
+.. code-block:: matlab
 
     # The mean connectivity matrix built from the HCP data
     figure('Color','w');
@@ -62,7 +61,7 @@ Now, we compute the gradients using 3 different embedding approaches: PCA,
 Laplacian embeddings (i.e., 'le') and Diffusion maps (i.e., 'dm')
 
 
-.. code-block:: default
+.. code-block:: matlab
 
     embeddings = {'pca','le','dm'};
     for ii = 1:numel(embeddings)
@@ -73,7 +72,7 @@ Laplacian embeddings (i.e., 'le') and Diffusion maps (i.e., 'dm')
 
 Next, for all embedding approaches, we display the first gradient.
 
-.. code-block:: default
+.. code-block:: matlab
 
     full_names = {'Principal Component Analysis','Laplacian Eigenmap', ...
                   'Diffusion Map Embedding'};
@@ -82,8 +81,6 @@ Next, for all embedding approaches, we display the first gradient.
                                   labeling); 
         h2{ii}.figure.Name = full_names{ii};
     end
-
-Shown here is the diffusion embedding figure. 
 
 
 .. image:: ./example_figs/g1_schaefer_100_na_dm.png
@@ -95,7 +92,7 @@ Shown here is the diffusion embedding figure.
 And the second gradient
 
 
-.. code-block:: default
+.. code-block:: matlab
 
     for ii = 1:numel(embeddings)
         h2{ii} = plot_hemispheres(gm{ii}.gradients{1}(:,2),{surf_lh,surf_rh}, ...
