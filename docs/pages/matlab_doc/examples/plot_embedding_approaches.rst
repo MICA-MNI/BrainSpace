@@ -31,9 +31,7 @@ Let's see the parcellation on the surface.
    :scale: 70%
    :align: center
 
-We can also see the connectivity matrix corresponding to the 100
-parcellations loaded above.
-
+We can also inspect the connectivity matrix corresponding to the 100 parcellations loaded above.
 
 .. code-block:: matlab
 
@@ -50,7 +48,6 @@ parcellations loaded above.
 Now, we compute the gradients using 3 different embedding approaches: PCA,
 Laplacian embeddings (i.e., 'le') and Diffusion maps (i.e., 'dm')
 
-
 .. code-block:: matlab
 
     embeddings = {'pca','le','dm'};
@@ -60,7 +57,7 @@ Laplacian embeddings (i.e., 'le') and Diffusion maps (i.e., 'dm')
     end
 
 
-Next, for all embedding approaches, we display the first gradient.
+Next, for all embedding approaches, we display the first gradient
 
 .. code-block:: matlab
 
@@ -74,7 +71,7 @@ Next, for all embedding approaches, we display the first gradient.
    :scale: 70%
    :align: center
 
-And the second gradient
+and the second gradient.
 
 .. code-block:: matlab
 
