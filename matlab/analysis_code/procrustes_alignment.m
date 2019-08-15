@@ -1,4 +1,4 @@
-function f
+function aligned = procrustes_alignment(gradients,varargin)
 
 % Parse input
 p = inputParser;
