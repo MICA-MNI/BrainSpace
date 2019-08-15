@@ -26,8 +26,12 @@ for ii = 1:size(data,2)
 end
 
 % Plot the surface(s).
-h.figure = figure('Color','white','Units','normalized','Position',[0 0 1 1]);
+h.figure = figure('Color','white','Units','normalized','Position',[0 0 .9 .9]);
 colormap(parula(256));
+for ii = 1:size(data,2)
+    clim(:,ii) = [min(data(~isinf(data(:,ii)),ii)); ...
+                  max(data(~isinf(data(:,ii)),ii))];
+end
 for jj = 1:size(D,2)
     for ii = 1:numel(S)*2
         idx = ceil(ii/2);
@@ -40,14 +44,14 @@ for jj = 1:size(D,2)
             'EdgeColor', 'None');
         material dull; lighting phong;
     end
-end
-
-% Add axes embelishments
-set(h.axes                              , ...
+    set(h.axes(:,jj)                    , ...
     'Visible'           , 'off'         , ...
     'DataAspectRatio'   , [1 1 1]       , ...
     'PlotBoxAspectRatio', [1 1 1]       , ...
-    'CLim'              , h.axes(1).CLim);
+    'CLim'              , clim(:,jj)     );
+end
+
+% Add axes embelishments
 set(h.axes(1,:),'View',[-90 0]);
 set(h.axes(2,:),'View',[90 0]);
 if size(h.axes,1) == 4
@@ -66,7 +70,7 @@ for ii = 1:size(D,2)
     h.cb(ii) = colorbar(h.axes(4,ii)); 
     h.cb(ii).Position = [h.axes(4,ii).Position(1:2) + [.175 .065] ...
                          .007 .08];
-    h.cb(ii).Ticks = h.axes(4,ii).CLim;
+    h.cb(ii).Ticks = clim(:,ii);
     h.cb(ii).FontName = 'DroidSans';
     h.cb(ii).FontSize = 14;
 end

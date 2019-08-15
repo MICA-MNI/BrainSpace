@@ -49,12 +49,12 @@ As an illustration of the rotation, lets plot the original t1w/t2w data
    :scale: 50%
    :align: center
 
-as well as one rotated version.
+as well as a few rotated version.
 
 .. code-block:: matlab
 
-    % Plot one of the rotations
-    h2 = plot_hemispheres(t1wt2w_rotated(:,1),{surf_lh,surf_rh});
+    % Plot a few of the rotations
+    h2 = plot_hemispheres(t1wt2w_rotated(:,1:3),{surf_lh,surf_rh});
 
 .. image:: ./example_figs/t1wt2w_rotated.png
    :scale: 50%

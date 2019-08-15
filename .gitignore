@@ -7,3 +7,5 @@ build
 dist
 
 *.m~
+*_deprecated.m
+*.swp
