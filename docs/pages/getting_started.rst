@@ -1,4 +1,4 @@
-.. _getting_started:
+.. _gettingstarted:
 
 Getting Started
 ==============================
@@ -26,7 +26,7 @@ Let's start by loading the data:
    .. code-tab:: matlab
 
          addpath('/path/to/micasoft/BrainSpace/matlab');
-         [surf_lh, surf_rh] = load_conte69()
+         [surf_lh, surf_rh] = load_conte69();
 
 We can plot the surfaces:
 
@@ -44,7 +44,7 @@ We can plot the surfaces:
         plot_hemispheres(ones(64984,1),{surf_lh,surf_rh}); 
 
 
-.. image:: ../_static/getting_started00.png
+.. image:: ./matlab_doc/examples/example_figs/gettingstarted1.png
    :scale: 70%
    :align: center
 
@@ -63,10 +63,11 @@ package only comes with toy matrices using Schaefer parcellations `(Schaefer et 
 
    .. code-tab:: matlab
 
+        labeling = load_parcellation('schaefer',400);
         conn_matices = load_group_hcp('schaefer',400);
         m = conn_matices.schaefer_400; 
 
-To compute the gradients of `m`. Next, we create the `GradientMaps` object and
+To compute the gradients of `m` we create the `GradientMaps` object and
 fit the model to our data:
 
 .. tabs::
@@ -92,7 +93,7 @@ fit the model to our data:
    .. code-tab:: matlab
 
         % Create gradient mapper using diffusion maps and normalized angle
-        gm = GradientMaps('kernel','na','manifold',dm','n_components',2);
+        gm = GradientMaps('kernel','na','approach','dm','n_components',2);
 
         % Fit the data with this gradient mapper.
         gm = gm.fit(m);
@@ -122,6 +123,6 @@ We can visually inspect the gradients:
         plot_hemispheres(gm.gradients{1}(:,1), {surf_lh,surf_rh});
 
 
-.. image:: ../_static/getting_started00.png
+.. image:: ./matlab_doc/examples/example_figs/gettingstarted2.png
    :scale: 70%
    :align: center

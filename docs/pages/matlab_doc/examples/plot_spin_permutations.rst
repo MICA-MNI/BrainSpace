@@ -20,9 +20,13 @@ We will start by loading the conte69 surfaces for left and right hemispheres, th
     % Load the data 
     [t1wt2w_lh,t1wt2w_rh] = load_metric('t1wt2w');
     [thickness_lh,thickness_rh] = load_metric('thickness');
-    thickness_lh = thickness_lh .* mask_lh; 
-    thickness_rh = thickness_rh .* mask_rh; 
-
+    
+    % Set the midline to nan
+    thickness_lh(~mask_lh) = nan; 
+    thickness_lh(~mask_rh) = nan; 
+    t1wt2w_lh(~mask_lh) = nan;
+    t1wt2w_rh(~mask_rh) = nan;
+    
 Lets first generate some null data using spintest. 
 
 .. code-block:: matlab
@@ -70,7 +74,7 @@ Now we simply compute the correlations between the first gradient and the origin
     r_rand = corr([t1wt2w_lh;t1wt2w_rh],thickness_rotated, ...
                   'rows','pairwise','type','spearman');
 
-To find a p-value, we simply compute the percentile rank of the true correlation in the distribution or random correlations. Assuming a threshold of p<0.05 for statistical significance and disregarding multiple comparison corrections, we consider the correlation to be significant if it is lower or higher than the 2.5th/97.5th percentile, respectively.
+To find a p-value, we simply compute the percentile rank of the true correlation in the distribution or random correlations. Assuming a threshold of p<0.05 for statistical significance and disregarding multiple comparison corrections, we consider the correlation to be significant if it is lower or higher than the 2.5th/97.5th percentile, respectively. 
 
 .. code-block:: matlab
 

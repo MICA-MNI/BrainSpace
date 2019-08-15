@@ -3,8 +3,8 @@ function h = plot_hemispheres(data,surface,parcellation)
 % If parcellated data is provided, bring it to the full mesh.
 if exist('parcellation','var')
     data = parcel2full(data,parcellation);
-    data(isnan(data)) = -Inf;
 end
+data(isnan(data)) = -Inf;
 
 % Make sure surfaces are in SurfStat format.
 S = convert_surface(surface,'SurfStat');
@@ -25,13 +25,18 @@ for ii = 1:size(data,2)
     end
 end
 
-% Plot the surface(s).
-h.figure = figure('Color','white','Units','normalized','Position',[0 0 .9 .9]);
-colormap(parula(256));
+% Determine color limits
 for ii = 1:size(data,2)
     clim(:,ii) = [min(data(~isinf(data(:,ii)),ii)); ...
                   max(data(~isinf(data(:,ii)),ii))];
 end
+
+% Account for data consisting of only one value
+clim = clim + (clim(1,:) == clim(2,:)) .* [-eps;eps];
+
+% Plot the surface(s).
+h.figure = figure('Color','white','Units','normalized','Position',[0 0 .9 .9]);
+colormap(parula(256));
 for jj = 1:size(D,2)
     for ii = 1:numel(S)*2
         idx = ceil(ii/2);
