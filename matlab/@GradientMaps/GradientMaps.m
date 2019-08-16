@@ -56,7 +56,7 @@ classdef GradientMaps
             addParameter(p, 'kernel', 'normalized angle', in_fun);
             addParameter(p, 'approach', 'diffusion embedding', in_fun);
             addParameter(p, 'alignment', 'none', in_fun);
-            addParameter(p, 'n_components', 2, @isnumeric);
+            addParameter(p, 'n_components', 10, @isnumeric);
             addParameter(p, 'random_state', 0);
             
             parse(p, varargin{:});
