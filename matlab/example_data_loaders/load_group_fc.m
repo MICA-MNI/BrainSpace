@@ -1,4 +1,8 @@
-function conn_matrices = load_group_hcp(name,parcel_number)
+function conn_matrices = load_group_fc(name,parcel_number,group)
+
+if nargin < 3
+    group = 'main';
+end
 
 if ~iscell(name) || ~isstring(name)
     name = {name};
@@ -6,7 +10,7 @@ end
 
 P = mfilename('fullpath');
 brainspace_path = regexp(P,'.*BrainSpace','match','once');
-data_path = [brainspace_path filesep 'shared' filesep 'data' filesep 'main_group']; 
+data_path = [brainspace_path filesep 'shared' filesep 'data' filesep group '_group']; 
 
 for ii = 1:numel(name)
     for jj = 1:numel(parcel_number)

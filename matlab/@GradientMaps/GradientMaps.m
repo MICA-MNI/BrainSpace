@@ -91,11 +91,11 @@ classdef GradientMaps
                             switch lower(varargin{ii+1})
                                 case {'none',''}
                                     obj.method.kernel = 'None';
-                                case 'pearson'
+                                case {'p','pearson'}
                                     obj.method.kernel = 'Pearson';
-                                case 'spearman'
+                                case {'sm','spearman'}
                                     obj.method.kernel = 'Spearman';
-                                case 'gaussian'
+                                case {'g','gaussian'}
                                     obj.method.kernel = 'Gaussian';
                                 case {'cs','cosine','cosine similarity','cossim','cosine_similarity'}
                                     obj.method.kernel = 'Cosine Similarity';

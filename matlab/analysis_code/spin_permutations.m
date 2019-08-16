@@ -18,6 +18,15 @@ if ~iscell(Y)
     Y = {Y}; 
 end
 
+% Check if NaNs match within hemisphere
+for ii = 1:numel(Y)
+    if ~all(any(isnan(Y{ii}),2) == all(isnan(Y{ii}),2))
+       error('NaNs should match across all datasets within hemispheres.');
+    end
+    Y_nonan{ii} = Y{ii};
+    Y_nonan{ii}(any(isnan(Y{ii}),2),:) = []; 
+end
+
 if ~iscell(spheres)
     spheres = {spheres};
 end
@@ -41,6 +50,10 @@ end
 for ii = 1:numel(spheres)
     S{ii} = convert_surface(spheres{ii},'SurfStat');
     vertices{ii} = S{ii}.coord';
+    
+    % Remove NaN vertices
+    vertices{ii}(any(isnan(Y{ii},2)),:) = [];
+    
     % If parcellated data on sphere, get centroids of vertices.
     if ~isempty(parcellation)
         % Get Euclidean mean of points within each parcel.
@@ -57,7 +70,7 @@ for ii = 1:numel(spheres)
     tree{ii} = KDTreeSearcher(vertices{ii});
 end
 
-Y_rand=cell(numel(spheres),1);
+Y_rand_nan=cell(numel(spheres),1);
 I1 = diag([-1 1 1]);
 
 %permutation starts
@@ -79,7 +92,12 @@ for j=1:permutationnumber
         end
         rotated_vertices = vertices{ii}*rotation;
         nearest_neighbour = knnsearch(tree{ii}, rotated_vertices); % added 2019-06-18 see home page
-        Y_rand{ii}= cat(3,Y_rand{ii}, Y{ii}(nearest_neighbour,:));
+        Y_rand_nan{ii}= cat(3,Y_rand_nan{ii}, Y_nonan{ii}(nearest_neighbour,:));
     end
 end
+
+% Reinsert NaNs
+for ii = 1:numel(Y_rand_nan)
+    Y_rand{ii} = nan([size(Y{ii}),permutation_number]);
+    Y_rand{ii}(~any(isnan(Y{ii}),2),:,:) = Y_rand_nan{ii};
 end

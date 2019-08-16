@@ -2,7 +2,14 @@ function full_data = parcel2full(parcellated_data,parcellation)
 % Converts parcellated data to full data. Any missing data in the full set
 % (e.g. midline) should be denoted as either 0 or NaN. 
 
-% Check for correct size of parcellation. 
+if iscell(parcellated_data)
+    for ii = 1:numel(parcellated_data)
+        full_data{ii} = parcel2full(parcellated_data{ii},parcellation);
+    end
+    return
+end
+
+% Check for correct size of parcellation.
 sz = size(parcellated_data,1); 
 if max(parcellation) ~= sz
     error('Parcellation number must be eqiuvalent to length of parcellated data.');
