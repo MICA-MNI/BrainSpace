@@ -8,7 +8,10 @@ Functions on PointData and CellData.
 
 import numpy as np
 from scipy.stats import mode
+from scipy.spatial import cKDTree
 from scipy.sparse.csgraph import laplacian
+
+from sklearn.utils.extmath import weighted_mode
 
 from vtkmodules.vtkFiltersVerdictPython import vtkCellSizeFilter
 from vtkmodules.vtkFiltersGeneralPython import vtkCellCenters
@@ -17,7 +20,7 @@ from vtkmodules.vtkFiltersCorePython import vtkPolyDataConnectivityFilter
 from . import mesh_elements as me
 from ..utils.parcellation import map_to_mask, reduce_by_labels
 from ..vtk_interface.pipeline import serial_connect
-from ..vtk_interface.decorators import append_vtk
+from ..vtk_interface.decorators import append_vtk, wrap_input
 
 
 @append_vtk(to='cell')
@@ -631,3 +634,92 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
         spd[mask] = point_data[mask]
 
     return spd
+
+
+@wrap_input(only_args=[0, 1])
+def resample_pointdata(source_surf, target_surf, source_name, ops='mean',
+                       append=False, array_name=None):
+    """Resample point data in source to target surface.
+
+    Parameters
+    ----------
+    source_surf : vtkPolyData or BSPolyData
+        Source surface.
+    target_surf : vtkPolyData or BSPolyData
+        Target surface.
+    source_name : str or list of str
+        Point data in source surface to resample.
+    ops : {'mean', 'weighted_mean', 'mode', 'weighted_mode'}, optional
+        How is data resampled. Default is 'mean'.
+    append: bool, optional
+        If True, append array to point data attributes of target surface and
+        return surface. Otherwise, only return resampled arrays.
+        Default is False.
+    array_name : str or list of str, optional
+        Array names to append to target's point data attributes. Only used if
+        ``append == True``. If None, use names in `source_name`.
+        Default is None.
+
+    Returns
+    -------
+    output : vtkPolyData, BSPolyData or dict[str,ndarray]
+        A dictionary with rasampled point data. Return ict if
+        ``append == False``. Otherwise, return target surface with the
+        new arrays.
+
+    Notes
+    -----
+    This function is meant for the same source and target surfaces but with
+    different number of points. For other types of resampling, see
+    vtkResampleWithDataSet.
+
+    """
+
+    if not isinstance(source_name, list):
+        source_name = [source_name]
+
+    if not isinstance(ops, list):
+        ops = [ops] * len(source_name)
+
+    if array_name is None:
+        array_name = source_name
+
+    cell_centers = compute_cell_center(source_surf)
+    cells = me.get_cells(source_surf)
+
+    tree = cKDTree(cell_centers, leafsize=20, compact_nodes=False,
+                   copy_data=False, balanced_tree=False)
+    _, idx_cell = tree.query(target_surf.Points, k=1, eps=0, n_jobs=1)
+
+    closest_cells = cells[idx_cell]
+    if np.any([op1 in ['weighted_mean', 'weighted_mode'] for op1 in ops]):
+        dist_to_cell_points = np.sum((target_surf.Points[:, None] -
+                                      source_surf.Points[closest_cells])**2,
+                                     axis=-1)
+        dist_to_cell_points **= .5
+        dist_to_cell_points += np.finfo(np.float).eps
+        weights = 1 / dist_to_cell_points
+
+    resampled = dict()
+    for i, fn in enumerate(source_name):
+        candidate_feat = source_surf.get_array(fn, at='p')[closest_cells]
+        if ops[i] == 'mean':
+            feat = np.mean(candidate_feat, axis=1)
+        elif ops[i] == 'weighted_mean':
+            feat = np.average(candidate_feat, weights=weights, axis=1)
+        elif ops[i] == 'mode':
+            feat = mode(candidate_feat, axis=1)[0].squeeze()
+            feat = feat.astype(candidate_feat.dtype)
+        elif ops[i] == 'weighted_mode':
+            feat = weighted_mode(candidate_feat, weights, axis=1)[0].squeeze()
+            feat = feat.astype(candidate_feat.dtype)
+        else:
+            raise ValueError('Unknown op: {0}'.format(ops[i]))
+
+        resampled[array_name[i]] = feat
+
+    if append:
+        for fn, feat in resampled.items():
+            target_surf.append_array(feat, name=fn, at='p')
+        return target_surf
+    return resampled
