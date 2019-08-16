@@ -354,8 +354,8 @@ def project_pointdata_onto_surface(source_surf, target_surf, source_names, ops,
                    copy_data=False, balanced_tree=False)
     _, idx_cell = tree.query(target_surf.Points, k=1, eps=0, n_jobs=1)
 
+    closest_cells = cells[idx_cell]
     if np.any([op1 in ['weighted_mean', 'weighted_mode'] for op1 in ops]):
-        closest_cells = cells[idx_cell]
         dist_to_cell_points = np.sum((target_surf.Points[:, None] -
                                       source_surf.Points[closest_cells])**2,
                                      axis=-1)
