@@ -1,4 +1,4 @@
-function Y_rand = spintest(Y,spheres,permutationnumber,varargin)
+function Y_rand = spin_permutations(Y,spheres,permutation_number,varargin)
 % Compute designated # of permutations/spins of the input surface data.
 % Uniformly samples from all possible rotations and applies them to the
 % data. 
@@ -52,7 +52,7 @@ for ii = 1:numel(spheres)
     vertices{ii} = S{ii}.coord';
     
     % Remove NaN vertices
-    vertices{ii}(any(isnan(Y{ii},2)),:) = [];
+    vertices{ii}(any(isnan(Y{ii}),2),:) = [];
     
     % If parcellated data on sphere, get centroids of vertices.
     if ~isempty(parcellation)
@@ -76,7 +76,7 @@ I1 = diag([-1 1 1]);
 %permutation starts
 disp('Running Spin Permutation');
 
-for j=1:permutationnumber
+for j=1:permutation_number
     %the updated uniform sampling procedure
     A = normrnd(0,1,3,3);
     [rotation, temp] = qr(A);
