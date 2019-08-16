@@ -8,16 +8,11 @@ Basic functions on surface meshes.
 
 import warnings
 import numpy as np
-from scipy.spatial import cKDTree
-from scipy.stats import mode
-
-from sklearn.utils.extmath import weighted_mode
 
 from vtkmodules.vtkCommonDataModelPython import vtkDataObject
 from vtkmodules.vtkFiltersCorePython import vtkThreshold
 from vtkmodules.vtkFiltersGeometryPython import vtkGeometryFilter
 
-from . import mesh_elements as me, array_operations as aop
 from ..vtk_interface.pipeline import serial_connect
 from ..vtk_interface.wrappers import wrap_vtk
 from ..vtk_interface.decorators import wrap_input
@@ -332,55 +327,3 @@ def mask_cells(surf, mask):
     """
 
     return _surface_mask(surf, mask, use_cell=True)
-
-
-@wrap_input(only_args=[0, 1])
-def project_pointdata_onto_surface(source_surf, target_surf, source_names, ops,
-                                   target_names=None):
-
-    if not isinstance(source_names, list):
-        source_names = [source_names]
-
-    if not isinstance(ops, list):
-        ops = [ops] * len(source_names)
-
-    if target_names is None:
-        target_names = source_names
-
-    cell_centers = aop.compute_cell_center(source_surf)
-    cells = me.get_cells(source_surf)
-
-    tree = cKDTree(cell_centers, leafsize=20, compact_nodes=False,
-                   copy_data=False, balanced_tree=False)
-    _, idx_cell = tree.query(target_surf.Points, k=1, eps=0, n_jobs=1)
-
-    if np.any([op1 in ['weighted_mean', 'weighted_mode'] for op1 in ops]):
-        closest_cells = cells[idx_cell]
-        dist_to_cell_points = np.sum((target_surf.Points[:, None] -
-                                      source_surf.Points[closest_cells])**2,
-                                     axis=-1)
-        dist_to_cell_points **= .5
-        dist_to_cell_points += np.finfo(np.float).eps
-        weights = 1 / dist_to_cell_points
-
-    if target_names is None:
-        target_names = source_names
-
-    for i, fn in enumerate(source_names):
-        candidate_feat = source_surf.get_array(fn, at='p')[closest_cells]
-        if ops[i] == 'mean':
-            feat = np.mean(candidate_feat, axis=1)
-        elif ops[i] == 'weighted_mean':
-            feat = np.average(candidate_feat, weights=weights, axis=1)
-        elif ops[i] == 'mode':
-            feat = mode(candidate_feat, axis=1)[0].squeeze()
-            feat = feat.astype(candidate_feat.dtype)
-        elif ops[i] == 'weighted_mode':
-            feat = weighted_mode(candidate_feat, weights, axis=1)[0].squeeze()
-            feat = feat.astype(candidate_feat.dtype)
-        else:
-            raise ValueError('Unknown op: {0}'.format(ops[i]))
-
-        target_surf.append_array(feat, name=target_names[i], at='p')
-
-    return target_surf
