@@ -1,10 +1,14 @@
-Null models based on spin permutations
+Tutorial 3: Null models
 =================================================
 
 TODO: Update with gradient comparison rather than thickness + t1w/t2w
 
-In this example we assess the significance of correlations between the first canonical gradient and data from other modalities (cortical thickness and T1w/T2w image intensity). A normal test of the significance of the correlation cannot be used, because the spatial auto-correlation in MRI data may bias the test statistic. Here, we use the spin test approach previously proposed in `(Alexander-Bloch et al., 2018) <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_, which preserves the auto-correlation of the permuted feature(s) by rotating the feature data on the spherical domain. Note that when comparing gradients to non-gradient markers, we recommend permuting the non-gradient markers. 
-We will start by loading the conte69 surfaces for left and right hemispheres, their corresponding spheres, midline mask, and t1w/t2w intensity as well as cortical thickness data.
+In this tutorial we assess the significance of correlations between the first canonical gradient and data from other modalities (cortical thickness and T1w/T2w image intensity). A normal test of the significance of the correlation cannot be used, because the spatial auto-correlation in MRI data may bias the test statistic. In this tutorial we will show two approaches for null hypothesis testing: spin permutations and Moran spectral randomization. 
+
+Spin Permutations
+--------------------
+Here, we use the spin permutations approach previously proposed in `(Alexander-Bloch et al., 2018) <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_, which preserves the auto-correlation of the permuted feature(s) by rotating the feature data on the spherical domain. Note that when comparing gradients to non-gradient markers, we recommend permuting the non-gradient markers. 
+We will start by loading the conte69 surfaces for left and right hemispheres, their corresponding spheres, midline mask, and t1w/t2w intensity as well as cortical thickness data, and a template functional gradient.
 
 .. code-block:: matlab
 
@@ -14,18 +18,12 @@ We will start by loading the conte69 surfaces for left and right hemispheres, th
     [surf_lh, surf_rh] = load_conte69;
     [sphere_lh, sphere_rh] = load_conte69('spheres');
 
-    % and the mask
-    [mask_lh, mask_rh] = load_mask;
-
     % Load the data 
     [t1wt2w_lh,t1wt2w_rh] = load_metric('t1wt2w');
     [thickness_lh,thickness_rh] = load_metric('thickness');
     
-    % Set the midline to nan
-    thickness_lh(~mask_lh) = nan; 
-    thickness_lh(~mask_rh) = nan; 
-    t1wt2w_lh(~mask_lh) = nan;
-    t1wt2w_rh(~mask_rh) = nan;
+    % Template functional gradient
+    embedding = load_template('fc');
     
 Lets first generate some null data using spintest. 
 
@@ -64,6 +62,8 @@ as well as a few rotated version.
    :scale: 50%
    :align: center
 
+.. warning:: Depending on the overlap of midlines (i.e. NaNs) in the original data and in the rotation, statistical comparisons between them may compare different numbers of features. This can bias your test statistics. Therefore, if a large portion of the sphere is not used, we recommend using Moran spectral randomization instead.  
+
 Now we simply compute the correlations between the first gradient and the original data, as well as all rotated data.
 
 .. code-block:: matlab
@@ -82,6 +82,10 @@ To find a p-value, we simply compute the percentile rank of the true correlation
    prctile_rank = mean(r_original > r_rand);
    significant = prctile_rank < 0.025 || prctile_rank >= 0.975;
 
-If significant is true, the we've found a statistically significant correlation.
+If significant is true, the we've found a statistically significant correlation. Alternatively, one could also test the one-tailed hypothesis whether the percentile rank is lower or higher than the 5th/95th percentile, respectively. 
+
+Moran Spectral Randomization 
+--------------------------------
+
 
 

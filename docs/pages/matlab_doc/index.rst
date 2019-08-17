@@ -30,9 +30,7 @@ Support Functions
 Examples 
 ----------------
 .. toctree::
+   :glob:
    :maxdepth: 1
 
-   examples/plot_gradient_inspection
-   examples/plot_embedding_approaches
-   examples/plot_different_parcellations
-   examples/plot_spin_permutations
+   examples/*

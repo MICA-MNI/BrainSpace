@@ -1,13 +1,13 @@
-.. _spintest:
+.. _spin_permutations:
 
 ==================
-spintest
+spin_permutations
 ==================
 
 ------------------
 Synopsis
 ------------------
-Performs a spin test to generate null data for hypothesis testing (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/spintest.m>`_).
+Performs a spin test to generate null data for hypothesis testing (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/spin_permutations.m>`_).
 
 ------------------
 Usage
@@ -15,7 +15,7 @@ Usage
 
 ::
 
-	null_data = spintest(data,spheres,permutation_number,varargin);
+	null_data = spin_permutations(data,spheres,permutation_number,varargin);
 
 - *data*: An n-by-m matrix of data to be randomised (single sphere) or cell array of n-by-m matrices (two spheres).  
 - *spheres*: Cell array containing spheres. 
@@ -32,4 +32,4 @@ Name-Value pairs
 ------------------
 
 - *'parcellation'*: a n-by-1 vector containing the parcellation scheme. Do not provide for no vertex-level analysis.  
-- *'type'*: program used to generate the spheres. Either 'FreeSurfer' (default), or 'CIVET'.
+- *'type'*: program used to generate the spheres. Either 'FreeSurfer' (default), or 'CIVET'. If Freesurfer, rotations are flipped along the x-axis for the second sphere. 
