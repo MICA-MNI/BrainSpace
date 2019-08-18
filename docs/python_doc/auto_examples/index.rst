@@ -20,7 +20,7 @@ Examples
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_embedding_approaches_thumb.png
+    .. figure:: ./images/thumb/sphx_glr_plot_embedding_approaches_thumb.png
 
         :ref:`sphx_glr_auto_examples_plot_embedding_approaches.py`
 
@@ -40,7 +40,7 @@ Examples
 
 .. only:: html
 
-    .. figure:: /auto_examples/images/thumb/sphx_glr_plot_different_parcellations_thumb.png
+    .. figure:: ./images/thumb/sphx_glr_plot_different_parcellations_thumb.png
 
         :ref:`sphx_glr_auto_examples_plot_different_parcellations.py`
 
@@ -53,6 +53,26 @@ Examples
    :hidden:
 
    /auto_examples/plot_different_parcellations
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Null models based on spin permutations">
+
+.. only:: html
+
+    .. figure:: ./images/thumb/sphx_glr_plot_spin_permutations_thumb.png
+
+        :ref:`sphx_glr_auto_examples_plot_spin_permutations.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_spin_permutations
 .. raw:: html
 
     <div style='clear:both'></div>
@@ -67,13 +87,13 @@ Examples
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//media/oualid/hd500/oualid/BrainSpace/docs/auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//media/oualid/hd500/oualid/BrainSpace/docs/auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

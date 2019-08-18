@@ -13,106 +13,92 @@ import functools
 from . import wrappers
 
 
-def _wrap_input_data(*args, only_args=None, skip_args=None, **kwargs):
-    """ Wrap all vtk objects in `args` and `kwargs` except those in `skip_args`.
+def _wrap_input_data(args, kwargs, *xargs, skip=False):
+    """ Wrap vtk objects in `args` and `kwargs`.
 
-    E.g., skip_args=[0, 2, 'key1'] to skip positional arguments in positions 0
-    and 2, and keyword arg 'key1' from wrapping.
+    E.g., xargs=(0, 2, 'key1') wrap positional arguments in positions 0
+    and 2, and keyword arg 'key1'.
 
     Parameters
     ----------
-    args : args
+    args : tuple
         Function args.
-    only_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to wrap. This has preference over `skip_args`.
-        Default is None.
-    skip_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to skip from wrapping. Not used if `only_args` is not None.
-        Default is None. If both are None, try to wrap all arguments.
-    kwargs : kwargs
+    kwargs : dict
         Keyword args.
+    xargs : sequence of int and str
+        Positional indices (integers) and keys as strings (for keyword
+        args) to wrap. If not specified, try to wrap all arguments.
+        If ``skip == True``, wrap all arguments except these ones.
+    skip : bool, optional
+        Wrap all arguments except those in `xargs`. Default is False.
 
     Returns
     -------
     wrapped_args : args
-         Return args with all vtk objects wrapped if not in `skip_args`.
+         Return args with the wrapped vtk objects wrapped.
     wrapped_kwargs: kwargs
-         Return keyword args with all vtk objects wrapped if not in `skip_args`.
+         Return keyword args with wrapped vtk objects.
 
     """
 
-    if only_args is None and skip_args is None:
-        only_args = list(range(len(args))) + list(kwargs.keys())
-    elif only_args is None:
-        if not isinstance(skip_args, list):
-            skip_args = [skip_args]
-        only_args = [i for i in range(len(args)) if i not in skip_args]
-        only_args += [k for k in kwargs.keys() if k not in skip_args]
-    elif not isinstance(only_args, list):
-        only_args = [only_args]
+    list_args = list(range(len(args))) + list(kwargs.keys())
+    if len(xargs) == 0:
+        xargs = list_args
+    if skip:
+        xargs = [a for a in list_args if a not in xargs]
 
     new_args = list(args)
     for i, a in enumerate(new_args):
-        if i in only_args and wrappers.is_vtk(a):
+        if i in xargs and wrappers.is_vtk(a):
             new_args[i] = wrappers.wrap_vtk(a)
 
     for k, v in kwargs.items():
-        if k in only_args and wrappers.is_vtk(v):
+        if k in xargs and wrappers.is_vtk(v):
             kwargs[k] = wrappers.wrap_vtk(v)
-
     return new_args, kwargs
 
 
-def _unwrap_input_data(*args, only_args=None, skip_args=None, **kwargs):
-    """ Unwrap (return the wrapped vtk object) all wrappers in `args` and
-    `kwargs` except those in `skip_args`.
+def _unwrap_input_data(args, kwargs, *xargs, skip=False):
+    """ Unwrap (return the wrapped vtk object) wrappers in `args` and `kwargs`.
 
-    E.g., skip_args=[0, 2, 'key1'] to skip positional arguments in positions 0
-    and 2, and keyword arg 'key1' from unwrapping.
+    E.g., ``xargs=(0, 2, 'key1')`` unwrap positional arguments in
+    positions 0 and 2, and keyword arg 'key1'.
 
     Parameters
     ----------
-    args : args
+    args : tuple
         Function args.
-    only_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to unwrap. This has preference over `skip_args`.
-        Default is None.
-    skip_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to skip from unwrapping. Not used if `only_args` is not None.
-        Default is None. If both are None, try to unwrap all arguments.
-    kwargs : kwargs
+    kwargs : dict
         Keyword args.
+    xargs : sequence of int and str
+        Positional indices (integers) and keys as strings (for keyword
+        args) to unwrap. If not specified, try to unwrap all arguments.
+        If ``skip == True``, unwrap all arguments except these ones.
+    skip : bool, optional
+        Unwrap all arguments except those in `wrap_args`. Default is False.
 
     Returns
     -------
     unwrapped_args : args
-         Return args unwrapped vtk objects if not in `skip_args`.
+         Return args with unwrapped vtk objects.
     unwrapped_kwargs: kwargs
-         Return keyword args with unwrapped vtk objects if not in `skip_args`.
+         Return keyword args with unwrapped vtk objects.
 
     """
 
-    if only_args is None and skip_args is None:
-        only_args = list(range(len(args))) + list(kwargs.keys())
-    elif only_args is None:
-        if not isinstance(skip_args, list):
-            skip_args = [skip_args]
-        only_args = [i for i in range(len(args)) if i not in skip_args]
-        only_args += [k for k in kwargs.keys() if k not in skip_args]
-    elif not isinstance(only_args, list):
-        only_args = [only_args]
+    list_args = list(range(len(args))) + list(kwargs.keys())
+    if len(xargs) == 0:
+        xargs = list_args
+    if skip:
+        xargs = [a for a in list_args if a not in xargs]
 
     new_args = list(args)
     for i, a in enumerate(new_args):
-        if i in only_args and wrappers.is_wrapper(a):
+        if i in xargs and wrappers.is_wrapper(a):
             new_args[i] = a.VTKObject
 
     for k, v in kwargs.items():
-        if k in only_args and wrappers.is_wrapper(v):
+        if k in xargs and wrappers.is_wrapper(v):
             kwargs[k] = v.VTKObject
     return new_args, kwargs
 
@@ -161,7 +147,7 @@ def _unwrap_output_data(data):
     return data
 
 
-def wrap_input(only_args=None, skip_args=None):
+def wrap_input(*xargs, skip=False):
     """Decorator to wrap the arguments of a function.
 
     An object is wrapped only if it is an instance of :class:`vtkObject`
@@ -169,14 +155,11 @@ def wrap_input(only_args=None, skip_args=None):
 
     Parameters
     ----------
-    only_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to wrap. This has preference over `skip_args`.
-        Default is None.
-    skip_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to skip from wrapping. Not used if `only_args` is not None.
-        Default is None. If both are None, try to wrap all arguments.
+    xargs : sequence of int and str
+        Positional indices (integers) and keys as strings (for keyword
+        args) to wrap. If no specified, try to wrap all args.
+    skip : bool, optional
+        Wrap all arguments except those in `xargs`. Default is False.
 
     See Also
     --------
@@ -187,11 +170,9 @@ def wrap_input(only_args=None, skip_args=None):
 
     def _wrapper_decorator(func):
         @functools.wraps(func)
-        def _wrapper_wrap(*args, **kwargs):
-            args, kwargs = _wrap_input_data(*args, **kwargs,
-                                            only_args=only_args,
-                                            skip_args=skip_args)
-            data = func(*args, **kwargs)
+        def _wrapper_wrap(*args, **kwds):
+            args, kwds = _wrap_input_data(args, kwds, *xargs, skip=skip)
+            data = func(*args, **kwds)
             return data
         return _wrapper_wrap
     return _wrapper_decorator
@@ -217,13 +198,13 @@ def wrap_output(func):
     """
 
     @functools.wraps(func)
-    def _wrapper_wrap(*args, **kwargs):
-        data = func(*args, **kwargs)
+    def _wrapper_wrap(*args, **kwds):
+        data = func(*args, **kwds)
         return _wrap_output_data(data)
     return _wrapper_wrap
 
 
-def unwrap_input(only_args=None, skip_args=None):
+def unwrap_input(*xargs, skip=False):
     """Decorator to unwrap input arguments of function.
 
     An object is unwrapped only if it is an instance of
@@ -231,14 +212,11 @@ def unwrap_input(only_args=None, skip_args=None):
 
     Parameters
     ----------
-    only_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to unwrap. This has preference over `skip_args`.
-        Default is None.
-    skip_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to skip from unwrapping. Not used if `only_args` is not None.
-        Default is None. If both are None, try to unwrap all arguments.
+    xargs : sequence of int and str
+        Positional indices (integers) and keys as strings (for keyword
+        args) to unwrap. If no specified, try to unwrap all args.
+    skip : bool, optional
+        Unwrap all arguments except those in `xargs`. Default is False.
 
     See Also
     --------
@@ -249,11 +227,9 @@ def unwrap_input(only_args=None, skip_args=None):
 
     def _wrapper_decorator(func):
         @functools.wraps(func)
-        def _wrapper_wrap(*args, **kwargs):
-            args, kwargs = _unwrap_input_data(*args, **kwargs,
-                                              only_args=only_args,
-                                              skip_args=skip_args)
-            data = func(*args, **kwargs)
+        def _wrapper_wrap(*args, **kwds):
+            args, kwds = _unwrap_input_data(args, kwds, *xargs, skip=skip)
+            data = func(*args, **kwds)
             return data
         return _wrapper_wrap
     return _wrapper_decorator
@@ -278,13 +254,13 @@ def unwrap_output(func):
     """
 
     @functools.wraps(func)
-    def _wrapper_wrap(*args, **kwargs):
-        data = func(*args, **kwargs)
+    def _wrapper_wrap(*args, **kwds):
+        data = func(*args, **kwds)
         return _unwrap_output_data(data)
     return _wrapper_wrap
 
 
-def wrap_func(inp=True, out=True, only_args=None, skip_args=None):
+def wrap_func(*xargs, inp=True, out=True, skip=False):
     """Decorator to wrap both arguments and output of a function.
 
     An object is wrapped only if it is an instance of :class:`vtkObject`
@@ -292,18 +268,15 @@ def wrap_func(inp=True, out=True, only_args=None, skip_args=None):
 
     Parameters
     ----------
+    xargs : sequence of int and str
+        Positional indices (integers) and keys as strings (for keyword
+        args) to wrap. If no specified, try to wrap all args.
     inp : bool, optional
         If True, wrap input arguments. Default is True.
     out : bool, optional
         If True, wrap output. Default is True.
-    only_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to wrap. This has preference over `skip_args`.
-        Default is None.
-    skip_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to skip from wrapping. Not used if `only_args` is not None.
-        Default is None. If both are None, try to wrap all arguments.
+    skip : bool, optional
+        Wrap all arguments except those in `xargs`. Default is False.
 
     See Also
     --------
@@ -314,12 +287,10 @@ def wrap_func(inp=True, out=True, only_args=None, skip_args=None):
 
     def _wrapper_decorator(func):
         @functools.wraps(func)
-        def _wrapper_wrap(*args, **kwargs):
+        def _wrapper_wrap(*args, **kwds):
             if inp:
-                args, kwargs = _wrap_input_data(*args, **kwargs,
-                                                only_args=only_args,
-                                                skip_args=skip_args)
-            data = func(*args, **kwargs)
+                args, kwds = _wrap_input_data(args, kwds, xargs, skip=skip)
+            data = func(*args, **kwds)
 
             if out:
                 return _wrap_output_data(data)
@@ -329,7 +300,7 @@ def wrap_func(inp=True, out=True, only_args=None, skip_args=None):
     return _wrapper_decorator
 
 
-def unwrap_func(inp=True, out=True, only_args=None, skip_args=None):
+def unwrap_func(inp=True, out=True, largs='*', skip=False):
     """Decorator to unwrap both arguments and output of a function.
 
     An object is unwrapped only if it is an instance of
@@ -337,18 +308,15 @@ def unwrap_func(inp=True, out=True, only_args=None, skip_args=None):
 
     Parameters
     ----------
+    largs : sequence of int and str
+        Positional indices (integers) and keys as strings (for keyword
+        args) to unwrap. If no specified, try to unwrap all args.
     inp : bool, optional
         If True, unwrap input arguments. Default is True.
     out : bool, optional
         If True, unwrap output. Default is True.
-    only_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to unwrap. This has preference over `skip_args`.
-        Default is None.
-    skip_args : int, str or list of int and str, optional
-        List of positional indices (integers) and keys as strings (for keyword
-        args) to skip from unwrapping. Not used if `only_args` is not None.
-        Default is None. If both are None, try to unwrap all arguments.
+    skip : bool, optional
+        Unwrap all arguments except those in `largs`. Default is False.
 
     See Also
     --------
@@ -359,12 +327,11 @@ def unwrap_func(inp=True, out=True, only_args=None, skip_args=None):
 
     def _wrapper_decorator(func):
         @functools.wraps(func)
-        def _wrapper_wrap(*args, **kwargs):
+        def _wrapper_wrap(*args, **kwds):
             if inp:
-                args, kwargs = _unwrap_input_data(*args, **kwargs,
-                                                  only_args=only_args,
-                                                  skip_args=skip_args)
-            data = func(*args, **kwargs)
+                args, kwds = _unwrap_input_data(*args, **kwds, largs=largs,
+                                                  skip=skip)
+            data = func(*args, **kwds)
 
             if out:
                 return _unwrap_output_data(data)

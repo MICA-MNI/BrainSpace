@@ -144,7 +144,7 @@ class BSAlgorithm(BSVTKObjectWrapper):
         """
         return self.VTKObject.GetOutputDataObject(*args)
 
-    @unwrap_input(skip_args=0)
+    @unwrap_input(0, skip=True)
     def SetInputDataObject(self, *args):
         """Set input data object.
 
@@ -159,7 +159,7 @@ class BSAlgorithm(BSVTKObjectWrapper):
         """
         self.VTKObject.SetInputDataObject(*args)
 
-    @unwrap_input(skip_args=0)
+    @unwrap_input(0, skip=True)
     def AddInputDataObject(self, *args):
         """Set input data object.
 
@@ -490,10 +490,33 @@ class BSPolyData(dsa.PolyData, BSPointSet):
         ValueError
             If PolyData has different cell types.
         """
-        if not self.has_unique_cell_type:
-            raise ValueError('PolyData has different types of cells.')
-        cells = self.Polygons
+        if self.has_only_triangle:
+            cells = self.Polygons
+        elif self.has_only_line:
+            cells = self.Lines
+        elif self.has_only_vertex:
+            cells = self.Verts
+        else:
+            raise ValueError('Cell type not supported.')
         return cells.reshape(-1, cells[0] + 1)[:, 1:]
+
+    def GetVerts(self):
+        """Returns the lines as a VTKArray instance."""
+        if not self.VTKObject.GetVerts():
+            return None
+        return dsa.vtkDataArrayToVTKArray(
+            self.VTKObject.GetVerts().GetData(), self)
+
+    Verts = property(GetVerts, None, None, "This property returns the connectivity of verts.")
+
+    def GetLines(self):
+        """Returns the lines as a VTKArray instance."""
+        if not self.VTKObject.GetLines():
+            return None
+        return dsa.vtkDataArrayToVTKArray(
+            self.VTKObject.GetLines().GetData(), self)
+
+    Lines = property(GetLines, None, None, "This property returns the connectivity of lines.")
 
 
 class BSUnstructuredGrid(dsa.UnstructuredGrid, BSPointSet):
@@ -666,7 +689,7 @@ class BSPolyDataMapper(BSMapper):
     def __init__(self, vtkobject=None, **kwargs):
         super().__init__(vtkobject=vtkobject, **kwargs)
 
-    @unwrap_input(skip_args=0)
+    @unwrap_input(0, skip=True)
     def SetInputData(self, poly_data):
         """Set input data.
 

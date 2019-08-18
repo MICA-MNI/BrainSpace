@@ -636,7 +636,7 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
     return spd
 
 
-@wrap_input(only_args=[0, 1])
+@wrap_input(0, 1)
 def resample_pointdata(source_surf, target_surf, source_name, ops='mean',
                        append=False, array_name=None):
     """Resample point data in source to target surface.

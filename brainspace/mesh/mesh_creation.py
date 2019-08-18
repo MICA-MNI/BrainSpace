@@ -102,7 +102,7 @@ def to_vertex(surf):
     return serial_connect(surf, vtkVertexGlyphFilter())
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def to_lines(surf):
     """Convert all cells in PolyData to lines.
 

@@ -18,7 +18,7 @@ def relabel_consecutive(lab, start_from=0):
 
     Parameters
     ----------
-    lab : array_like
+    lab : ndarray
         Array to relabel.
     start_from : int, optional
         Initial label. The default is 0.
@@ -30,8 +30,10 @@ def relabel_consecutive(lab, start_from=0):
 
     """
 
-    _, new_lab = np.unique(lab, return_inverse=True)
-    return new_lab + start_from
+    new_lab = np.empty_like(lab)
+    new_lab[:] = np.unique(lab, return_inverse=True)[1]
+    new_lab += start_from
+    return new_lab
 
 
 def relabel(lab, new_labels=None):
@@ -62,7 +64,8 @@ def relabel(lab, new_labels=None):
     if new_labels is None:
         return relabel_consecutive(lab)
 
-    return relabel(lab, dict(zip(np.unique(lab), new_labels)))
+    keys = np.unique(lab)[:new_labels.size]
+    return relabel(lab, dict(zip(keys, new_labels)))
 
 
 def find_label_correspondence(lab1, lab2):
@@ -71,9 +74,9 @@ def find_label_correspondence(lab1, lab2):
 
     Parameters
     ----------
-    lab1 : array_like
+    lab1 : ndarray, shape = (n_lab,)
         First array of labels.
-    lab2 : array_like
+    lab2 : ndarray, shape = (n_lab,)
         Second array of labels.
 
     Returns
@@ -84,7 +87,6 @@ def find_label_correspondence(lab1, lab2):
     Notes
     -----
     Correspondences are based on largest overlap using the Hungarian algorithm.
-
     """
 
     u1, idx1 = np.unique(lab1, return_inverse=True)
@@ -106,21 +108,20 @@ def relabel_by_overlap(lab, ref_lab):
 
     Parameters
     ----------
-    lab : array_like
+    lab : ndarray, shape = (n_lab,)
         Array of labels.
-    ref_lab : array_like
+    ref_lab : ndarray, shape = (n_lab,)
         Reference array of labels.
 
     Returns
     -------
-    new_lab : ndarray
+    new_lab : ndarray, shape = (n_lab,)
         Array relabeled using the reference array.
 
     Notes
     -----
     Correspondences between labels are based on largest overlap using the
     Hungarian algorithm.
-
     """
 
     u1 = np.unique(lab)
@@ -148,7 +149,7 @@ def map_to_mask(values, mask, fill=0, axis=0):
     ----------
     values : ndarray, shape = (n_rows, n_cols) or (n_cols,)
         Source array of values.
-    mask : 1D ndarray, shape = (n_mask,)
+    mask : ndarray, shape = (n_mask,)
         Mask of boolean values. Data is mapped to mask.
         If `values` is 2D, the mask is applied according to `axis`.
     fill : float, optional
@@ -164,6 +165,9 @@ def map_to_mask(values, mask, fill=0, axis=0):
         (n_mask, n_cols) otherwise.
 
     """
+
+    if np.issubdtype(values.dtype, np.integer) and not np.isfinite(fill):
+        raise ValueError("Cannot use non-finite 'fill' with integer arrays.")
 
     if values.ndim == 1:
         axis = 0
@@ -184,26 +188,28 @@ def map_to_labels(source_val, target_lab, mask=None, fill=0, source_lab=None):
     """Map data in source to target according to their labels.
 
     Target labels are sorted in ascending order, such that the smallest label
-    indexes the value at position 0 in `source_lab`.
+    indexes the value at position 0 in `source_val`. If `source_lab` is
+    specified, any label in `target_lab` must be in `source_lab`.
 
     Parameters
     ----------
-    source_val : 1D ndarray
+    source_val : ndarray, shape = (n_val,)
         Source array of values.
-    target_lab : 1D ndarray
+    target_lab : ndarray, shape = (n_lab,)
         Target labels.
-    mask : 1D ndarray, optional
+    mask : ndarray, shape = (n_lab,), optional
         If mask is not None, only consider target labels in mask.
+        Default is None.
     fill : float, optional
         Value used to fill elements outside the mask. Only used if mask is not
         None. Default is 0.
-    source_lab : 1D ndarray, optional
-        Source labels. If None, it takes the same unique labels
-        as the target label in ascending order. Default is None.
+    source_lab : ndarray, shape = (n_val,), optional
+        Source labels for source values. If None, use unique labels in
+        `target_lab` in ascending order. Default is None.
 
     Returns
     -------
-    target_val : 1D ndarray
+    target_val : ndarray, shape = (n_lab,)
         Target array with corresponding source values.
 
     """
@@ -213,130 +219,120 @@ def map_to_labels(source_val, target_lab, mask=None, fill=0, source_lab=None):
         labs2 = map_to_labels(source_val, target_lab2, source_lab=source_lab)
         return map_to_mask(labs2, mask, fill=fill)
 
-    source_val = np.asarray(source_val)
-    uq_tl, idx_tl = np.unique(target_lab, return_inverse=True)
+    if source_lab is None:
+        uq_tl, idx_tl = np.unique(target_lab, return_inverse=True)
+        return source_val[idx_tl]
 
-    if source_lab is not None:
-        source_lab = np.asarray(source_lab)
-        if source_lab.size != source_val.size:
-            raise ValueError('Source values and labels must have same size.')
+    if source_lab.size != source_val.size:
+        raise ValueError('Source values and labels must have same size.')
 
-        uq_sl, idx_sl = np.unique(source_lab, return_inverse=True)
+    uq_sl, idx_sl = np.unique(source_lab, return_inverse=True)
+    if source_lab.size != uq_sl.size:
+        raise ValueError('Source labels must have distinct labels.')
 
-        if source_lab.size != uq_sl.size:
-            raise ValueError('Source labels must have distinct labels.')
-        if np.setdiff1d(uq_tl, uq_sl).size > 0:
-            raise ValueError('Source and target labels do not coincide.')
+    source_val = source_val[idx_sl]
+    return source_val[target_lab]
 
-        source_val = source_val[idx_sl]
 
-    if idx_tl.max() >= source_val.size:
-        raise ValueError('There are more labels than values.')
-
-    return source_val[idx_tl]
+def _get_redop(red_op, weights=None, axis=None):
+    if red_op in ['mean', 'average']:
+        if weights is None:
+            def fred(x, w): return np.mean(x, axis=axis)
+        else:
+            def fred(x, w): return np.average(x, weights=w, axis=axis)
+    elif red_op == 'median':
+        def fred(x, w): return np.median(x, axis=axis)
+    elif red_op == 'mode':
+        if weights is None:
+            def fred(x, w): return mode(x, axis=axis)[0].ravel()
+        else:
+            def fred(x, w): return weighted_mode(x, w, axis=axis)
+    elif red_op == 'sum':
+        def fred(x, w): return np.sum(x if w is None else w * x, axis=axis)
+    elif red_op == 'max':
+        def fred(x, w): return np.max(x, axis=axis)
+    elif red_op == 'min':
+        def fred(x, w): return np.min(x, axis=axis)
+    else:
+        raise ValueError("Unknown reduction operation '{0}'".format(red_op))
+    return fred
 
 
 def reduce_by_labels(values, labels, weights=None, target_labels=None,
                      red_op='mean', axis=0, dtype=np.float):
-    """Summarize data in source according to its labels.
+    """Summarize data in `values` according to `labels`.
 
     Parameters
     ----------
     values : 1D or 2D ndarray
         Array of values.
-    labels : 1D ndarray
+    labels : 1D ndarray, shape = (n_lab,)
         Labels used summarize values.
-    weights : 1D ndarray, optional
+    weights : 1D ndarray, shape = (n_lab,), optional
         Weights associated with labels. Only used when `red_op` is
-        'average', 'mean', 'sum' or 'mode'. Default is None.
+        'average', 'mean', 'sum' or 'mode'. Weights are not normalized.
+        Default is None.
     target_labels : 1D ndarray, optional
         Target labels. Arrange new array following the ordering of labels
         in the `target_labels`. When None, new array is arranged in ascending
-        order of source labels. Default is None.
+        order of `labels`. Default is None.
     red_op : str or callable, optional
         How to summarize data. If str, options are: {'min', 'max', 'sum',
         'mean', 'median', 'mode', 'average'}. If callable, it should receive
-        a 1D array of values, an array of weights (or None), and return a
-        scalar value. Default is 'mean'.
-    dtype : dtype
+        a 1D array of values, array of weights (or None) and return a scalar
+        value. Default is 'mean'.
+    dtype : dtype, optional
         Data type of output array. Default is float.
     axis : {0, 1}, optional
-        If ``axis == 0``, apply to each row (therefore, reducing number of
-        columns per row). Otherwise, to each column (reducing number of rows
-        per column). Default is 0.
+        If ``axis == 0``, apply to each row (reduce number of columns per row).
+        Otherwise, apply to each column (reduce number of rows per column).
+        Default is 0.
 
     Returns
     -------
     target_values : ndarray
         Summarized target values.
-
     """
 
-    # TODO: examples and check axis arg
-    # TODO: return 1D array when input is 1D
+    if axis == 1 and values.ndim == 1:
+        axis = 0
 
-    values2d = np.atleast_2d(values)
     if target_labels is None:
-        target_labels = np.unique(labels)
+        uq_tl = np.unique(labels)
         idx_back = None
     else:
-        target_labels, idx_back = np.unique(target_labels, return_inverse=True)
+        uq_tl, idx_back = np.unique(target_labels, return_inverse=True)
 
     if weights is not None:
         weights = np.atleast_2d(weights)
 
+    v2d = np.atleast_2d(values)
+    if axis == 1:
+        v2d = v2d.T
+
     if isinstance(red_op, str):
-        if red_op in ['mean', 'average']:
-            if weights is None:
-                fred = lambda x, w, ax: np.mean(x, axis=ax)
-            else:
-                fred = lambda x, w, ax: np.average(x, weights=w, axis=ax)
-        elif red_op == 'median':
-            fred = lambda x, w, ax: np.median(x, axis=ax)
-        elif red_op == 'mode':
-            if weights is None:
-                fred = lambda x, w, ax: mode(x, axis=ax)[0].ravel()
-            else:
-                fred = lambda x, w, ax: weighted_mode(x, w, axis=ax)
-                # np.apply_along_axis(lambda x:
-                # np.bincount(x, weights=w.ravel()).argmax(), 0, x)
-        elif red_op == 'sum':
-            fred = lambda x, w, ax: np.sum(x if w is None else w*x, axis=ax)
-        elif red_op == 'max':
-            fred = lambda x, w, ax: np.max(x, axis=ax)
-        elif red_op == 'min':
-            fred = lambda x, w, ax: np.min(x, axis=ax)
-        else:
-            raise ValueError('Unknown reduction operation \'{0}\''.
-                             format(red_op))
+        fred = _get_redop(red_op, weights=weights, axis=1)
     else:
         fred = red_op
 
-    nr, nc = values2d.shape
-    new_shape = (nr, target_labels.size) if axis == 0 \
-        else (target_labels.size, nc)
-    mapped = np.empty(new_shape, dtype=dtype)
-    for ilab, lab in enumerate(target_labels):
+    mapped = np.empty((v2d.shape[0], uq_tl.size), dtype=dtype)
+    for ilab, lab in enumerate(uq_tl):
         mask = labels == lab
-        wm = None
-        if weights is not None:
-            wm = weights[:, mask] if axis == 0 else weights[:, mask].T
+        wm = None if weights is None else weights[:, mask]
 
-        if red_op in ['min', 'max', 'sum', 'mean', 'average', 'median', 'mode']:
-            if axis == 0:
-                mapped[:, ilab] = fred(values2d[:, mask], wm, ax=1-axis)
-            else:
-                mapped[ilab, :] = fred(values2d[mask, :], wm, ax=1-axis)
+        if isinstance(red_op, str):
+            mapped[:, ilab] = fred(v2d[:, mask], wm)
 
         else:
-            for idx in range(values2d.shape[axis]):
-                if axis == 0:
-                    mapped[idx, ilab] = fred(values2d[idx, mask], wm, ax=1-axis)
-                else:
-                    mapped[ilab, idx] = fred(values2d[mask, idx], wm, ax=1-axis)
+            for idx in range(v2d.shape[0]):
+                mapped[idx, ilab] = fred(v2d[idx, mask], wm)
 
     if idx_back is not None:
-        if axis == 0:
-            return mapped[:, idx_back]
-        return mapped[idx_back, :]
+        mapped = mapped[:, idx_back]
+
+    if axis == 1:
+        mapped = mapped.T
+
+    if values.ndim == 1:
+        return mapped[0]
     return mapped

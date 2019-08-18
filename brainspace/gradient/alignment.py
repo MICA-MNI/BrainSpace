@@ -58,9 +58,9 @@ def generalized_procrustes(data, reference=None, n_iter=10, tol=1e-5,
 
     Parameters
     ----------
-    data :  list of 2D ndarrays, shape = (n_samples, n_feat)
+    data :  list of ndarrays, shape = (n_samples, n_feat)
         List of datasets to align.
-    reference : 2D ndarray, shape = (n_samples, n_feat), optional
+    reference : ndarray, shape = (n_samples, n_feat), optional
         Dataset to use as reference in the first iteration. If None, the first
         dataset in `data` is used as reference. Default is None.
     n_iter : int, optional
@@ -75,9 +75,9 @@ def generalized_procrustes(data, reference=None, n_iter=10, tol=1e-5,
 
     Returns
     -------
-    aligned : list of 2D ndarray, shape = (n_samples, n_feat)
+    aligned : list of ndarray, shape = (n_samples, n_feat)
         Aligned datsets.
-    reference : 2D ndarray, shape = (n_samples, n_feat)
+    reference : ndarray, shape = (n_samples, n_feat)
         Reference dataset built in the last iteration. Only if
         ``return_reference == True``.
     """
@@ -91,6 +91,7 @@ def generalized_procrustes(data, reference=None, n_iter=10, tol=1e-5,
         reference = np.mean(aligned, axis=0)
     else:
         aligned = [None] * len(data)
+        reference = reference.copy()
 
     dist = np.inf
     for i in range(n_iter):
@@ -133,9 +134,9 @@ class ProcrustesAlignment(BaseEstimator):
 
     Attributes
     -------
-    aligned_ : list of 2D ndarray, shape = (n_samples, n_feat)
+    aligned_ : list of ndarray, shape = (n_samples, n_feat)
         Aligned datsets.
-    mean_ : 2D ndarray, shape = (n_samples, n_feat)
+    mean_ : ndarray, shape = (n_samples, n_feat)
         Reference dataset built in the last iteration.
     """
 
@@ -149,9 +150,9 @@ class ProcrustesAlignment(BaseEstimator):
 
         Parameters
         ----------
-        data :  list of 2D ndarrays, shape = (n_samples, n_feat)
+        data :  list of ndarrays, shape = (n_samples, n_feat)
             List of datasets to align.
-        reference : 2D ndarray, shape = (n_samples, n_feat), optional
+        reference : ndarray, shape = (n_samples, n_feat), optional
             Dataset to use as reference in the first iteration. If None, the
             first dataset in `data` is used as reference. Default is None.
 

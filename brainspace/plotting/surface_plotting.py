@@ -188,7 +188,7 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
     return p.show(interactive=interactive, embed_nb=embed_nb)
 
 
-@wrap_input(only_args=[0, 1])
+@wrap_input(0, 1)
 def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
                      cmap_name='viridis', color=(0, 0, 0.5), size=(400, 400),
                      interactive=True, embed_nb=False):

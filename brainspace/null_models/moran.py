@@ -64,7 +64,7 @@ def compute_mem(a, spectrum='nonzero', tol=1e-10):
             a_format = a.format
             a = a.tocoo(copy=False)
             row, col = a.row, a.col
-            a = getattr(a, 'too' + a_format)(copy=False)
+            a = getattr(a, 'to' + a_format)(copy=False)
         else:
             row, col = a.row, a.col
         ac[row, col] += a.data
@@ -75,6 +75,9 @@ def compute_mem(a, spectrum='nonzero', tol=1e-10):
         ac += a
 
     w, v = np.linalg.eigh(ac)
+    if ssp.issparse(a):
+        v = v.A
+
     w, v = w[::-1], v[:, ::-1]
 
     # Remove zero eigen-value/vector
@@ -133,7 +136,7 @@ def spectral_randomization(x, mem, n_rep=100, method='singleton', joint=False,
 
     Returns
     -------
-    output : ndarray, shape = (n_rep, n_feat, n_vertices)
+    output : ndarray, shape = (n_rep, n_vertices, n_feat)
         Random samples. If ``n_feat == 1``, shape = (n_rep, n_vertices).
 
     References
@@ -186,7 +189,6 @@ def spectral_randomization(x, mem, n_rep=100, method='singleton', joint=False,
     x_mean = x.mean(axis=0)
     x_std = x.std(axis=0, ddof=1)
     sim = x_mean + (mem @ rxv2) * (np.sqrt(n_rows - 1) * x_std)
-    sim = sim.swapaxes(1, 2)
 
     return sim.squeeze()
 
@@ -258,11 +260,10 @@ class MoranSpectralRandomization(BaseEstimator):
         """
 
         # If surface is provided instead of affinity
-        if not isinstance(w, np.ndarray):
+        if not (isinstance(w, np.ndarray) or ssp.issparse(w)):
             w = me.get_ring_distance(w, n_ring=self.n_ring, metric='geodesic')
             w.data **= -1  # inverse of distance
             # s /= np.nansum(s, axis=1, keepdims=True)  # normalize rows
-            # s = s.tocoo(copy=False)
 
         self.mev_, self.mem_ = compute_mem(w, spectrum=self.spectrum,
                                            tol=self.tol)
@@ -274,12 +275,12 @@ class MoranSpectralRandomization(BaseEstimator):
         Parameters
         ----------
         x : 1D or 2D ndarray, shape = (n_vertices,) or (n_vertices, n_feat)
-            Array of variables arranged in columns, where `n_feat` is the number
-            of variables.
+            Array of variables arranged in columns, where `n_feat` is the
+            number of variables.
 
         Returns
         -------
-        output : ndarray, shape = (n_rep, n_feat, n_vertices)
+        output : ndarray, shape = (n_rep, n_vertices, n_feat)
             Random samples. If ``n_feat == 1``, shape = (n_rep, n_vertices).
 
         """
@@ -288,4 +289,3 @@ class MoranSpectralRandomization(BaseEstimator):
                                       method=self.method, joint=self.joint,
                                       random_state=self.random_state)
         return rand
-

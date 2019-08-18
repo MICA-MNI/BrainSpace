@@ -106,7 +106,7 @@ surfaces and spheres.
 
 
 
-.. image:: ../python_doc/examples_figs/ex2_fig0.png
+.. image:: ../examples_figs/ex2_fig0.png
    :scale: 70%
    :align: center
 
@@ -127,7 +127,7 @@ We can also see the data on the spheres.
 
 
 
-.. image:: ../python_doc/examples_figs/ex2_fig1.png
+.. image:: ../examples_figs/ex2_fig1.png
    :scale: 70%
    :align: center
 
@@ -170,7 +170,7 @@ parcels and used them as the sphere coordinates
 
 
 
-.. image:: ../python_doc/examples_figs/ex2_fig2.png
+.. image:: ../examples_figs/ex2_fig2.png
    :scale: 70%
    :align: center
 
@@ -227,7 +227,7 @@ Let's check the 3 first spin permutations
 
 
 
-.. image:: ../python_doc/examples_figs/ex2_fig3.png
+.. image:: ../examples_figs/ex2_fig3.png
    :scale: 70%
    :align: center
 
