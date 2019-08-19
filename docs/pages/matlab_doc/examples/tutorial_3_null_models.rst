@@ -1,14 +1,24 @@
 Tutorial 3: Null models
 =================================================
 
-TODO: Update with gradient comparison rather than thickness + t1w/t2w
-
-In this tutorial we assess the significance of correlations between the first canonical gradient and data from other modalities (cortical thickness and T1w/T2w image intensity). A normal test of the significance of the correlation cannot be used, because the spatial auto-correlation in MRI data may bias the test statistic. In this tutorial we will show two approaches for null hypothesis testing: spin permutations and Moran spectral randomization. 
+In this tutorial we assess the significance of correlations between the first
+canonical gradient and data from other modalities (cortical thickness and
+T1w/T2w image intensity). A normal test of the significance of the correlation
+cannot be used, because the spatial auto-correlation in MRI data may bias the
+test statistic. In this tutorial we will show two approaches for null hypothesis
+testing: spin permutations and Moran spectral randomization. 
 
 Spin Permutations
 --------------------
-Here, we use the spin permutations approach previously proposed in `(Alexander-Bloch et al., 2018) <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_, which preserves the auto-correlation of the permuted feature(s) by rotating the feature data on the spherical domain. Note that when comparing gradients to non-gradient markers, we recommend permuting the non-gradient markers. 
-We will start by loading the conte69 surfaces for left and right hemispheres, their corresponding spheres, midline mask, and t1w/t2w intensity as well as cortical thickness data, and a template functional gradient.
+Here, we use the spin permutations approach previously proposed in
+`(Alexander-Bloch et al., 2018)
+<https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_, which
+preserves the auto-correlation of the permuted feature(s) by rotating the
+feature data on the spherical domain. Note that when comparing gradients to
+non-gradient markers, we recommend permuting the non-gradient markers. We will
+start by loading the conte69 surfaces for left and right hemispheres, their
+corresponding spheres, midline mask, and t1w/t2w intensity as well as cortical
+thickness data, and a template functional gradient.
 
 .. code-block:: matlab
 
@@ -62,30 +72,50 @@ as well as a few rotated version.
    :scale: 50%
    :align: center
 
-.. warning:: Depending on the overlap of midlines (i.e. NaNs) in the original data and in the rotation, statistical comparisons between them may compare different numbers of features. This can bias your test statistics. Therefore, if a large portion of the sphere is not used, we recommend using Moran spectral randomization instead.  
+.. warning:: 
+    Depending on the overlap of midlines (i.e. NaNs) in the original 
+    data and in the rotation, statistical comparisons between them may compare
+    different numbers of features. This can bias your test statistics. Therefore, if
+    a large portion of the sphere is not used, we recommend using Moran spectral
+    randomization instead.  
 
-Now we simply compute the correlations between the first gradient and the original data, as well as all rotated data.
+Now we simply compute the correlations between the first gradient and the
+original data, as well as all rotated data.
 
 .. code-block:: matlab
 
-    % Find correlation between thickness and T1w/T2w
-    r_original = corr([t1wt2w_lh;t1wt2w_rh],[thickness_lh;thickness_rh], ...
-                      'rows','pairwise','type','spearman');
-    r_rand = corr([t1wt2w_lh;t1wt2w_rh],thickness_rotated, ...
-                  'rows','pairwise','type','spearman');
-
-To find a p-value, we simply compute the percentile rank of the true correlation in the distribution or random correlations. Assuming a threshold of p<0.05 for statistical significance and disregarding multiple comparison corrections, we consider the correlation to be significant if it is lower or higher than the 2.5th/97.5th percentile, respectively. 
+    % Find correlation between FC-G1 with thickness and T1w/T2w
+    r_original_thick = corr(embedding,[thickness_lh;thickness_rh], ...
+                    'rows','pairwise','type','spearman');
+    r_rand_thick = corr(embedding,thickness_rotated, ...
+                'rows','pairwise','type','spearman');
+    r_original_t1wt2w = corr(embedding,[t1wt2w_lh;t1wt2w_rh], ...
+                    'rows','pairwise','type','spearman');
+    r_rand_t1wt2w = corr(embedding,t1wt2w_rotated, ...
+                'rows','pairwise','type','spearman');
+          
+          
+To find a p-value, we simply compute the percentile rank of the true correlation
+in the distribution or random correlations. Assuming a threshold of p<0.05 for
+statistical significance and disregarding multiple comparison corrections, we
+consider the correlation to be significant if it is lower or higher than the
+2.5th/97.5th percentile, respectively. 
 
 .. code-block:: matlab
 
    % Compute percentile rank.
-   prctile_rank = mean(r_original > r_rand);
-   significant = prctile_rank < 0.025 || prctile_rank >= 0.975;
+    prctile_rank_thick = mean(r_original_thick > r_rand_thick);
+    significant_thick = prctile_rank_thick < 0.025 || prctile_rank_thick >= 0.975;
 
-If significant is true, the we've found a statistically significant correlation. Alternatively, one could also test the one-tailed hypothesis whether the percentile rank is lower or higher than the 5th/95th percentile, respectively. 
+    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w);
+    significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
+
+If significant is true, the we've found a statistically significant correlation.
+Alternatively, one could also test the one-tailed hypothesis whether the
+percentile rank is lower or higher than the 5th/95th percentile, respectively. 
 
 Moran Spectral Randomization 
 --------------------------------
 
-
+Under construction. 
 
