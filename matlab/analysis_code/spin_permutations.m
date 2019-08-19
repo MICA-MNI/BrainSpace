@@ -22,6 +22,10 @@ if ~iscell(spheres)
     spheres = {spheres};
 end
 
+if numel(Y) ~= numel(spheres)
+    error('Found a different number of data cells than sphere cells.');
+end
+
 if ~isempty(parcellation)
     if ~iscell(parcellation)
         parcellation = {parcellation};
@@ -40,7 +44,20 @@ end
 % the KD Tree.
 for ii = 1:numel(spheres)
     S{ii} = convert_surface(spheres{ii},'SurfStat');
-    vertices{ii} = S{ii}.coord';
+    vertices{ii} = S{ii}.coord';    
+
+    % Check for correct data dimensions. 
+    if size(Y{ii},1) ~= size(vertices{ii},1)
+        if size(Y{ii},2) == size(vertices{ii},1)
+            error(['Found a different number of data points than vertices.' ...
+                ' The number of rows in Y should be equal to the number of vertices.' ...
+                ' It looks like you may be using row vectors, try transposing your data.'])
+        else
+            error(['Found a different number of data points than vertices. ' ...
+                'The number of rows in Y should be equal to the number of vertices.']);
+        end
+    end
+    
     % If parcellated data on sphere, get centroids of vertices.
     if ~isempty(parcellation)
         % Get Euclidean mean of points within each parcel.

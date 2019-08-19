@@ -1,17 +1,15 @@
-function V = compute_mem(W,n_ring,mask,eigenvectors)
+function V = compute_mem(W,varargin)
 
-% Set default arguments
-if nargin < 4
-    eigenvectors = 'all';
-end
-if nargin < 3
-    mask = [];
-end
-if nargin < 2
-    n_ring = 1;
-end
+% Parse input
+p = inputParser;
+addParameter(p, 'n_ring', 1, @isnumeric);
+addParameter(p, 'mask', [], @islogical);
+addParameter(p, 'eigenvectors', 'all', @ischar);
 
-% If input is cell array, combine surfaces
+parse(p, varargin{:});
+R = p.Results;
+
+% If input is cell array, combine surfaces.
 if iscell(W)
     if numel(W) == 1
         W = W{1};
@@ -22,25 +20,24 @@ if iscell(W)
     end
 end
 
-if islogical(mask)
-    mask = find(mask);
+if islogical(R.mask)
+    R.mask = find(R.mask);
 end
 
 if isstruct(W) || ischar(W)   
-    % Make sure the surface in a matlab format. 
+    % Make sure the surface is in matlab format. 
     W = convert_surface(W,'matlab'); 
-    N = size(W.vertices,1);
 
     % Convert triangles to edges.
     faces = sort(W.faces,2);
     edges = double(unique(sort([faces(:,[1 2]); faces(:,[1 3]); faces(:,[2 3])],2),'rows'));
-    edges(any(ismember(edges,mask),2),:) = [];
+    edges(any(ismember(edges,R.mask),2),:) = [];
     
     % Compute nodes within n_ring - this can probably be much more efficient
     G = graph(edges(:,1),edges(:,2));
     G = rmnode(G,find(degree(G)==0));
     D_all = distances(G);
-    D = (D_all > 0) & (D_all <= n_ring);
+    D = (D_all > 0) & (D_all <= R.n_ring);
     
     % Compute euclidean distances
     dist = double(sqrt(sum((W.vertices(edges(:,1),:) - W.vertices(edges(:,2),:)).^2,2)));
@@ -68,7 +65,7 @@ end
 
 % Remove zero eigenvector
 idx = find(abs(lambda) < 1e-10); 
-if strcmp(eigenvectors,'all')
+if strcmp(R.eigenvectors,'all')
     if numel(idx) == 1
         V(:,idx) = [];
         lambda(idx) = []; 
