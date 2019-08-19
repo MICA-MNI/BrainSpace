@@ -1,18 +1,13 @@
-function Y_rand = MSR(Y,V,nRandomizations,procedure,joint)
-% MORAN_SPECTRAL_RANDOMIZATION   Null model for spatially auto-correlated data.
-%   x_rand = MICA_MORANSPECTRALRANDOMIZATION(x,W,nRandomizations,procedure)
+function Y_rand = moran_randomization(Y,V,nRandomizations,procedure,joint)
+% MORAN_RANDOMIZATION   Null model for spatially auto-correlated data.
+%   y_rand = MICA_MORAN_RANDOMIZATION(y,W,nRandomizations,procedure)
 %   computes random values x_rand with similar spatial properties as the
-%   input data x. x is a n-by-1 vector of observations, W is a n-by-n
-%   symmetric distance matrix, nRandomizations is a scalar denoting the
-%   amount of randomized datasets in the output, and procedure is the
-%   method used to compute randomized data. W can also be a surface in
-%   SurfStat format or MATLAB format. 
+%   input data x. x is a n-by-1 vector of observations, V are the Moran
+%   eigenvectors, nRandomizations is a scalar denoting the amount of
+%   randomized datasets in the output, and procedure is the method used to
+%   compute randomized data. 
 %
-%   [x_rand,diagnostics] = MICA_MORANSPECTRALRANDOMIZATION(x,W,nRandomizations,procedure)
-%   also provides a diagnostics output. This is used only for debugging. 
-%
-%   The procedure can be either 'singleton' or 'pair'. 'triple' was not
-%   implemented as the authors of Ref [1] recommend against its usage.
+%   The procedure can be either 'singleton' or 'pair'. 
 %
 %   Written by Reinder Vos de Wael (Mar, 2019)
 %
@@ -21,6 +16,8 @@ function Y_rand = MSR(Y,V,nRandomizations,procedure,joint)
 %           constrained null models for irregularly spaced data using Moran
 %           spectral randomization methods. Methods in Ecology and
 %           Evolution, 6(10), 1169-1178.
+%
+%   See also: COMPUTE_MEM
 
 %% Deal with the input.  
 

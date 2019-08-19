@@ -72,8 +72,8 @@ end
 
 % Add colorbars. 
 for ii = 1:size(D,2)
-    h.cb(ii) = colorbar(h.axes(4,ii)); 
-    h.cb(ii).Position = [h.axes(4,ii).Position(1:2) + [.175 .065] ...
+    h.cb(ii) = colorbar(h.axes(end,ii)); 
+    h.cb(ii).Position = [h.axes(end,ii).Position(1:2) + [.175 .065] ...
                          .007 .08];
     h.cb(ii).Ticks = clim(:,ii);
     h.cb(ii).FontName = 'DroidSans';

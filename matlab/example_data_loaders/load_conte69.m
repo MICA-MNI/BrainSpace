@@ -14,6 +14,9 @@ if strcmp(type,'spheres')
 elseif strcmp(type,'surfaces')
     surf_lh = convert_surface([surface_path 'conte69_32k_left_hemisphere.gii']);
     surf_rh = convert_surface([surface_path 'conte69_32k_right_hemisphere.gii']);
+elseif strcmp(type,'5k_surfaces')
+    surf_lh = convert_surface([surface_path 'conte69_5k_left_hemisphere.gii']);
+    surf_rh = convert_surface([surface_path 'conte69_5k_right_hemisphere.gii']);
 else
     error('Unknown type. Valid arguments are ''spheres'' and ''surfaces''.');
 end

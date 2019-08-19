@@ -1,7 +1,29 @@
-function V = MEM(W,n_ring,mask,eigenvectors)
+function V = compute_mem(W,n_ring,mask,eigenvectors)
 
+% Set default arguments
 if nargin < 4
     eigenvectors = 'all';
+end
+if nargin < 3
+    mask = [];
+end
+if nargin < 2
+    n_ring = 1;
+end
+
+% If input is cell array, combine surfaces
+if iscell(W)
+    if numel(W) == 1
+        W = W{1};
+    elseif numel(W) > 2
+        error('Did not recognize weight matrix or surface format.')
+    else
+        W = combine_surfaces(W{1},W{2});
+    end
+end
+
+if islogical(mask)
+    mask = find(mask);
 end
 
 if isstruct(W) || ischar(W)   

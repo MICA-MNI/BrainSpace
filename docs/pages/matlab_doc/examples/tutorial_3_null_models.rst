@@ -33,7 +33,7 @@ thickness data, and a template functional gradient.
     [thickness_lh,thickness_rh] = load_metric('thickness');
     
     % Template functional gradient
-    embedding = load_template('fc');
+    embedding = load_template('fc',1);
     
 Lets first generate some null data using spintest. 
 
@@ -112,10 +112,73 @@ consider the correlation to be significant if it is lower or higher than the
 
 If significant is true, the we've found a statistically significant correlation.
 Alternatively, one could also test the one-tailed hypothesis whether the
-percentile rank is lower or higher than the 5th/95th percentile, respectively. 
+percentile rank is lower or higher than the 5th/95th percentile, respectively.
 
 Moran Spectral Randomization 
 --------------------------------
 
-Under construction. 
+.. note:: Section still under construction.
+
+Moran Spectral Randomization (MSR) computes Moran's I, a metric for spatial
+auto-correlation and generates normally distributed data with similar
+auto-correlation. Critically, it relies on a weight matrix denoting the spatial
+proximity of features to one another. Within the realm of neuroimaging, one
+straightforward example of this is inverse geodesic distance i.e. distance
+across the cortical surface. 
+
+In this example we will show how to perform MSR on a subregion of the brain,
+here the temporal lobe. We will start by loading the conte69 surfaces for left
+and right hemispheres, a left temporal lobe mask, t1w/t2w intensity as well as
+cortical thickness data, and a template functional gradient. 
+
+.. code-block:: matlab
+
+    addpath(genpath('/path/to/BrainSpace/matlab')); 
+
+    % load the conte69 hemisphere surfaces and spheres
+    [surf_lh, surf_rh] = load_conte69('5k_surfaces');
+
+    % Load the data 
+    t1wt2w_lh = load_metric('t1wt2w');
+    curvature_lh = load_metric('curvature');
+    
+    % Template functional gradient
+    embedding = load_template('fc',1);
+
+We will now compute the Moran eigenvectors. This can be done either by providing
+a weight matrix, or providing a cortical surface (see also: :ref:`compute_mem`).
+
+.. code-block:: matlab
+
+    n_ring = 5; 
+    MEM = compute_mem(surf_lh,n_ring,~temporal_mask_lh);
+
+Using the Moran eigenvectors we can now compute the randomized data. As the
+computationally intensive portion of MSR is mostly in :ref`compute_mem`, we can
+push the number of permutations a bit further. 
+
+.. code-block:: matlab
+
+    n_perm = 10000;
+    y_rand = moran_randomization([curv_tl,t1wt2w_tl],MEM,n_perm,'singleton',true);
+
+    curv_rand = squeeze(y_rand(:,1,:));
+    t1wt2w_rand = squeeze(y_rand(:,2,:));
+
+Now that we have the randomized data, we can 
+
+.. code-block:: matlab
+
+    % Do cosrrelations
+    r_original_curv = corr(embedding_tl,curv_tl,'type','spearman');
+    r_rand_curv = corr(embedding_tl,curv_rand,'type','spearman');
+
+    r_original_t1wt2w = corr(embedding_tl,t1wt2w_tl,'type','spearman');
+    r_rand_t1wt2w = corr(embedding_tl,t1wt2w_rand,'type','spearman');
+
+    prctile_rank_curv = mean(r_original_curv > r_rand_curv);
+    significant_curv = prctile_rank_curv < 0.025 || prctile_rank_curv >= 0.975;
+
+    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w);
+    significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
