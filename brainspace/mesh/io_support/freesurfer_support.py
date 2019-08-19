@@ -113,7 +113,7 @@ def _read_geometry_fs(ipth, is_ascii=False):
     return build_polydata(x_points, cells=x_cells)
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def _write_geometry_fs(pd, opth, fname_header=None, is_ascii=False):
     """Adapted from nibabel. Add ascii support."""
 

@@ -22,7 +22,7 @@ ASSOC_CELLS = vtkDataObject.FIELD_ASSOCIATION_CELLS
 ASSOC_POINTS = vtkDataObject.FIELD_ASSOCIATION_POINTS
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def _surface_selection(surf, array_name, low=-np.inf, upp=np.inf,
                        use_cell=False, keep=True):
     """Selection of points or cells meeting some thresholding criteria.
@@ -104,7 +104,7 @@ def _surface_selection(surf, array_name, low=-np.inf, upp=np.inf,
     return surf_sel
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def _surface_mask(surf, mask, use_cell=False):
     """Selection fo points or cells meeting some criteria.
 

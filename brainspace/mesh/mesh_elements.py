@@ -14,7 +14,7 @@ from scipy.sparse.csgraph import dijkstra
 from ..vtk_interface.decorators import wrap_input
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def get_points(surf, mask=None):
     """Get surface points.
 
@@ -42,7 +42,7 @@ def get_points(surf, mask=None):
     return pts if mask is None else pts[mask]
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def get_cells(surf):
     """Get surface cells.
 

@@ -2,6 +2,9 @@ docs/_build
 docs/generated
 test_python
 
+.pytest_cache
+.ipynb_checkpoints
+
 *.egg-info
 build
 dist

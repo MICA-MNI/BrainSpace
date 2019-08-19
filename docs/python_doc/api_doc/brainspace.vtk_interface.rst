@@ -86,6 +86,4 @@ Decorators
     wrap_output
     unwrap_input
     unwrap_output
-    wrap_func
-    unwrap_func
     append_vtk

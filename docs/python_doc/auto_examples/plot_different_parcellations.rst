@@ -69,7 +69,7 @@ parcellations to the left and right hemispheres first.
                      embed_nb=True, size=(800, 800), cmap_name='tab20')
 
 
-.. image:: ../python_doc/examples_figs/ex1_fig0.png
+.. image:: ../examples_figs/ex1_fig0.png
    :scale: 70%
    :align: center
 
@@ -99,10 +99,7 @@ We have 4 mean connectivity matrices built from each parcellation.
 
 
 
-.. * .. image:: /auto_examples/images/sphx_glr_plot_different_parcellations_001.png
-.. *     :class: sphx-glr-single-img
-
-.. image:: ../python_doc/examples_figs/ex1_fig1.png
+.. image:: ../examples_figs/ex1_fig1.png
    :scale: 70%
    :align: center
 
@@ -170,7 +167,7 @@ Finally, we plot the first gradient for each parcellation as follows:
                      embed_nb=True, size=(800, 800), cmap_name='viridis')
 
 
-.. image:: ../python_doc/examples_figs/ex1_fig2.png
+.. image:: ../examples_figs/ex1_fig2.png
    :scale: 70%
    :align: center
 

@@ -62,7 +62,7 @@ remaining to the right.
 
 
 
-.. image:: ../python_doc/examples_figs/ex0_fig0.png
+.. image:: ../examples_figs/ex0_fig0.png
    :scale: 70%
    :align: center
 
@@ -88,10 +88,8 @@ parcellations loaded above.
 
 
 
-.. * .. image:: /auto_examples/images/sphx_glr_plot_embedding_approaches_001.png
-.. *     :class: sphx-glr-single-img
 
-.. image:: ../python_doc/examples_figs/ex0_fig1.png
+.. image:: ../examples_figs/ex0_fig1.png
    :scale: 70%
    :align: center
 
@@ -158,7 +156,7 @@ Next, for all embedding approaches, we display the first gradient
 
 
 
-.. image:: ../python_doc/examples_figs/ex0_fig2.png
+.. image:: ../examples_figs/ex0_fig2.png
    :scale: 70%
    :align: center
 
@@ -175,7 +173,7 @@ And the second gradient
                      embed_nb=True, size=(800, 600), cmap_name='viridis')
 
 
-.. image:: ../python_doc/examples_figs/ex0_fig3.png
+.. image:: ../examples_figs/ex0_fig3.png
    :scale: 70%
    :align: center
 

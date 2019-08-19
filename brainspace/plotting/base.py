@@ -113,7 +113,7 @@ def _create_grid(nrow, ncol):
 
 class BasePlotter(object):
 
-    @wrap_input(only_args=['ren_win', 'iren'])
+    @wrap_input('ren_win', 'iren')
     def __init__(self, n_rows=1, n_cols=1, ren_win=None, iren=None, **kwargs):
 
         self.ren_win = ren_win

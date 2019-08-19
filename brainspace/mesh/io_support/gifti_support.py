@@ -39,7 +39,7 @@ def _read_gifti(ipth):
     return s.VTKObject
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def _write_gifti(pd, opth):
     # TODO: what about pointdata?
     from nibabel.gifti.gifti import GiftiDataArray
