@@ -6,7 +6,9 @@ parcel2full
 Synopsis
 ---------
 
-Converts data from a parcellated data matrix to full data matrix by assigning each vertex the value of its parcel (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/surface_manipulation/parcel2full.m>`_).
+Converts data from a parcellated data matrix to full data matrix by assigning
+each vertex the value of its parcel (`source code
+<https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/surface_manipulation/parcel2full.m>`_).
 
 Usage 
 ----------
@@ -18,7 +20,10 @@ Usage
 - *parcellation*: a 1-by-m parcel vector containing natural numbers.
 - *full_data*: n-by-m matrix containing the data at the vertex level.
 
-Description
+Description 
 --------------
-A useful tool for quickly moving data between parcel and vertex level, especially in combination with :ref:`full2parcel`. This is mostly used for plotting parcellated data on the surface. 
+
+A useful tool for quickly moving data between parcel and vertex level,
+especially in combination with :ref:`full2parcel`. This is mostly used for
+plotting parcellated data on the surface. 
 

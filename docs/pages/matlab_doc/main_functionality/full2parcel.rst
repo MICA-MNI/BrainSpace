@@ -20,4 +20,7 @@ Usage
 
 Description
 --------------
-A useful tool for quickly moving data between vertex and parcel level, especially in combination with :ref:`parcel2full`. For more flexible usage, see also :ref:`labelmean`.
+
+A useful tool for quickly moving data between vertex and parcel level,
+especially in combination with :ref:`parcel2full`. For more flexible usage, see
+also :ref:`labelmean`.

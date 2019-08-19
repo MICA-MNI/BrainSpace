@@ -8,17 +8,21 @@ cannot be used, because the spatial auto-correlation in MRI data may bias the
 test statistic. In this tutorial we will show two approaches for null hypothesis
 testing: spin permutations and Moran spectral randomization. 
 
+.. note:: 
+    When using either approach to compare gradients to non-gradient markers, we
+    recommend randomizing the non-gradient markers as these randomizations need not
+    maintain the statistical independence between gradients.
+
 Spin Permutations
 --------------------
 Here, we use the spin permutations approach previously proposed in
 `(Alexander-Bloch et al., 2018)
 <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_, which
 preserves the auto-correlation of the permuted feature(s) by rotating the
-feature data on the spherical domain. Note that when comparing gradients to
-non-gradient markers, we recommend permuting the non-gradient markers. We will
-start by loading the conte69 surfaces for left and right hemispheres, their
-corresponding spheres, midline mask, and t1w/t2w intensity as well as cortical
-thickness data, and a template functional gradient.
+feature data on the spherical domain. 
+We will start by loading the conte69 surfaces for left and right hemispheres,
+their corresponding spheres, midline mask, and t1w/t2w intensity as well as
+cortical thickness data, and a template functional gradient.
 
 .. code-block:: matlab
 
@@ -42,7 +46,7 @@ Lets first generate some null data using spintest.
     % Lets create some rotations
     rng(0); % For replicability
     n_permutations = 1000;
-    y_rand = spintest({[t1wt2w_lh,thickness_lh],[t1wt2w_rh,thickness_rh]}, ...
+    y_rand = spin_permutations({[t1wt2w_lh,thickness_lh],[t1wt2w_rh,thickness_rh]}, ...
                       {sphere_lh,sphere_rh}, ...
                       n_permutations);
 
@@ -117,19 +121,18 @@ percentile rank is lower or higher than the 5th/95th percentile, respectively.
 Moran Spectral Randomization 
 --------------------------------
 
-.. note:: Section still under construction.
-
 Moran Spectral Randomization (MSR) computes Moran's I, a metric for spatial
 auto-correlation and generates normally distributed data with similar
-auto-correlation. Critically, it relies on a weight matrix denoting the spatial
-proximity of features to one another. Within the realm of neuroimaging, one
-straightforward example of this is inverse geodesic distance i.e. distance
-across the cortical surface. 
+auto-correlation. MSR relies on a weight matrix denoting the spatial proximity
+of features to one another. Within neuroimaging, one straightforward example of
+this is inverse geodesic distance i.e. distance along the cortical surface. 
 
-In this example we will show how to perform MSR on a subregion of the brain,
-here the temporal lobe. We will start by loading the conte69 surfaces for left
-and right hemispheres, a left temporal lobe mask, t1w/t2w intensity as well as
-cortical thickness data, and a template functional gradient. 
+In this example we will show how to use MSR to assess statistical significance
+between cortical markers (here curvature and cortical t1wt2w intensity) and the
+first functional connectivity gradient. We will start by loading the conte69
+surfaces for left and right hemispheres, a left temporal lobe mask, t1w/t2w
+intensity as well as cortical thickness data, and a template functional
+gradient. 
 
 .. code-block:: matlab
 
@@ -146,12 +149,14 @@ cortical thickness data, and a template functional gradient.
     embedding = load_template('fc',1);
 
 We will now compute the Moran eigenvectors. This can be done either by providing
-a weight matrix, or providing a cortical surface (see also: :ref:`compute_mem`).
+a weight matrix of spatial proximity between each vertex, or by providing a
+cortical surface (see also: :ref:`compute_mem`). Here we'll use a cortical
+surface.
 
 .. code-block:: matlab
 
     n_ring = 5; 
-    MEM = compute_mem(surf_lh,n_ring,~temporal_mask_lh);
+    MEM = compute_mem(surf_lh,'n_ring',n_ring,'mask',~temporal_mask_lh);
 
 Using the Moran eigenvectors we can now compute the randomized data. As the
 computationally intensive portion of MSR is mostly in :ref`compute_mem`, we can
@@ -165,20 +170,33 @@ push the number of permutations a bit further.
     curv_rand = squeeze(y_rand(:,1,:));
     t1wt2w_rand = squeeze(y_rand(:,2,:));
 
-Now that we have the randomized data, we can 
+Now that we have the randomized data, we can compute correlations between the
+gradient and the real/randomised data.  
 
 .. code-block:: matlab
 
-    % Do cosrrelations
     r_original_curv = corr(embedding_tl,curv_tl,'type','spearman');
     r_rand_curv = corr(embedding_tl,curv_rand,'type','spearman');
 
     r_original_t1wt2w = corr(embedding_tl,t1wt2w_tl,'type','spearman');
     r_rand_t1wt2w = corr(embedding_tl,t1wt2w_rand,'type','spearman');
 
+To find a p-value, we simply compute the percentile rank of the true correlation
+in the distribution or random correlations. Assuming a threshold of p<0.05 for
+statistical significance and disregarding multiple comparison corrections, we
+consider the correlation to be significant if it is lower or higher than the
+2.5th/97.5th percentile, respectively. 
+
+.. code-block:: matlab
+
     prctile_rank_curv = mean(r_original_curv > r_rand_curv);
     significant_curv = prctile_rank_curv < 0.025 || prctile_rank_curv >= 0.975;
 
     prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w);
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
+
+
+If significant is true, the we've found a statistically significant correlation.
+Alternatively, one could also test the one-tailed hypothesis whether the
+percentile rank is lower or higher than the 5th/95th percentile, respectively.
 
