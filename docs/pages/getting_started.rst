@@ -53,7 +53,7 @@ Lets load a mean functional connectivity matrix built from a subset of the Human
 
    .. code-tab:: py
 
-        >>> from brainspace.data.base import load_hcp_group
+        >>> from brainspace.data.base import load_group_hcp
         >>> m = load_group_hcp('schaefer', n_parcels=400)
         >>> m.shape
         (400, 400)

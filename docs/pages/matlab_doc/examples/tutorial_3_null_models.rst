@@ -2,11 +2,11 @@ Tutorial 3: Null models
 =================================================
 
 In this tutorial we assess the significance of correlations between the first
-canonical gradient and data from other modalities (cortical thickness and
-T1w/T2w image intensity). A normal test of the significance of the correlation
-cannot be used, because the spatial auto-correlation in MRI data may bias the
-test statistic. In this tutorial we will show two approaches for null hypothesis
-testing: spin permutations and Moran spectral randomization. 
+canonical gradient and data from other modalities (curvature, cortical thickness
+and T1w/T2w image intensity). A normal test of the significance of the
+correlation cannot be used, because the spatial auto-correlation in MRI data may
+bias the test statistic. In this tutorial we will show two approaches for null
+hypothesis testing: spin permutations and Moran spectral randomization. 
 
 .. note:: 
     When using either approach to compare gradients to non-gradient markers, we
@@ -139,14 +139,27 @@ gradient.
     addpath(genpath('/path/to/BrainSpace/matlab')); 
 
     % load the conte69 hemisphere surfaces and spheres
-    [surf_lh, surf_rh] = load_conte69('5k_surfaces');
+    [surf_lh, surf_rh] = load_conte69();
 
     % Load the data 
     t1wt2w_lh = load_metric('t1wt2w');
-    curvature_lh = load_metric('curvature');
-    
-    % Template functional gradient
+    curv_lh = load_metric('curvature');
+
+    % Load mask
+    temporal_mask_tmp = load_mask('temporal');
+
+    % There's a one vertex overlap between the HCP midline mask (i.e. nans) and
+    % our temporal mask.
+    temporal_mask_lh = temporal_mask_tmp & ~isnan(t1wt2w_lh);
+
+    % Load the embedding
     embedding = load_template('fc',1);
+    embedding_lh = embedding(1:end/2);
+
+    % Keep only the temporal lobe. 
+    embedding_tl = embedding(temporal_mask_lh);
+    t1wt2w_tl = t1wt2w_lh(temporal_mask_lh);
+    curv_tl = curv_lh(temporal_mask_lh);
 
 We will now compute the Moran eigenvectors. This can be done either by providing
 a weight matrix of spatial proximity between each vertex, or by providing a
