@@ -12,3 +12,7 @@ dist
 *.m~
 *_deprecated.m
 *.swp
+
+.vscode
+
+.DS_Store
