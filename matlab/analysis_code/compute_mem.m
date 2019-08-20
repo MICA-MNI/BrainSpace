@@ -20,13 +20,19 @@ if iscell(W)
     end
 end
 
-if islogical(R.mask)
-    R.mask = find(R.mask);
-end
-
 if isstruct(W) || ischar(W)   
+    
     % Make sure the surface is in matlab format. 
     W = convert_surface(W,'matlab'); 
+    
+    % Check if mask is correct. 
+    if numel(R.mask) > 0
+        if numel(R.mask) == size(W.vertices,1)
+            R.mask = find(R.mask);
+        else
+            error('Different number of elements in the mask than the number of vertices.')
+        end
+    end
 
     % Convert triangles to edges.
     faces = sort(W.faces,2);

@@ -17,7 +17,7 @@ Usage
 
 ::
 
-	null_data = spin_permutations(data,spheres,permutation_number,varargin);
+    null_data = spin_permutations(data,spheres,permutation_number,varargin);
 
 - *data*: An n-by-m matrix of data to be randomised (single sphere) or cell array of n-by-m matrices (two spheres).  
 - *spheres*: Cell array containing spheres. 
