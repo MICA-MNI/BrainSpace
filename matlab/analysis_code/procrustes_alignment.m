@@ -3,7 +3,7 @@ function aligned = procrustes_alignment(gradients,varargin)
 % Parse input
 p = inputParser;
 addParameter(p, 'nIterations', 100, @isnumeric);
-addParameter(p, 'first_alignment_target',nan);
+addParameter(p, 'reference',nan);
 parse(p, varargin{:});
 
 % Grab embeddings.
@@ -15,7 +15,7 @@ end
 if isnan(p.Results.first_alignment_target)
     first_target = embs{1};
 else
-    first_target = p.Results.first_alignment_target;
+    first_target = p.Results.reference;
 end
 
 realigned = procrustes_analysis(embs, p.Results.nIterations, first_target);

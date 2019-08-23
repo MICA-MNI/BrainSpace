@@ -1,10 +1,10 @@
 function out = labelmean(D,L,varargin)
 % LABELMEAN    mean value within label
-%   Averages columns with the same label. D must be a two-dimensional matrix.
-%   L must be a row vector containing integers (NaNs allowed). These integers
-%   are the labels of the corresponding column in D. The sortbylabelvector
-%   flag will cause the output to be sorted in the same order as the labels
-%   in L, rather than numeric order. 
+%   Averages columns with the same label. D must be a two-dimensional
+%   matrix. L must be a row vector containing integers (NaNs allowed).
+%   These integers are the labels of the corresponding column in D. The
+%   sortbylabelvector flag will cause the output to be sorted in the same
+%   order as the labels in L, rather than numeric order.
 %
 %   Written by Reinder Vos de Wael (May 2017)
 %

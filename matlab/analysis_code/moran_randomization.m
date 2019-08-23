@@ -1,15 +1,14 @@
-function Y_rand = moran_randomization(Y,V,nRandomizations,procedure,joint)
+function Y_rand = moran_randomization(Y,MEM,nRandomizations,procedure,joint)
 % MORAN_RANDOMIZATION   Null model for spatially auto-correlated data.
-%   y_rand = MICA_MORAN_RANDOMIZATION(y,W,nRandomizations,procedure)
+%   y_rand = MICA_MORAN_RANDOMIZATION(y,MEM,nRandomizations,procedure,joint)
 %   computes random values x_rand with similar spatial properties as the
-%   input data x. x is a n-by-1 vector of observations, V are the Moran
+%   input data x. x is a n-by-1 vector of observations, MEM are the Moran
 %   eigenvectors, nRandomizations is a scalar denoting the amount of
-%   randomized datasets in the output, and procedure is the method used to
-%   compute randomized data. 
+%   randomized datasets in the output, procedure is the method used to
+%   compute randomized data, and joint determines whether columns of Y are
+%   randomized identically or separately.
 %
 %   The procedure can be either 'singleton' or 'pair'. 
-%
-%   Written by Reinder Vos de Wael (Mar, 2019)
 %
 %   References:
 %       [1] Wagner, H. H., & Dray, S. (2015). Generating spatially
@@ -18,6 +17,10 @@ function Y_rand = moran_randomization(Y,V,nRandomizations,procedure,joint)
 %           Evolution, 6(10), 1169-1178.
 %
 %   See also: COMPUTE_MEM
+%
+%   For more information, please consult our <a
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/moran_randomization.html">ReadTheDocs</a>.
+
 
 %% Deal with the input.  
 
@@ -27,9 +30,9 @@ if ~any(procedure == ["singleton","pair"])
 end
 
 % Get correlations between x and the eigenvectors. 
-r_xV = corr(Y,V,'row','pairwise')';
+r_xV = corr(Y,MEM,'row','pairwise')';
 
-n = size(V,1);
+n = size(MEM,1);
 
 % Select which procedure to use. 
 switch procedure
@@ -67,7 +70,7 @@ end
 % Compute the simulated data, match the mean and standard deviation. 
 Y_rand = nan(size(Y,1),size(Y,2),nRandomizations);
 for ii = 1:size(a,2)
-    Y_rand(:,ii,:) = mean(Y(:,ii)) + std(Y(:,ii)) .* ((n-1)^0.5*V*squeeze(a(:,ii,:)));
+    Y_rand(:,ii,:) = mean(Y(:,ii)) + std(Y(:,ii)) .* ((n-1)^0.5*MEM*squeeze(a(:,ii,:)));
 end
 end
 

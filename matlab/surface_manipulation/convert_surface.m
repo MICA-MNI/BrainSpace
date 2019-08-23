@@ -1,5 +1,6 @@
 function S2 = convert_surface(S,varargin)
-% CONVERT_SURFACE   Converts surfaces to MATLAB or SurfStat format.
+% CONVERT_SURFACE   Converts surfaces to MATLAB or SurfStat format and 
+%                   writes new surface files.
 %
 %   S2 = CONVERT_SURFACE(S) converts surface S to SurfStat format. S can
 %   either be a file (.gii, .mat, .obj, Freesurfer), a loaded variable (in

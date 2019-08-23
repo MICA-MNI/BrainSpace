@@ -37,7 +37,7 @@ for ii = 1:2:numel(varargin)
         case {'diffusiontime','alpha'}
             approach_arg{end+1} = varargin{ii};
             approach_arg{end+1} = varargin{ii+1};
-        case {'niterations','first_alignment_target'}
+        case {'niterations','reference'}
             alignment_arg{end+1} = varargin{ii};
             alignment_arg{end+1} = varargin{ii+1};
         otherwise

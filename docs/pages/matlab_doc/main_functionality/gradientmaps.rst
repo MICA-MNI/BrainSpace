@@ -100,7 +100,7 @@ fit
        The diffusion time used in diffusion embedding. Leave at 0 for automatic estimation.
       - niterations (default: 100)
        The number of iterations in Procrustes analysis.
-      - first_alignment_target (default: gradients of the first data matrix)
+      - reference (default: gradients of the first data matrix)
        The target for alignment for the first iteration of Procrustes analysis.
    Example usage: ``fit({data_matrix_1,data_matrix_2,...,data_matrix_n},'sparsity',75)``
 
