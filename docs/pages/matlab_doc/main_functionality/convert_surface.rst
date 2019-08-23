@@ -6,7 +6,7 @@ convert_surface
 Synopsis
 ---------
 
-Loads and convßerts surfaces (`source code
+Loads and converts surfaces (`source code
 <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/surface_manipulation/convert_surface.m>`_).
 
 

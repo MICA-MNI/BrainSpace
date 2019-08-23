@@ -1,4 +1,4 @@
-.. gradient_in_euclidean:
+.. _gradient_in_euclidean:
 
 =======================
 gradient_in_euclidean
@@ -19,15 +19,22 @@ Usage
 ::
 
    handles = gradient_in_euclidean(gradients)
+   handles = gradient_in_euclidean(gradients,surface)
+   handles = gradient_in_euclidean(gradients,surface,parcellation)
 
 - *gradients*: an n-by-3 matrix of gradients (usually the first three). 
+- *surface*: a surface readable by :ref:`convert_surface` or a two-element cell array containing left and right hemispheric surfaces in that order. 
+- *parcellation*: an m-by-1 vector containing the parcellation scheme, where m is the number of vertices. 
 - *handles*: a structure containing the handles of the graphics objects. 
 
 ------------------
 Description
 ------------------
+
 Produces a 3D scatter plot of gradient data in Euclidean space with each
-datapoint color coded by their location. 
+datapoint color coded by their location. If provided a surface (and
+parcellation), also produces surface plots with the colors projected back to the
+surface. 
 
 BrainSpace only provides basic figure building functionality. For more
 information on how to use Matlab to create publication-ready figures we

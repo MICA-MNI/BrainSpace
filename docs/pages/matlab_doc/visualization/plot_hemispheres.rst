@@ -1,4 +1,4 @@
-.. plot_hemispheres:
+.. _plot_hemispheres:
 
 ==================
 plot_hemispheres

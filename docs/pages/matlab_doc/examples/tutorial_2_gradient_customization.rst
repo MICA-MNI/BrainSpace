@@ -1,6 +1,12 @@
 Tutorial 2: Customizing and aligning gradients
 =====================================================
-In this tutorial you'll learn about the methods available within the ``GradientMaps`` class. The flexible usage of this class allows for the customization of gradient computation with different kernels and dimensionality reductions, as well as aligning gradients from different datasets. This tutorial will only show you how to apply these techniques, for in-depth descriptions we recommend you read the main manuscript [[ADD HYPERLINK]]. 
+
+In this tutorial you'll learn about the methods available within the
+``GradientMaps`` class. The flexible usage of this class allows for the
+customization of gradient computation with different kernels and dimensionality
+reductions, as well as aligning gradients from different datasets. This tutorial
+will only show you how to apply these techniques, for in-depth descriptions we
+recommend you read the main manuscript [[ADD HYPERLINK]]. 
 
 As before, we'll start by loading the sample data.
 
@@ -20,7 +26,9 @@ As before, we'll start by loading the sample data.
     % and load the conte69 hemisphere surfaces
     [surf_lh, surf_rh] = load_conte69();
     
-The ``GradientMaps`` object allows for many different kernels and dimensionality reduction techniques (for a full list see :ref:`GradientMaps`). Lets have a look at three different kernels.
+The ``GradientMaps`` object allows for many different kernels and dimensionality
+reduction techniques (for a full list see :ref:`GradientMaps`). Lets have a look
+at three different kernels.
     
 .. code-block:: matlab    
     
@@ -40,7 +48,11 @@ The ``GradientMaps`` object allows for many different kernels and dimensionality
     :scale: 70%
     :align: center
 
-It seems the gradients provided by these kernels are quite similar although their scaling is quite different. Do note that the gradients are in arbitrary units, so the smaller/larger axes across kernels do not imply anything. Similar to using different kernels, we can also use different dimensionality reduction techniques. 
+It seems the gradients provided by these kernels are quite similar although
+their scaling is quite different. Do note that the gradients are in arbitrary
+units, so the smaller/larger axes across kernels do not imply anything. Similar
+to using different kernels, we can also use different dimensionality reduction
+techniques. 
  
 .. code-block:: matlab    
     
@@ -60,7 +72,15 @@ It seems the gradients provided by these kernels are quite similar although thei
     :scale: 70%
     :align: center
 
-Here we do see some substantial differences: PCA appears to find a slightly different axis, with the somatomotor in the middle between default mode and visual, whereas LE and DM both find the canonical first gradient but their signs are flipped! Fortunately, the sign of gradients is arbitrary, so we could simply multiply either the LM and DM gradient by -1 to make them more comparable. A more principled way of increasing comparability across gradients are alignment techniques. BrainSpace provides two alignment techniques: Procrustes analysis, and joint alignment. For this example we will load functional connectivity data of a second subject group and align it with the first group.  
+Here we do see some substantial differences: PCA appears to find a slightly
+different axis, with the somatomotor in the middle between default mode and
+visual, whereas LE and DM both find the canonical first gradient but their signs
+are flipped! Fortunately, the sign of gradients is arbitrary, so we could simply
+multiply either the LM and DM gradient by -1 to make them more comparable. A
+more principled way of increasing comparability across gradients are alignment
+techniques. BrainSpace provides two alignment techniques: Procrustes analysis,
+and joint alignment. For this example we will load functional connectivity data
+of a second subject group and align it with the first group.  
 
 .. code-block:: matlab    
     
@@ -71,7 +91,9 @@ Here we do see some substantial differences: PCA appears to find a slightly diff
     Gp = Gp.fit({conn_matrix2,conn_matrix});
     Gj = Gj.fit({conn_matrix2,conn_matrix});
 
-Here, ``Gp`` contains the Procrustes aligned data and ``Gj`` contains the joint aligned data. Lets plot them, but in separate figures to keep things organized.  
+Here, ``Gp`` contains the Procrustes aligned data and ``Gj`` contains the joint
+aligned data. Lets plot them, but in separate figures to keep things organized.
+
 
 .. code-block:: matlab    
     
@@ -103,7 +125,12 @@ Here, ``Gp`` contains the Procrustes aligned data and ``Gj`` contains the joint 
     :scale: 70%
     :align: center
 
-Before gradient alignment, the first gradient is reversed, but both alignments resolve this issue. If the input data was less similar, alignments may also resolve changes in the order of the gradients. However, you should always inspect the output of an alignment; if the input data is sufficiently dissimilar then the alignment may produce odd results.
+Before gradient alignment, the first gradient is reversed, but both alignments
+resolve this issue. If the input data was less similar, alignments may also
+resolve changes in the order of the gradients. However, you should always
+inspect the output of an alignment; if the input data is sufficiently dissimilar
+then the alignment may produce odd results.
 
-That concludes the second tutorial. In the third tutorial we will consider null hypothesis testing of comparisons between gradients and other markers. 
+That concludes the second tutorial. In the third tutorial we will consider null
+hypothesis testing of comparisons between gradients and other markers. 
 

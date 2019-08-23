@@ -1,3 +1,5 @@
+.. _matlab_package:
+
 Matlab Package
 ======================================
 
