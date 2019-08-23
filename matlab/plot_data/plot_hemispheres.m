@@ -1,4 +1,19 @@
-function h = plot_hemispheres(data,surface,parcellation)
+function h = plot_hemispheres(data,surface,varargin)
+
+for ii = 1:2:numel(varargin)
+    switch lower(varargin{ii})
+        case 'labeltext'
+            if ischar(varargin{ii+1})
+                label_text = cell(varargin{ii+1});
+            else
+                label_text = varargin{ii+1};
+            end
+        case 'parcellation'
+            parcellation = varargin{ii+1}; 
+    otherwise
+        error('Unknown name-value pair.')
+    end
+end
 
 % If parcellated data is provided, bring it to the full mesh.
 if exist('parcellation','var')
@@ -78,4 +93,11 @@ for ii = 1:size(D,2)
     h.cb(ii).Ticks = clim(:,ii);
     h.cb(ii).FontName = 'DroidSans';
     h.cb(ii).FontSize = 14;
+end
+
+% Add labels
+for ii = 1:numel(label_text)
+    h.text(ii) = text(h.axes(1,ii),-.2,.5,label_text{ii},'Rotation',90, ...
+        'Units','Normalized','HorizontalAlignment','center', 'FontName', ...
+        'DroidSans','FontSize',16);
 end

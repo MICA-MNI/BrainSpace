@@ -42,7 +42,7 @@ at three different kernels.
         gm_k{2}.gradients{1}(:,1), ...
         gm_k{3}.gradients{1}(:,1)], ...
         {surf_lh,surf_rh}, ...
-        labeling);
+        'parcellation', labeling);
     
 .. image:: ./example_figs/g1_schaefer_400_kernel.png
     :scale: 70%
@@ -66,7 +66,7 @@ techniques.
         gm_m{2}.gradients{1}(:,1), ...
         gm_m{3}.gradients{1}(:,1)], ...
         {surf_lh,surf_rh}, ...
-        labeling);
+        'parcellation', labeling);
     
 .. image:: ./example_figs/g1_schaefer_400_approach.png
     :scale: 70%
@@ -99,7 +99,7 @@ aligned data. Lets plot them, but in separate figures to keep things organized.
 .. code-block:: matlab    
     
     plot_hemispheres({Gp.gradients{1}(:,1),Gp.gradients{2}(:,1)}, ...
-        {surf_lh,surf_rh}, labeling);
+        {surf_lh,surf_rh}, 'parcellation', labeling);
     
 .. image:: ./example_figs/g1_main_holdout_noalign.png
     :scale: 70%
@@ -118,7 +118,7 @@ aligned data. Lets plot them, but in separate figures to keep things organized.
 .. code-block:: matlab    
     
     h2 = plot_hemispheres({Gj.aligned{1}(:,1),Gj.aligned{2}(:,1)}, ...
-        {surf_lh,surf_rh},labeling);
+        {surf_lh,surf_rh},'parcellation',labeling);
     h2.figure.Name = 'Joint';
     
     

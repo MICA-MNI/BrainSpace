@@ -18,12 +18,11 @@ Usage
 
 ::
 
-   handles = plot_hemispheres(data,surface);
-   handles = plot_hemispheres(data,surface,parcellation);
+   handles = plot_hemispheres(data,surface,varargin);
 
-- *data*: n n-by-1 vector of data to plot where n is the number of vertices or parcels.
+- *data*: an n-by-m vector of data to plot where n is the number of vertices or parcels, and m the number of markers to plot.
 - *surface*: a surface readable by :ref:`convert_surface` or a two-element cell array containing left and right hemispheric surfaces in that order. 
-- *parcellation*: an m-by-1 vector containing the parcellation scheme, where m is the number of vertices. 
+- *varargin*: Name-Value Pairs (see below).
 - *handles*: a structure containing the handles of the graphics objects. 
 
 ------------------
@@ -50,3 +49,7 @@ Also see the `source code
 <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/plot_data/plot_hemispheres.m>`_
 for basic graphic object property modifications.
 
+Name-Value Pairs
+^^^^^^^^^^^^^^^^^
+- *parcellation*: an k-by-1 vector containing the parcellation scheme, where k is the number of vertices. 
+- *labeltext*: A cell array of m elements containing labels for each column of data. These will be printed next to the hemispheres. 

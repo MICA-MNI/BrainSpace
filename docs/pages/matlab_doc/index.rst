@@ -9,6 +9,14 @@ groups: "main functionality" which performs the computations, "visualization"
 which plots data, and "support functions" which supports the other functions,
 but are not intended for usage by the user.
 
+Tutorials 
+----------------
+.. toctree::
+   :glob:
+   :maxdepth: 1
+
+   examples/*
+
 Main Functionality
 --------------------
 .. toctree::
@@ -32,11 +40,3 @@ Support Functions
    :maxdepth: 1
 
    support_functions/*
-
-Examples 
-----------------
-.. toctree::
-   :glob:
-   :maxdepth: 1
-
-   examples/*

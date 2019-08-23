@@ -50,7 +50,8 @@ a look at the first two gradients.
 
 .. code-block:: matlab
 
-    plot_hemispheres(gm.gradients{1}(:,1:2),{surf_lh,surf_rh});
+    plot_hemispheres(gm.gradients{1}(:,1:2),{surf_lh,surf_rh}, ...
+                     'parcellation', labeling);
 
 .. image:: ./example_figs/g1-2_schaefer_400.png
     :scale: 70%
@@ -65,7 +66,7 @@ plot.
 
 .. code-block:: matlab
 
-    scree_plot(gm.lambdas{1})
+    scree_plot(gm.lambdas{1});
 
 .. image:: ./example_figs/scree.png
     :scale: 70%
