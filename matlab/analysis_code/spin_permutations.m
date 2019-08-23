@@ -43,7 +43,7 @@ end
 % Convert the surface to SurfStat so we can read the vertex data and build
 % the KD Tree.
 for ii = 1:numel(spheres)
-    S{ii} = convert_surface(spheres{ii},'SurfStat');
+    S{ii} = convert_surface(spheres{ii});
     vertices{ii} = S{ii}.coord';    
 
     % Check for correct data dimensions. 

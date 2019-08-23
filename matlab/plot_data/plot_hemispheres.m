@@ -7,7 +7,7 @@ end
 data(isnan(data)) = -Inf;
 
 % Make sure surfaces are in SurfStat format.
-S = convert_surface(surface,'SurfStat');
+S = convert_surface(surface);
 if ~iscell(S); S = {S}; end
 if numel(S) > 3; error('More than two surfaces are not accepted.'); end
 

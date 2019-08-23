@@ -38,7 +38,7 @@ if nargin > 1
     D_full(all(isnan(D_full),2)) = .7; 
     
     % Make sure surfaces are in SurfStat format.
-    S = convert_surface(surface,'SurfStat');
+    S = convert_surface(surface);
     if ~iscell(S); S = {S}; end
     if numel(S) > 3; error('More than two surfaces are not accepted.'); end
     

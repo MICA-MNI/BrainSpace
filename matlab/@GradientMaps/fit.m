@@ -22,7 +22,8 @@ function obj = fit(obj,connectivity_matrix,varargin)
 %       - first_alignment_target (default: none)
 %           A matrix with equivalent size to that of the gradient matrix.
 %
-% For complete documentation please consult our <a href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>
+% For complete documentation please consult our <a
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
 
 % Deal with varargin
 kernel_arg = {};

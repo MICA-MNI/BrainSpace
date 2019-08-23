@@ -23,7 +23,7 @@ end
 if isstruct(W) || ischar(W)   
     
     % Make sure the surface is in matlab format. 
-    W = convert_surface(W,'matlab'); 
+    W = convert_surface(W,'format','matlab'); 
     
     % Check if mask is correct. 
     if numel(R.mask) > 0

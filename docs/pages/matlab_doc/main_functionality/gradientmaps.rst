@@ -59,8 +59,8 @@ be provided to alter its behavior.
    - 'pearson', 'p'
    - 'spearman', 'sm'
    - 'gaussian', 'g'
-   - 'cosine similarity', 'cs'
-   - 'normalized angle', 'na' (default)
+   - 'cosine similarity', 'cs', 'cossim', 'cosine_similarity'
+   - 'normalized angle', 'na', 'normangle', 'normalized_angle' (default)
    - a function handle (the function will be applied to the data matrix)
 'approach'
    - 'principal component analysis', 'pca'

@@ -76,8 +76,9 @@ Here we do see some substantial differences: PCA appears to find a slightly
 different axis, with the somatomotor in the middle between default mode and
 visual, whereas LE and DM both find the canonical first gradient but their signs
 are flipped! Fortunately, the sign of gradients is arbitrary, so we could simply
-multiply either the LM and DM gradient by -1 to make them more comparable. A
-more principled way of increasing comparability across gradients are alignment
+multiply either the LM and DM gradient by -1 to make them more comparable. 
+
+A more principled way of increasing comparability across gradients are alignment
 techniques. BrainSpace provides two alignment techniques: Procrustes analysis,
 and joint alignment. For this example we will load functional connectivity data
 of a second subject group and align it with the first group.  
