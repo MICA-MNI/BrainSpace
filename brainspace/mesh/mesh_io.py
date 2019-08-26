@@ -11,9 +11,10 @@ High-level read/write functions for several formats.
 # from vtkmodules.vtkIOLegacyPython import vtkPolyDataReader, vtkPolyDataWriter
 # from vtkmodules.vtkIOGeometryPython import vtkOBJReader, vtkOBJWriter
 
-from vtk import (vtkPLYReader, vtkPLYWriter, vtkXMLPolyDataReader,
-                 vtkXMLPolyDataWriter, vtkPolyDataReader, vtkPolyDataWriter,
-                 vtkOBJReader, vtkOBJWriter)
+import vtk
+# from vtk import (vtkPLYReader, vtkPLYWriter, vtkXMLPolyDataReader,
+#                  vtkXMLPolyDataWriter, vtkPolyDataReader, vtkPolyDataWriter,
+#                  vtkOBJReader, vtkOBJWriter)
 
 from .io_support import (vtkFSReader, vtkFSWriter, vtkGIFTIReader,
                          vtkGIFTIWriter)
@@ -29,13 +30,13 @@ supported_formats = ['binary', 'ascii']
 @wrap_output
 def _select_reader(itype):
     if itype == 'ply':
-        reader = vtkPLYReader()
+        reader = vtk.vtkPLYReader()
     elif itype == 'obj':
-        reader = vtkOBJReader()
+        reader = vtk.vtkOBJReader()
     elif itype == 'vtp':
-        reader = vtkXMLPolyDataReader()
+        reader = vtk.vtkXMLPolyDataReader()
     elif itype == 'vtk':
-        reader = vtkPolyDataReader()
+        reader = vtk.vtkPolyDataReader()
     elif itype in ['asc', 'fs']:
         reader = vtkFSReader()
         if itype == 'asc':
@@ -50,13 +51,13 @@ def _select_reader(itype):
 @wrap_output
 def _select_writer(otype):
     if otype == 'ply':
-        writer = vtkPLYWriter()
+        writer = vtk.vtkPLYWriter()
     elif otype == 'obj':
-        writer = vtkOBJWriter()
+        writer = vtk.vtkOBJWriter()
     elif otype == 'vtp':
-        writer = vtkXMLPolyDataWriter()
+        writer = vtk.vtkXMLPolyDataWriter()
     elif otype == 'vtk':
-        writer = vtkPolyDataWriter()
+        writer = vtk.vtkPolyDataWriter()
     elif otype in ['asc', 'fs']:
         writer = vtkFSWriter()
     elif otype == 'gii':
