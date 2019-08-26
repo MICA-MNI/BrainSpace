@@ -37,16 +37,13 @@ def _generate_sphere():
     return wrap_vtk(s.GetOutput())
 
 
-@parametrize('ext', ['fs', 'asc', 'ply', 'obj', 'vtp', 'vtk'])
+@parametrize('ext', ['fs', 'asc', 'ply', 'vtp', 'vtk'])
 def test_io(ext):
     s = _generate_sphere()
 
     root_pth = os.path.dirname(__file__)
-    pth = os.path.join(root_pth, 'test_sphere_io.{ext}')
+    io_pth = os.path.join(root_pth, 'test_sphere_io.{ext}').format(ext=ext)
 
-    # for ext in ['fs', 'asc', 'ply', 'obj', 'vtp', 'vtk']:
-
-    io_pth = pth.format(ext=ext)
     mio.save_surface(s, io_pth)
     s2 = mio.load_surface(io_pth)
 
@@ -105,7 +102,7 @@ def test_mesh_creation():
     assert isinstance(pd, BSPolyData)
 
 
-def test_mesh_operations():
+def test_cell_operations():
     s = _generate_sphere()
 
     rs = np.random.RandomState(0)
@@ -126,6 +123,12 @@ def test_mesh_operations():
     n_cells = mop.mask_cells(s, mask_cell_name).n_cells
     assert n_cells == np.count_nonzero(label_cells > 3)
 
+
+def test_point_operations():
+    s = _generate_sphere()
+
+    rs = np.random.RandomState(0)
+
     # Drop, select and mask points
     label_points = rs.randint(0, 10, s.n_points)
     point_name = s.append_array(label_points, at='p')
@@ -137,15 +140,58 @@ def test_mesh_operations():
     # selected points
     with pytest.warns(UserWarning):
         n_pts = mop.drop_points(s, point_name, low=0, upp=3).n_points
-        assert n_pts < s.n_points
+        assert n_pts <= s.n_points
 
     with pytest.warns(UserWarning):
         n_pts = mop.select_points(s, point_name, low=0, upp=3).n_points
-        assert n_pts < s.n_points
+        assert n_pts <= s.n_points
 
     with pytest.warns(UserWarning):
         n_pts = mop.mask_points(s, mask_point_name).n_points
-        assert n_pts < s.n_points
+        assert n_pts <= s.n_points
+
+
+# def test_mesh_operations():
+#     s = _generate_sphere()
+#
+#     rs = np.random.RandomState(0)
+#
+#     # Drop, select and mask cells
+#     label_cells = rs.randint(0, 10, s.n_cells)
+#     cell_name = s.append_array(label_cells, at='c')
+#     # Warns when array is boolean
+#     with pytest.warns(UserWarning):
+#         mask_cell_name = s.append_array(label_cells > 3, at='c')
+#
+#     n_cells = mop.drop_cells(s, cell_name, upp=3).n_cells
+#     assert n_cells == np.count_nonzero(label_cells > 3)
+#
+#     n_cells = mop.select_cells(s, cell_name, low=0, upp=3).n_cells
+#     assert n_cells == np.count_nonzero(label_cells <= 3)
+#
+#     n_cells = mop.mask_cells(s, mask_cell_name).n_cells
+#     assert n_cells == np.count_nonzero(label_cells > 3)
+#
+#     # Drop, select and mask points
+#     label_points = rs.randint(0, 10, s.n_points)
+#     point_name = s.append_array(label_points, at='p')
+#     # Warns when array is boolean
+#     with pytest.warns(UserWarning):
+#         mask_point_name = s.append_array(label_points > 3, at='p')
+#
+#     # Warns cause number of selected points may not coincide with
+#     # selected points
+#     with pytest.warns(UserWarning):
+#         n_pts = mop.drop_points(s, point_name, low=0, upp=3).n_points
+#         assert n_pts < s.n_points
+#
+#     with pytest.warns(UserWarning):
+#         n_pts = mop.select_points(s, point_name, low=0, upp=3).n_points
+#         assert n_pts < s.n_points
+#
+#     with pytest.warns(UserWarning):
+#         n_pts = mop.mask_points(s, mask_point_name).n_points
+#         assert n_pts < s.n_points
 
 
 def test_mesh_elements():
