@@ -9,32 +9,30 @@ from brainspace.datasets import *
 from brainspace.vtk_interface.wrappers import BSPolyData
 
 
-def test_load_conte69():
+parametrize = pytest.mark.parametrize
 
-    surf_lh, surf_rh = load_conte69()
+
+testdata_surface = [
+    ({}),
+    ({'as_sphere': True}),
+    ({'as_sphere': False, 'with_normals': False}),
+    ({'as_sphere': True, 'with_normals': False}),
+]
+
+
+@parametrize('kwds', testdata_surface)
+def test_load_surface(kwds):
+
+    surf_lh, surf_rh = load_conte69(**kwds)
     assert isinstance(surf_lh, BSPolyData)
     assert isinstance(surf_rh, BSPolyData)
     assert surf_lh.n_points == surf_rh.n_points
-    assert 'Normals' in surf_lh.PointData.keys()
-    assert 'Normals' in surf_rh.PointData.keys()
-
-    surf_lh2, surf_rh2 = load_conte69(as_sphere=False)
-    assert np.all(surf_lh2.Points == surf_lh.Points)
-    assert np.all(surf_rh2.Points == surf_rh.Points)
-
-    surf_lh3, surf_rh3 = load_conte69(with_normals=False)
-    assert np.all(surf_lh3.Points == surf_lh.Points)
-    assert np.all(surf_rh3.Points == surf_rh.Points)
-    assert 'Normals' not in surf_lh3.PointData.keys()
-    assert 'Normals' not in surf_rh3.PointData.keys()
-
-    sphere_lh, sphere_rh = load_conte69(as_sphere=True, with_normals=True)
-    assert sphere_lh.n_points == surf_lh.n_points
-    assert sphere_rh.n_points == surf_rh.n_points
-    assert np.any(sphere_lh.Points != surf_lh.Points)
-    assert np.any(sphere_rh.Points != surf_rh.Points)
-    assert 'Normals' in sphere_lh.PointData.keys()
-    assert 'Normals' in sphere_rh.PointData.keys()
+    if 'with_normals' not in kwds or kwds['with_normals']:
+        assert 'Normals' in surf_lh.PointData.keys()
+        assert 'Normals' in surf_rh.PointData.keys()
+    else:
+        assert 'Normals' not in surf_lh.PointData.keys()
+        assert 'Normals' not in surf_rh.PointData.keys()
 
 
 def test_load_mask():
@@ -46,17 +44,22 @@ def test_load_mask():
     assert mask.dtype == np.bool
 
 
-def test_load_parcellation():
+@parametrize('name', ['vosdewael', 'schaefer'])
+@parametrize('kwds', [{}] + [{'n_parcels': k} for k in [100, 200, 300, 400]])
+def test_load_parcellation(name, kwds):
     mask = load_mask()
     total_n_pts = mask.size
 
-    for name in ['vosdewael', 'schaefer']:
-        for n in [100, 200, 300, 400]:
-            parc = load_parcellation(name, n_parcels=n)
+    if 'n_parcels' in kwds:
+        n = kwds['n_parcels']
+        parc = load_parcellation(name, n_parcels=n)
+    else:
+        n = 400
+        parc = load_parcellation(name)
 
-            assert parc.shape == (total_n_pts,)
-            assert np.unique(parc).size == n + 1
-            assert np.count_nonzero(np.isnan(parc[mask])) == 0
+    assert parc.shape == (total_n_pts,)
+    assert np.unique(parc).size == n + 1
+    assert np.count_nonzero(np.isnan(parc[mask])) == 0
 
 
 def test_load_thickness():
@@ -81,30 +84,51 @@ def test_load_myelin():
     assert np.isnan(myelin[~mask]).all()
 
 
-def test_load_gradient():
+@parametrize('name', ['fc', 'mpc'])
+@parametrize('kwds', [{}] + [{'idx': k} for k in [0, 1]])
+def test_load_gradient(name, kwds):
     mask = load_mask()
     total_n_pts = mask.size
 
-    grad = load_gradient('fc')
+    if 'idx' in kwds:
+        idx = kwds['idx']
+        grad = load_gradient(name, idx=idx)
+    else:
+        grad = load_gradient(name)
+
     assert grad.shape == (total_n_pts,)
     assert grad.dtype == np.float
     assert not np.isnan(grad[mask]).any()
     assert np.isnan(grad[~mask]).all()
 
-    grad0 = load_gradient('fc', idx=0)
-    assert ((grad0 == grad) | (np.isnan(grad0) & np.isnan(grad))).all()
 
-    grad1 = load_gradient('fc', idx=1)
-    assert grad1.shape == (total_n_pts,)
+@parametrize('name', ['vosdewael', 'schaefer'])
+@parametrize('kwds', [{}] + [{'n_parcels': k} for k in [100, 200, 300, 400]])
+def test_load_group(name, kwds):
 
-    grad = load_gradient('mpc')
-    assert grad.shape == (total_n_pts,)
-    assert grad.dtype == np.float
-    assert not np.isnan(grad[mask]).any()
-    assert np.isnan(grad[~mask]).all()
+    if 'n_parcels' in kwds:
+        n = kwds['n_parcels']
+        cm = load_group_hcp(name, n_parcels=n)
+    else:
+        n = 400
+        cm = load_group_hcp(name)
 
-    grad0 = load_gradient('mpc', idx=0)
-    assert ((grad0 == grad) | (np.isnan(grad0) & np.isnan(grad))).all()
+    assert cm.shape == (n, n)
+    assert cm.dtype == np.float
+    assert np.allclose(cm, cm.T)
 
-    grad1 = load_gradient('mpc', idx=1)
-    assert grad1.shape == (total_n_pts,)
+
+@parametrize('name', ['vosdewael', 'schaefer'])
+@parametrize('kwds', [{}] + [{'n_parcels': k} for k in [100, 200, 300, 400]])
+def test_load_holdout(name, kwds):
+
+    if 'n_parcels' in kwds:
+        n = kwds['n_parcels']
+        cm = load_group_hcp(name, n_parcels=n)
+    else:
+        n = 400
+        cm = load_group_hcp(name)
+
+    assert cm.shape == (n, n)
+    assert cm.dtype == np.float
+    assert np.allclose(cm, cm.T)
