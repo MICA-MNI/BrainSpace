@@ -9,9 +9,11 @@ Basic functions on surface meshes.
 import warnings
 import numpy as np
 
-from vtkmodules.vtkCommonDataModelPython import vtkDataObject
-from vtkmodules.vtkFiltersCorePython import vtkThreshold
-from vtkmodules.vtkFiltersGeometryPython import vtkGeometryFilter
+# from vtkmodules.vtkCommonDataModelPython import vtkDataObject
+# from vtkmodules.vtkFiltersCorePython import vtkThreshold
+# from vtkmodules.vtkFiltersGeometryPython import vtkGeometryFilter
+
+from vtk import vtkDataObject, vtkThreshold, vtkGeometryFilter
 
 from ..vtk_interface.pipeline import serial_connect
 from ..vtk_interface.wrappers import wrap_vtk

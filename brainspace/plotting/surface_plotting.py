@@ -9,15 +9,10 @@ Surface plotting functions.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from vtkmodules.vtkFiltersGeneralPython import vtkTransformFilter
-from vtkmodules.vtkCommonTransformsPython import vtkTransform
-
 from .base import Plotter
 from .colormaps import colormaps
 
-from ..vtk_interface.wrappers import wrap_vtk
 from ..vtk_interface.decorators import wrap_input
-from ..vtk_interface.pipeline import serial_connect
 
 
 orientations = {'lateral': (0, -90, -90),

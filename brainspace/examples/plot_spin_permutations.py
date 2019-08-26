@@ -15,7 +15,7 @@ permuted feature(s) by rotating the feature data on the spherical domain.
 # We will start by loading the conte69 surfaces for left and right hemispheres
 # and their corresponding spheres.
 
-from brainspace.data.base import load_conte69, load_mask
+from brainspace.datasets import load_conte69, load_mask
 
 
 # load the conte69 hemisphere surfaces and spheres
@@ -31,8 +31,8 @@ mask = load_mask()
 # burden.
 
 from brainspace.gradient import GradientMaps
-from brainspace.data.base import (load_t1t2, load_thickness, load_parcellation,
-                                  load_group_hcp)
+from brainspace.datasets import (load_t1t2, load_thickness, load_parcellation,
+                                 load_group_hcp)
 
 parcel_name = 'schaefer'
 n_parcels = 400

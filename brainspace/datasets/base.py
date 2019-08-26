@@ -1,7 +1,8 @@
 from os.path import dirname, join
 import numpy as np
 
-from vtkmodules.vtkFiltersCorePython import vtkPolyDataNormals
+# from vtkmodules.vtkFiltersCorePython import vtkPolyDataNormals
+from vtk import vtkPolyDataNormals
 
 from ..mesh.mesh_io import load_surface
 from ..utils.parcellation import reduce_by_labels

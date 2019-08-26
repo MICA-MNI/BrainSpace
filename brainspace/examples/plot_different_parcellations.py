@@ -14,7 +14,7 @@ representations.
 # their corresponding mean connectivity matrices. We also load the conte69
 # surface. These files are provided with BrainSpace.
 
-from brainspace.data.base import load_group_hcp, load_parcellation, load_conte69
+from brainspace.datasets import load_group_hcp, load_parcellation, load_conte69
 
 # Different parcellations
 list_parcels = [100, 200, 300, 400]

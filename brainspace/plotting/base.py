@@ -15,13 +15,19 @@ from PIL import Image
 from ..vtk_interface import wrap_vtk
 from ..vtk_interface.decorators import wrap_input
 
-from vtkmodules.vtkCommonCorePython import vtkCommand
-from vtkmodules.vtkIOImagePython import vtkPNGWriter
-from vtkmodules.vtkRenderingOpenGL2Python import \
-    vtkXRenderWindowInteractor as vtkRenderWindowInteractor
-from vtkmodules.vtkRenderingCorePython import (vtkWindowToImageFilter,
-                                               vtkRenderWindow)
-from vtkmodules import qt as vtk_qt
+# from vtkmodules.vtkCommonCorePython import vtkCommand
+# from vtkmodules.vtkIOImagePython import vtkPNGWriter
+# from vtkmodules.vtkRenderingOpenGL2Python import \
+#     vtkXRenderWindowInteractor as vtkRenderWindowInteractor
+# from vtkmodules.vtkRenderingCorePython import (vtkWindowToImageFilter,
+#                                                vtkRenderWindow)
+# from vtkmodules import qt as vtk_qt
+
+from vtk import (vtkCommand, vtkPNGWriter,
+                 vtkXRenderWindowInteractor as vtkRenderWindowInteractor,
+                 vtkWindowToImageFilter, vtkRenderWindow)
+
+import vtk.qt as vtk_qt
 
 from ..vtk_interface.wrappers import BSRenderer
 from ..vtk_interface.pipeline import get_output
@@ -47,7 +53,9 @@ except ImportError:
 
 
 try:
-    from vtkmodules.qt.QVTKRenderWindowInteractor import \
+    # from vtkmodules.qt.QVTKRenderWindowInteractor import \
+    #     QVTKRenderWindowInteractor
+    from vtk.qt.QVTKRenderWindowInteractor import \
         QVTKRenderWindowInteractor
     from PyQt5 import QtGui
     from PyQt5.QtWidgets import QVBoxLayout, QFrame, QMainWindow

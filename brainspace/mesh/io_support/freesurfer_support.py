@@ -9,8 +9,10 @@ VTK read/write filters for FreeSurfer geometry files.
 import re
 import numpy as np
 
-from vtkmodules.vtkCommonDataModelPython import vtkPolyData
-from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
+# from vtkmodules.vtkCommonDataModelPython import vtkPolyData
+# from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
+from vtk import vtkPolyData
+from vtk.util.vtkAlgorithm import VTKPythonAlgorithmBase
 
 from ...vtk_interface.decorators import wrap_input
 from ...vtk_interface.checks import has_only_triangle

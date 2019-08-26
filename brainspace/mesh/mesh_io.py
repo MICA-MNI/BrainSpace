@@ -6,10 +6,14 @@ High-level read/write functions for several formats.
 # License: BSD 3 clause
 
 
-from vtkmodules.vtkIOPLYPython import vtkPLYReader, vtkPLYWriter
-from vtkmodules.vtkIOXMLPython import vtkXMLPolyDataReader, vtkXMLPolyDataWriter
-from vtkmodules.vtkIOLegacyPython import vtkPolyDataReader, vtkPolyDataWriter
-from vtkmodules.vtkIOGeometryPython import vtkOBJReader, vtkOBJWriter
+# from vtkmodules.vtkIOPLYPython import vtkPLYReader, vtkPLYWriter
+# from vtkmodules.vtkIOXMLPython import vtkXMLPolyDataReader, vtkXMLPolyDataWriter
+# from vtkmodules.vtkIOLegacyPython import vtkPolyDataReader, vtkPolyDataWriter
+# from vtkmodules.vtkIOGeometryPython import vtkOBJReader, vtkOBJWriter
+
+from vtk import (vtkPLYReader, vtkPLYWriter, vtkXMLPolyDataReader,
+                 vtkXMLPolyDataWriter, vtkPolyDataReader, vtkPolyDataWriter,
+                 vtkOBJReader, vtkOBJWriter)
 
 from .io_support import (vtkFSReader, vtkFSWriter, vtkGIFTIReader,
                          vtkGIFTIWriter)

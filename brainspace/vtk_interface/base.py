@@ -10,7 +10,8 @@ import re
 from collections import defaultdict
 
 import vtk
-from vtkmodules.numpy_interface.dataset_adapter import VTKObjectWrapper
+# from vtkmodules.numpy_interface.dataset_adapter import VTKObjectWrapper
+from vtk.numpy_interface.dataset_adapter import VTKObjectWrapper
 
 
 re_state = 'Set(?P<state>(?P<root>[A-Z0-9].*)To(?P<value>[A-Z0-9].*))'

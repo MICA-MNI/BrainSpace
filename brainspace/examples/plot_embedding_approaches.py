@@ -13,7 +13,7 @@ decomposed using 3 different embedding approaches to obtain the gradients.
 # using the original vertex-wise connectivity matrix, we are going to load a
 # 100x100 matrix based on Schaefer et al., 2017 parcellation.
 
-from brainspace.data.base import load_group_hcp, load_parcellation, load_conte69
+from brainspace.datasets import load_group_hcp, load_parcellation, load_conte69
 
 # First load mean connectivity matrix and Schaefer parcellation
 conn_matrix = load_group_hcp('schaefer', n_parcels=100)
