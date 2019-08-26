@@ -22,6 +22,9 @@ from brainspace.mesh import mesh_cluster as mcluster
 from brainspace.mesh import array_operations as aop
 
 
+parametrize = pytest.mark.parametrize
+
+
 try:
     import nibabel as nb
 except ImportError:
@@ -34,20 +37,23 @@ def _generate_sphere():
     return wrap_vtk(s.GetOutput())
 
 
-def test_io():
+@parametrize('ext', ['fs', 'asc', 'ply', 'obj', 'vtp', 'vtk'])
+def test_io(ext):
     s = _generate_sphere()
 
     root_pth = os.path.dirname(__file__)
     pth = os.path.join(root_pth, 'test_sphere_io.{ext}')
-    for ext in ['fs', 'asc', 'ply', 'obj', 'vtp', 'vtk']:
-        io_pth = pth.format(ext=ext)
-        mio.save_surface(s, io_pth)
-        s2 = mio.load_surface(io_pth)
 
-        assert np.allclose(s.Points, s2.Points)
-        assert np.all(s.get_cells2D() == s2.get_cells2D())
+    # for ext in ['fs', 'asc', 'ply', 'obj', 'vtp', 'vtk']:
 
-        os.remove(io_pth)
+    io_pth = pth.format(ext=ext)
+    mio.save_surface(s, io_pth)
+    s2 = mio.load_surface(io_pth)
+
+    assert np.allclose(s.Points, s2.Points)
+    assert np.all(s.get_cells2D() == s2.get_cells2D())
+
+    os.remove(io_pth)
 
 
 @pytest.mark.skipif(nb is None, reason="Requires nibabel")
