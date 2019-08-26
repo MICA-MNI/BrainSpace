@@ -40,7 +40,6 @@ def test_io():
     root_pth = os.path.dirname(__file__)
     pth = os.path.join(root_pth, 'test_sphere_io.{ext}')
     for ext in ['fs', 'asc', 'ply', 'obj', 'vtp', 'vtk']:
-        print(ext)
         io_pth = pth.format(ext=ext)
         mio.save_surface(s, io_pth)
         s2 = mio.load_surface(io_pth)

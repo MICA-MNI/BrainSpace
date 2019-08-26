@@ -12,9 +12,6 @@ High-level read/write functions for several formats.
 # from vtkmodules.vtkIOGeometryPython import vtkOBJReader, vtkOBJWriter
 
 import vtk
-# from vtk import (vtkPLYReader, vtkPLYWriter, vtkXMLPolyDataReader,
-#                  vtkXMLPolyDataWriter, vtkPolyDataReader, vtkPolyDataWriter,
-#                  vtkOBJReader, vtkOBJWriter)
 
 from .io_support import (vtkFSReader, vtkFSWriter, vtkGIFTIReader,
                          vtkGIFTIWriter)
