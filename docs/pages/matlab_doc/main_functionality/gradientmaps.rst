@@ -59,8 +59,8 @@ be provided to alter its behavior.
    - 'pearson', 'p'
    - 'spearman', 'sm'
    - 'gaussian', 'g'
-   - 'cosine similarity', 'cs'
-   - 'normalized angle', 'na' (default)
+   - 'cosine similarity', 'cs', 'cossim', 'cosine_similarity'
+   - 'normalized angle', 'na', 'normangle', 'normalized_angle' (default)
    - a function handle (the function will be applied to the data matrix)
 'approach'
    - 'principal component analysis', 'pca'
@@ -100,7 +100,7 @@ fit
        The diffusion time used in diffusion embedding. Leave at 0 for automatic estimation.
       - niterations (default: 100)
        The number of iterations in Procrustes analysis.
-      - first_alignment_target (default: gradients of the first data matrix)
+      - reference (default: gradients of the first data matrix)
        The target for alignment for the first iteration of Procrustes analysis.
    Example usage: ``fit({data_matrix_1,data_matrix_2,...,data_matrix_n},'sparsity',75)``
 

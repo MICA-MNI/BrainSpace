@@ -1,10 +1,24 @@
 function Y_rand = spin_permutations(Y,spheres,permutation_number,varargin)
-% Compute designated # of permutations/spins of the input surface data.
-% Uniformly samples from all possible rotations and applies them to the
-% data. 
+% SPIN_PERMUTATIONS   constructs null data through spin permutations.
 %
-% Original code by Aaron Alexander-Bloch & Siyuan Liu 
-% Modified for use in the BrainSpace toolbox by Reinder Vos de Wael
+%   Y_rand = SPIN_PERMUTATIONS(Y,spheres,permutation_number,varargin)
+%   performs spin permutations of n-by-m matrix Y, where n is number of
+%   vertices and m number of markers to perumute. Spheres is a structure
+%   containing a sphere, a path to a sphere, or a 2-element cell array
+%   containing two of the aforementioned. permutation_number denotes the
+%   number of spins to perform. 
+%
+%   Name-Value pairs
+%       'parcellation': an n-by-1 vector containing parcellations on the
+%                       surface.
+%       'type': The program used to construct the surface; 'FreeSurfer' 
+%               (default) and 'CIVET' are supported. 
+%
+%   Original code by Aaron Alexander-Bloch & Siyuan Liu 
+%   Modified for use in the BrainSpace toolbox by Reinder Vos de Wael
+%
+%   For more information, please consult our <a
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/spin_permutations.html">ReadTheDocs</a>.
 
 % Make sure input is in the correct format. 
 p = inputParser;
@@ -43,7 +57,7 @@ end
 % Convert the surface to SurfStat so we can read the vertex data and build
 % the KD Tree.
 for ii = 1:numel(spheres)
-    S{ii} = convert_surface(spheres{ii},'SurfStat');
+    S{ii} = convert_surface(spheres{ii});
     vertices{ii} = S{ii}.coord';    
 
     % Check for correct data dimensions. 

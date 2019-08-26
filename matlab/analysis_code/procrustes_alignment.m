@@ -1,9 +1,19 @@
 function aligned = procrustes_alignment(gradients,varargin)
+% PROCRUSTES_ALIGNMENT   Performs a Procrustes alignment between gradients.
+%
+%   aligned = PROCRUSTES_ALIGNMENT(gradients,varargin) performs a singular
+%   value decomposition of the vectors in cell array gradients to align
+%   them. Valid name-value pairs are  the number of iterations
+%   'nIterations' (default: 100) and the reference (default: first cell of
+%   the gradients array). 
+%
+%   For more information, please consult our <a
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/procrustes_alignment.html">ReadTheDocs</a>.
 
 % Parse input
 p = inputParser;
 addParameter(p, 'nIterations', 100, @isnumeric);
-addParameter(p, 'first_alignment_target',nan);
+addParameter(p, 'reference',nan);
 parse(p, varargin{:});
 
 % Grab embeddings.
@@ -15,7 +25,7 @@ end
 if isnan(p.Results.first_alignment_target)
     first_target = embs{1};
 else
-    first_target = p.Results.first_alignment_target;
+    first_target = p.Results.reference;
 end
 
 realigned = procrustes_analysis(embs, p.Results.nIterations, first_target);

@@ -1,4 +1,24 @@
-function V = compute_mem(W,varargin)
+function MEM = compute_mem(W,varargin)
+% COMPUTE_MEM   computes the Moran eigenvectors. 
+%
+%   MEM = COMPUTE_MEM(W,varargin) computes the Moran eigenvectors for a
+%   weight matrix or a surface. If a surface is provided, then the weights
+%   are computed as inverse geodesic distance. 
+%
+%   Name-Value pairs:
+%       'n_ring' Determines the distance (in mesh units) of the vertices
+%       for which geodesic distance is computed. Only used when W is a
+%       surface (Default: 1). 
+%       'mask': A logical n-by-1 mask containing true for vertices thta
+%       that shouold not be included in the weight matrix. Only used when W
+%       is a surface (Default: []).
+%       'eigenvectors: if set to 'all', then when multiple eigenvectors
+%       have eigenvalues equal to zero, only one is removed and the
+%       remainder is reorthogonalized. If set to anything else, removes all
+%       eigenvector with eigenvalue zero.
+% 
+%   For complete documentation, please consult our <a
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/compute_mem.html">ReadTheDocs</a>.
 
 % Parse input
 p = inputParser;
@@ -23,7 +43,7 @@ end
 if isstruct(W) || ischar(W)   
     
     % Make sure the surface is in matlab format. 
-    W = convert_surface(W,'matlab'); 
+    W = convert_surface(W,'format','matlab'); 
     
     % Check if mask is correct. 
     if numel(R.mask) > 0
@@ -67,30 +87,30 @@ else
 end
 
 % Eigenvalue decomposition of W. 
-[V,lambda] = eig(full(W),'vector');
+[MEM,lambda] = eig(full(W),'vector');
 
 % Remove zero eigenvector
 idx = find(abs(lambda) < 1e-10); 
 if strcmp(R.eigenvectors,'all')
     if numel(idx) == 1
-        V(:,idx) = [];
+        MEM(:,idx) = [];
         lambda(idx) = []; 
     elseif numel(idx) > 1
         % See supplemental info 3 of Ref 1, function scores.listw().
-        w = [ones(size(V,1),1),V(:,idx)];
+        w = [ones(size(MEM,1),1),MEM(:,idx)];
         Q = qr(w);
-        V(:,idx) = Q(:,1:end-1);
-        V(:,idx(1)) = [];
+        MEM(:,idx) = Q(:,1:end-1);
+        MEM(:,idx(1)) = [];
         lambda(idx(1)) = []; 
     else
         error('Did not find a zero eigenvector');
     end
 else
-    V(:,idx) = [];
+    MEM(:,idx) = [];
     lambda(:,idx) = []; 
 end
 
 % Sort eigenvectors and values.
 [~, idx] = sort(lambda,'descend');
-V = V(:,idx);
+MEM = MEM(:,idx);
 

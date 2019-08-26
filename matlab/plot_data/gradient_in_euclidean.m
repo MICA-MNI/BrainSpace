@@ -1,24 +1,43 @@
-function [h,C,C_full] = gradient_in_euclidean(G,surface,parcellation)
+function [h,C] = gradient_in_euclidean(gradients,surface,parcellation)
+% GRADIENT_IN_EUCLIDEAN   Plots gradient values as a scatter plot.
+%
+%   h = GRADIENT_IN_EUCLIDEAN(gradients) plots a scatter plot of n-by-2 or
+%   n-by-3 matrix gradients where n is the number of datapoints. Each point
+%   is colored by their position with respect to the center.
+%
+%   [h,C] = GRADIENT_IN_EUCLIDEAN(gradients) also returns n-by-3 matrix C
+%   containing the RGB color values of each datapoint.
+%
+%   h = GRADIENT_IN_EUCLIDEAN(gradients,surface) plots the colors on the
+%   cortical surface. surface must be in a format readable by
+%   convert_surface.
+%
+%   h = GRADIENT_IN_EUCLIDEAN(gradients,surface,parcellation) plots the
+%   colors on the cortical surface grouped by m-by-1 vector parcellation,
+%   where m is the number of vertices in surface.
+%
+%   For more information, please consult our <a
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/visualization/gradient_in_euclidean.html">ReadTheDocs</a>.
 
-if size(G,2) ~= 3 && size(G,2) ~= 2
+if size(gradients,2) ~= 3 && size(gradients,2) ~= 2
     error('Input matrix must be numeric with two or three columns.');
 end
 
 h.figure = figure('Color','White','Units','Normalized','Position',[0 0 .9 .9]);
 h.axes_scatter = axes('Position',[.38 .6 .3 .3]);
 
-if size(G,2) == 2
-    cart = (G - mean(G)) ./ max(abs(G(:)-mean(G(:))));
+if size(gradients,2) == 2
+    cart = (gradients - mean(gradients)) ./ max(abs(gradients(:)-mean(gradients(:))));
     [th,r] = cart2pol(cart(:,2),cart(:,1));
     r = r ./ 2 + .5;
     C = [cos(.75*(th + 0*pi)), cos(.75*th - .5*pi), cos(.75*th + .5*pi)];
     C = C .* r;
     C = C ./ max(C(:));
     C(C<0) = 0;
-    h.scatter = scatter(G(:,1),G(:,2),200,C,'Marker','.');
+    h.scatter = scatter(gradients(:,1),gradients(:,2),200,C,'Marker','.');
 else
-    C = (G - min(G)) ./ max(G - min(G));
-    h.scatter = scatter3(G(:,1),G(:,2),G(:,3),200,C,'Marker','.');
+    C = (gradients - min(gradients)) ./ max(gradients - min(gradients));
+    h.scatter = scatter3(gradients(:,1),gradients(:,2),gradients(:,3),200,C,'Marker','.');
     zlabel('Gradient 3');
 end
 set(h.axes_scatter                              , ...
@@ -34,11 +53,11 @@ if nargin > 1
         D_full = parcel2full((1:size(C,1))',parcellation);
     end
     
-    % Deal with nans. 
+    % Deal with nans.
     D_full(all(isnan(D_full),2)) = .7; 
     
     % Make sure surfaces are in SurfStat format.
-    S = convert_surface(surface,'SurfStat');
+    S = convert_surface(surface);
     if ~iscell(S); S = {S}; end
     if numel(S) > 3; error('More than two surfaces are not accepted.'); end
     
@@ -79,13 +98,11 @@ if nargin > 1
         set(h.axes(4),'View',[90 0]);
     end
 
-    % Add a camlight. 
+    % Add a camlight.
     for ii = 1:numel(h.axes)
         axes(h.axes(ii));
         h.camlight(ii) = camlight();
     end
 
 end
-
-
 end

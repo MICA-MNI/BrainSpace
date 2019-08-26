@@ -1,5 +1,5 @@
-Tutorial 3: Null models
-=================================================
+Tutorial 3: Null models for gradient significance
+==================================================
 
 In this tutorial we assess the significance of correlations between the first
 canonical gradient and data from other modalities (curvature, cortical thickness
@@ -172,13 +172,13 @@ surface.
     MEM = compute_mem(surf_lh,'n_ring',n_ring,'mask',~temporal_mask_lh);
 
 Using the Moran eigenvectors we can now compute the randomized data. As the
-computationally intensive portion of MSR is mostly in :ref`compute_mem`, we can
+computationally intensive portion of MSR is mostly in :ref:`compute_mem`, we can
 push the number of permutations a bit further. 
 
 .. code-block:: matlab
 
-    n_perm = 10000;
-    y_rand = moran_randomization([curv_tl,t1wt2w_tl],MEM,n_perm,'singleton',true);
+    n_rand = 10000;
+    y_rand = moran_randomization([curv_tl,t1wt2w_tl],MEM,n_rand,'singleton',true);
 
     curv_rand = squeeze(y_rand(:,1,:));
     t1wt2w_rand = squeeze(y_rand(:,2,:));
@@ -213,3 +213,6 @@ If significant is true, the we've found a statistically significant correlation.
 Alternatively, one could also test the one-tailed hypothesis whether the
 percentile rank is lower or higher than the 5th/95th percentile, respectively.
 
+This concludes the third and last tutorial. You should now be familliar with all
+the functionality of the BrainSpace toolbox. For more details on any specific
+function, please see `ref`:matlab_package
