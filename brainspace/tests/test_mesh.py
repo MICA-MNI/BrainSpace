@@ -7,7 +7,8 @@ import os
 import numpy as np
 
 import vtk
-from vtkmodules.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
+# from vtkmodules.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
+from vtk.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
 
 
 from brainspace.vtk_interface import wrap_vtk

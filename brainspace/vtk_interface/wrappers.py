@@ -528,9 +528,10 @@ class BSUnstructuredGrid(dsa.UnstructuredGrid, BSPointSet):
     pass
 
 
-class BSGraph(dsa.Graph, BSDataObject):
-    """Wrapper for vtkUnstructuredGrid."""
-    pass
+# Not available
+# class BSGraph(dsa.Graph, BSDataObject):
+#     """Wrapper for vtkUnstructuredGrid."""
+#     pass
 
 
 class BSMolecule(dsa.Molecule, BSDataObject):

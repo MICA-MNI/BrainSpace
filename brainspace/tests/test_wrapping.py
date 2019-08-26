@@ -5,7 +5,8 @@ import pytest
 import numpy as np
 
 import vtk
-from vtkmodules.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
+# from vtkmodules.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
+from vtk.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
 
 from brainspace.vtk_interface import checks, wrap_vtk
 from brainspace.vtk_interface.base import BSVTKObjectWrapper
