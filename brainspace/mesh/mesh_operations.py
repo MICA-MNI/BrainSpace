@@ -72,7 +72,7 @@ def _surface_selection(surf, array_name, low=-np.inf, upp=np.inf,
     if upp == np.inf:
         upp = array.max()
 
-    tf = wrap_vtk(vtkThreshold(), invert=not keep)
+    tf = wrap_vtk(vtkThreshold, invert=not keep)
     tf.ThresholdBetween(low, upp)
     if use_cell:
         tf.SetInputArrayToProcess(0, 0, 0, ASSOC_CELLS, array_name)
@@ -89,7 +89,7 @@ def _surface_selection(surf, array_name, low=-np.inf, upp=np.inf,
     else:
         n_expected = np.count_nonzero(~mask)
 
-    n_sel = surf_sel.n_cells() if use_cell else surf_sel.n_points
+    n_sel = surf_sel.n_cells if use_cell else surf_sel.n_points
     if n_expected != n_sel:
         element = 'cells' if use_cell else 'points'
         warnings.warn('The number of selected {0} is different than expected. '

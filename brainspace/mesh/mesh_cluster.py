@@ -22,7 +22,7 @@ from ..gradient import diffusion_mapping
 
 
 def cluster_points(surf, n_clusters=100, is_size=False, mask=None,
-                   with_centers=True, random_state=0, approach='kmeans',
+                   with_centers=True, random_state=None, approach='kmeans',
                    n_init=3, n_jobs=1):
     """Clustering of surface points.
 
@@ -41,7 +41,7 @@ def cluster_points(surf, n_clusters=100, is_size=False, mask=None,
         If True, an array of labels with the closest points to the centroid of
         each cluster is returned. Default is True.
     random_state : int, RandomState instance or None, optional
-         Random number generation. Use int to make randomness deterministic.
+         Random state. Default is None.
     approach : {'kmeans', 'ward'}, optional
         Clustering method: k-means or hierarchical with ward linkage.
         Hierarchical clustering is faster but k-means provides better results.
@@ -142,7 +142,7 @@ def sample_points_clustering(surf, keep=0.1, mask=None, random_state=None,
         Mask for surface points. Points outside the mask (i.e., False) are
         discarded from sampling. Default is None.
     random_state : int, RandomState instance or None, optional
-         Random number generation. Default is None.
+         Random state. Default is None.
     approach : {'kmeans', 'ward'}, optional
         Clustering approach: k-means or hierarchical with ward linkage.
         Hierarchical is faster but k-means provides better results.

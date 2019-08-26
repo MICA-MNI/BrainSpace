@@ -110,7 +110,7 @@ def _read_geometry_fs(ipth, is_ascii=False):
                 x_cells = np.zeros((n_cells, 3), dtype=np.uintp)
                 x_cells.flat[:] = np.fromfile(fh, '>i4', n_cells * 3)
 
-    return build_polydata(x_points, cells=x_cells)
+    return build_polydata(x_points, cells=x_cells).VTKObject
 
 
 @wrap_input(0)
@@ -172,7 +172,7 @@ class vtkFSReader(VTKPythonAlgorithmBase):
 
     def RequestData(self, request, inInfo, outInfo):
         opt = vtkPolyData.GetData(outInfo, 0)
-        if self.__is_ascii:  # or self.__FileName.split('.')[-1] == 'asc':
+        if self.__is_ascii or self.__FileName.split('.')[-1] == 'asc':
             s = _read_geometry_fs(self.__FileName, is_ascii=True)
         else:
             s = _read_geometry_fs(self.__FileName, is_ascii=False)

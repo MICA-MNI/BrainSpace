@@ -302,7 +302,7 @@ def compute_point_area(surf, cell_area=None, area_as='one_third',
         cell_area = surf.get_array(name=cell_area, at='c')
 
     return map_celldata_to_pointdata(surf, cell_area, red_func=area_as,
-                                     odtype=cell_area.dtype)
+                                     dtype=cell_area.dtype)
 
 
 @append_vtk(to='point')
@@ -623,7 +623,11 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
     retain = np.ones(pd.shape)
     retain[ws > 0] -= relax
 
-    spd = pd.copy()
+    if np.issubdtype(pd.dtype, np.floating):
+        spd = pd.copy()
+    else:
+        spd = pd.astype(np.float)
+
     for i in range(n_iter):
         wp = w.dot(spd)
         spd *= retain
@@ -662,8 +666,8 @@ def resample_pointdata(source_surf, target_surf, source_name, ops='mean',
 
     Returns
     -------
-    output : vtkPolyData, BSPolyData or dict[str,ndarray]
-        A dictionary with rasampled point data. Return ict if
+    output : vtkPolyData, BSPolyData or list of ndarray
+        Resampled point data. Return ndarray or list of ndarray if
         ``append == False``. Otherwise, return target surface with the
         new arrays.
 
@@ -677,6 +681,9 @@ def resample_pointdata(source_surf, target_surf, source_name, ops='mean',
 
     if not isinstance(source_name, list):
         source_name = [source_name]
+        is_list = False
+    else:
+        is_list = True
 
     if not isinstance(ops, list):
         ops = [ops] * len(source_name)
@@ -700,7 +707,7 @@ def resample_pointdata(source_surf, target_surf, source_name, ops='mean',
         dist_to_cell_points += np.finfo(np.float).eps
         weights = 1 / dist_to_cell_points
 
-    resampled = dict()
+    resampled = [None] * len(source_name)
     for i, fn in enumerate(source_name):
         candidate_feat = source_surf.get_array(fn, at='p')[closest_cells]
         if ops[i] == 'mean':
@@ -716,10 +723,10 @@ def resample_pointdata(source_surf, target_surf, source_name, ops='mean',
         else:
             raise ValueError('Unknown op: {0}'.format(ops[i]))
 
-        resampled[array_name[i]] = feat
+        resampled[i] = feat
 
     if append:
-        for fn, feat in resampled.items():
-            target_surf.append_array(feat, name=fn, at='p')
+        for i, feat in enumerate(resampled):
+            target_surf.append_array(feat, name=array_name[i], at='p')
         return target_surf
-    return resampled
+    return resampled if is_list else resampled[0]

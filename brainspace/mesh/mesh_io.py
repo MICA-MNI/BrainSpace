@@ -9,8 +9,7 @@ High-level read/write functions for several formats.
 from vtkmodules.vtkIOPLYPython import vtkPLYReader, vtkPLYWriter
 from vtkmodules.vtkIOXMLPython import vtkXMLPolyDataReader, vtkXMLPolyDataWriter
 from vtkmodules.vtkIOLegacyPython import vtkPolyDataReader, vtkPolyDataWriter
-from vtkmodules.vtkIOGeometryPython import (vtkSTLReader, vtkSTLWriter,
-                                            vtkOBJReader, vtkOBJWriter)
+from vtkmodules.vtkIOGeometryPython import vtkOBJReader, vtkOBJWriter
 
 from .io_support import (vtkFSReader, vtkFSWriter, vtkGIFTIReader,
                          vtkGIFTIWriter)
@@ -19,7 +18,7 @@ from ..vtk_interface.decorators import wrap_output
 
 
 # 'fs' type for FreeSurfer geometry data (also read FreeSurfer ascii as .asc)
-supported_types = ['ply', 'stl', 'obj', 'vtp', 'vtk', 'asc', 'fs', 'gii']
+supported_types = ['ply', 'obj', 'vtp', 'vtk', 'asc', 'fs', 'gii']
 supported_formats = ['binary', 'ascii']
 
 
@@ -27,8 +26,6 @@ supported_formats = ['binary', 'ascii']
 def _select_reader(itype):
     if itype == 'ply':
         reader = vtkPLYReader()
-    elif itype == 'stl':
-        reader = vtkSTLReader()
     elif itype == 'obj':
         reader = vtkOBJReader()
     elif itype == 'vtp':
@@ -37,6 +34,8 @@ def _select_reader(itype):
         reader = vtkPolyDataReader()
     elif itype in ['asc', 'fs']:
         reader = vtkFSReader()
+        if itype == 'asc':
+            reader.SetFileTypeToASCII()
     elif itype == 'gii':
         reader = vtkGIFTIReader()
     else:
@@ -48,8 +47,6 @@ def _select_reader(itype):
 def _select_writer(otype):
     if otype == 'ply':
         writer = vtkPLYWriter()
-    elif otype == 'stl':
-        writer = vtkSTLWriter()
     elif otype == 'obj':
         writer = vtkOBJWriter()
     elif otype == 'vtp':
@@ -74,7 +71,7 @@ def load_surface(ipth, itype=None, return_data=True, update=True):
     ----------
     ipth : str
         Input filename.
-    itype : {'ply', 'stl', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
+    itype : {'ply', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
         Input file type. If None, it is deduced from `ipth`. Default is None.
     return_data : bool, optional
         Whether to return data instead of filter. Default is False
@@ -121,7 +118,7 @@ def save_surface(ifilter, opth, oformat=None, otype=None):
     oformat : {'ascii', 'binary'}, optional
         File format. Defaults to writer's default format.
         Only used when writer accepts format. Default is None.
-    otype : {'ply', 'stl', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
+    otype : {'ply', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
         File type. If None, type is deduced from `opth`. Default is None.
 
     Notes
@@ -139,11 +136,11 @@ def save_surface(ifilter, opth, oformat=None, otype=None):
 
     writer = _select_writer(otype)
     writer.filename = opth
-    if otype not in ['vtp', 'tri', 'gii']:
+    if otype not in ['vtp', 'tri', 'gii', 'obj']:
         if oformat == 'ascii' or otype == 'asc':
-            writer.filetype = 'ascii'
+            writer.SetFileTypeToASCII()
         else:
-            writer.filetype = 'binary'
+            writer.SetFileTypeToBinary()
 
     serial_connect(ifilter, writer, update=True, as_data=False, port=None)
 

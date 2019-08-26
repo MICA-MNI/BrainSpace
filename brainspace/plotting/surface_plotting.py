@@ -28,7 +28,7 @@ orientations = {'lateral': (0, -90, -90),
 
 def plot_surf(surfs, layout, array_name=None, view=None, share=None,
               nan_color=(0, 0, 0, 1), cmap_name='viridis', color=(0, 0, 0.5),
-              size=(400, 400), interactive=True, embed_nb=False):
+              size=(400, 400), interactive=True, embed_nb=False, **kwargs):
     """Plot surfaces arranged according to the `layout`.
 
     Parameters
@@ -61,6 +61,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
     embed_nb : bool, optional
         Whether to embed figure in notebook. Only used if running in a
         notebook. Default is False.
+    kwargs : keyword-valued args
+            Additional arguments passed to the plotter.
 
     Returns
     -------
@@ -142,7 +144,10 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
                 v = np.concatenate([v for v in vals[:, i] if v is not None])
                 n_vals[i, :] = np.unique(v).size
 
-    p = Plotter(n_rows=nrow, n_cols=ncol, try_qt=False, size=size)
+    kwargs.update({'n_rows': nrow, 'n_cols': ncol, 'try_qt': False,
+                   'size': size})
+    # p = Plotter(n_rows=nrow, n_cols=ncol, try_qt=False, size=size, **kwargs)
+    p = Plotter(**kwargs)
     for k in range(layout.size):
         ren1 = p.AddRenderer(row=k // ncol, col=k % ncol, background=(1, 1, 1))
         s = surfs[layout.flat[k]]
@@ -191,7 +196,7 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 @wrap_input(0, 1)
 def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
                      cmap_name='viridis', color=(0, 0, 0.5), size=(400, 400),
-                     interactive=True, embed_nb=False):
+                     interactive=True, embed_nb=False, **kwargs):
     """Plot left and right hemispheres in lateral and medial views.
 
     Parameters
@@ -215,6 +220,8 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
     embed_nb : bool, optional
         Whether to embed figure in notebook. Only used if running in a
         notebook. Default is False.
+    kwargs : keyword-valued args
+        Additional arguments passed to the plotter.
 
 
     Returns
@@ -255,4 +262,4 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
 
     return plot_surf(surfs, layout, array_name=array_name, nan_color=nan_color,
                      view=view, cmap_name=cmap_name, color=color, size=size,
-                     interactive=interactive, embed_nb=embed_nb)
+                     interactive=interactive, embed_nb=embed_nb, **kwargs)

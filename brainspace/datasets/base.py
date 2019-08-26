@@ -143,7 +143,7 @@ def load_thickness(parcellation=None, mask=None):
     parcellation : 1D ndarray, optional
         Data is reduced according to the parcellation labeling.
         Default is None.
-    mask : 1D ndarray
+    mask : 1D ndarray, optional
         Boolean mask. Only return points within mask. Default is None.
 
     Returns
@@ -165,7 +165,7 @@ def load_t1t2(parcellation=None, mask=None):
     parcellation : 1D ndarray, optional
         Data is reduced according to the parcellation labeling.
         Default is None.
-    mask : 1D ndarray
+    mask : 1D ndarray, optional
         Boolean mask. Only return points within mask. Default is None.
 
     Returns
@@ -191,7 +191,7 @@ def load_gradient(name, idx=0, parcellation=None, mask=None):
     parcellation : 1D ndarray, optional
         Data is reduced according to the parcellation labeling.
         Default is None.
-    mask : 1D ndarray
+    mask : 1D ndarray, optional
         Boolean mask. Only return points within mask. Default is None.
 
     Returns

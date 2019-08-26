@@ -394,8 +394,8 @@ class PCAMaps(Embedding):
     ----------
     n_components : int or None, optional
         Number of principal components. Default is 10.
-    random_state : int or None, optional
-        Random state. Default is None.
+    random_state : int, RandomState instance or None, optional
+         Random state. Default is None.
 
     Attributes
     ----------

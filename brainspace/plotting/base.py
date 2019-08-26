@@ -61,7 +61,8 @@ def in_ipython():
     if has_ipython:
         try:
             ipy = IPython.get_ipython()
-            is_ipy = True
+            if ipy is not None:
+                is_ipy = True
         except:
             pass
     return is_ipy
@@ -114,7 +115,12 @@ def _create_grid(nrow, ncol):
 class BasePlotter(object):
 
     @wrap_input('ren_win', 'iren')
-    def __init__(self, n_rows=1, n_cols=1, ren_win=None, iren=None, **kwargs):
+    def __init__(self, n_rows=1, n_cols=1, offscreen=None, ren_win=None,
+                 iren=None, **kwargs):
+
+        self.n_rows = n_rows
+        self.n_cols = n_cols
+        self.offscreen = offscreen
 
         self.ren_win = ren_win
         if self.ren_win is None:
@@ -124,9 +130,6 @@ class BasePlotter(object):
         self.iren = iren
         if self.iren is None:
             self.iren = wrap_vtk(vtkRenderWindowInteractor)
-
-        self.n_rows = n_rows
-        self.n_cols = n_cols
 
         self.n_renderers = 0
         self.renderers = dict()
@@ -187,7 +190,7 @@ class BasePlotter(object):
                           "provided for a single renderer: "
                           "'n_rows=1' and 'n_cols=1'")
 
-        if embed_nb:
+        if embed_nb or self.offscreen is True:
             self.ren_win.SetOffScreenRendering(True)
         else:
             self.ren_win.SetOffScreenRendering(False)
@@ -210,7 +213,8 @@ class BasePlotter(object):
             return self._capture_image(scale=scale,
                                        transparent_bg=transparent_bg)
 
-        self.iren.Start()
+        if self.offscreen is not True:
+            self.iren.Start()
         return None
 
     def close(self, *args):
@@ -229,7 +233,7 @@ class BasePlotter(object):
         return self.panel
 
     def _capture_image(self, scale=None, transparent_bg=True):
-        self.ren_win.Render()
+        # self.ren_win.Render()
         scale = (1, 1) if scale is None else scale
         bg = 'RGBA' if transparent_bg else 'RGB'
 
@@ -246,8 +250,8 @@ class BasePlotter(object):
         return self._capture_image(scale=scale, transparent_bg=transparent_bg)
 
     def screenshot(self, filename=None, scale=None, transparent_bg=True):
-        if not self.active:
-            raise ValueError("Cannot take screenshot. Call 'show' first.")
+        # if not self.active:
+        #     raise ValueError("Cannot take screenshot. Call 'show' first.")
 
         img = self._capture_image(scale=scale, transparent_bg=transparent_bg)
         if filename is None:
@@ -282,9 +286,10 @@ def _get_qt_app():
 
 class Plotter(BasePlotter):
 
-    def __init__(self, n_rows=1, n_cols=1, try_qt=True, **kwargs):
+    def __init__(self, n_rows=1, n_cols=1, try_qt=True, offscreen=None,
+                 **kwargs):
         self.try_qt = try_qt
-        self.use_qt = has_pyqt and try_qt
+        self.use_qt = has_pyqt and try_qt and offscreen is not True
 
         # Prepare qt
         iren = None
@@ -308,7 +313,7 @@ class Plotter(BasePlotter):
             iren = ren_win.GetInteractor()
 
         super().__init__(n_rows=n_rows, n_cols=n_cols, ren_win=ren_win,
-                         iren=iren, **kwargs)
+                         iren=iren, offscreen=offscreen, **kwargs)
 
         # Exit with 'q' and 'e'
         self.iren.AddObserver("KeyPressEvent", self.key_quit)
@@ -344,8 +349,10 @@ class Plotter(BasePlotter):
 
 
 class GridPlotter(Plotter):
-    def __init__(self, n_rows=1, n_cols=1, try_qt=True, **kwargs):
-        super().__init__(n_rows=n_rows, n_cols=n_cols, try_qt=try_qt, **kwargs)
+    def __init__(self, n_rows=1, n_cols=1, try_qt=True, offscreen=None,
+                 **kwargs):
+        super().__init__(n_rows=n_rows, n_cols=n_cols, try_qt=try_qt,
+                         offscreen=offscreen, **kwargs)
 
     def AddRenderer(self, row, col, renderer=None, **kwargs):
         if not isinstance(row, int) or not isinstance(row, int):
