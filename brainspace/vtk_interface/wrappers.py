@@ -511,7 +511,8 @@ class BSPolyData(dsa.PolyData, BSPointSet):
         return dsa.vtkDataArrayToVTKArray(
             self.VTKObject.GetVerts().GetData(), self)
 
-    Verts = property(GetVerts, None, None, "This property returns the connectivity of verts.")
+    Verts = property(GetVerts, None, None, "This property returns the "
+                                           "connectivity of verts.")
 
     def GetLines(self):
         """Returns the lines as a VTKArray instance."""
@@ -520,7 +521,8 @@ class BSPolyData(dsa.PolyData, BSPointSet):
         return dsa.vtkDataArrayToVTKArray(
             self.VTKObject.GetLines().GetData(), self)
 
-    Lines = property(GetLines, None, None, "This property returns the connectivity of lines.")
+    Lines = property(GetLines, None, None, "This property returns the "
+                                           "connectivity of lines.")
 
 
 class BSUnstructuredGrid(dsa.UnstructuredGrid, BSPointSet):
@@ -534,9 +536,9 @@ class BSUnstructuredGrid(dsa.UnstructuredGrid, BSPointSet):
 #     pass
 
 
-class BSMolecule(dsa.Molecule, BSDataObject):
-    """Wrapper for vtkMolecule."""
-    pass
+# class BSMolecule(dsa.Molecule, BSDataObject):
+#     """Wrapper for vtkMolecule."""
+#     pass
 
 
 class BSLookupTable(BSVTKObjectWrapper):
