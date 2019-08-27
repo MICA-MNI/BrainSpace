@@ -211,19 +211,19 @@ class BasePlotter(object):
 
         self.ren_win.Render()
 
-        # if embed_nb and interactive:
-        #     try:
-        #         return self._render_panel()
-        #     except:
-        #         pass
-        #
-        # if embed_nb:
-        #     return self._capture_image(scale=scale,
-        #                                transparent_bg=transparent_bg)
-        #
-        # if self.offscreen is not True:
-        #     self.iren.Start()
-        # return None
+        if embed_nb and interactive:
+            try:
+                return self._render_panel()
+            except:
+                pass
+
+        if embed_nb:
+            return self._capture_image(scale=scale,
+                                       transparent_bg=transparent_bg)
+
+        if self.offscreen is not True:
+            self.iren.Start()
+        return None
 
     def close(self, *args):
         # try:
