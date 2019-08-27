@@ -17,15 +17,12 @@ from ..vtk_interface.decorators import wrap_input
 
 # from vtkmodules.vtkCommonCorePython import vtkCommand
 # from vtkmodules.vtkIOImagePython import vtkPNGWriter
-# from vtkmodules.vtkRenderingOpenGL2Python import \
-#     vtkXRenderWindowInteractor as vtkRenderWindowInteractor
-# from vtkmodules.vtkRenderingCorePython import (vtkWindowToImageFilter,
+# from vtkmodules.vtkRenderingCorePython import (vtkRenderWindowInteractor,
+#                                                vtkWindowToImageFilter,
 #                                                vtkRenderWindow)
 # from vtkmodules import qt as vtk_qt
 
-from vtk import (vtkCommand, vtkPNGWriter,
-                 # vtkXRenderWindowInteractor as vtkRenderWindowInteractor,
-                 vtkRenderWindowInteractor,
+from vtk import (vtkCommand, vtkPNGWriter, vtkRenderWindowInteractor,
                  vtkWindowToImageFilter, vtkRenderWindow)
 
 import vtk.qt as vtk_qt
