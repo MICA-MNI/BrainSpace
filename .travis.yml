@@ -59,7 +59,6 @@ script:
       python3 -m pytest;
     else
       py.test -v --doctest-modules --cov-report term-missing  --cov=brainspace brainspace;
-#      pytest;
     fi
 
 after_success:
