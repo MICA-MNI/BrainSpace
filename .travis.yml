@@ -8,59 +8,51 @@ matrix:
     - name: "Python 3.5.6 on Xenial Linux"
       python: 3.5
       services: xvfb
-      env: OSYS=LINUXSYS
 
     - name: "Python 3.6.7 on Xenial Linux"
       python: 3.6
       services: xvfb
-      env: OSYS=LINUXSYS
 
     - name: "Python 3.7.1 on Xenial Linux"
       python: 3.7
       services: xvfb
-      env: OSYS=LINUXSYS
 
     # ======= OSX ========
     - name: "Python 3.6.5 on macOS 10.13"
       os: osx
       osx_image: xcode9.4
       language: generic
-      env: OSYS=OSXSYS
 
     - name: "Python 3.7.4 on macOS 10.14"
       os: osx
       osx_image: xcode11
       language: generic
-      env: OSYS=OSXSYS
 
-#
-#before_install:
-#  - if [[ "$OSYS" == "LINUXSYS" ]]; then
-#    false
-#
-#    elif [[ "$OSYS" == "OSXSYS" ]]; then
-#      python3 --version
-#      pip3 install -U pip
-#      pip3 install -U pytest
-#      pip3 install codecov
-#    fi
+
+before_install:
+  - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      python3 --version
+      pip3 install -U pip
+      pip3 install -U pytest
+      pip3 install codecov
+    fi
 
 
 # command to install dependencies
 install:
-  - if [[ "$OSYS" == "LINUXSYS" ]]; then
-      pip install -r requirements.txt;
-    elif [[ "$OSYS" == "OSXSYS" ]]; then
+  - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       pip3 install -r requirements.txt;
+    else
+      pip install -r requirements.txt;
     fi
 
 
 # command to run tests
 script:
-  - if [[ "$OSYS" == "LINUXSYS" ]]; then
-      pytest;
-    elif [[ "$OSYS" == "OSXSYS" ]]; then
+  - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       python3 -m pytest;
+    else
+      pytest;
     fi
 
 #after_success:
