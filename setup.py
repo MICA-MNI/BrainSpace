@@ -21,7 +21,7 @@ INSTALL_REQUIRES = ['numpy>=1.11.0',
                     'scikit-learn>=0.20.0',
                     'matplotlib>=2.0.0',
                     'vtk>=8.1.0',
-                    'nibabel'
+                    'nibabel',
                     'pillow']
 
 
