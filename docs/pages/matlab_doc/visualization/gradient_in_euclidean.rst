@@ -37,7 +37,7 @@ parcellation), also produces surface plots with the colors projected back to the
 surface. 
 
 BrainSpace only provides basic figure building functionality. For more
-information on how to use Matlab to create publication-ready figures we
+information on how to use MATLAB to create publication-ready figures we
 recommend delving into `graphics object properties
 <https://www.mathworks.com/help/matlab/graphics-object-properties.html>`_ (e.g.
 `figure

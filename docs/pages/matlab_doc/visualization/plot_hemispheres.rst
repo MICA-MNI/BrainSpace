@@ -36,7 +36,7 @@ remainder. If a parcellation scheme is provided, data should have as many
 datapoints as there are parcels.  
 
 BrainSpace only provides basic figure building functionality. For more
-information on how to use Matlab to create publication-ready figures we
+information on how to use MATLAB to create publication-ready figures we
 recommend delving into `graphics object properties
 <https://www.mathworks.com/help/matlab/graphics-object-properties.html>`_ (e.g.
 `figure
