@@ -37,6 +37,10 @@ before_install:
       pip3 install -U pip;
       pip3 install -U pytest;
       pip3 install codecov;
+    else
+      python --version;
+      pip install -U pip;
+      pip install pytest pytest-cov coverage coveralls codecov;
     fi
 
 
@@ -54,12 +58,13 @@ script:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       python3 -m pytest;
     else
-      pytest -v --cov brainspace;
+      py.test -v --doctest-modules --cov-report term-missing  --cov=brainspace brainspace;
+#      pytest;
     fi
 
 after_success:
   # Upload coverage data to codecov
   - if [[ "$REPORT_COVERAGE" == "true" ]]; then
       echo "Uploading coverage to Codecov";
-      codecov;
+      coveralls; codecov;
     fi
