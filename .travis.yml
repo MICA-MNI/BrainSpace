@@ -1,92 +1,133 @@
 language: python
 sudo: false
 dist: xenial
-services: xvfb
-#notifications:
-#  email: change
+#services:
+#  - xvfb
 
-python:
-  - "3.6"
-  - "3.7"
+#python:
+#  - "3.5"
+#  - "3.6"
+#  - "3.7"
 
-env:
-  matrix:
-    - CHECK_TYPE=linting
-    - CHECK_TYPE=docdoctest
-    - CHECK_TYPE=test
-  global:
-    - INSTALL_TYPE=setup
+matrix:
+  include:
 
-#matrix:
-#  include:
-#    - python: 3.6
-#      env:
-#        - INSTALL_TYPE=sdist
-#        - CHECK_TYPE=test
-#    - python: 3.6
-#      env:
-#        - INSTALL_TYPE=wheel
-#        - CHECK_TYPE=test
-#    - python: 3.6
-#      env:
-#        - INSTALL_TYPE=conda
-#        - CHECK_TYPE=test
+    - name: "Python 3.5.6 on Xenial Linux"
+      python: 3.5
+      services: xvfb
+#      install: pip install -r requirements.txt
+#      script: pytest
+      env: OS="linux"
+
+    - name: "Python 3.6.7 on Xenial Linux"
+      python: 3.6
+      services: xvfb
+#      install: pip install -r requirements.txt
+#      script: pytest
+      env: OS="linux"
+
+    - name: "Python 3.7.1 on Xenial Linux"
+      python: 3.7
+      services: xvfb
+#      install: pip install -r requirements.txt
+#      script: pytest
+      env: OS="linux"
+
+    # ======= OSX ========
+    - name: "Python 3.6.5 on macOS 10.13"
+      os: osx
+      osx_image: xcode9.4
+      language: generic
+#      before_install:
+#        - python3 --version
+#        - pip3 install -U pip
+#        - pip3 install -U pytest
+#        - pip3 install codecov
+#      install: pip3 install -r requirements.txt
+#      script: python3 -m pytest
+      env: OS="osx"
+
+    - name: "Python 3.7.4 on macOS 10.14"
+      os: osx
+      osx_image: xcode11
+      language: generic
+#      before_install:
+#        - python3 --version
+#        - pip3 install -U pip
+#        - pip3 install -U pytest
+#        - pip3 install codecov
+#      install: pip3 install -r requirements.txt
+#      script: python3 -m pytest
+      env: OS="osx"
+
+    #  ====== WINDOWS =========
+#    - name: "Python 3.5.4 on Windows"
+#      os: windows           # Windows 10.0.17134 N/A Build 17134
+#      language: shell       # 'language: python' is an error on Travis CI Windows
+#      before_install:
+#        - choco install python --version 3.5.4
+#        - python --version
+#        - python -m pip install --upgrade pip
+#        - pip3 install --upgrade pytest
+#        - pip3 install codecov
+#      env: PATH=/c/Python35:/c/Python35/Scripts:$PATH
+#      install: pip3 install -r requirements.txt
+#      script: python -m pytest
+#    - name: "Python 3.6.8 on Windows"
+#      os: windows           # Windows 10.0.17134 N/A Build 17134
+#      language: shell       # 'language: python' is an error on Travis CI Windows
+#      before_install:
+#        - choco install python --version 3.6.8
+#        - python --version
+#        - python -m pip install --upgrade pip
+#        - pip3 install --upgrade pytest
+#        - pip3 install codecov
+#      env: PATH=/c/Python36:/c/Python36/Scripts:$PATH
+#      install: pip3 install -r requirements.txt
+#      script: python -m pytest
+#    - name: "Python 3.7.4 on Windows"
+#      os: windows           # Windows 10.0.17134 N/A Build 17134
+#      language: shell       # 'language: python' is an error on Travis CI Windows
+#      before_install:
+#        - choco install python --version 3.7.4
+#        - python --version
+#        - python -m pip install --upgrade pip
+#        - pip3 install --upgrade pytest
+#        - pip3 install codecov
+#      env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
+#      install: pip3 install -r requirements.txt
+#      script: python -m pytest
+
 
 before_install:
-  - python -m pip install --upgrade pip
-  - if [ "${INSTALL_TYPE}" == "conda" ]; then
-      wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
-      bash miniconda.sh -b -p $HOME/miniconda;
-      export PATH="$HOME/miniconda/bin:$PATH";
-      hash -r;
-      conda config --set always_yes yes --set changeps1 no;
-      conda update -q conda;
+  - if [[ "$OS" == "linux" ]]; then
+    false
 
-      travis_retry conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
-      source activate test-environment
-
-      travis_retry pip install --only-binary=numpy,scipy numpy scipy "scikit-learn>=0.20.0" matplotlib "vtk>=8.1.0" nibabel pillow pytest --progress-bar off
-
-    fi
-  - if [ "${CHECK_TYPE}" == "linting" ]; then
-      pip install flake8;
-    fi
-  - if [ "${CHECK_TYPE}" == "test" ]; then
-      pip install "pytest>=3.6" pytest-cov coverage coveralls codecov;
+    elif [[ "$OS" == "osx" ]]; then
+      python3 --version
+      pip3 install -U pip
+      pip3 install -U pytest
+      pip3 install codecov
     fi
 
+
+# command to install dependencies
 install:
-  - if [ "${INSTALL_TYPE}" == "setup" ]; then
-      python setup.py install;
-    elif [ "${INSTALL_TYPE}" == "sdist" ]; then
-      python setup.py sdist;
-      pip install dist/*.tar.gz;
-    elif [ "${INSTALL_TYPE}" == "wheel" ]; then
-      python setup.py bdist_wheel;
-      pip install dist/*.whl;
-    elif [ "${INSTALL_TYPE}" == "conda" ]; then
-      pip install --no-deps .;
-    else
-      false;
+  - if [[ "$OS" == "linux" ]]; then
+      pip install -r requirements.txt
+    elif [[ "$OS" == "osx" ]]; then
+      pip3 install -r requirements.txt
     fi
 
+
+# command to run tests
 script:
-  - if [ "${CHECK_TYPE}" == "linting" ]; then
-      flake8 brainspace;
-    elif [ "${CHECK_TYPE}" == "docdoctest" ]; then
-      cd docs;
-      pip install -r ./requirements.txt;
-      make html;
-      make doctest;
-    elif [ "${CHECK_TYPE}" == "test" ]; then
-      py.test --doctest-modules --cov-report term-missing --cov=brainspace brainspace;
-    else
-      false;
-    fi
+  - if [[ "$OS" == "linux" ]]; then
+    pytest
+  elif [[ "$OS" == "osx" ]]; then
+    python3 -m pytest
+  fi
 
-after_success:
-  # codecov with numba installed doesn't make sense, so don't do that
-  - if [ "${CHECK_TYPE}" == "test" ]; then
-      coveralls; codecov;
-    fi
-
+#after_success:
+#  # Upload coverage data to codecov
+#  - codecov
