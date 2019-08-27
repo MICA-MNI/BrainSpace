@@ -16,3 +16,7 @@ install:
 # command to run tests
 script:
   - pytest
+
+after_success:
+  # Upload coverage data to codecov
+  - codecov
