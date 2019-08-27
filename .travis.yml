@@ -2,6 +2,7 @@ language: python
 sudo: false
 dist: xenial
 
+
 matrix:
   include:
 
@@ -16,6 +17,7 @@ matrix:
     - name: "Python 3.7.1 on Xenial Linux"
       python: 3.7
       services: xvfb
+      env: REPORT_COVERAGE=true
 
     # ======= OSX ========
     - name: "Python 3.6.5 on macOS 10.13"
@@ -52,9 +54,12 @@ script:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       python3 -m pytest;
     else
-      pytest;
+      pytest -v --cov brainspace;
     fi
 
-#after_success:
-#  # Upload coverage data to codecov
-#  - codecov
+after_success:
+  # Upload coverage data to codecov
+  - if [[ "$REPORT_COVERAGE" == "true" ]]; then
+      echo "Uploading coverage to Codecov";
+      codecov;
+    fi
