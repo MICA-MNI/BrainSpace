@@ -13,7 +13,7 @@ from io import open as io_open
 
 TEST_REQUIRES = [
         # testing and coverage
-        'pytest', 'coverage', 'pytest-cov',
+        'pytest', 'coverage', 'pytest-cov', 'coveralls',
     ]
 
 INSTALL_REQUIRES = ['numpy>=1.11.0',
