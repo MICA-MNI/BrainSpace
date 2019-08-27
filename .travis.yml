@@ -1,52 +1,56 @@
 language: python
 sudo: false
 dist: xenial
-services:
-  - xvfb
+#services:
+#  - xvfb
 
-python:
-  - "3.5"
-  - "3.6"
-  - "3.7"
+#python:
+#  - "3.5"
+#  - "3.6"
+#  - "3.7"
 
 matrix:
   include:
+
+    - name: "Python 3.5 on Xenial Linux"
+      python: 3.5
+      services: xvfb
+
+    - name: "Python 3.6 on Xenial Linux"
+      python: 3.6
+      services: xvfb
+
+    - name: "Python 3.7.1 on Xenial Linux"
+      python: 3.7           # this works for Linux but is ignored on macOS or Windows
+      services: xvfb
+
     # ======= OSX ========
-    - name: "Python 2.7.14 on macOS 10.13"
+#    - name: "Python 3.6.5 on macOS 10.13"
+#      os: osx
+#      osx_image: xcode9.4  # Python 3.6.5 running on macOS 10.13
+#      language: shell       # 'language: python' is an error on Travis CI macOS
+#      before_install:
+#        - python3 --version
+#        - pip3 install -U pip
+#        - pip3 install -U pytest
+#        - pip3 install codecov
+#      script: python3 -m pytest
+#      after_success: python3 -m codecov
+#    - name: "Python 3.7.3 on macOS 10.14"
+#      os: osx
+#      osx_image: xcode10.2  # Python 3.7.3 running on macOS 10.14.3
+#      language: shell       # 'language: python' is an error on Travis CI macOS
+#      before_install:
+#        - python3 --version
+#        - pip3 install -U pip
+#        - pip3 install -U pytest
+#        - pip3 install codecov
+#      script: python3 -m pytest
+#      after_success: python3 -m codecov
+    - name: "Python 3.7.4 on macOS"
       os: osx
-      osx_image: xcode9.3  # Python 2.7.14_2 running on macOS 10.13
+      osx_image: xcode11    # Python 3.7.4 running on macOS 10.14.4
       language: shell       # 'language: python' is an error on Travis CI macOS
-      before_install:
-        - python --version
-        # - pip install -U pip
-        # - python -m pip install --upgrade pip
-        - pip install pytest --user
-        - pip install codecov --user
-      install: pip install ".[test]" --user
-      script: python -m pytest
-      after_success: python  -m codecov
-    - name: "Python 3.6.5 on macOS 10.13"
-      os: osx
-      osx_image: xcode9.4  # Python 3.6.5 running on macOS 10.13
-      language: shell       # 'language: python' is an error on Travis CI macOS
-      before_install:
-        - python3 --version
-        - pip3 install -U pip
-        - pip3 install -U pytest
-        - pip3 install codecov
-      script: python3 -m pytest
-      after_success: python 3 -m codecov
-    - name: "Python 3.7.3 on macOS 10.14"
-      os: osx
-      osx_image: xcode10.2  # Python 3.7.3 running on macOS 10.14.3
-      language: shell       # 'language: python' is an error on Travis CI macOS
-      before_install:
-        - python3 --version
-        - pip3 install -U pip
-        - pip3 install -U pytest
-        - pip3 install codecov
-      script: python3 -m pytest
-      after_success: python 3 -m codecov
     #  ====== WINDOWS =========
 #    - name: "Python 2.7 on Windows"
 #      os: windows           # Windows 10.0.17134 N/A Build 17134
@@ -97,6 +101,6 @@ install:
 script:
   - pytest
 
-after_success:
-  # Upload coverage data to codecov
-  - codecov
+#after_success:
+#  # Upload coverage data to codecov
+#  - codecov
