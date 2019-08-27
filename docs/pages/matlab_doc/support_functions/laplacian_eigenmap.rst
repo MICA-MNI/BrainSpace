@@ -23,5 +23,5 @@ Description
 --------------
 
 Performs the laplacian eigenmap procedure. Original implemented in the `MATLAB
-Toolbox for Dimensionality Reduction <http://homepage.tudelft.nl/19j49>`_ by
+Toolbox for Dimensionality Reduction <https://lvdmaaten.github.io/drtoolbox/>`_ by
 Laurens van der Maaten. Modified for use in the BrainSpace toolbox. 
