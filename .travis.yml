@@ -31,10 +31,10 @@ matrix:
 
 before_install:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      python3 --version
-      pip3 install -U pip
-      pip3 install -U pytest
-      pip3 install codecov
+      python3 --version;
+      pip3 install -U pip;
+      pip3 install -U pytest;
+      pip3 install codecov;
     fi
 
 
