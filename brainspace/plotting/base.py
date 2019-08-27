@@ -198,17 +198,17 @@ class BasePlotter(object):
                           "provided for a single renderer: "
                           "'n_rows=1' and 'n_cols=1'")
 
-        # if embed_nb or self.offscreen is True:
-        #     self.ren_win.SetOffScreenRendering(True)
-        # else:
-        #     self.ren_win.SetOffScreenRendering(False)
-        #
-        #     self.iren.SetRenderWindow(self.ren_win.VTKObject)
-        #     self.iren.Initialize()
-        #     if not interactive:
-        #         self.iren.SetInteractorStyle(None)
-        #     self.iren.AddObserver(vtkCommand.ExitEvent, self.close)
-        #
+        if embed_nb or self.offscreen is True:
+            self.ren_win.SetOffScreenRendering(True)
+        else:
+            self.ren_win.SetOffScreenRendering(False)
+
+            self.iren.SetRenderWindow(self.ren_win.VTKObject)
+            self.iren.Initialize()
+            if not interactive:
+                self.iren.SetInteractorStyle(None)
+            self.iren.AddObserver(vtkCommand.ExitEvent, self.close)
+
         # self.ren_win.Render()
         #
         # if embed_nb and interactive:
