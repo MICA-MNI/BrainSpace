@@ -33,35 +33,35 @@ matrix:
       language: generic
       env: OSYS=OSXSYS
 
-
-before_install:
-  - if [[ "$OSYS" == "LINUXSYS" ]]; then
-    false
-
-    elif [[ "$OSYS" == "OSXSYS" ]]; then
-      python3 --version
-      pip3 install -U pip
-      pip3 install -U pytest
-      pip3 install codecov
-    fi
+#
+#before_install:
+#  - if [[ "$OSYS" == "LINUXSYS" ]]; then
+#    false
+#
+#    elif [[ "$OSYS" == "OSXSYS" ]]; then
+#      python3 --version
+#      pip3 install -U pip
+#      pip3 install -U pytest
+#      pip3 install codecov
+#    fi
 
 
 # command to install dependencies
 install:
   - if [[ "$OSYS" == "LINUXSYS" ]]; then
-      pip install -r requirements.txt
+      pip install -r requirements.txt;
     elif [[ "$OSYS" == "OSXSYS" ]]; then
-      pip3 install -r requirements.txt
+      pip3 install -r requirements.txt;
     fi
 
 
 # command to run tests
-script:
-  - if [[ "$OSYS" == "LINUXSYS" ]]; then
-    pytest
-  elif [[ "$OSYS" == "OSXSYS" ]]; then
-    python3 -m pytest
-  fi
+#script:
+#  - if [[ "$OSYS" == "LINUXSYS" ]]; then
+#    pytest
+#  elif [[ "$OSYS" == "OSXSYS" ]]; then
+#    python3 -m pytest
+#  fi
 
 #after_success:
 #  # Upload coverage data to codecov
