@@ -223,6 +223,7 @@ setup(
     # maintainers, and where to support the project financially. The key is
     # what's used to render the link text on PyPI.
     project_urls={  # Optional
+        'Documentation': 'https://brainspace.readthedocs.io',
         'Bug Reports': 'https://github.com/MICA-MNI/BrainSpace/issues',
         'Source': 'https://github.com/MICA-MNI/BrainSpace',
     },
