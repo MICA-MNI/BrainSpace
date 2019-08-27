@@ -58,10 +58,10 @@ install:
 # command to run tests
 script:
   - if [[ "$OSYS" == "LINUXSYS" ]]; then
-    pytest;
-  elif [[ "$OSYS" == "OSXSYS" ]]; then
-    python3 -m pytest;
-  fi
+      pytest;
+    elif [[ "$OSYS" == "OSXSYS" ]]; then
+      python3 -m pytest;
+    fi
 
 #after_success:
 #  # Upload coverage data to codecov
