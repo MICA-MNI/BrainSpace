@@ -48,7 +48,7 @@ We can plot the surfaces:
    :align: center
 
 
-Lets load a mean functional connectivity matrix built from a subset of the Human
+Let's load a mean functional connectivity matrix built from a subset of the Human
 Connectome Project Young Adult cohort. This package comes with connectivity
 matrices subdivided based on functional parcellations `(Schaefer et al., 2017)
 <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. 
@@ -100,7 +100,7 @@ fit the model to our data:
         gm = gm.fit(m);
 
 
-Lets plot the first gradient.
+Let's plot the first gradient.
 
 .. tabs::
 

@@ -39,11 +39,11 @@ cortical thickness data, and a template functional gradient.
     % Template functional gradient
     embedding = load_template('fc',1);
     
-Lets first generate some null data using spintest. 
+Let's first generate some null data using spintest. 
 
 .. code-block:: matlab
 
-    % Lets create some rotations
+    % Let's create some rotations
     rng(0); % For replicability
     n_permutations = 1000;
     y_rand = spin_permutations({[t1wt2w_lh,thickness_lh],[t1wt2w_rh,thickness_rh]}, ...
@@ -54,7 +54,7 @@ Lets first generate some null data using spintest.
     t1wt2w_rotated = squeeze([y_rand{1}(:,1,:); y_rand{2}(:,1,:)]);
     thickness_rotated = squeeze([y_rand{1}(:,2,:); y_rand{2}(:,2,:)]);
 
-As an illustration of the rotation, lets plot the original t1w/t2w data
+As an illustration of the rotation, let's plot the original t1w/t2w data
 
 .. code-block:: matlab
  
@@ -114,9 +114,10 @@ consider the correlation to be significant if it is lower or higher than the
     prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w);
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
-If significant is true, the we've found a statistically significant correlation.
-Alternatively, one could also test the one-tailed hypothesis whether the
-percentile rank is lower or higher than the 5th/95th percentile, respectively.
+If significant is true, then we have found a statistically significant
+correlation. Alternatively, one could also test the one-tailed hypothesis
+whether the percentile rank is lower or higher than the 5th/95th percentile,
+respectively.
 
 Moran Spectral Randomization 
 --------------------------------
@@ -209,9 +210,10 @@ consider the correlation to be significant if it is lower or higher than the
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
 
-If significant is true, then we've found a statistically significant correlation.
-Alternatively, one could also test the one-tailed hypothesis whether the
-percentile rank is lower or higher than the 5th/95th percentile, respectively.
+If significant is true, then we have found a statistically significant
+correlation. Alternatively, one could also test the one-tailed hypothesis
+whether the percentile rank is lower or higher than the 5th/95th percentile,
+respectively.
 
 This concludes the third and last tutorial. You should now be familliar with all
 the functionality of the BrainSpace toolbox. For more details on any specific

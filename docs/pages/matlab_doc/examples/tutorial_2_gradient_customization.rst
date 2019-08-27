@@ -19,7 +19,7 @@ As before, we'll start by loading the sample data.
     labeling = load_parcellation('schaefer',400);
     
     % The loader functions output data in a struct array for when you
-    % load multiple parcellations. Lets just bring them to numeric arrays.
+    % load multiple parcellations. Let's just bring them to numeric arrays.
     conn_matrix = conn_matrix.schaefer_400;
     labeling = labeling.schaefer_400;
     
@@ -27,7 +27,7 @@ As before, we'll start by loading the sample data.
     [surf_lh, surf_rh] = load_conte69();
     
 The ``GradientMaps`` object allows for many different kernels and dimensionality
-reduction techniques (for a full list see :ref:`GradientMaps`). Lets have a look
+reduction techniques (for a full list see :ref:`GradientMaps`). Let's have a look
 at three different kernels.
     
 .. code-block:: matlab    
@@ -93,7 +93,7 @@ of a second subject group and align it with the first group.
     Gj = Gj.fit({conn_matrix2,conn_matrix});
 
 Here, ``Gp`` contains the Procrustes aligned data and ``Gj`` contains the joint
-aligned data. Lets plot them, but in separate figures to keep things organized.
+aligned data. Let's plot them, but in separate figures to keep things organized.
 
 
 .. code-block:: matlab    
