@@ -235,11 +235,17 @@ classdef GradientMaps
             end
             
             if ~issymmetric(data)
-                error('Affinity matrix is not symmetric.')
+                if max(max(abs(data - data'))) > eps % floating point issues. 
+                    error('Affinity matrix is not symmetric.')
+                else
+                    data = tril(data) + tril(data,-1)'; % Attempt to force symmetry
+                end
             end
             
-            % Check if the graph is connected.
-            if ~all(conncomp(graph(abs(data))) == 1)
+            % Check if the graph is connected. Large matrices may remain
+            % floating point asymmetric despite the above check, so only
+            % use lower.
+            if ~all(conncomp(graph(abs(data),'lower')) == 1) 
                 error('Graph is not connected.')
             end
             
