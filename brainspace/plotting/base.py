@@ -209,8 +209,8 @@ class BasePlotter(object):
                 self.iren.SetInteractorStyle(None)
             self.iren.AddObserver(vtkCommand.ExitEvent, self.close)
 
-        # self.ren_win.Render()
-        #
+        self.ren_win.Render()
+
         # if embed_nb and interactive:
         #     try:
         #         return self._render_panel()
