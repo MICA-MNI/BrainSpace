@@ -21,7 +21,7 @@ def test_plotter():
     ac0 = ren0.AddActor()
     m0 = ac0.SetMapper(inputdata=s)
 
-    # p.show(embed_nb=False)
+    p.show(embed_nb=False)
     # img = p.screenshot()
     # assert isinstance(img, PIL.Image.Image)
     #
