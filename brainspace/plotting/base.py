@@ -24,7 +24,8 @@ from ..vtk_interface.decorators import wrap_input
 # from vtkmodules import qt as vtk_qt
 
 from vtk import (vtkCommand, vtkPNGWriter,
-                 vtkXRenderWindowInteractor as vtkRenderWindowInteractor,
+                 # vtkXRenderWindowInteractor as vtkRenderWindowInteractor,
+                 vtkRenderWindowInteractor,
                  vtkWindowToImageFilter, vtkRenderWindow)
 
 import vtk.qt as vtk_qt
