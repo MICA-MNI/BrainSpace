@@ -40,16 +40,15 @@ before_install:
     else
       python --version;
       pip install -U pip;
-      pip install pytest pytest-cov coverage coveralls codecov;
     fi
 
 
 # command to install dependencies
 install:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      pip3 install -r requirements.txt;
+      pip3 install -e ".[test]";
     else
-      pip install -r requirements.txt;
+      pip install -e ".[test]";
     fi
 
 
