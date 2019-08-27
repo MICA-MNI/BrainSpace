@@ -129,7 +129,7 @@ aligned data. Lets plot them, but in separate figures to keep things organized.
 Before gradient alignment, the first gradient is reversed, but both alignments
 resolve this issue. If the input data was less similar, alignments may also
 resolve changes in the order of the gradients. However, you should always
-inspect the output of an alignment; if the input data is sufficiently dissimilar
+inspect the output of an alignment; if the input data are sufficiently dissimilar
 then the alignment may produce odd results.
 
 That concludes the second tutorial. In the third tutorial we will consider null

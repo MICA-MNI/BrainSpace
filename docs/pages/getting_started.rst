@@ -3,7 +3,8 @@
 Getting Started
 ==============================
 
-BrainSpace offers a wide variety of approaches to build gradients. Here we will go through the basics to start using BrainSpace.
+BrainSpace offers a wide variety of approaches to build gradients. Here we will
+go through the basics to start using BrainSpace.
 
 Let's start by loading the data:
 
@@ -47,7 +48,10 @@ We can plot the surfaces:
    :align: center
 
 
-Lets load a mean functional connectivity matrix built from a subset of the Human Connectome Project Young Adult cohort. This package comes with connectivity matrices subdivided based on functional parcellations `(Schaefer et al., 2017) <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. 
+Lets load a mean functional connectivity matrix built from a subset of the Human
+Connectome Project Young Adult cohort. This package comes with connectivity
+matrices subdivided based on functional parcellations `(Schaefer et al., 2017)
+<https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. 
 
 .. tabs::
 

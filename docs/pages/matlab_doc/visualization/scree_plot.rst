@@ -8,7 +8,7 @@ scree_plot
 Synopsis
 ------------------
 
-Produces a screee plot of the lambdas (`source code
+Produces a scree plot of the lambdas (`source code
 <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/plot_data/scree_plot.m>`_).
 
 
@@ -27,10 +27,10 @@ Usage
 Description
 ------------------
 
-Scree plot plots the lambdas scaled to a sum of 1. It is a useful tool for
+`scree_plot` plots the lambdas scaled to a sum of 1. It is a useful tool for
 identifying the difference in the importance of each eigenvector (i.e. gradient)
 with higher lambdas being more important in principal component analysis and
-diffusion embedding, and lower ones more important in laplacian eigenmaps.
+diffusion embedding, and lower ones more important in Laplacian eigenmaps.
 
 BrainSpace only provides basic figure building functionality. For more
 information on how to use Matlab to create publication-ready figures we

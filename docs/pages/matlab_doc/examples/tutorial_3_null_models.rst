@@ -209,10 +209,10 @@ consider the correlation to be significant if it is lower or higher than the
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
 
-If significant is true, the we've found a statistically significant correlation.
+If significant is true, then we've found a statistically significant correlation.
 Alternatively, one could also test the one-tailed hypothesis whether the
 percentile rank is lower or higher than the 5th/95th percentile, respectively.
 
 This concludes the third and last tutorial. You should now be familliar with all
 the functionality of the BrainSpace toolbox. For more details on any specific
-function, please see `ref`:matlab_package
+function, please see :ref:`matlab_package`.

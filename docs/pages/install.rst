@@ -70,7 +70,7 @@ the following in MATLAB: ::
     addpath('/path/to/BrainSpace/matlab/')
 
 If you want to load BrainSpace every time you start MATLAB, type ``edit
-startup`` and append the above line to the end of thils file. 
+startup`` and append the above line to the end of this file. 
 
 You can move the matlab directory to other locations. However, the example data
 loader functions used in our tutorials require the matlab and shared directories

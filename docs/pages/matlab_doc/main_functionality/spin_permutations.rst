@@ -40,6 +40,6 @@ corresponding to the respective elements in the data cell array.
 Name-Value pairs
 ------------------
 
-- *'parcellation'*: a n-by-1 vector containing the parcellation scheme. Do not provide for no vertex-level analysis.
+- *'parcellation'*: a n-by-1 vector containing the parcellation scheme. If you are performing vertexwise analysis, do not provide this pair. 
 
 - *'type'*: program used to generate the spheres. Either 'FreeSurfer' (default), or 'CIVET'. If Freesurfer, rotations are flipped along the x-axis for the second sphere. 
