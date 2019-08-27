@@ -329,18 +329,18 @@ class Plotter(BasePlotter):
     def show(self, interactive=True, embed_nb=False, scale=None,
              transparent_bg=True):
         embed_nb = embed_nb and in_notebook()
-        if embed_nb and interactive and not has_panel:
-            interactive = False
-
-        if self.use_qt and not embed_nb:
-            self.iren.Initialize()
-            if not interactive:
-                self.iren.SetInteractorStyle(None)
-            self.app_window.show()
-            self.qt_ren.show()
-        else:
-            return super().show(interactive=interactive, embed_nb=embed_nb,
-                                scale=scale, transparent_bg=transparent_bg)
+        # if embed_nb and interactive and not has_panel:
+        #     interactive = False
+        #
+        # if self.use_qt and not embed_nb:
+        #     self.iren.Initialize()
+        #     if not interactive:
+        #         self.iren.SetInteractorStyle(None)
+        #     self.app_window.show()
+        #     self.qt_ren.show()
+        # else:
+        #     return super().show(interactive=interactive, embed_nb=embed_nb,
+        #                         scale=scale, transparent_bg=transparent_bg)
 
     def key_quit(self, obj=None, event=None):
         try:
