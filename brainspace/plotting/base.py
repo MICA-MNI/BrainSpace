@@ -198,32 +198,32 @@ class BasePlotter(object):
                           "provided for a single renderer: "
                           "'n_rows=1' and 'n_cols=1'")
 
-        if embed_nb or self.offscreen is True:
-            self.ren_win.SetOffScreenRendering(True)
-        else:
-            self.ren_win.SetOffScreenRendering(False)
-
-            self.iren.SetRenderWindow(self.ren_win.VTKObject)
-            self.iren.Initialize()
-            if not interactive:
-                self.iren.SetInteractorStyle(None)
-            self.iren.AddObserver(vtkCommand.ExitEvent, self.close)
-
-        self.ren_win.Render()
-
-        if embed_nb and interactive:
-            try:
-                return self._render_panel()
-            except:
-                pass
-
-        if embed_nb:
-            return self._capture_image(scale=scale,
-                                       transparent_bg=transparent_bg)
-
-        if self.offscreen is not True:
-            self.iren.Start()
-        return None
+        # if embed_nb or self.offscreen is True:
+        #     self.ren_win.SetOffScreenRendering(True)
+        # else:
+        #     self.ren_win.SetOffScreenRendering(False)
+        #
+        #     self.iren.SetRenderWindow(self.ren_win.VTKObject)
+        #     self.iren.Initialize()
+        #     if not interactive:
+        #         self.iren.SetInteractorStyle(None)
+        #     self.iren.AddObserver(vtkCommand.ExitEvent, self.close)
+        #
+        # self.ren_win.Render()
+        #
+        # if embed_nb and interactive:
+        #     try:
+        #         return self._render_panel()
+        #     except:
+        #         pass
+        #
+        # if embed_nb:
+        #     return self._capture_image(scale=scale,
+        #                                transparent_bg=transparent_bg)
+        #
+        # if self.offscreen is not True:
+        #     self.iren.Start()
+        # return None
 
     def close(self, *args):
         # try:
@@ -329,18 +329,18 @@ class Plotter(BasePlotter):
     def show(self, interactive=True, embed_nb=False, scale=None,
              transparent_bg=True):
         embed_nb = embed_nb and in_notebook()
-        # if embed_nb and interactive and not has_panel:
-        #     interactive = False
-        #
-        # if self.use_qt and not embed_nb:
-        #     self.iren.Initialize()
-        #     if not interactive:
-        #         self.iren.SetInteractorStyle(None)
-        #     self.app_window.show()
-        #     self.qt_ren.show()
-        # else:
-        #     return super().show(interactive=interactive, embed_nb=embed_nb,
-        #                         scale=scale, transparent_bg=transparent_bg)
+        if embed_nb and interactive and not has_panel:
+            interactive = False
+
+        if self.use_qt and not embed_nb:
+            self.iren.Initialize()
+            if not interactive:
+                self.iren.SetInteractorStyle(None)
+            self.app_window.show()
+            self.qt_ren.show()
+        else:
+            return super().show(interactive=interactive, embed_nb=embed_nb,
+                                scale=scale, transparent_bg=transparent_bg)
 
     def key_quit(self, obj=None, event=None):
         try:
