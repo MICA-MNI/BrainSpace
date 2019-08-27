@@ -12,20 +12,20 @@ dist: xenial
 matrix:
   include:
 
-    - name: "Python 3.5 on Xenial Linux"
+    - name: "Python 3.5.6 on Xenial Linux"
       python: 3.5
       services: xvfb
       install: pip install -r requirements.txt
       script: pytest
 
-    - name: "Python 3.6 on Xenial Linux"
+    - name: "Python 3.6.7 on Xenial Linux"
       python: 3.6
       services: xvfb
       install: pip install -r requirements.txt
       script: pytest
 
     - name: "Python 3.7.1 on Xenial Linux"
-      python: 3.7           # this works for Linux but is ignored on macOS or Windows
+      python: 3.7
       services: xvfb
       install: pip install -r requirements.txt
       script: pytest
@@ -33,8 +33,8 @@ matrix:
     # ======= OSX ========
     - name: "Python 3.6.5 on macOS 10.13"
       os: osx
-      osx_image: xcode9.4  # Python 3.6.5 running on macOS 10.13
-      language: generic       # 'language: python' is an error on Travis CI macOS
+      osx_image: xcode9.4
+      language: generic
       before_install:
         - python3 --version
         - pip3 install -U pip
@@ -44,8 +44,8 @@ matrix:
       script: python3 -m pytest
     - name: "Python 3.7.4 on macOS 10.14"
       os: osx
-      osx_image: xcode11    # Python 3.7.4 running on macOS 10.14.4
-      language: generic       # 'language: python' is an error on Travis CI macOS
+      osx_image: xcode11
+      language: generic
       before_install:
         - python3 --version
         - pip3 install -U pip
