@@ -18,20 +18,20 @@ env:
   global:
     - INSTALL_TYPE=setup
 
-matrix:
-  include:
-    - python: 3.6
-      env:
-        - INSTALL_TYPE=sdist
-        - CHECK_TYPE=test
-    - python: 3.6
-      env:
-        - INSTALL_TYPE=wheel
-        - CHECK_TYPE=test
-    - python: 3.6
-      env:
-        - INSTALL_TYPE=conda
-        - CHECK_TYPE=test
+#matrix:
+#  include:
+#    - python: 3.6
+#      env:
+#        - INSTALL_TYPE=sdist
+#        - CHECK_TYPE=test
+#    - python: 3.6
+#      env:
+#        - INSTALL_TYPE=wheel
+#        - CHECK_TYPE=test
+#    - python: 3.6
+#      env:
+#        - INSTALL_TYPE=conda
+#        - CHECK_TYPE=test
 
 before_install:
   - python -m pip install --upgrade pip
@@ -57,8 +57,7 @@ before_install:
     fi
 
 install:
-  - |
-    if [ "${INSTALL_TYPE}" == "setup" ]; then
+  - if [ "${INSTALL_TYPE}" == "setup" ]; then
       python setup.py install;
     elif [ "${INSTALL_TYPE}" == "sdist" ]; then
       python setup.py sdist;
@@ -73,8 +72,7 @@ install:
     fi
 
 script:
-  - |
-    if [ "${CHECK_TYPE}" == "linting" ]; then
+  - if [ "${CHECK_TYPE}" == "linting" ]; then
       flake8 brainspace;
     elif [ "${CHECK_TYPE}" == "docdoctest" ]; then
       cd docs;
