@@ -102,8 +102,8 @@ install:
   - pip install -r requirements.txt
 
 # command to run tests
-script:
-  - pytest
+#script:
+#  - pytest
 
 #after_success:
 #  # Upload coverage data to codecov
