@@ -12,7 +12,8 @@ from sklearn.preprocessing import normalize
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.cluster import k_means
 
-from vtkmodules.vtkFiltersCorePython import vtkDecimatePro
+# from vtkmodules.vtkFiltersCorePython import vtkDecimatePro
+from vtk import vtkDecimatePro
 
 from . import mesh_elements as me
 from .mesh_correspondence import find_point_correspondence

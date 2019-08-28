@@ -9,4 +9,4 @@ neuroimaging and network neuroscience communities. The toolbox also contains
 several maps that allow for exploratory analysis of gradient correspondence
 with several features, together with tools to generate spatial null models.
 
-For installation instructions, examples and documentation of BrainSpace see https://brainspace.readthedocs.io/en/latest/.
+For installation instructions, examples and documentation of BrainSpace see https://brainspace.readthedocs.io.

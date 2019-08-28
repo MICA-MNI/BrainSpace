@@ -9,7 +9,7 @@ This document gives a basic walkthrough of BrainSpace python package.
 Working with gradients
 ----------------------
 
-:class:`.GradientMaps` is the main class that offers all the functionality to
+:class:`.GradientMaps` is the main class that offers the functionality to
 work with gradients. This class builds the affinity matrix, performs the
 embedding and aligns the gradients. This class follows closely the `API of scikit-learn
 objects <https://scikit-learn.org/dev/developers/contributing.html#apis-of-scikit-learn-objects>`_.
@@ -120,7 +120,7 @@ objects <https://scikit-learn.org/dev/developers/contributing.html#apis-of-sciki
 VTK wrapping
 -------------
 
-All surface mesh functionality provided in BrainSpace is built on top of the
+All surface mesh functionalities provided in BrainSpace is built on top of the
 `Visualization Toolkit (VTK) <https://vtk.org/>`_. BrainSpace provides several
 wrappers for most data objects and some filters in VTK. Here we present
 a subset of this functionality.
@@ -132,19 +132,22 @@ Wrapping interface
 :class:`.BSVTKObjectWrapper` is the base class for all wrappers implemented in
 BrainSpace. Wrapping a VTK object is done with the :func:`.wrap_vtk` function.
 When wrapping a VTK object, if the corresponding wrapper does not exist, it
-falls back to :class:`.BSVTKObjectWrapper`. The complete list of wrappers
-implemented in the current version of BrainSpace is available in ??
+falls back to :class:`.BSVTKObjectWrapper`. Check the API for the complete list
+of wrappers implemented in the current version of BrainSpace.
 
 The :class:`.BSVTKObjectWrapper` is a wrapper that extends the Python object
-wrapper in VTK :class:`~vtkmodules.numpy_interface.dataset_adapter.VTKObjectWrapper`
+wrapper in VTK
+:class:`~vtkmodules.numpy_interface.dataset_adapter.VTKObjectWrapper`
 to provide easier access to VTK setter and getter class methods. The wrapper,
-since it is a subclass of :class:`~vtkmodules.numpy_interface.dataset_adapter.VTKObjectWrapper`,
-holds a reference to the vtk object in the :attr:`.BSVTKObjectWrapper.VTKObject` attribute.
-And further includes the following functionality:
+since it is a subclass of
+:class:`~vtkmodules.numpy_interface.dataset_adapter.VTKObjectWrapper`,
+holds a reference to the VTK object in the
+:attr:`.BSVTKObjectWrapper.VTKObject` attribute. And further includes the
+following functionality:
 
-#. :meth:`~.BSVTKObjectWrapper.setVTK` and :meth:`~.BSVTKObjectWrapper.getVTK` to invoke several setter/getter methods on the vtk object: ::
+#. :meth:`~.BSVTKObjectWrapper.setVTK` and :meth:`~.BSVTKObjectWrapper.getVTK` to invoke several setter/getter methods on the VTK object: ::
 
-    >>> # Lets create a sphere with VTK
+    >>> # Let's create a sphere with VTK
     >>> from vtkmodules.vtkCommonDataModelPython import vtkSphere
     >>> s = vtkSphere()
     >>> s
@@ -164,7 +167,7 @@ And further includes the following functionality:
     >>> ws
     <brainspace.vtk_interface.base.BSVTKObjectWrapper at 0x7f60cd7d6f60>
 
-    >>> # and holds a reference to the vtk sphere
+    >>> # and holds a reference to the VTK sphere
     >>> ws.VTKObject
     (vtkCommonDataModelPython.vtkSphere)0x7f610d222f48
 
@@ -183,7 +186,7 @@ And further includes the following functionality:
     (1.5, 1.5, 1.5)
 
     >>> # these methods can be invoked on the wrapper, which forwards
-    >>> # them to the vtk object
+    >>> # them to the VTK object
     >>> ws.GetRadius()
     2.0
 
@@ -265,7 +268,7 @@ Using the previous functionality, these methods can be called as follows: ::
     >>> m.GetColorModeAsString()
     'Default'
 
-    >>> # Now we are going to wrap the vtk object
+    >>> # Now we are going to wrap the VTK object
     >>> wm = wrap_vtk(m)
     >>> wm
     <brainspace.vtk_interface.wrappers.BSPolyDataMapper at 0x7f60ada07828>
@@ -291,14 +294,14 @@ In the example above, the wrapper class of our mapper is no longer :class:`~.BSV
 but :class:`~.BSPolyDataMapper`. This is because :func:`.wrap_vtk` looks for a
 convenient wrapper by searching the hierarchy of wrappers in a bottom-up fashion,
 and :class:`~.BSPolyDataMapper` is a wrapper that is already implemented in the
-current version of BrainSpace. We can also see this with vtk actor: ::
+current version of BrainSpace. We can also see this with VTK actor: ::
 
     >>> from vtkmodules.vtkRenderingCorePython import vtkActor
     >>> wa = wrap_vtk(vtkActor())
     >>> wa
     <brainspace.vtk_interface.wrappers.BSActor at 0x7f60cd749e80>
 
-    >>> # When a wrapper exists, the vtk object can be created directly
+    >>> # When a wrapper exists, the VTK object can be created directly
     >>> from brainspace.vtk_interface.wrappers import BSActor
     >>> wa2 = BSActor()
     <brainspace.vtk_interface.wrappers.BSActor at 0x7f60cce8fac8>
@@ -313,11 +316,11 @@ current version of BrainSpace. We can also see this with vtk actor: ::
 
 :class:`.BSActor` is a special wrapper, because calls to setter and getter methods can
 be forwarded also to its property (i.e., GetProperty()). Methods are first
-forwarded to the vtk object of the actor, but if they don't exist, they are
+forwarded to the VTK object of the actor, but if they do not exist, they are
 forwarded then to the property. As of the current version, this is only implemented
 for :class:`.BSActor`: ::
 
-    >>> # To see the opacity using the vtk object
+    >>> # To see the opacity using the VTK object
     >>> wa3.VTKObject.GetProperty().GetOpacity()
     1.0
 
@@ -336,7 +339,7 @@ for :class:`.BSActor`: ::
     0.25
 
 The advantage of this approach over existing packages that build over VTK is that
-we don't need to learn about all the new API. If the user is familiar with VTK,
+we do not need to learn about all the new API. If the user is familiar with VTK,
 then using this approach is straightforward, we can invoke the setter and getter
 methods by simply stripping the Get/Set prefixes.
 
@@ -426,10 +429,10 @@ filters. The previous example can be rewritten as follows: ::
     >>> output2.GetNumberOfPoints()
     25
 
-First, note that we can simply provide the vtk class instead of the object
+First, note that we can simply provide the VTK class instead of the object
 to :func:`.wrap_vtk`. Furthermore, the output object of the previous pipeline
 is a polydata. This brings us to one of the most important wrappers in
-BrainSpace, :class:`.BSPolyData`, a wrapper for vtk polydata objects.
+BrainSpace, :class:`.BSPolyData`, a wrapper for VTK polydata objects.
 
 .. * .. currentmodule:: brainspace.vtk_interface.pipeline
 
@@ -497,7 +500,7 @@ additional features: ::
     >>> output2.get_array(name='Normals', at='point').shape
     (25, 3)
 
-    >>> # we don't have to specify the attributes
+    >>> # we do not have to specify the attributes
     >>> output2.get_array(name='Normals')
     (25, 3)
 
@@ -529,7 +532,7 @@ Plotting
 
 BrainSpace offers two high-level plotting functions: :func:`.plot_surf` and
 :func:`.plot_hemispheres`. These functions are based on the wrappers of the corresponding
-vtk objects. We have already seen above the :class:`~.BSPolyDataMapper` and
+VTK objects. We have already seen above the :class:`~.BSPolyDataMapper` and
 :class:`~.BSActor` class wrappers. Here we will show how rendering is performed
 using these wrappers. The base class for all plotters is :class:`BasePlotter`, with
 subclasses :class:`Plotter` and :class:`GridPlotter`.

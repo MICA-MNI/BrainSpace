@@ -13,9 +13,11 @@ from scipy.sparse.csgraph import laplacian
 
 from sklearn.utils.extmath import weighted_mode
 
-from vtkmodules.vtkFiltersVerdictPython import vtkCellSizeFilter
-from vtkmodules.vtkFiltersGeneralPython import vtkCellCenters
-from vtkmodules.vtkFiltersCorePython import vtkPolyDataConnectivityFilter
+# from vtkmodules.vtkFiltersVerdictPython import vtkCellSizeFilter
+# from vtkmodules.vtkFiltersGeneralPython import vtkCellCenters
+# from vtkmodules.vtkFiltersCorePython import vtkPolyDataConnectivityFilter
+
+from vtk import vtkCellSizeFilter, vtkCellCenters, vtkPolyDataConnectivityFilter
 
 from . import mesh_elements as me
 from ..utils.parcellation import map_to_mask, reduce_by_labels

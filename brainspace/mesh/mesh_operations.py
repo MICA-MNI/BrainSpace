@@ -9,9 +9,11 @@ Basic functions on surface meshes.
 import warnings
 import numpy as np
 
-from vtkmodules.vtkCommonDataModelPython import vtkDataObject
-from vtkmodules.vtkFiltersCorePython import vtkThreshold
-from vtkmodules.vtkFiltersGeometryPython import vtkGeometryFilter
+# from vtkmodules.vtkCommonDataModelPython import vtkDataObject
+# from vtkmodules.vtkFiltersCorePython import vtkThreshold
+# from vtkmodules.vtkFiltersGeometryPython import vtkGeometryFilter
+
+from vtk import vtkDataObject, vtkThreshold, vtkGeometryFilter
 
 from ..vtk_interface.pipeline import serial_connect
 from ..vtk_interface.wrappers import wrap_vtk
@@ -72,7 +74,11 @@ def _surface_selection(surf, array_name, low=-np.inf, upp=np.inf,
     if upp == np.inf:
         upp = array.max()
 
-    tf = wrap_vtk(vtkThreshold, invert=not keep)
+    if keep is False:
+        raise ValueError("Don't support 'keep=False'.")
+
+    # tf = wrap_vtk(vtkThreshold, invert=not keep)
+    tf = wrap_vtk(vtkThreshold)
     tf.ThresholdBetween(low, upp)
     if use_cell:
         tf.SetInputArrayToProcess(0, 0, 0, ASSOC_CELLS, array_name)

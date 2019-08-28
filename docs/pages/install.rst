@@ -22,25 +22,22 @@ To use BrainSpace, the following Python packages are required:
 * `scikit-learn <https://scikit-learn.org/stable/>`_
 * `vtk <https://vtk.org/>`_
 * `matplotlib <https://matplotlib.org/>`_
+* `nibabel <https://nipy.org/nibabel/index.html>`_
 
-Matplotlib is only used for colormaps and we may remove this dependency in
-future releases.
+Nibabel is required for reading/writing of Gifti surfaces. Matplotlib is only
+used for colormaps and we may remove this dependency in future releases.
 
 
 Additional dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^
-For reading/writing of Gifti surfaces BrainSpace requires nibabel. To enable
-interactivity, some plotting functionality in IPython notebooks makes
+To enable interactivity, some plotting functionality in IPython notebooks makes
 use of the panel package. PyQT is another dependency for background plotting.
 See `PyVista <https://docs.pyvista.org/plotting/qt_plotting.html#background-plotting>`_
 for more on background plotting. The support of background rendering however
 is still experimental.
 
-* `nibabel <https://nipy.org/nibabel/index.html>`_
 * `panel <https://panel.pyviz.org/>`_
 * `pyqt <https://riverbankcomputing.com/software/pyqt/intro>`_
-
-Although these dependencies are optional, we recommend installing, at least, nibabel.
 
 
 Installation

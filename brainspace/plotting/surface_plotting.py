@@ -9,15 +9,10 @@ Surface plotting functions.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from vtkmodules.vtkFiltersGeneralPython import vtkTransformFilter
-from vtkmodules.vtkCommonTransformsPython import vtkTransform
-
 from .base import Plotter
 from .colormaps import colormaps
 
-from ..vtk_interface.wrappers import wrap_vtk
 from ..vtk_interface.decorators import wrap_input
-from ..vtk_interface.pipeline import serial_connect
 
 
 orientations = {'lateral': (0, -90, -90),
@@ -146,6 +141,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
     kwargs.update({'n_rows': nrow, 'n_cols': ncol, 'try_qt': False,
                    'size': size})
+    # kwargs.update({'n_rows': nrow, 'n_cols': ncol, 'try_qt': False,
+    #                'size': size, 'offscreen': True})
     # p = Plotter(n_rows=nrow, n_cols=ncol, try_qt=False, size=size, **kwargs)
     p = Plotter(**kwargs)
     for k in range(layout.size):
@@ -190,6 +187,7 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         ren1.ResetCamera()
         ren1.GetActiveCamera().Zoom(1.2)
 
+    # return p.show(interactive=interactive, embed_nb=embed_nb, as_mpl=True)
     return p.show(interactive=interactive, embed_nb=embed_nb)
 
 
@@ -240,6 +238,9 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
     layout = ['lh', 'lh', 'rh', 'rh']
     view = ['medial', 'lateral', 'medial', 'lateral']
 
+    if isinstance(array_name, np.ndarray) and array_name.ndim == 2:
+        array_name = [a for a in array_name]
+
     if isinstance(array_name, list):
         layout = [layout] * len(array_name)
         array_name2 = []
@@ -254,8 +255,9 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
         array_name = np.asarray(array_name2)[:, None]
     elif isinstance(array_name, np.ndarray):
         n_pts_lh = surf_lh.n_points
-        array_name = surf_lh.append_array(array_name[:n_pts_lh], at='p')
-        surf_rh.append_array(array_name[n_pts_lh:], name=array_name, at='p')
+        array_name2 = surf_lh.append_array(array_name[:n_pts_lh], at='p')
+        surf_rh.append_array(array_name[n_pts_lh:], name=array_name2, at='p')
+        array_name = array_name2
 
     if isinstance(cmap_name, list):
         cmap_name = np.asarray(cmap_name)[:, None]

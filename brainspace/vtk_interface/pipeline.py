@@ -5,7 +5,8 @@ VTK pipeline wrapper.
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
-from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
+# from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
+from vtk import vtkAlgorithm
 
 from .wrappers import BSDataObject, BSAlgorithm
 from .decorators import wrap_input

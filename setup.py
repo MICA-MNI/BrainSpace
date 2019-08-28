@@ -10,6 +10,21 @@ from setuptools import setup, find_packages
 from os import path
 from io import open as io_open
 
+
+TEST_REQUIRES = [
+        # testing and coverage
+        'pytest', 'coverage', 'pytest-cov', 'coveralls',
+    ]
+
+INSTALL_REQUIRES = ['numpy>=1.11.0',
+                    'scipy>=0.17.0',
+                    'scikit-learn>=0.20.0',
+                    'matplotlib>=2.0.0',
+                    'vtk>=8.1.0',
+                    'nibabel',
+                    'pillow']
+
+
 here = path.abspath(path.dirname(__file__))
 
 
@@ -72,13 +87,13 @@ setup(
     #
     # This field corresponds to the "Description-Content-Type" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#description-content-type-optional
-    long_description_content_type='text/markdown',  # Optional (see note above)
+    long_description_content_type='text/x-rst',  # Optional (see note above)
 
     # This should be a valid link to your project's main homepage.
     #
     # This field corresponds to the "Home-Page" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#home-page-optional
-    url='https://github.com/BrainSpace/brainspace',  # Optional
+    url='https://github.com/MICA-MNI/BrainSpace',  # Optional
 
     # This should be your name or the name of the organization which owns the
     # project.
@@ -119,15 +134,13 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3 :: Only',
 
-
-
     ],
 
     # This field adds keywords for your project which will appear on the
     # project page. What does your project relate to?
     #
     # Note that this is a string of words separated by whitespace, not a list.
-    keywords='sample setuptools development',  # Optional
+    keywords='brain cortex gradient manifold',  # Optional
 
     # You can just specify package directories manually here if your project is
     # simple. Or you can use find_packages().
@@ -153,11 +166,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['numpy>=1.11.0',
-                      'scipy>=0.17.0',
-                      'scikit-learn>=0.20.0',
-                      'matplotlib>=2.0.0',
-                      'vtk>=8.2.0'],  # Optional
+    install_requires=INSTALL_REQUIRES,  # Optional
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
@@ -171,15 +180,18 @@ setup(
     #     'ipy_tools': ['ipython'],
     #     'colormaps': ['matplotlib'],
     # },
+    extras_require={  # Optional
+        'test': TEST_REQUIRES + INSTALL_REQUIRES,
+    },
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.
     #
     # If using Python 2.6 or earlier, then these have to be included in
     # MANIFEST.in as well.
-    package_data={  # Optional
-        'mydata': ['brainspace_data/*'],
-    },
+    # package_data={  # Optional
+    #     'mydata': ['brainspace_data/*'],
+    # },
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
@@ -211,9 +223,8 @@ setup(
     # maintainers, and where to support the project financially. The key is
     # what's used to render the link text on PyPI.
     project_urls={  # Optional
-        'Bug Reports': 'https://github.com/BrainSpace/issues',
-        # 'Funding': 'https://donate.pypi.org',
-        # 'Say Thanks!': 'http://saythanks.io/to/example',
-        'Source': 'https://github.com/BrainSpace/brainspace',
+        'Documentation': 'https://brainspace.readthedocs.io',
+        'Bug Reports': 'https://github.com/MICA-MNI/BrainSpace/issues',
+        'Source': 'https://github.com/MICA-MNI/BrainSpace',
     },
 )

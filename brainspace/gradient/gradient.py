@@ -67,8 +67,8 @@ class GradientMaps(BaseEstimator):
     ----------
     n_gradients : int, optional
         Number of gradients. Default is 10.
-    approach : {'dm', 'le', 'pca'} or object
-        Embedding approach. It can be a string or instance:
+    approach : {'dm', 'le', 'pca'} or object, optional
+        Embedding approach. Default is 'dm'. It can be a string or instance:
 
         - 'dm' or :class:`.DiffusionMaps`: embedding using diffusion maps.
         - 'le' or :class:`.LaplacianEigenmaps`: embedding using Laplacian
@@ -103,7 +103,7 @@ class GradientMaps(BaseEstimator):
         is used.
     """
 
-    def __init__(self, n_gradients=10, approach=None, kernel=None,
+    def __init__(self, n_gradients=10, approach='dm', kernel=None,
                  alignment=None, random_state=None):
         self.n_gradients = n_gradients
         self.approach = approach
@@ -159,7 +159,6 @@ class GradientMaps(BaseEstimator):
             self.fit(np.vstack(x), gamma=gamma, sparsity=sparsity, **kwargs)
 
             s = np.cumsum([0] + [x1.shape[0] for x1 in x])
-            print(s)
             for i, x1 in enumerate(x):
                 a, b = s[i], s[i+1]
                 lam[i], grad[i] = self.lambdas_[a:b], self.gradients_[a:b]

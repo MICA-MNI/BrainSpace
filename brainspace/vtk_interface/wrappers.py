@@ -9,12 +9,16 @@ import string
 import warnings
 import numpy as np
 
-from vtkmodules.util.numpy_support import numpy_to_vtk, vtk_to_numpy
-from vtkmodules.numpy_interface import dataset_adapter as dsa
-from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
-from vtkmodules.vtkCommonCorePython import vtkObject, vtkLookupTable
-from vtkmodules.vtkRenderingCorePython import vtkMapper
-from vtkmodules.vtkCommonDataModelPython import vtkDataSet
+# from vtkmodules.util.numpy_support import numpy_to_vtk, vtk_to_numpy
+# from vtkmodules.numpy_interface import dataset_adapter as dsa
+# from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
+# from vtkmodules.vtkCommonCorePython import vtkObject, vtkLookupTable
+# from vtkmodules.vtkRenderingCorePython import vtkMapper
+# from vtkmodules.vtkCommonDataModelPython import vtkDataSet
+
+from vtk.util.numpy_support import numpy_to_vtk, vtk_to_numpy
+from vtk.numpy_interface import dataset_adapter as dsa
+from vtk import vtkAlgorithm, vtkObject, vtkLookupTable, vtkMapper, vtkDataSet
 
 from .checks import (get_cell_types, get_number_of_cell_types,
                      has_unique_cell_type, has_only_triangle,
@@ -507,7 +511,8 @@ class BSPolyData(dsa.PolyData, BSPointSet):
         return dsa.vtkDataArrayToVTKArray(
             self.VTKObject.GetVerts().GetData(), self)
 
-    Verts = property(GetVerts, None, None, "This property returns the connectivity of verts.")
+    Verts = property(GetVerts, None, None, "This property returns the "
+                                           "connectivity of verts.")
 
     def GetLines(self):
         """Returns the lines as a VTKArray instance."""
@@ -516,7 +521,8 @@ class BSPolyData(dsa.PolyData, BSPointSet):
         return dsa.vtkDataArrayToVTKArray(
             self.VTKObject.GetLines().GetData(), self)
 
-    Lines = property(GetLines, None, None, "This property returns the connectivity of lines.")
+    Lines = property(GetLines, None, None, "This property returns the "
+                                           "connectivity of lines.")
 
 
 class BSUnstructuredGrid(dsa.UnstructuredGrid, BSPointSet):
@@ -524,14 +530,15 @@ class BSUnstructuredGrid(dsa.UnstructuredGrid, BSPointSet):
     pass
 
 
-class BSGraph(dsa.Graph, BSDataObject):
-    """Wrapper for vtkUnstructuredGrid."""
-    pass
+# Not available
+# class BSGraph(dsa.Graph, BSDataObject):
+#     """Wrapper for vtkUnstructuredGrid."""
+#     pass
 
 
-class BSMolecule(dsa.Molecule, BSDataObject):
-    """Wrapper for vtkMolecule."""
-    pass
+# class BSMolecule(dsa.Molecule, BSDataObject):
+#     """Wrapper for vtkMolecule."""
+#     pass
 
 
 class BSLookupTable(BSVTKObjectWrapper):
