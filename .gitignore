@@ -1,7 +1,6 @@
 docs/_build
 docs/generated
 test_python
-auto_examples2
 
 .pytest_cache
 .ipynb_checkpoints
