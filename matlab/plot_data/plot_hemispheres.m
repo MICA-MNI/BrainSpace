@@ -95,9 +95,11 @@ for ii = 1:size(D,2)
     h.cb(ii).FontSize = 14;
 end
 
-% Add labels         
-for ii = 1:numel(label_text)
-    h.text(ii) = text(h.axes(1,ii),-.2,.5,label_text{ii},'Rotation',90, ...
-        'Units','Normalized','HorizontalAlignment','center', 'FontName', ...
-        'DroidSans','FontSize',18);
+% Add labels   
+if exist('label_text','var')
+    for ii = 1:numel(label_text)
+        h.text(ii) = text(h.axes(1,ii),-.2,.5,label_text{ii},'Rotation',90, ...
+            'Units','Normalized','HorizontalAlignment','center', 'FontName', ...
+            'DroidSans','FontSize',18);
+    end
 end

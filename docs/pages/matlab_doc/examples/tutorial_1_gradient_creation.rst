@@ -51,7 +51,9 @@ a look at the first two gradients.
 .. code-block:: matlab
 
     plot_hemispheres(gm.gradients{1}(:,1:2),{surf_lh,surf_rh}, ...
-                     'parcellation', labeling);
+                 'parcellation', labeling, ...
+                 'labeltext',{'Gradient 1','Gradient 2'});
+
 
 .. image:: ./example_figs/g1-2_schaefer_400.png
     :scale: 70%
