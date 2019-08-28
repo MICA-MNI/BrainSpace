@@ -55,7 +55,7 @@ a look at the first two gradients.
                  'labeltext',{'Gradient 1','Gradient 2'});
 
 
-.. image:: ./example_figs/g1-2_schaefer_400.png
+.. image:: ./example_figs/g1-2_schaefer_400_v2.png
     :scale: 70%
     :align: center
 
