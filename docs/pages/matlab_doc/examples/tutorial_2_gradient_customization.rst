@@ -48,7 +48,7 @@ at three different kernels.
         'parcellation', labeling, ...
         'labeltext',label_text);
     
-.. image:: ./example_figs/g1_schaefer_400_kernel.png
+.. image:: ./example_figs/g1_schaefer_400_kernel_v2.png
     :scale: 70%
     :align: center
 
@@ -79,7 +79,7 @@ techniques.
         'parcellation', labeling, ...
         'labeltext', label_text);
     
-.. image:: ./example_figs/g1_schaefer_400_approach.png
+.. image:: ./example_figs/g1_schaefer_400_approach_v2.png
     :scale: 70%
     :align: center
 
@@ -115,7 +115,7 @@ aligned data. Let's plot them, but in separate figures to keep things organized.
         {surf_lh,surf_rh}, 'parcellation', labeling, ...
         'labeltext',{'Unaligned Group 1','Unaligned Group 2'});
     
-.. image:: ./example_figs/g1_main_holdout_noalign.png
+.. image:: ./example_figs/g1_main_holdout_noalign_v2.png
     :scale: 70%
     :align: center
 
@@ -125,7 +125,7 @@ aligned data. Let's plot them, but in separate figures to keep things organized.
         {surf_lh,surf_rh},'parcellation',labeling, ...
         'labeltext',{'Procrustes Group 1','Procrustes Group 2'});
     
-.. image:: ./example_figs/g1_main_holdout_procrustes.png
+.. image:: ./example_figs/g1_main_holdout_procrustes_v2.png
     :scale: 70%
     :align: center
     
@@ -135,7 +135,7 @@ aligned data. Let's plot them, but in separate figures to keep things organized.
         {surf_lh,surf_rh},'parcellation',labeling, ...
         'labeltext',{'Joint Group 1','Joint Group 2'});
     
-.. image:: ./example_figs/g1_main_holdout_joint.png
+.. image:: ./example_figs/g1_main_holdout_joint_v2.png
     :scale: 70%
     :align: center
 
