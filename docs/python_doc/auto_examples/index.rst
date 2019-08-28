@@ -2,7 +2,7 @@
 
 
 
-.. _sphx_glr_auto_examples:
+.. _sphx_glr_python_doc_auto_examples:
 
 .. _examples_index:
 
@@ -16,13 +16,13 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Embedding approaches for gradient construction">
+    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 1">
 
 .. only:: html
 
-    .. figure:: ./images/thumb/sphx_glr_plot_embedding_approaches_thumb.png
+    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial1_thumb.png
 
-        :ref:`sphx_glr_auto_examples_plot_embedding_approaches.py`
+        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial1.py`
 
 .. raw:: html
 
@@ -32,17 +32,17 @@ Examples
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_embedding_approaches
+   /python_doc/auto_examples/plot_tutorial1
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Functional gradients across spatial scales">
+    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 2">
 
 .. only:: html
 
-    .. figure:: ./images/thumb/sphx_glr_plot_different_parcellations_thumb.png
+    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial2_thumb.png
 
-        :ref:`sphx_glr_auto_examples_plot_different_parcellations.py`
+        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial2.py`
 
 .. raw:: html
 
@@ -52,17 +52,17 @@ Examples
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_different_parcellations
+   /python_doc/auto_examples/plot_tutorial2
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Null models based on spin permutations">
+    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 3">
 
 .. only:: html
 
-    .. figure:: ./images/thumb/sphx_glr_plot_spin_permutations_thumb.png
+    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial3_thumb.png
 
-        :ref:`sphx_glr_auto_examples_plot_spin_permutations.py`
+        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial3.py`
 
 .. raw:: html
 
@@ -72,7 +72,7 @@ Examples
 .. toctree::
    :hidden:
 
-   /auto_examples/plot_spin_permutations
+   /python_doc/auto_examples/plot_tutorial3
 .. raw:: html
 
     <div style='clear:both'></div>
@@ -87,13 +87,13 @@ Examples
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
+    :download:`Download all examples in Python source code: auto_examples_python.zip <//media/oualid/hd500/oualid/BrainSpace_forked/docs/python_doc/auto_examples/auto_examples_python.zip>`
 
 
 
   .. container:: sphx-glr-download
 
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
+    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//media/oualid/hd500/oualid/BrainSpace_forked/docs/python_doc/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

@@ -10,6 +10,7 @@ import warnings
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
+import matplotlib.pyplot as plt
 from PIL import Image
 
 from ..vtk_interface import wrap_vtk
@@ -180,7 +181,7 @@ class BasePlotter(object):
         return getattr(self.ren_win, name)
 
     def show(self, interactive=True, embed_nb=False, scale=None,
-             transparent_bg=True):
+             transparent_bg=True, as_mpl=False):
 
         if self.n_renderers == 0:
             raise ValueError('No renderers available.')
@@ -196,7 +197,7 @@ class BasePlotter(object):
                           "provided for a single renderer: "
                           "'n_rows=1' and 'n_cols=1'")
 
-        if embed_nb or self.offscreen is True:
+        if embed_nb or as_mpl or self.offscreen is True:
             self.ren_win.SetOffScreenRendering(True)
         else:
             self.ren_win.SetOffScreenRendering(False)
@@ -218,6 +219,9 @@ class BasePlotter(object):
         if embed_nb:
             return self._capture_image(scale=scale,
                                        transparent_bg=transparent_bg)
+
+        if as_mpl:
+            return self._plot_mpl(scale=scale, transparent_bg=transparent_bg)
 
         if self.offscreen is not True:
             self.iren.Start()
@@ -263,6 +267,26 @@ class BasePlotter(object):
         if filename is None:
             return img
         img.save(filename)
+
+    def _plot_mpl(self, scale=None, transparent_bg=True):
+        scale = (1, 1) if scale is None else scale
+        bg = 'RGBA' if transparent_bg else 'RGB'
+
+        w2if = wrap_vtk(vtkWindowToImageFilter, readFrontBuffer=False,
+                        input=self.ren_win.VTKObject, scale=scale,
+                        inputBufferType=bg)
+
+        img = get_output(w2if)
+        array = img.get_array(name='ImageScalars', at='p')
+        shape = img.dimensions[::-1][1:] + (-1,)
+        array = array.reshape(shape)[::-1]
+
+        h, w = array.shape[:2]
+        fig = plt.figure(figsize=(w/100, h/100), dpi=100)
+        ax = fig.gca()
+        ax.set_axis_off()
+        ax.imshow(array, interpolation='bilinear')
+        plt.show()
 
     def Render(self):
         self.ren_win.Render()
@@ -325,12 +349,13 @@ class Plotter(BasePlotter):
         self.iren.AddObserver("KeyPressEvent", self.key_quit)
 
     def show(self, interactive=True, embed_nb=False, scale=None,
-             transparent_bg=True):
+             transparent_bg=True, as_mpl=False):
+
         embed_nb = embed_nb and in_notebook()
         if embed_nb and interactive and not has_panel:
             interactive = False
 
-        if self.use_qt and not embed_nb:
+        if self.use_qt and not as_mpl and not embed_nb and self.offscreen is not True:
             self.iren.Initialize()
             if not interactive:
                 self.iren.SetInteractorStyle(None)
@@ -338,7 +363,8 @@ class Plotter(BasePlotter):
             self.qt_ren.show()
         else:
             return super().show(interactive=interactive, embed_nb=embed_nb,
-                                scale=scale, transparent_bg=transparent_bg)
+                                scale=scale, transparent_bg=transparent_bg,
+                                as_mpl=as_mpl)
 
     def key_quit(self, obj=None, event=None):
         try:

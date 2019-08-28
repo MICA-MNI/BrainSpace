@@ -141,6 +141,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
     kwargs.update({'n_rows': nrow, 'n_cols': ncol, 'try_qt': False,
                    'size': size})
+    # kwargs.update({'n_rows': nrow, 'n_cols': ncol, 'try_qt': False,
+    #                'size': size, 'offscreen': True})
     # p = Plotter(n_rows=nrow, n_cols=ncol, try_qt=False, size=size, **kwargs)
     p = Plotter(**kwargs)
     for k in range(layout.size):
@@ -185,6 +187,7 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         ren1.ResetCamera()
         ren1.GetActiveCamera().Zoom(1.2)
 
+    # return p.show(interactive=interactive, embed_nb=embed_nb, as_mpl=True)
     return p.show(interactive=interactive, embed_nb=embed_nb)
 
 
