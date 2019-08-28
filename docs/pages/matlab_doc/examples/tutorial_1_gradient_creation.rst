@@ -68,7 +68,7 @@ a scree plot.
 
 .. code-block:: matlab
 
-    scree_plot(gm.lambdas{1});
+    scree_plot(gm.lambda{1});
 
 .. image:: ./example_figs/scree.png
     :scale: 70%

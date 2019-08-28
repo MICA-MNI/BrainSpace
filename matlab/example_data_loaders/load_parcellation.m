@@ -1,6 +1,6 @@
 function parcel_data = load_parcellation(name,parcel_number)
 
-if ~iscell(name) || ~isstring(name)
+if ~iscell(name) && ~isstring(name)
     name = {name};
 end    
 
