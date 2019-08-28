@@ -30,7 +30,7 @@ if numel(S) > 3; error('More than two surfaces are not accepted.'); end
 N1 = sum(cellfun(@(x)size(x.coord,2),S));
 N2 = size(data,1);
 if N1 ~= N2; error('Number of vertices on the surface and number of data points do not match.'); end
-if size(data,2) > 5; warning('Plotting more than five data vectors results in off-screen axes'); end
+if size(data,2) > 4; warning('Plotting more than four data vectors may result in off-screen axes'); end
 
 % Split data over surfaces.
 for ii = 1:size(data,2)
@@ -55,7 +55,7 @@ colormap(parula(256));
 for jj = 1:size(D,2)
     for ii = 1:numel(S)*2
         idx = ceil(ii/2);
-        h.axes(ii,jj) = axes('Position',[-.133+ii*.133 1-.2*jj .2 .2]);
+        h.axes(ii,jj) = axes('Position',[-.1+ii*.133 .9-.2*jj .2 .2]);
         h.trisurf(ii,jj) = trisurf(S{idx}.tri, ...
             S{idx}.coord(1,:), ...
             S{idx}.coord(2,:), ...
@@ -95,9 +95,9 @@ for ii = 1:size(D,2)
     h.cb(ii).FontSize = 14;
 end
 
-% Add labels
+% Add labels         
 for ii = 1:numel(label_text)
     h.text(ii) = text(h.axes(1,ii),-.2,.5,label_text{ii},'Rotation',90, ...
         'Units','Normalized','HorizontalAlignment','center', 'FontName', ...
-        'DroidSans','FontSize',16);
+        'DroidSans','FontSize',18);
 end

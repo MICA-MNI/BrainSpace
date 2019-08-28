@@ -40,11 +40,13 @@ at three different kernels.
         gm_k{ii} = gm_k{ii}.fit(conn_matrix);
     end
     
+    label_text = {'Pearson','Spearman',{'Normalized','Angle'}};
     plot_hemispheres([gm_k{1}.gradients{1}(:,1), ...
         gm_k{2}.gradients{1}(:,1), ...
         gm_k{3}.gradients{1}(:,1)], ...
         {surf_lh,surf_rh}, ...
-        'parcellation', labeling);
+        'parcellation', labeling, ...
+        'labeltext',label_text);
     
 .. image:: ./example_figs/g1_schaefer_400_kernel.png
     :scale: 70%
@@ -58,6 +60,7 @@ techniques.
  
 .. code-block:: matlab    
     
+    % Compute gradients for every approach.
     embeddings = {'principalComponentanAnalysis', ...
                   'laplacianEigenmap', ...
                   'diffusionEmbedding'}; % case-insensitve
@@ -66,11 +69,15 @@ techniques.
         gm_m{ii} = gm_m{ii}.fit(conn_matrix);
     end
     
+    % Plot all to one figure. 
+    label_text = {{'Principal','Component Analysis'}, ...
+        {'Laplacian','Eigenmap'}, {'Diffusion','Map Embedding'}};
     plot_hemispheres([gm_m{1}.gradients{1}(:,1), ...
         gm_m{2}.gradients{1}(:,1), ...
         gm_m{3}.gradients{1}(:,1)], ...
         {surf_lh,surf_rh}, ...
-        'parcellation', labeling);
+        'parcellation', labeling, ...
+        'labeltext', label_text);
     
 .. image:: ./example_figs/g1_schaefer_400_approach.png
     :scale: 70%
@@ -85,14 +92,16 @@ multiply either the LM and DM gradient by -1 to make them more comparable.
 A more principled way of increasing comparability across gradients are alignment
 techniques. BrainSpace provides two alignment techniques: Procrustes analysis,
 and joint alignment. For this example we will load functional connectivity data
-of a second subject group and align it with the first group.  
+of a second subject group and align it with the first group using a normalized
+angle kernel and laplacian eigenmap approach.  
 
 .. code-block:: matlab    
     
     conn_matrix2 = load_group_fc('schaefer',400,'holdout');
-    Gp = GradientMaps('kernel','na','manifold','le','alignment','pa');
-    Gj = GradientMaps('kernel','na','manifold','le','alignment','ja');
-    
+    conn_matrix2 = conn_matrix2.schaefer_400;
+    Gp = GradientMaps('kernel','na','approach','le','alignment','pa');
+    Gj = GradientMaps('kernel','na','approach','le','alignment','ja');
+
     Gp = Gp.fit({conn_matrix2,conn_matrix});
     Gj = Gj.fit({conn_matrix2,conn_matrix});
 
@@ -102,8 +111,9 @@ aligned data. Let's plot them, but in separate figures to keep things organized.
 
 .. code-block:: matlab    
     
-    plot_hemispheres({Gp.gradients{1}(:,1),Gp.gradients{2}(:,1)}, ...
-        {surf_lh,surf_rh}, 'parcellation', labeling);
+    plot_hemispheres([Gp.gradients{1}(:,1),Gp.gradients{2}(:,1)], ...
+        {surf_lh,surf_rh}, 'parcellation', labeling, ...
+        'labeltext',{'Unaligned Group 1','Unaligned Group 2'});
     
 .. image:: ./example_figs/g1_main_holdout_noalign.png
     :scale: 70%
@@ -111,9 +121,9 @@ aligned data. Let's plot them, but in separate figures to keep things organized.
 
 .. code-block:: matlab    
     
-    h1 = plot_hemispheres({Gp.aligned{1}(:,1),Gp.aligned{2}(:,1)}, ...
-        {surf_lh,surf_rh},labeling);
-    h1.figure.Name = 'Procrustes';
+    plot_hemispheres([Gp.aligned{1}(:,1),Gp.aligned{2}(:,1)], ...
+        {surf_lh,surf_rh},'parcellation',labeling, ...
+        'labeltext',{'Procrustes Group 1','Procrustes Group 2'});
     
 .. image:: ./example_figs/g1_main_holdout_procrustes.png
     :scale: 70%
@@ -121,10 +131,9 @@ aligned data. Let's plot them, but in separate figures to keep things organized.
     
 .. code-block:: matlab    
     
-    h2 = plot_hemispheres({Gj.aligned{1}(:,1),Gj.aligned{2}(:,1)}, ...
-        {surf_lh,surf_rh},'parcellation',labeling);
-    h2.figure.Name = 'Joint';
-    
+    plot_hemispheres([Gj.aligned{1}(:,1),Gj.aligned{2}(:,1)], ...
+        {surf_lh,surf_rh},'parcellation',labeling, ...
+        'labeltext',{'Joint Group 1','Joint Group 2'});
     
 .. image:: ./example_figs/g1_main_holdout_joint.png
     :scale: 70%

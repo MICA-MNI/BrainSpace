@@ -134,7 +134,7 @@ classdef GradientMaps
                                     obj.method.alignment = 'None';
                                 case {'pa','procrustes','procrustes analysis','procrustesanalysis'}
                                     obj.method.alignment = 'Procrustes Analysis';
-                                case {'j','joint','jointalignment'}
+                                case {'ja','joint','jointalignment'}
                                     obj.method.alignment = 'Joint Alignment';
                             end
                             change_string{end+1} = (['Set the alignment to: ' obj.method.alignment '.']);
