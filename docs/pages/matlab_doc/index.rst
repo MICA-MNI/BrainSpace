@@ -20,10 +20,16 @@ Tutorials
 Main Functionality
 --------------------
 .. toctree::
-   :glob:
    :maxdepth: 1
 
-   main_functionality/*
+   main_functionality/gradientmaps
+   main_functionality/convert_surface
+   main_functionality/combine_surfaces
+   main_functionality/spin_permutations
+   main_functionality/compute_mem
+   main_functionality/moran_randomization
+   main_functionality/full2parcel
+   main_functionality/parcel2full
 
 Visualization
 ---------------

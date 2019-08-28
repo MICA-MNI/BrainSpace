@@ -32,7 +32,9 @@ at three different kernels.
     
 .. code-block:: matlab    
     
-    kernels = {'p','sm','na'};
+    kernels = {'pearson', ...
+               'spearman', ...
+               'normalizedAngle'}; % Case-insensitive
     for ii = 1:numel(kernels)
         gm_k{ii} = GradientMaps('kernel',kernels{ii},'approach','dm');
         gm_k{ii} = gm_k{ii}.fit(conn_matrix);
@@ -56,7 +58,9 @@ techniques.
  
 .. code-block:: matlab    
     
-    embeddings = {'pca','le','dm'};
+    embeddings = {'principalComponentanAnalysis', ...
+                  'laplacianEigenmap', ...
+                  'diffusionEmbedding'}; % case-insensitve
     for ii = 1:numel(embeddings)
         gm_m{ii} = GradientMaps('kernel','na','approach',embeddings{ii});
         gm_m{ii} = gm_m{ii}.fit(conn_matrix);
