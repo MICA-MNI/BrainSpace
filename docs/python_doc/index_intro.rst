@@ -72,7 +72,7 @@ objects <https://scikit-learn.org/dev/developers/contributing.html#apis-of-sciki
     >>> np.sum(np.square(gm.aligned_[0] - gm.aligned_[1]))
     1.4615624326798128e-05
 
-#. We can also change the embedding approach using 'dm' or an object of :class:`.DifusionMaps`::
+#. We can also change the embedding approach using 'dm' or an object of :class:`.DiffusionMaps`::
 
     >>> # In this case we will pass an object
     >>> from brainspace.gradient import DiffusionMaps
