@@ -10,6 +10,7 @@ import warnings
 
 import numpy as np
 from scipy.stats import rankdata
+from scipy.spatial.distance import pdist, squareform
 
 from sklearn.metrics.pairwise import cosine_similarity, rbf_kernel
 
@@ -65,8 +66,9 @@ def compute_affinity(x, kernel=None, sparsity=.9, gamma=None):
         a = np.corrcoef(x)
 
     elif kernel in {'cosine', 'normalized_angle'}:
-        a = cosine_similarity(x)
-        np.fill_diagonal(a, 1)
+        # a = cosine_similarity(x)
+        # np.fill_diagonal(a, 1)
+        a = 1 - squareform(pdist(x, metric='cosine'))
         if kernel == 'normalized_angle':
             a = 1 - np.arccos(a, a)/np.pi
 
