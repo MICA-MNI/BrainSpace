@@ -12,7 +12,7 @@ As before, we'll start by loading the sample data.
 
 .. code-block:: matlab    
 
-    addpath(genpath('/Users/reinder/Github/BrainSpace/matlab'));
+    addpath(genpath('/path/to/BrainSpace/matlab'));
     
     % First load mean connectivity matrix and Schaefer parcellation
     conn_matrix = load_group_fc('schaefer',400);
