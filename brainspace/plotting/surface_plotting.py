@@ -235,6 +235,9 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
     layout = ['lh', 'lh', 'rh', 'rh']
     view = ['medial', 'lateral', 'medial', 'lateral']
 
+    if isinstance(array_name, np.ndarray) and array_name.ndim == 2:
+        array_name = [a for a in array_name]
+
     if isinstance(array_name, list):
         layout = [layout] * len(array_name)
         array_name2 = []
@@ -249,8 +252,9 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, nan_color=(0, 0, 0, 1),
         array_name = np.asarray(array_name2)[:, None]
     elif isinstance(array_name, np.ndarray):
         n_pts_lh = surf_lh.n_points
-        array_name = surf_lh.append_array(array_name[:n_pts_lh], at='p')
-        surf_rh.append_array(array_name[n_pts_lh:], name=array_name, at='p')
+        array_name2 = surf_lh.append_array(array_name[:n_pts_lh], at='p')
+        surf_rh.append_array(array_name[n_pts_lh:], name=array_name2, at='p')
+        array_name = array_name2
 
     if isinstance(cmap_name, list):
         cmap_name = np.asarray(cmap_name)[:, None]

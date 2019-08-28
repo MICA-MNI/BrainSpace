@@ -64,8 +64,13 @@ def load_parcellation(name, n_parcels=400):
     return np.loadtxt(ipth, dtype=np.int)
 
 
-def load_mask():
+def load_mask(region=None):
     """ Load mask for conte69.
+
+    Parameters
+    ----------
+    region : {'temporal'} or None, optional
+        Region name. If None, load mask for all cortex. Default is None.
 
     Returns
     -------
@@ -74,8 +79,14 @@ def load_mask():
     """
 
     root_pth = dirname(__file__)
-    ipth_lh = join(root_pth, 'surfaces/conte69_32k_lh_mask.csv')
-    ipth_rh = join(root_pth, 'surfaces/conte69_32k_rh_mask.csv')
+    ipth_lh = join(root_pth, 'surfaces/conte69_32k_lh{}_mask.csv')
+    ipth_rh = join(root_pth, 'surfaces/conte69_32k_rh{}_mask.csv')
+    if region is None:
+        region = ''
+    else:
+        region = '_' + region
+    ipth_lh = ipth_lh.format(region)
+    ipth_rh = ipth_rh.format(region)
     mask_lh = np.loadtxt(ipth_lh, dtype=np.bool)
     mask_rh = np.loadtxt(ipth_rh, dtype=np.bool)
     return np.concatenate([mask_lh, mask_rh])
@@ -132,7 +143,7 @@ def _load_feat(feat_name, parcellation=None, mask=None):
     if parcellation is not None:
         if mask is not None:
             parcellation = parcellation[mask]
-        x = reduce_by_labels(x, parcellation, red_op='mean')[0]
+        x = reduce_by_labels(x, parcellation, red_op='mean')
     return x
 
 
@@ -176,6 +187,28 @@ def load_t1t2(parcellation=None, mask=None):
     """
 
     x = _load_feat('conte69_32k_t1wt2w', parcellation=parcellation,
+                   mask=mask)
+    return x
+
+
+def load_curvature(parcellation=None, mask=None):
+    """ Load curvature data for conte69 surface.
+
+    Parameters
+    ----------
+    parcellation : 1D ndarray, optional
+        Data is reduced according to the parcellation labeling.
+        Default is None.
+    mask : 1D ndarray, optional
+        Boolean mask. Only return points within mask. Default is None.
+
+    Returns
+    -------
+    myelin : 1D ndarray
+        Array with curvature data.
+    """
+
+    x = _load_feat('conte69_32k_curvature', parcellation=parcellation,
                    mask=mask)
     return x
 
