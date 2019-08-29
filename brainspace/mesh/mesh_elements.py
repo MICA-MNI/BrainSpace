@@ -536,24 +536,32 @@ def get_ring_distance(surf, n_ring=1, metric='geodesic', mask=None,
     # Geodesic distance is computed for each point based only on the points
     # in its ring
     if metric == 'geodesic':
-        d = get_ring_adjacency(surf, n_ring=n_ring, mask=mask,
+        d = get_ring_adjacency(surf, n_ring=n_ring, mask=None,
                                include_self=True, dtype=dtype)
     else:
         d = get_ring_adjacency(surf, n_ring=n_ring, mask=mask,
                                include_self=False, dtype=dtype)
 
-    n_pts = surf.GetNumberOfPoints() if mask is None else np.count_nonzero(mask)
     if metric == 'geodesic':
-        imm_dist = get_immediate_distance(surf, mask=mask, dtype=dtype)
+        imm_dist = get_immediate_distance(surf, mask=None, dtype=dtype)
+
+        n_pts = surf.GetNumberOfPoints()
         for i in range(n_pts):
+            if mask is not None and not mask[i]:
+                continue
             idx = d[i].indices
             idx_pnt = np.argmax(idx == i)
             d.data[d.indptr[i]:d.indptr[i+1]] = \
                 dijkstra(csgraph=imm_dist[idx][:, idx], indices=idx_pnt)
 
+        if mask is not None:
+            d = d[mask][:, mask]
+
+        d.eliminate_zeros()
+
     elif metric in ['euclidean', 'sqeuclidean']:
         points = get_points(surf, mask=mask)
-        for i in range(n_pts):
+        for i in range(points.shape[0]):
             idx = d[i].indices
             d.data[d.indptr[i]:d.indptr[i+1]] = \
                 cdist(points[i:i+1], points[idx], metric=metric)
