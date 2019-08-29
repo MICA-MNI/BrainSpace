@@ -113,6 +113,7 @@ Let's plot the first gradient.
 
 
    .. code-tab:: matlab
+
         % Plot the first gradient on the cortical surface.
         plot_hemispheres(gm.gradients{1}(:,1), {surf_lh,surf_rh});
 
