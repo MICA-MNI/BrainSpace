@@ -12,9 +12,9 @@ Let's start by loading the data:
 
    .. code-tab:: py
 
-        >>> from brainspace.data.base import load_conte69
+        >>> from brainspace.datasets import load_conte69
 
-        >>> # Load left and right hemisphere
+        >>> # Load left and right hemispheres
         >>> surf_lh, surf_rh = load_conte69()
         >>> surf_lh.n_points
         32492
@@ -24,8 +24,11 @@ Let's start by loading the data:
 
    .. code-tab:: matlab
 
-         addpath('/path/to/micasoft/BrainSpace/matlab');
-         [surf_lh, surf_rh] = load_conte69();
+        addpath('/path/to/micasoft/BrainSpace/matlab');
+
+        % Load left and right hemispheres
+        [surf_lh, surf_rh] = load_conte69();
+
 
 We can plot the surfaces:
 
@@ -35,8 +38,7 @@ We can plot the surfaces:
 
         >>> from brainspace.plotting import plot_hemispheres
         >>> plot_hemispheres(surf_lh, surf_rh, interactive=False,
-        ...                  embed_nb=True, size=(800, 200),
-        ...                  color=(0, 0.5, 0.9))
+        ...                  embed_nb=True, size=(800, 200))
 
    .. code-tab:: matlab
 
@@ -57,7 +59,7 @@ matrices subdivided based on functional parcellations `(Schaefer et al., 2017)
 
    .. code-tab:: py
 
-        >>> from brainspace.data.base import load_group_hcp
+        >>> from brainspace.datasets import load_group_hcp
         >>> m = load_group_hcp('schaefer', n_parcels=400)
         >>> m.shape
         (400, 400)
@@ -77,14 +79,13 @@ fit the model to our data:
 
         >>> from brainspace.gradient import GradientMaps
 
-        >>> # create gradient mapper using diffusion maps and normalized angle
-        >>> # gradients will be aligned using procrustes analysis
-        >>> gm = GradientMaps(n_gradients=2, approach='dm', kernel='normalized_angle',
-        ...                   align=None, random_state=0)
+        >>> # Build gradients using diffusion maps and normalized angle
+        >>> gm = GradientMaps(n_gradients=2, approach='dm',
+        ...                   kernel='normalized_angle', random_state=0)
 
         >>> # and fit to the data
         >>> gm = gm.fit(m)
-        GradientMaps(align=None, approach='dm', kernel='normalized_angle',
+        GradientMaps(alignment=None, approach='dm', kernel='normalized_angle',
                      n_gradients=2, random_state=0)
 
         >>> # The gradients are in
@@ -93,10 +94,10 @@ fit the model to our data:
 
    .. code-tab:: matlab
 
-        % Create gradient mapper using diffusion maps and normalized angle
+        % Build gradients using diffusion maps and normalized angle
         gm = GradientMaps('kernel','na','approach','dm','n_components',2);
 
-        % Fit the data with this gradient mapper.
+        % and fit to the data
         gm = gm.fit(m);
 
 
@@ -106,21 +107,13 @@ Let's plot the first gradient.
 
    .. code-tab:: py
 
-        >>> n_pts_lh = surf_lh.n_points
-
-        >>> # We need to append the first gradient to the left hemisphere
-        >>> surf_lh.append_array(gm.gradients_[:n_pts_lh, 0], name='gradient1', at='points')
-
-        >>> # and right hemisphere
-        >>> surf_rh.append_array(gm.gradients_[n_pts_lh:, 0], name='gradient1', at='points')
-
-        >>> # now, plotting
-        >>> plot_hemispheres(surf_lh, surf_rh, array_name='gradient1',
+        >>> # Plot first gradient on the cortical surface.
+        >>> plot_hemispheres(surf_lh, surf_rh, array_name=gm.gradients_[:, 0],
         ...                  interactive=False, embed_nb=True, size=(800, 200))
 
 
    .. code-tab:: matlab
-        % Plot the first gradient on the cortical surface. 
+        % Plot the first gradient on the cortical surface.
         plot_hemispheres(gm.gradients{1}(:,1), {surf_lh,surf_rh});
 
 

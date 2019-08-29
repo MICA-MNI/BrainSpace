@@ -32,15 +32,15 @@ objects <https://scikit-learn.org/dev/developers/contributing.html#apis-of-sciki
     >>> # use Laplacian eigenmaps (i.e., 'le') to find the gradients
     >>> # and align gradients using procrustes
     >>> gm = GradientMaps(n_gradients=2, approach='le', kernel='normalized_angle',
-    ...                   align='procrustes')
+    ...                   alignment='procrustes')
 
 
 #. Now we can compute the gradients for the two datasets by invoking the :meth:`~.GradientMaps.fit` method::
 
     >>> # Note that multiple datasets are passed as a list
     >>> gm.fit([x1, x2])
-    GradientMaps(align='procrustes', approach='le', kernel='normalized_angle',
-       n_gradients=2, random_state=0)
+    GradientMaps(alignment='procrustes', approach='le', kernel='normalized_angle',
+       n_gradients=2, random_state=None)
 
 #. The object has 3 important attributes: eigenvalues, gradients, and aligned gradients::
 
@@ -80,11 +80,11 @@ objects <https://scikit-learn.org/dev/developers/contributing.html#apis-of-sciki
 
     >>> # let's create a new gm object with the new embedding approach
     >>> gm2 = GradientMaps(n_gradients=2, approach=dm, kernel='normalized_angle',
-    ...                    align='procrustes')
+    ...                    alignment='procrustes')
 
     >>> # and fit to the data
     >>> gm2.fit([x1, x2])
-    GradientMaps(align='procrustes',
+    GradientMaps(alignment='procrustes',
                  approach=DiffusionMaps(alpha=1, diffusion_time=0,
                                         n_components=2, random_state=None),
                  kernel='normalized_angle', n_gradients=2, random_state=None)
@@ -101,9 +101,9 @@ objects <https://scikit-learn.org/dev/developers/contributing.html#apis-of-sciki
 #. If we try a different alignment method::
 
     >>> gm3 = GradientMaps(n_gradients=2, approach='le', kernel='normalized_angle',
-    ...                    align='manifold')
+    ...                    alignment='joint')
     >>> gm3.fit([x1, x2])
-    GradientMaps(align='manifold', approach='le', kernel='normalized_angle',
+    GradientMaps(alignment='joint', approach='le', kernel='normalized_angle',
                  n_gradients=2, random_state=None)
 
     >>> # the disparity between the gradients
@@ -147,9 +147,10 @@ following functionality:
 
 #. :meth:`~.BSVTKObjectWrapper.setVTK` and :meth:`~.BSVTKObjectWrapper.getVTK` to invoke several setter/getter methods on the VTK object: ::
 
+    >>> import vtk
+
     >>> # Let's create a sphere with VTK
-    >>> from vtkmodules.vtkCommonDataModelPython import vtkSphere
-    >>> s = vtkSphere()
+    >>> s = vtk.vtkSphere()
     >>> s
     (vtkCommonDataModelPython.vtkSphere)0x7f610d222f48
 
@@ -241,7 +242,7 @@ at least, for methods with more that one word: ::
 
 :func:`.wrap_vtk` provides a nice way to wrap and simultaneously set the values for a VTK object: ::
 
-    >>> ws2 = wrap_vtk(vtkSphere(), radius=10, center=(5, 5, 0))
+    >>> ws2 = wrap_vtk(vtk.vtkSphere(), radius=10, center=(5, 5, 0))
     >>> ws2.getVTK('radius', 'center')
     {'radius': 10.0, 'center': (5.0, 5.0, 0.0)}
 
@@ -255,8 +256,7 @@ In VTK, among setter methods, we have state methods with the form **Set**\ Somet
 Using the previous functionality, these methods can be called as follows: ::
 
     >>> # Let's create a mapper
-    >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
-    >>> m = vtkPolyDataMapper()
+    >>> m = vtk.vtkPolyDataMapper()
 
     >>> # This class has several state methods to set the color mode
     >>> [m for m in dir(m) if m.startswith('SetColorModeTo')]
@@ -296,8 +296,7 @@ convenient wrapper by searching the hierarchy of wrappers in a bottom-up fashion
 and :class:`~.BSPolyDataMapper` is a wrapper that is already implemented in the
 current version of BrainSpace. We can also see this with VTK actor: ::
 
-    >>> from vtkmodules.vtkRenderingCorePython import vtkActor
-    >>> wa = wrap_vtk(vtkActor())
+    >>> wa = wrap_vtk(vtk.vtkActor())
     >>> wa
     <brainspace.vtk_interface.wrappers.BSActor at 0x7f60cd749e80>
 
@@ -360,8 +359,6 @@ Pipeline liaisons
 ^^^^^^^^^^^^^^^^^
 VTK workflow is based on connecting (a source to) several filters (and to a sink).
 This often makes the code very cumbersome. Let's see a dummy example: ::
-
-    >>> import vtk
 
     >>> # Generate point cloud
     >>> point_source = vtk.vtkPointSource()
