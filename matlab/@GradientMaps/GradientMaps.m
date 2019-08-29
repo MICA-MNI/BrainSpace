@@ -97,7 +97,7 @@ classdef GradientMaps
                                     obj.method.kernel = 'Spearman';
                                 case {'g','gaussian'}
                                     obj.method.kernel = 'Gaussian';
-                                case {'cs','cosine','cosine similarity','cossim','cosine_similarity'}
+                                case {'cs','cosine','cosine similarity','cossim','cosine_similarity','cosinesimilarity'}
                                     obj.method.kernel = 'Cosine Similarity';
                                 case {'na','normalized angle','normalizedangle','normangle','normalized_angle'}
                                     obj.method.kernel = 'Normalized Angle';
@@ -113,7 +113,7 @@ classdef GradientMaps
                             change_string{end+1} = ('Set the approach to a custom function handle.');
                         else
                             switch lower(varargin{ii+1})
-                                case {'pca','principalcomponentananalysis','principal component analysis'}
+                                case {'pca','principalcomponentanalysis','principal component analysis'}
                                     obj.method.approach = 'Principal Component Analysis';
                                 case {'dm','diffusion embedding','diffusionembedding','diffemb'}
                                     obj.method.approach = 'Diffusion Embedding';
@@ -130,7 +130,7 @@ classdef GradientMaps
                             change_string{end+1} = ('Set the alignment to a custom function handle.');
                         else
                             switch lower(varargin{ii+1})
-                                case 'none'
+                                case {'','none'}
                                     obj.method.alignment = 'None';
                                 case {'pa','procrustes','procrustes analysis','procrustesanalysis'}
                                     obj.method.alignment = 'Procrustes Analysis';

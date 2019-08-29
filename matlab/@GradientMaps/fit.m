@@ -19,7 +19,7 @@ function obj = fit(obj,connectivity_matrix,varargin)
 %   - Alignment arguments
 %       - niterations (default: 100)
 %           - Any integer
-%       - first_alignment_target (default: none)
+%       - reference (default: nan)
 %           A matrix with equivalent size to that of the gradient matrix.
 %
 % For complete documentation please consult our <a
@@ -50,6 +50,13 @@ if ~iscell(connectivity_matrix)
     connectivity_matrix = {connectivity_matrix};
 end
 
+% Most of MATLAB's operations default are column-wise, but we define rows to
+% be seeds. The easiest solution is to just transpose at the start, rather
+% than transpose at every operation.
+for ii = 1:numel(connectivity_matrix)
+    connectivity_matrix{ii} = connectivity_matrix{ii}';
+end
+    
 disp('Running gradient analysis...');
 if isa(obj.method.kernel,'char')
     disp(['Kernel: ' obj.method.kernel]);
