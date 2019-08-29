@@ -6,7 +6,8 @@ Getting Started
 BrainSpace offers a wide variety of approaches to build gradients. Here we will
 go through the basics to start using BrainSpace.
 
-Let's start by loading the data:
+The packages comes with the conte69 surface, and several cortical features and
+parcellations. Let's start by loading the conte69 surfaces:
 
 .. tabs::
 
@@ -30,7 +31,10 @@ Let's start by loading the data:
         [surf_lh, surf_rh] = load_conte69();
 
 
-We can plot the surfaces:
+To load your own surfaces, you can use our Matlab :func:`.convert_surface`
+function and :func:`.load_surface` when using Python. BrainSpace also provides
+surface plotting functionality. We can plot the conte69 hemisphere surfaces as
+follows:
 
 .. tabs::
 
@@ -51,7 +55,7 @@ We can plot the surfaces:
 
 
 Let's load a mean functional connectivity matrix built from a subset of the Human
-Connectome Project Young Adult cohort. This package comes with connectivity
+Connectome Project Young Adult cohort. BrainSpace comes with connectivity
 matrices subdivided based on functional parcellations `(Schaefer et al., 2017)
 <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. 
 
@@ -70,8 +74,9 @@ matrices subdivided based on functional parcellations `(Schaefer et al., 2017)
         conn_matices = load_group_hcp('schaefer',400);
         m = conn_matices.schaefer_400; 
 
-To compute the gradients of `m` we create the `GradientMaps` object and
-fit the model to our data:
+To compute the gradients of our connectivity matrix `m` we create the
+`GradientMaps` object and fit the model to our data:
+
 
 .. tabs::
 
@@ -101,7 +106,7 @@ fit the model to our data:
         gm = gm.fit(m);
 
 
-Let's plot the first gradient.
+Now we can visually inspect the gradients. Let's plot the first gradient:
 
 .. tabs::
 
@@ -109,7 +114,7 @@ Let's plot the first gradient.
 
         >>> # Plot first gradient on the cortical surface.
         >>> plot_hemispheres(surf_lh, surf_rh, array_name=gm.gradients_[:, 0],
-        ...                  interactive=False, embed_nb=True, size=(800, 200))
+        ...                  size=(800, 200))
 
 
    .. code-tab:: matlab
