@@ -187,7 +187,7 @@ def load_thickness(parcellation=None, mask=None):
 
 
 def load_t1t2(parcellation=None, mask=None):
-    """ Load myelin data (t1t2) for conte69 surface.
+    """ Load t1/t2 data for conte69 surface.
 
     Parameters
     ----------
@@ -199,8 +199,8 @@ def load_t1t2(parcellation=None, mask=None):
 
     Returns
     -------
-    myelin : 1D ndarray
-        Array with myelin data.
+    t1t2 : 1D ndarray
+        Array with t1/t2 data.
     """
 
     x = _load_feat('conte69_32k_t1wt2w', parcellation=parcellation,
@@ -221,7 +221,7 @@ def load_curvature(parcellation=None, mask=None):
 
     Returns
     -------
-    myelin : 1D ndarray
+    curv : 1D ndarray
         Array with curvature data.
     """
 
