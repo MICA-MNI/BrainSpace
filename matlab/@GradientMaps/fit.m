@@ -80,7 +80,7 @@ if strcmp(obj.method.alignment,'Joint Alignment')
         tmp = cat(2,connectivity_matrix{:});
     catch ME
         if strcmp(ME.identifier,'MATLAB:catenate:dimensionMismatch')
-            error('Joint alignment requires that matrices have the same number of columns.')
+            error('Joint alignment requires that matrices have the same number of features.')
         else
             rethrow(ME)
         end
@@ -95,6 +95,11 @@ for ii = 1:N
     % Apply the kernel
     kernel_data = obj.kernels(connectivity_matrix{ii},kernel_arg{:});
 
+    % Check for Infs or NaNs in the kernel data
+    if any(isnan(kernel_data(:))) || any(isinf(kernel_data(:)))
+        error('Detected NaNs or Infs in the kernel data.');
+    end
+    
     % Run the embedding
     if isa(obj.method.approach,'char')
         [obj.gradients{ii}, obj.lambda{ii}] = ...
@@ -103,8 +108,6 @@ for ii = 1:N
         obj.gradients{ii} = obj.method.approach(kernel_data); 
     end
     disp('Stored (unaligned) results in the gradients field.');
-    
-
 end
 
 %Run the alignment

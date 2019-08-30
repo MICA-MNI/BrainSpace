@@ -199,7 +199,18 @@ classdef GradientMaps
                     error('Unknown kernel method');
             end
             
-            kernel_data(kernel_data < 0) = 0; 
+            % Check for negative numbers.
+            if any(kernel_data(:) < 0)
+                disp('Found negative numbers in the kernel matrix. These will be set to zero.');
+                kernel_data(kernel_data < 0) = 0; 
+            end
+            
+            % Check for vectors of zeros. 
+            if any(all(kernel_data == 0))
+                error(['After thresholding, a complete vector in the kernel ' ...
+                    'matrix consists of zeros. Consider using a kernel that ' ...
+                    'does not allow for negative numbers (e.g. normalized angle).']); 
+            end
             
             if ~issymmetric(kernel_data)
                 if max(max(abs(kernel_data - kernel_data'))) < p.Results.tolerance
