@@ -10,6 +10,23 @@ from ..vtk_interface import wrap_vtk, serial_connect
 
 
 def load_holdout_hcp(name, n_parcels=400):
+    """ Load holdout connectivity matrix for a given parcellation.
+
+    Connectivity is derived from a holdout subset of HCP data.
+
+    Parameters
+    ----------
+    name : {'schaefer', 'vosdewael'}
+        Parcellation name.
+    n_parcels : {100, 200, 300, 400}, optional
+        Number of parcels. Default is 400.
+
+    Returns
+    -------
+    conn : 2D ndarray, shape = (n_parcels, n_parcels)
+        Connectivity matrix.
+    """
+
     root_pth = dirname(__file__)
     fname = '{name}_{np}_mean_connectivity_matrix.csv'.format(name=name,
                                                               np=n_parcels)

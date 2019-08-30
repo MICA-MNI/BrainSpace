@@ -315,7 +315,7 @@ def get_ring_adjacency(surf, n_ring=1, include_self=True, mask=None,
         return get_immediate_adjacency(surf, include_self=include_self,
                                        mask=mask, dtype=dtype)
 
-    adj = get_immediate_adjacency(surf, include_self=False, mask=mask,
+    adj = get_immediate_adjacency(surf, include_self=True, mask=mask,
                                   dtype=np.bool)
     adj **= n_ring
     if not include_self:
@@ -532,28 +532,31 @@ def get_ring_distance(surf, n_ring=1, metric='geodesic', mask=None,
     if n_ring == 1:
         return get_immediate_distance(surf, mask=mask, dtype=dtype)
 
-    # Distance only restricted to ring
-    # Geodesic distance is computed for each point based only on the points
-    # in its ring
-    if metric == 'geodesic':
-        d = get_ring_adjacency(surf, n_ring=n_ring, mask=mask,
-                               include_self=True, dtype=dtype)
-    else:
-        d = get_ring_adjacency(surf, n_ring=n_ring, mask=mask,
-                               include_self=False, dtype=dtype)
-
-    n_pts = surf.GetNumberOfPoints() if mask is None else np.count_nonzero(mask)
     if metric == 'geodesic':
         imm_dist = get_immediate_distance(surf, mask=mask, dtype=dtype)
-        for i in range(n_pts):
+
+        # Faster
+        d = get_ring_adjacency(surf, n_ring=n_ring, mask=mask,
+                               include_self=True, dtype=dtype)
+        for i in range(imm_dist.shape[0]):
             idx = d[i].indices
             idx_pnt = np.argmax(idx == i)
-            d.data[d.indptr[i]:d.indptr[i+1]] = \
+            d.data[d.indptr[i]:d.indptr[i + 1]] = \
                 dijkstra(csgraph=imm_dist[idx][:, idx], indices=idx_pnt)
+        d.eliminate_zeros()
+
+        # Slower
+        # d = get_ring_adjacency(surf, n_ring=n_ring, mask=mask,
+        #                        include_self=False)
+        # d = d.multiply(dijkstra(imm_dist)).astype(dtype)
+
+        d.data[np.isinf(d.data)] = 0
 
     elif metric in ['euclidean', 'sqeuclidean']:
+        d = get_ring_adjacency(surf, n_ring=n_ring, mask=mask,
+                               include_self=False, dtype=dtype)
         points = get_points(surf, mask=mask)
-        for i in range(n_pts):
+        for i in range(points.shape[0]):
             idx = d[i].indices
             d.data[d.indptr[i]:d.indptr[i+1]] = \
                 cdist(points[i:i+1], points[idx], metric=metric)

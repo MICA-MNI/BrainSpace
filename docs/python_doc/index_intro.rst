@@ -116,11 +116,10 @@ objects <https://scikit-learn.org/dev/developers/contributing.html#apis-of-sciki
 
 
 
-
 VTK wrapping
 -------------
 
-All surface mesh functionalities provided in BrainSpace is built on top of the
+Surface mesh functionality provided in BrainSpace is built on top of the
 `Visualization Toolkit (VTK) <https://vtk.org/>`_. BrainSpace provides several
 wrappers for most data objects and some filters in VTK. Here we present
 a subset of this functionality.
