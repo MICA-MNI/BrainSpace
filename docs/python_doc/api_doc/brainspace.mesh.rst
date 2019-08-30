@@ -1,3 +1,6 @@
+
+.. _pymod-mesh:
+
 Mesh
 =======================
 
@@ -5,14 +8,16 @@ BrainSpace provides basic functionality for working with surface meshes. This
 functionality is built on top of the
 `Visualization Toolkit (VTK) <https://vtk.org/>`_.
 
-- :ref:`Read/Write functionality<Read/Write functionality>`
-- :ref:`Surface creation<Surface creation>`
-- :ref:`Elements<Elements>`
-- :ref:`Connectivity<Connectivity>`
-- :ref:`Operations on meshes<Operations on meshes>`
-- :ref:`Operations on mesh data<Operations on mesh data>`
-- :ref:`Mesh clustering<Mesh clustering>`
+- :ref:`pysec-mesh-io`
+- :ref:`pysec-mesh-creation`
+- :ref:`pysec-mesh-elements`
+- :ref:`pysec-mesh-connectivity`
+- :ref:`pysec-mesh-mesh_operations`
+- :ref:`pysec-mesh-array_operations`
+- :ref:`pysec-mesh-mesh_clustering`
 
+
+.. _pysec-mesh-io:
 
 Read/Write functionality
 -------------------------
@@ -27,6 +32,8 @@ Read/Write functionality
    save_surface
 
 
+.. _pysec-mesh-creation:
+
 Surface creation
 -------------------------
 
@@ -39,6 +46,8 @@ Surface creation
    to_lines
    to_vertex
 
+
+.. _pysec-mesh-elements:
 
 Elements
 ------------------------------
@@ -53,6 +62,8 @@ Elements
    get_points
    get_edges
 
+
+.. _pysec-mesh-connectivity:
 
 Connectivity
 ------------------------------
@@ -75,6 +86,8 @@ Connectivity
    get_ring_distance
 
 
+.. _pysec-mesh-mesh_operations:
+
 Operations on meshes
 ---------------------
 
@@ -92,6 +105,8 @@ Operations on meshes
    mask_points
    select_points
 
+
+.. _pysec-mesh-array_operations:
 
 Operations on mesh data
 -----------------------
@@ -117,7 +132,7 @@ Operations on mesh data
 
 
 
-
+.. _pysec-mesh-mesh_clustering:
 
 Mesh clustering
 -----------------------

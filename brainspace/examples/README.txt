@@ -1,7 +1,7 @@
 .. _examples_index:
 
-Examples
-========
+Tutorials
+=========
 
 .. contents:: **Contents**
     :local:

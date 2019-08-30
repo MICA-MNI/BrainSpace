@@ -1,12 +1,18 @@
+
+.. _pymod-datasets:
+
 Datasets
 ===========================
 
-- :ref:`Surfaces<Surfaces>`
-- :ref:`Cortical features<Cortical features>`
-- :ref:`Connectivity matrices<Connectivity matrices>`
+- :ref:`pysec-datasets-surfaces`
+- :ref:`pysec-datasets-cortical_features`
+- :ref:`pysec-datasets-connectivity_matrices`
 
 
 .. currentmodule:: brainspace.datasets.base
+
+
+.. _pysec-datasets-surfaces:
 
 Surfaces
 ------------
@@ -16,6 +22,8 @@ Surfaces
 
     load_conte69
 
+
+.. _pysec-datasets-cortical_features:
 
 Cortical features
 ------------------
@@ -30,6 +38,8 @@ Cortical features
     load_t1t2
     load_gradient
 
+
+.. _pysec-datasets-connectivity_matrices:
 
 Connectivity matrices
 ----------------------

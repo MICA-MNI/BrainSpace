@@ -1,11 +1,15 @@
+
+.. _pymod-nullmodels:
+
 Null models
 ===============================
 
-- :ref:`Spin permutations<Spin permutations>`
-- :ref:`Moran spectral randomization<Moran spectral randomization>`
+- :ref:`pysec-nullmodels-spin`
+- :ref:`pysec-nullmodels-moran`
 
 
 
+.. _pysec-nullmodels-spin:
 
 Spin permutations
 -------------------------
@@ -19,6 +23,8 @@ Spin permutations
    SpinRandomization
    generate_spin_samples
 
+
+.. _pysec-nullmodels-moran:
 
 Moran spectral randomization
 -----------------------------

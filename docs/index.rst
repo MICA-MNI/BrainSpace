@@ -44,4 +44,5 @@ Support
 
 If you have problems installing the software or questions about usage,
 documentation or something else related to BrainSpace, you can post to the
-Issues section of our repository.
+`Issues <https://github.com/MICA-MNI/BrainSpace/issues>`_ section of our
+repository.
