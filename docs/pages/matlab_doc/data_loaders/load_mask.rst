@@ -1,4 +1,4 @@
-.. _load_mask:
+.. _load_mask_matlab:
 
 =======================
 load_mask

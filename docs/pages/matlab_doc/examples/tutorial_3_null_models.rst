@@ -164,7 +164,7 @@ gradient.
 
 We will now compute the Moran eigenvectors. This can be done either by providing
 a weight matrix of spatial proximity between each vertex, or by providing a
-cortical surface (see also: :ref:`compute_mem`). Here we'll use a cortical
+cortical surface (see also: :ref:`compute_mem_matlab`). Here we'll use a cortical
 surface.
 
 .. code-block:: matlab
@@ -173,7 +173,7 @@ surface.
     MEM = compute_mem(surf_lh,'n_ring',n_ring,'mask',~temporal_mask_lh);
 
 Using the Moran eigenvectors we can now compute the randomized data. As the
-computationally intensive portion of MSR is mostly in :ref:`compute_mem`, we can
+computationally intensive portion of MSR is mostly in :ref:`compute_mem_matlab`, we can
 push the number of permutations a bit further. 
 
 .. code-block:: matlab
@@ -218,4 +218,4 @@ respectively.
 
 This concludes the third and last tutorial. You should now be familliar with all
 the functionality of the BrainSpace toolbox. For more details on any specific
-function, please see :ref:`matlab_package`.
+function, please see :ref:`matlab_package_matlab`.

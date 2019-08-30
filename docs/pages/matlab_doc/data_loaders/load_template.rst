@@ -1,4 +1,4 @@
-.. _load_template:
+.. _load_template_matlab:
 
 =======================
 load_template

@@ -27,7 +27,7 @@ As before, we'll start by loading the sample data.
     [surf_lh, surf_rh] = load_conte69();
     
 The ``GradientMaps`` object allows for many different kernels and dimensionality
-reduction techniques (for a full list see :ref:`GradientMaps`). Let's have a look
+reduction techniques (for a full list see :ref:`GradientMaps_matlab`). Let's have a look
 at three different kernels.
     
 .. code-block:: matlab    

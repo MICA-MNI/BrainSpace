@@ -1,4 +1,4 @@
-.. _load_metric:
+.. _load_metric_matlab:
 
 =======================
 load_metric

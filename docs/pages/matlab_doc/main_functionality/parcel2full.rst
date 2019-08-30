@@ -1,4 +1,4 @@
-.. _parcel2full:
+.. _parcel2full_matlab:
 
 parcel2full
 ==============================
@@ -24,6 +24,6 @@ Description
 --------------
 
 A useful tool for quickly moving data between parcel and vertex level,
-especially in combination with :ref:`full2parcel`. This is mostly used for
+especially in combination with :ref:`full2parcel_matlab`. This is mostly used for
 plotting parcellated data on the surface. 
 

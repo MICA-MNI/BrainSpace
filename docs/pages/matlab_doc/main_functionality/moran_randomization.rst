@@ -1,4 +1,4 @@
-.. _moran_randomization:
+.. _moran_randomization_matlab:
 
 ====================
 moran_randomization
@@ -21,7 +21,7 @@ Usage
     Y_rand = moran_randomization(Y,MEM,n_perm,procedure,joint);
 
 - *Y*: An n-by-m data matrix to randomize where n is number of datapoints and m are different modalities. 
-- *MEM*: Moran eigenvectors as returned by :ref:`compute_mem`.
+- *MEM*: Moran eigenvectors as returned by :ref:`compute_mem_matlab`.
 - *n_perm*: Number of perutations
 - *procedure*: Randomization procedure; either 'singleton' or 'pair'.
 - *joint*: If true, randomizes different modalities identically. 
@@ -34,7 +34,7 @@ Description
 Implementation of Moran spectral randomization as presented by  `(Wagner and
 Dray, 2015)
 <https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12407>`_.
-This function uses the eigenvectors computed by :ref:`compute_mem` to generate
+This function uses the eigenvectors computed by :ref:`compute_mem_matlab` to generate
 null model data with similar spatial autocorrelation. The implemented procedures
 are 'singleton' and 'pair'. Singleton matches the input data's autocorrelation
 more closely at the cost of fewer possible randomizations (max: 2\ :sup:`n`). In

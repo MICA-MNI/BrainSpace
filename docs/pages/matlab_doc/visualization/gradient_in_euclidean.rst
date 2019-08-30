@@ -1,4 +1,4 @@
-.. _gradient_in_euclidean:
+.. _gradient_in_euclidean_matlab:
 
 =======================
 gradient_in_euclidean
@@ -23,7 +23,7 @@ Usage
    handles = gradient_in_euclidean(gradients,surface,parcellation)
 
 - *gradients*: an n-by-3 matrix of gradients (usually the first three). 
-- *surface*: a surface readable by :ref:`convert_surface` or a two-element cell array containing left and right hemispheric surfaces in that order. 
+- *surface*: a surface readable by :ref:`convert_surface_matlab` or a two-element cell array containing left and right hemispheric surfaces in that order. 
 - *parcellation*: an m-by-1 vector containing the parcellation scheme, where m is the number of vertices. 
 - *handles*: a structure containing the handles of the graphics objects. 
 

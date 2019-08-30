@@ -1,4 +1,4 @@
-.. _load_group_fc:
+.. _load_group_fc_matlab:
 
 =======================
 load_group_fc

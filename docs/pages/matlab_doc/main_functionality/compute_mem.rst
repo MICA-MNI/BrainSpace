@@ -1,4 +1,4 @@
-.. _compute_mem:
+.. _compute_mem_matlab:
 
 ==================
 compute_mem
@@ -30,7 +30,7 @@ Description
 The Moran eigenvectors hold information on the spatial autocorrelation of the
 data. Their computation is kept separate from the randomization as these
 eigenvectors can be used for any feature on the same surface. These eigenvectors
-are used for Moran spectral randomization by :ref:`moran_randomization`. See
+are used for Moran spectral randomization by :ref:`moran_randomization_matlab`. See
 also `(Wagner and Dray, 2015)
 <https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12407>`_.
 

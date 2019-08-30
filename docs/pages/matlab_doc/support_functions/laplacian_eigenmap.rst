@@ -1,4 +1,4 @@
-.. _laplacian_eigenmap:
+.. _laplacian_eigenmap_matlab:
 
 laplacian_eigenmap
 ==============================

@@ -1,4 +1,4 @@
-.. _convert_surface:
+.. _convert_surface_matlab:
 
 convert_surface
 ==============================

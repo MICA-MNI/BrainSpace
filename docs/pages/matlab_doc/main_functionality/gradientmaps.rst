@@ -1,4 +1,4 @@
-.. _gradientmaps:
+.. _gradientmaps_matlab:
 
 ==============================
 GradientMaps

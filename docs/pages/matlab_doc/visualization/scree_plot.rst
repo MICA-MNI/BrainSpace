@@ -1,4 +1,4 @@
-.. _scree_plot:
+.. _scree_plot_matlab:
 
 =======================
 scree_plot
@@ -20,7 +20,7 @@ Usage
 
    handles = scree_plot(lambdas)
 
-- *lambdas*: a vector of lambdas; can be taken from the :ref:`GradientMaps` object. 
+- *lambdas*: a vector of lambdas; can be taken from the :ref:`GradientMaps_matlab` object. 
 - *handles*: a structure containing the handles of the graphics objects. 
 
 ------------------

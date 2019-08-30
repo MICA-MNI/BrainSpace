@@ -1,4 +1,4 @@
-.. _load_parcellation:
+.. _load_parcellation_matlab:
 
 =======================
 load_parcellation

@@ -1,4 +1,4 @@
-.. _plot_hemispheres:
+.. _plot_hemispheres_matlab:
 
 ==================
 plot_hemispheres
@@ -21,7 +21,7 @@ Usage
    handles = plot_hemispheres(data,surface,varargin);
 
 - *data*: an n-by-m vector of data to plot where n is the number of vertices or parcels, and m the number of markers to plot.
-- *surface*: a surface readable by :ref:`convert_surface` or a two-element cell array containing left and right hemispheric surfaces in that order. 
+- *surface*: a surface readable by :ref:`convert_surface_matlab` or a two-element cell array containing left and right hemispheric surfaces in that order. 
 - *varargin*: Name-Value Pairs (see below).
 - *handles*: a structure containing the handles of the graphics objects. 
 

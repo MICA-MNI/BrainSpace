@@ -1,4 +1,4 @@
-.. _load_conte69:
+.. _load_conte69_matlab:
 
 =======================
 load_conte69
