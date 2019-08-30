@@ -52,7 +52,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.autosectionlabel',
+    # 'sphinx.ext.autosectionlabel',
     'sphinx.ext.doctest',
     'sphinx_gallery.gen_gallery',
     # 'sphinxcontrib.apidoc',
