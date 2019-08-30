@@ -76,7 +76,7 @@ def generalized_procrustes(data, reference=None, n_iter=10, tol=1e-5,
     Returns
     -------
     aligned : list of ndarray, shape = (n_samples, n_feat)
-        Aligned datsets.
+        Aligned datasets.
     reference : ndarray, shape = (n_samples, n_feat)
         Reference dataset built in the last iteration. Only if
         ``return_reference == True``.
