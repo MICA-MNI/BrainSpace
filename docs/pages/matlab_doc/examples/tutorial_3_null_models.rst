@@ -108,10 +108,10 @@ consider the correlation to be significant if it is lower or higher than the
 .. code-block:: matlab
 
    % Compute percentile rank.
-    prctile_rank_thick = mean(r_original_thick > r_rand_thick);
+    prctile_rank_thick = mean(r_original_thick > r_rand_thick); % = 0.9410
     significant_thick = prctile_rank_thick < 0.025 || prctile_rank_thick >= 0.975;
 
-    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w);
+    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w); % = 0 
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
 If significant is true, then we have found a statistically significant
@@ -169,7 +169,7 @@ surface.
 
 .. code-block:: matlab
 
-    n_ring = 5; 
+    n_ring = 1; 
     MEM = compute_mem(surf_lh,'n_ring',n_ring,'mask',~temporal_mask_lh);
 
 Using the Moran eigenvectors we can now compute the randomized data. As the
@@ -179,13 +179,14 @@ push the number of permutations a bit further.
 .. code-block:: matlab
 
     n_rand = 10000;
+    rng(0); % For replicability.
     y_rand = moran_randomization([curv_tl,t1wt2w_tl],MEM,n_rand,'singleton',true);
 
     curv_rand = squeeze(y_rand(:,1,:));
     t1wt2w_rand = squeeze(y_rand(:,2,:));
 
 Now that we have the randomized data, we can compute correlations between the
-gradient and the real/randomised data.  
+gradient and the real/randomized data.  
 
 .. code-block:: matlab
 
@@ -203,10 +204,10 @@ consider the correlation to be significant if it is lower or higher than the
 
 .. code-block:: matlab
 
-    prctile_rank_curv = mean(r_original_curv > r_rand_curv);
+    prctile_rank_curv = mean(r_original_curv > r_rand_curv); % = 0.8249.
     significant_curv = prctile_rank_curv < 0.025 || prctile_rank_curv >= 0.975;
 
-    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w);
+    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w); % = 0.
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
 

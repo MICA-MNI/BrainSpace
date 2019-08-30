@@ -38,6 +38,14 @@ Visualization
    :maxdepth: 1
    
    visualization/*
+
+Data Loaders
+---------------
+.. toctree::
+    :glob:
+    :maxdepth: 1
+
+    data_loaders/*
    
 Support Functions
 ------------------

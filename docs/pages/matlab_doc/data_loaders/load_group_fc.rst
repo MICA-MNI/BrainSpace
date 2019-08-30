@@ -1,0 +1,23 @@
+.. _load_group_fc:
+
+=======================
+load_group_fc
+=======================
+
+------------------
+Synopsis
+------------------
+
+Loads group level functional connectivity matrices (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/example_data_loaders/load_group_fc.m>`_). 
+
+------------------
+Usage
+------------------
+
+::
+
+    conn_matrices = load_group_fc(parcellation,scale)
+
+- *parcellation*: Name of the parcellation, either 'schaeffer' for Schaeffer (functional) parcellations or 'vosdewael' for a subparcellation of aparc. Both may be provided as a cell or string array. 
+- *scale*: Scale of the parcellation. Either 100, 200, 300, or 400. Multiple may be provided as a vector.
+- *conn_matrices*: Structure of all requested data. 
