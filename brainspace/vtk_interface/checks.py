@@ -8,8 +8,11 @@ VTK basic checks.
 
 import numpy as np
 
-from vtkmodules.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
-from vtkmodules.vtkCommonDataModelPython import vtkCellTypes
+# from vtkmodules.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
+# from vtkmodules.vtkCommonDataModelPython import vtkCellTypes
+
+from vtk.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
+from vtk import vtkCellTypes
 
 
 def get_cell_types(surf):

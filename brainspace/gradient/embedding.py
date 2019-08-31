@@ -22,20 +22,19 @@ from sklearn.decomposition import PCA
 from .utils import is_symmetric, make_symmetric
 
 
-def diffusion_mapping(adj, n_components=None, alpha=0.5, diffusion_time=0,
+def diffusion_mapping(adj, n_components=10, alpha=0.5, diffusion_time=0,
                       random_state=None):
     """Compute diffusion map of affinity matrix.
 
     Parameters
     ----------
-    adj : 2D ndarray or sparse matrix
+    adj : ndarray or sparse matrix, shape = (n, n)
         Affinity matrix.
     n_components : int or None, optional
-        Number of eigenvectors. If None, selection of `n_comp` is based
-        on 95% drop-off in eigenvalues. When `n_comp` is None,
+        Number of eigenvectors. If None, selection of `n_components` is based
+        on 95% drop-off in eigenvalues. When `n_components` is None,
         the maximum number of eigenvectors is restricted to
-        ``n_comp <= sqrt(n)``, where `n` is the number of rows of `adj`.
-        Default is None.
+        ``n_components <= sqrt(n)``. Default is 10.
     alpha : float, optional
         Anisotropic diffusion parameter, ``0 <= alpha <= 1``. Default is 0.5.
     diffusion_time : int, optional
@@ -46,11 +45,10 @@ def diffusion_mapping(adj, n_components=None, alpha=0.5, diffusion_time=0,
 
     Returns
     -------
-    w : 1D ndarray, shape (n_components,)
+    w : ndarray, shape (n_components,)
         Eigenvalues of the affinity matrix in descending order.
-    v : 2D ndarray, shape (n, n_components)
-        Eigenvectors of the affinity matrix in same order. Where `n` is
-        the number of rows of the affinity matrix.
+    v : ndarray, shape (n, n_components)
+        Eigenvectors of the affinity matrix in same order.
 
     References
     ----------
@@ -164,7 +162,7 @@ def diffusion_mapping(adj, n_components=None, alpha=0.5, diffusion_time=0,
     return w, v
 
 
-def laplacian_eigenmaps(adj, n_components=8, norm_laplacian=True,
+def laplacian_eigenmaps(adj, n_components=10, norm_laplacian=True,
                         random_state=None):
     """Compute embedding using Laplacian eigenmaps.
 
@@ -175,7 +173,7 @@ def laplacian_eigenmaps(adj, n_components=8, norm_laplacian=True,
     adj : 2D ndarray or sparse matrix
         Affinity matrix.
     n_components : int, optional
-        Number of eigenvectors. Default is 8.
+        Number of eigenvectors. Default is 10.
     norm_laplacian : bool, optional
         If True use normalized Laplacian. Default is True.
     random_state : int or None, optional
@@ -184,7 +182,7 @@ def laplacian_eigenmaps(adj, n_components=8, norm_laplacian=True,
     Returns
     -------
     w : 1D ndarray, shape (n_components,)
-        Eigenvalues of the affinity matrix in descending order.
+        Eigenvalues of the affinity matrix in ascending order.
     v : 2D ndarray, shape (n, n_components)
         Eigenvectors of the affinity matrix in same order. Where `n` is
         the number of rows of the affinity matrix.
@@ -253,12 +251,12 @@ class Embedding(BaseEstimator, metaclass=ABCMeta):
 
         Parameters
         ----------
-        x : 2D ndarray
+        x : ndarray, shape = (n, n)
             Input matrix.
 
         Returns
         -------
-        embedding : 2D ndarray, shape(n, n_components)
+        embedding : ndarray, shape(n, n_components)
             Embedded data.
 
         """
@@ -272,7 +270,7 @@ class DiffusionMaps(Embedding):
     Parameters
     ----------
     n_components : int or None, optional
-        Number of eigenvectors. Default is 2.
+        Number of eigenvectors. Default is 10.
     alpha : float, optional
         Anisotropic diffusion parameter, ``0 <= alpha <= 1``. Default is 0.5.
     diffusion_time : int, optional
@@ -303,7 +301,7 @@ class DiffusionMaps(Embedding):
 
     """
 
-    def __init__(self, n_components=2, alpha=0.5, diffusion_time=1,
+    def __init__(self, n_components=10, alpha=0.5, diffusion_time=1,
                  random_state=None):
         super().__init__(n_components=n_components)
         self.alpha = alpha
@@ -315,7 +313,7 @@ class DiffusionMaps(Embedding):
 
         Parameters
         ----------
-        affinity : 2D ndarray
+        affinity : ndarray or sparse matrix, shape = (n, n)
             Affinity matrix.
 
         Returns
@@ -340,7 +338,7 @@ class LaplacianEigenmaps(Embedding):
     Parameters
     ----------
     n_components : int or None, optional
-        Number of eigenvectors. Default is 2.
+        Number of eigenvectors. Default is 10.
     norm_laplacian : bool, optional
         If True, use normalized Laplacian. Default is True.
     random_state : int or None, optional
@@ -348,9 +346,9 @@ class LaplacianEigenmaps(Embedding):
 
     Attributes
     ----------
-    lambdas_ : 1D ndarray, shape (n_components,)
-        Eigenvalues of the affinity matrix in descending order.
-    maps_ : 2D ndarray, shape (n, n_components)
+    lambdas_ : ndarray, shape (n_components,)
+        Eigenvalues of the affinity matrix in ascending order.
+    maps_ : ndarray, shape (n, n_components)
         Eigenvectors of the affinity matrix in same order. Where `n` is
         the number of rows of the affinity matrix.
 
@@ -361,7 +359,7 @@ class LaplacianEigenmaps(Embedding):
 
     """
 
-    def __init__(self, n_components=2, norm_laplacian=True, random_state=None):
+    def __init__(self, n_components=10, norm_laplacian=True, random_state=None):
         super().__init__(n_components=n_components)
         self.norm_laplacian = norm_laplacian
         self.random_state = random_state
@@ -371,7 +369,7 @@ class LaplacianEigenmaps(Embedding):
 
         Parameters
         ----------
-        affinity : 2D ndarray
+        affinity : ndarray or sparse matrix, shape = (n, n)
             Affinity matrix.
 
         Returns
@@ -395,15 +393,15 @@ class PCAMaps(Embedding):
     Parameters
     ----------
     n_components : int or None, optional
-        Number of principal components. Default is 2.
-    random_state : int or None, optional
-        Random state. Default is None.
+        Number of principal components. Default is 10.
+    random_state : int, RandomState instance or None, optional
+         Random state. Default is None.
 
     Attributes
     ----------
-    lambdas_ : 1D ndarray, shape (n_components,)
+    lambdas_ :ndarray, shape (n_components,)
         Explained variance for first principal components in descending order.
-    maps_ : 2D ndarray, shape (n, n_components)
+    maps_ : ndarray, shape (n_samples, n_components)
         Projection of input data onto the principal components.
 
     See Also
@@ -412,7 +410,7 @@ class PCAMaps(Embedding):
     :class:`.LaplacianEigenmaps`
 
     """
-    def __init__(self, n_components=2, random_state=None):
+    def __init__(self, n_components=10, random_state=None):
         super().__init__(n_components=n_components)
         self.random_state = random_state
 
@@ -421,7 +419,7 @@ class PCAMaps(Embedding):
 
         Parameters
         ----------
-        x : 2D ndarray, shape(n_samples, n_feat)
+        x : ndarray, shape(n_samples, n_feat)
             Input matrix.
 
         Returns
@@ -437,5 +435,3 @@ class PCAMaps(Embedding):
         self.lambdas_ = pca.explained_variance_
 
         return self
-
-

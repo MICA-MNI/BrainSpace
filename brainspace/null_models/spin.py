@@ -23,9 +23,9 @@ def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
 
     Parameters
     ----------
-    points_lh : ndarray, shape = (n_lh, 3)
+    points_lh : BSPolyData or ndarray, shape = (n_lh, 3)
         Array of points in a sphere, where `n_lh` is the number of points.
-    points_rh : ndarray, shape = (n_rh, 3), optional
+    points_rh : BSPolyData or ndarray, shape = (n_rh, 3), optional
         Array of points in a sphere, where `n_rh` is the number of points. If
         provided, rotations are derived from the rotations computed for
         `points_lh` by reflecting the rotation matrix across the Y-Z plane.
@@ -55,6 +55,14 @@ def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
     * https://netneurotools.readthedocs.io
 
     """
+
+    # Handle if user provides spheres
+    if not isinstance(points_lh, np.ndarray):
+        points_lh = me.get_points(points_lh)
+
+    if points_rh is not None:
+        if not isinstance(points_rh, np.ndarray):
+            points_rh = me.get_points(points_rh)
 
     pts = {'lh': points_lh}
     if points_rh is not None:
@@ -109,9 +117,9 @@ class SpinRandomization(BaseEstimator):
 
     Attributes
     ----------
-    spin_lh_ : 2D ndarray, shape (n_lh, n_rep)
+    spin_lh_ : ndarray, shape (n_rep, n_lh)
         Spin indices for points in left hemisphere.
-    spin_rh_ : 2D ndarray, shape (n_rh, n_rep)
+    spin_rh_ : ndarray, shape (n_rep, n_rh)
         Spin indices for points in right hemisphere. Only if user provides
         right hemisphere points. None, otherwise.
 
@@ -131,15 +139,15 @@ class SpinRandomization(BaseEstimator):
         self.n_rep = n_rep
         self.random_state = random_state
 
-    def fit(self, points_lh, points_rh=None, mask_lh=None, mask_rh=None):
+    def fit(self, points_lh, points_rh=None):
         """ Compute spin indices by random rotation.
 
         Parameters
         ----------
-        points_lh : BSPolyData or 2D ndarray, shape = (n_lh, 3)
+        points_lh : BSPolyData or ndarray, shape = (n_lh, 3)
             Sphere for the left hemisphere. If ndarray, each row must
             represent a vertex in the sphere.
-        points_rh : BSPolyData or 2D ndarray, shape = (n_rh, 3), optional
+        points_rh : BSPolyData or ndarray, shape = (n_rh, 3), optional
             Sphere for the right hemisphere. If ndarray, row must
             represent a vertex in the sphere. Default is None.
 
@@ -150,28 +158,7 @@ class SpinRandomization(BaseEstimator):
 
         """
 
-        self.mask_lh = mask_lh
-        self.mask_rh = mask_rh
-
-        # Handle if user provides spheres
-        if not isinstance(points_lh, np.ndarray):
-            points_lh = me.get_points(points_lh)
-
-        spin_points_lh = points_lh
-        if mask_lh is not None:
-            spin_points_lh = spin_points_lh[mask_lh]
-
-        spin_points_rh = None
-        if points_rh is not None:
-            if not isinstance(points_rh, np.ndarray):
-                points_rh = me.get_points(points_rh)
-
-            spin_points_rh = points_rh
-            if mask_rh is not None:
-                spin_points_rh = spin_points_rh[mask_rh]
-
-        spin_idx = generate_spin_samples(spin_points_lh,
-                                         points_rh=spin_points_rh,
+        spin_idx = generate_spin_samples(points_lh, points_rh=points_rh,
                                          unique=self.unique, n_rep=self.n_rep,
                                          random_state=self.random_state)
 
@@ -184,33 +171,30 @@ class SpinRandomization(BaseEstimator):
 
         Parameters
         ----------
-        x_lh : 1D or 2D ndarray, shape = (n_lh,) or (n_lh, n_feat)
+        x_lh : ndarray, shape = (n_lh,) or (n_lh, n_feat)
             Array of variables arranged in columns, where `n_feat` is the number
             of variables.
-        x_rh : 1D or 2D ndarray, shape = (n_rh,) or (n_rh, n_feat), optional
+        x_rh : ndarray, shape = (n_rh,) or (n_rh, n_feat), optional
             Array of variables arranged in columns for the right hemisphere.
             Default is None.
 
         Returns
         -------
-        rand_lh : ndarray, shape = (n_rep, n_feat, n_lh)
+        rand_lh : ndarray, shape = (n_rep, n_lh, n_feat)
             Permutations of `x_rh`. If ``n_feat == 1``, shape = (n_rep, n_lh).
 
-        rand_lh : ndarray, shape = (n_rep, n_feat, n_rh)
+        rand_lh : ndarray, shape = (n_rep, n_rh, n_feat)
             Permutations of `x_rh`. If ``n_feat == 1``, shape = (n_rep, n_rh).
             None if `x_rh` is None. Only if `spin_rh_` is not None.
 
         """
 
-        if self.mask_lh is None:
-            rand_lh = x_lh[self.spin_lh_]
-        else:
-            rand_lh = x_lh[self.spin_lh_]
-        if x_rh is None:
+        rand_lh = x_lh[self.spin_lh_]
+        if self.spin_rh_ is None:
             return rand_lh
 
         rand_rh = None
-        if self.spin_rh_ is not None:
+        if x_rh is not None:
             rand_rh = x_rh[self.spin_rh_]
 
         return rand_lh, rand_rh

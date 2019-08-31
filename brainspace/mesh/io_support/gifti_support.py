@@ -6,8 +6,10 @@ VTK read/write filters for Gifti (.surf.gii).
 # License: BSD 3 clause
 
 
-from vtkmodules.vtkCommonDataModelPython import vtkPolyData
-from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
+# from vtkmodules.vtkCommonDataModelPython import vtkPolyData
+# from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
+from vtk import vtkPolyData
+from vtk.util.vtkAlgorithm import VTKPythonAlgorithmBase
 
 from ...vtk_interface.decorators import wrap_input
 from ..mesh_creation import build_polydata
@@ -39,7 +41,7 @@ def _read_gifti(ipth):
     return s.VTKObject
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def _write_gifti(pd, opth):
     # TODO: what about pointdata?
     from nibabel.gifti.gifti import GiftiDataArray

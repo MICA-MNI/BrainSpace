@@ -8,11 +8,16 @@ Functions for surface creation.
 
 import numpy as np
 
-from vtkmodules.util.vtkConstants import VTK_ID_TYPE
-from vtkmodules.util.numpy_support import numpy_to_vtk
-from vtkmodules.vtkCommonDataModelPython import vtkPolyData, vtkCellArray
-from vtkmodules.vtkFiltersCorePython import vtkTriangleFilter
-from vtkmodules.vtkFiltersGeneralPython import vtkVertexGlyphFilter
+# from vtkmodules.util.vtkConstants import VTK_ID_TYPE
+# from vtkmodules.util.numpy_support import numpy_to_vtk
+# from vtkmodules.vtkCommonDataModelPython import vtkPolyData, vtkCellArray
+# from vtkmodules.vtkFiltersCorePython import vtkTriangleFilter
+# from vtkmodules.vtkFiltersGeneralPython import vtkVertexGlyphFilter
+
+from vtk.util.vtkConstants import VTK_ID_TYPE
+from vtk.util.numpy_support import numpy_to_vtk
+from vtk import (vtkPolyData, vtkCellArray, vtkTriangleFilter,
+                 vtkVertexGlyphFilter)
 
 from .mesh_elements import get_edges
 from ..vtk_interface.pipeline import serial_connect
@@ -102,7 +107,7 @@ def to_vertex(surf):
     return serial_connect(surf, vtkVertexGlyphFilter())
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def to_lines(surf):
     """Convert all cells in PolyData to lines.
 

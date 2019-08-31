@@ -1,7 +1,7 @@
 VTK interface
 =================================
 
-All surface mesh functionality provided in BrainSpace is built on top of the
+Surface mesh functionality provided in BrainSpace is built on top of the
 `Visualization Toolkit (VTK) <https://vtk.org/>`_. BrainSpace provides several
 wrappers for most data objects and some filters in VTK. Here we present
 a subset of this functionality.
@@ -86,6 +86,4 @@ Decorators
     wrap_output
     unwrap_input
     unwrap_output
-    wrap_func
-    unwrap_func
     append_vtk

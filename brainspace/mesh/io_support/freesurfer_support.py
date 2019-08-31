@@ -9,8 +9,10 @@ VTK read/write filters for FreeSurfer geometry files.
 import re
 import numpy as np
 
-from vtkmodules.vtkCommonDataModelPython import vtkPolyData
-from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
+# from vtkmodules.vtkCommonDataModelPython import vtkPolyData
+# from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
+from vtk import vtkPolyData
+from vtk.util.vtkAlgorithm import VTKPythonAlgorithmBase
 
 from ...vtk_interface.decorators import wrap_input
 from ...vtk_interface.checks import has_only_triangle
@@ -110,10 +112,10 @@ def _read_geometry_fs(ipth, is_ascii=False):
                 x_cells = np.zeros((n_cells, 3), dtype=np.uintp)
                 x_cells.flat[:] = np.fromfile(fh, '>i4', n_cells * 3)
 
-    return build_polydata(x_points, cells=x_cells)
+    return build_polydata(x_points, cells=x_cells).VTKObject
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def _write_geometry_fs(pd, opth, fname_header=None, is_ascii=False):
     """Adapted from nibabel. Add ascii support."""
 
@@ -172,7 +174,7 @@ class vtkFSReader(VTKPythonAlgorithmBase):
 
     def RequestData(self, request, inInfo, outInfo):
         opt = vtkPolyData.GetData(outInfo, 0)
-        if self.__is_ascii:  # or self.__FileName.split('.')[-1] == 'asc':
+        if self.__is_ascii or self.__FileName.split('.')[-1] == 'asc':
             s = _read_geometry_fs(self.__FileName, is_ascii=True)
         else:
             s = _read_geometry_fs(self.__FileName, is_ascii=False)

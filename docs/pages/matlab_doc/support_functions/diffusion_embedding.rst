@@ -1,4 +1,4 @@
-.. _diffusion_embedding:
+.. _diffusion_embedding_matlab:
 
 diffusion_embedding
 ==============================

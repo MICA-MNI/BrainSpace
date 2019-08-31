@@ -10,6 +10,7 @@ import warnings
 
 import numpy as np
 from scipy.stats import rankdata
+from scipy.spatial.distance import pdist, squareform
 
 from sklearn.metrics.pairwise import cosine_similarity, rbf_kernel
 
@@ -21,11 +22,11 @@ def compute_affinity(x, kernel=None, sparsity=.9, gamma=None):
 
     Parameters
     ----------
-    x : 2D ndarray, shape = (n_samples, n_feat)
+    x : ndarray, shape = (n_samples, n_feat)
         Input matrix.
-    kernel : {'pearson', 'spearman', 'cosine', 'normalized_angle', 'gaussian'}\
-        or None, optional.
-        Kernel function. If None, only sparsify. Default is None. Valid options:
+    kernel : str or None, optional
+        Kernel function. If None, only sparsify. Default is None.
+        Valid options:
 
         - If 'pearson', use Pearson's correlation coefficient.
         - If 'spearman', use Spearman's rank correlation coefficient.
@@ -35,16 +36,16 @@ def compute_affinity(x, kernel=None, sparsity=.9, gamma=None):
           between 0 and 1.
         - If 'gaussian', use Gaussian kernel or RBF.
 
-    sparsity : float, optional
+    sparsity : float or None, optional
         Proportion of smallest elements to zero-out for each row.
-        Default is 0.9.
+        If None, do not sparsify. Default is 0.9.
     gamma : float or None, optional
         Inverse kernel width. Only used if ``kernel == 'gaussian'``.
         If None, ``gamma = 1./n_feat``. Default is None.
 
     Returns
     -------
-    affinity : 2D ndarray, shape = (n_samples, n_samples)
+    affinity : ndarray, shape = (n_samples, n_samples)
         Affinity matrix.
     """
 
@@ -65,8 +66,9 @@ def compute_affinity(x, kernel=None, sparsity=.9, gamma=None):
         a = np.corrcoef(x)
 
     elif kernel in {'cosine', 'normalized_angle'}:
-        a = cosine_similarity(x)
-        np.fill_diagonal(a, 1)
+        # a = cosine_similarity(x)
+        # np.fill_diagonal(a, 1)
+        a = 1 - squareform(pdist(x, metric='cosine'))
         if kernel == 'normalized_angle':
             a = 1 - np.arccos(a, a)/np.pi
 

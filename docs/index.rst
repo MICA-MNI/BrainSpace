@@ -21,7 +21,6 @@ null models.
 
    pages/install
    pages/getting_started
-   auto_examples/index
    python_doc/index_python
    pages/matlab_doc/index
    pages/references

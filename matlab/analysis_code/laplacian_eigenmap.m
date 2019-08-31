@@ -30,7 +30,7 @@ function [embedding, lambda] = laplacian_eigenmap(data, n_components)
 % href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/laplacian_eigenmap.html">ReadTheDocs</a>.
 
 
-if ~exist('no_dims', 'var')
+if ~exist('n_components', 'var')
     n_components = 2;
 end
 

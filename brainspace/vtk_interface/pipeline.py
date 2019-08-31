@@ -5,7 +5,8 @@ VTK pipeline wrapper.
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
-from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
+# from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
+from vtk import vtkAlgorithm
 
 from .wrappers import BSDataObject, BSAlgorithm
 from .decorators import wrap_input
@@ -17,7 +18,7 @@ from .decorators import wrap_input
 # (because a single input port can have more than one connection)
 
 
-@wrap_input(only_args=[0, 1])
+@wrap_input(0, 1)
 def connect(ftr0, ftr1, port0=0, port1=0, add_conn=False):
     """Connection of two filters.
 
@@ -101,7 +102,7 @@ def connect(ftr0, ftr1, port0=0, port1=0, add_conn=False):
     return ftr1
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def to_data(ftr, port=0):
     """Extract data from filter.
 
@@ -126,18 +127,19 @@ def to_data(ftr, port=0):
 
     """
 
-    n_ports = 1 if port > -1 else ftr.nop
+    list_ports = [port] if port > -1 else range(ftr.nop)
+    n_ports = len(list_ports)
     out = [None] * n_ports
-    for i in range(n_ports):
-        ftr.Update(i)
-        out[i] = ftr.GetOutputDataObject(i)
+    for i, port_id in enumerate(list_ports):
+        ftr.Update(port_id)
+        out[i] = ftr.GetOutputDataObject(port_id)
 
     if port > -1:
         return out[0]
     return out
 
 
-@wrap_input(only_args=0)
+@wrap_input(0)
 def get_output(ftr, as_data=True, update=True, port=0):
     """Get output from filter.
 

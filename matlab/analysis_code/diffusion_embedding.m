@@ -49,4 +49,15 @@ else
 end
 
 % Calculate embedding and bring the data towards output format.
-embedding = bsxfun(@times, psi(:,2:(n_components+1)), scaled_eigval(1:n_components).');
+try
+    embedding = bsxfun(@times, psi(:,2:(n_components+1)), scaled_eigval(1:n_components).');
+catch ME
+    if strcmp(ME.identifier,'MATLAB:badsubscript')
+        warning(['An error ocurred. Most likely you requested more components' ...
+                 ' than could be computed. Attempting to return all available ' ...
+                 'components.']);
+        embedding = bsxfun(@times, psi(:,2:end),scaled_eigval(1:end).');
+    else
+        rethrow(ME);
+    end
+end

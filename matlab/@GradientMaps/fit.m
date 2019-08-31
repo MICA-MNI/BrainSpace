@@ -19,10 +19,11 @@ function obj = fit(obj,connectivity_matrix,varargin)
 %   - Alignment arguments
 %       - niterations (default: 100)
 %           - Any integer
-%       - first_alignment_target (default: none)
+%       - reference (default: nan)
 %           A matrix with equivalent size to that of the gradient matrix.
 %
-% For complete documentation please consult our <a href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>
+% For complete documentation please consult our <a
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
 
 % Deal with varargin
 kernel_arg = {};
@@ -36,7 +37,7 @@ for ii = 1:2:numel(varargin)
         case {'diffusiontime','alpha'}
             approach_arg{end+1} = varargin{ii};
             approach_arg{end+1} = varargin{ii+1};
-        case {'niterations','first_alignment_target'}
+        case {'niterations','reference'}
             alignment_arg{end+1} = varargin{ii};
             alignment_arg{end+1} = varargin{ii+1};
         otherwise
@@ -49,6 +50,13 @@ if ~iscell(connectivity_matrix)
     connectivity_matrix = {connectivity_matrix};
 end
 
+% Most of MATLAB's operations default are column-wise, but we define rows to
+% be seeds. The easiest solution is to just transpose at the start, rather
+% than transpose at every operation.
+for ii = 1:numel(connectivity_matrix)
+    connectivity_matrix{ii} = connectivity_matrix{ii}';
+end
+    
 disp('Running gradient analysis...');
 if isa(obj.method.kernel,'char')
     disp(['Kernel: ' obj.method.kernel]);
@@ -72,7 +80,7 @@ if strcmp(obj.method.alignment,'Joint Alignment')
         tmp = cat(2,connectivity_matrix{:});
     catch ME
         if strcmp(ME.identifier,'MATLAB:catenate:dimensionMismatch')
-            error('Joint alignment requires that matrices have the same number of columns.')
+            error('Joint alignment requires that matrices have the same number of features.')
         else
             rethrow(ME)
         end
@@ -87,6 +95,11 @@ for ii = 1:N
     % Apply the kernel
     kernel_data = obj.kernels(connectivity_matrix{ii},kernel_arg{:});
 
+    % Check for Infs or NaNs in the kernel data
+    if any(isnan(kernel_data(:))) || any(isinf(kernel_data(:)))
+        error('Detected NaNs or Infs in the kernel data.');
+    end
+    
     % Run the embedding
     if isa(obj.method.approach,'char')
         [obj.gradients{ii}, obj.lambda{ii}] = ...
@@ -95,8 +108,6 @@ for ii = 1:N
         obj.gradients{ii} = obj.method.approach(kernel_data); 
     end
     disp('Stored (unaligned) results in the gradients field.');
-    
-
 end
 
 %Run the alignment

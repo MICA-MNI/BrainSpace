@@ -1,4 +1,4 @@
-.. _full2parcel:
+.. _full2parcel_matlab:
 
 full2parcel
 ==============================
@@ -6,7 +6,8 @@ full2parcel
 Synopsis
 ---------
 
-Converts data from a full data matrix to parcellated data (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/surface_manipulation/full2parcel.m>`_).
+Converts data from a full data matrix to parcellated data (`source code
+<https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/surface_manipulation/full2parcel.m>`_).
 
 Usage 
 ----------
@@ -20,4 +21,7 @@ Usage
 
 Description
 --------------
-A useful tool for quickly moving data between vertex and parcel level, especially in combination with :ref:`parcel2full`. For more flexible usage, see also :ref:`labelmean`.
+
+A useful tool for quickly moving data between vertex and parcel level,
+especially in combination with :ref:`parcel2full_matlab`. For more flexible usage, see
+also :ref:`labelmean_matlab`.

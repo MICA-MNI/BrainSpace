@@ -10,3 +10,4 @@ This page contains links to all the python related documents on python package.
 
    index_intro
    api_doc/index_api
+   auto_examples/index

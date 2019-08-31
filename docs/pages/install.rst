@@ -3,7 +3,7 @@
 Installation Guide
 ==============================
 
-BrainSpace is available in Python and Matlab.
+BrainSpace is available in Python and MATLAB.
 
 
 Python installation
@@ -22,25 +22,22 @@ To use BrainSpace, the following Python packages are required:
 * `scikit-learn <https://scikit-learn.org/stable/>`_
 * `vtk <https://vtk.org/>`_
 * `matplotlib <https://matplotlib.org/>`_
+* `nibabel <https://nipy.org/nibabel/index.html>`_
 
-Matplotlib is only used for colormaps and we may remove this dependency in
-future releases.
+Nibabel is required for reading/writing Gifti surfaces. Matplotlib is only
+used for colormaps and we may remove this dependency in future releases.
 
 
 Additional dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^
-For reading/writing of Gifti surfaces BrainSpace requires nibabel. To enable
-interactivity, some plotting functionality in IPython notebooks makes
+To enable interactivity, some plotting functionality in IPython notebooks makes
 use of the panel package. PyQT is another dependency for background plotting.
 See `PyVista <https://docs.pyvista.org/plotting/qt_plotting.html#background-plotting>`_
 for more on background plotting. The support of background rendering however
 is still experimental.
 
-* `nibabel <https://nipy.org/nibabel/index.html>`_
 * `panel <https://panel.pyviz.org/>`_
 * `pyqt <https://riverbankcomputing.com/software/pyqt/intro>`_
-
-Although these dependencies are optional, we recommend installing, at least, nibabel.
 
 
 Installation
@@ -58,12 +55,23 @@ To install with ``conda``: ::
 
 MATLAB installation
 -------------------
-This toolbox has been tested with MATLAB versions R2018b, although we expect it to work with versions R2017a and newer. It will definitely throw errors with versions R2016 and older
 
-To install the MATLAB toolbox simply `download <https://github.com/MICA-MNI/BrainSpace>`_ and unzip the GitHub toolbox and run the following in MATLAB: ::
+This toolbox has been tested with MATLAB versions R2018b, although we expect it
+to work with versions R2017a and newer. It will definitely throw errors with
+versions R2016 and older
+
+To install the MATLAB toolbox simply `download
+<https://github.com/MICA-MNI/BrainSpace>`_ and unzip the GitHub toolbox and run
+the following in MATLAB: ::
 
     addpath('/path/to/BrainSpace/matlab/')
 
-If you want to load BrainSpace every time you start MATLAB, type ``edit startup`` and append the above line to the end of thils file.
+If you want to load BrainSpace every time you start MATLAB, type ``edit
+startup`` and append the above line to the end of this file. 
+
+You can move the MATLAB directory to other locations. However, the example data
+loader functions used in our tutorials require the MATLAB and shared directories
+to both be in a parent directory called BrainSpace. 
     
-If you wish to open gifti files you will also need to install the `gifti library <https://www.artefact.tk/software/matlab/gifti/>`_.
+If you wish to open gifti files you will also need to install the `gifti library
+<https://www.artefact.tk/software/matlab/gifti/>`_.
