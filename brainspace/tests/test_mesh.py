@@ -231,7 +231,7 @@ def test_mesh_elements():
 
     d = me.get_immediate_distance(s)
     assert d.shape == (s.n_points, s.n_points)
-    assert d.dtype == np.float32
+    assert d.dtype == np.float
     assert d.nnz == adj2.nnz
 
     d2 = me.get_immediate_distance(s, metric='sqeuclidean')
@@ -240,19 +240,19 @@ def test_mesh_elements():
     assert np.allclose(d_sq.A, d2.A)
 
     rd = me.get_ring_distance(s)
-    assert rd.dtype == np.float32
+    assert rd.dtype == np.float
     assert np.allclose(d.A, rd.A)
 
     rd2 = me.get_ring_distance(s, n_ring=2)
     assert (rd2 - d).nnz > 0
 
-    assert me.get_cell_point_neighbors(s).shape == (s.n_cells, s.n_cells)
-    assert me.get_cell_edge_neighbors(s).shape == (s.n_cells, s.n_cells)
+    assert me.get_cell_neighbors(s).shape == (s.n_cells, s.n_cells)
     assert me.get_edges(s).shape == (n_edges, 2)
     assert me.get_edge_length(s).shape == (n_edges,)
 
-    # assert me.get_border_cells(s) ==
-    # assert me.get_border_edges(s) ==
+    assert me.get_boundary_points(s).size == 0
+    assert me.get_boundary_edges(s).size == 0
+    assert me.get_boundary_cells(s).size == 0
 
 
 def test_mesh_cluster():
