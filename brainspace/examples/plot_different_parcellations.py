@@ -28,7 +28,7 @@ surf_lh, surf_rh = load_conte69()
 
 
 ###############################################################################
-# Let's see the different parcellations of the surface. We have to append the
+# Let's visualize the different parcellations of the surface. We have to append the
 # parcellations to the left and right hemispheres first.
 
 from brainspace.plotting import plot_hemispheres

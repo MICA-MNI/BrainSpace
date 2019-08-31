@@ -24,7 +24,7 @@ surf_lh, surf_rh = load_conte69()
 
 
 ###############################################################################
-# Let's see the parcellation. We are going to append the parcellation to the
+# Let's visualize the parcellation. We are going to append the parcellation to the
 # hemispheres and plot them. Note that the parcellation is arranged such that
 # the first elements of the array correspond to the left hemisphere, and the
 # remaining to the right.
@@ -44,7 +44,7 @@ plot_hemispheres(surf_lh, surf_rh, array_name='Schaefer100', interactive=False,
 
 
 ###############################################################################
-# We can also see the connectivity matrix correlsponding to the 100
+# We can also visualize the connectivity matrix corresponding to the 100-node
 # parcellations loaded above.
 
 import matplotlib.pyplot as plt
@@ -114,4 +114,4 @@ plot_hemispheres(surf_lh, surf_rh, array_name=array_names, interactive=False,
 
 ###############################################################################
 # We can see how the gradients follow the previously described
-# somatomotor-to-visual and defaultmode-to-sensory axes.
+# somatomotor-to-visual and default-mode-to-sensory axes (Margulies et al. 2016).

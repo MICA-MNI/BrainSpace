@@ -5,7 +5,7 @@ Null models based on spin permutations
 In this example we assess the significance of correlations between the first
 canonical gradient and data from other modalities (cortical thickness and
 T1w/T2w image intensity). We use the spin test approach previously proposed in
-(Alexander-Bloch et al., 2018), which preserve the auto-correlation of the
+(Alexander-Bloch et al., 2018), which preserve the spatial auto-correlation of the
 permuted feature(s) by rotating the feature data on the spherical domain.
 
 """
@@ -52,7 +52,7 @@ gradient = gm.fit(cm).gradients_[:, 0]
 
 
 ###############################################################################
-# Let's see the the data. We are going to append the data to both hemispheres
+# Let's visualize the the data. We are going to append the data to both hemispheres
 # surfaces and spheres.
 
 import numpy as np
@@ -80,7 +80,7 @@ plot_hemispheres(surf_lh, surf_rh,
 
 
 ###############################################################################
-# We can also see the data on the spheres.
+# We can also display the data on the spheres.
 
 plot_hemispheres(sphere_lh, sphere_rh,
                  array_name=['myelin', 'thickness', 'gradient'],
