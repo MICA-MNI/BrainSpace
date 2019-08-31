@@ -5,7 +5,8 @@ Null models based on spin permutations
 In this example we assess the significance of correlations between the first
 canonical gradient and data from other modalities (cortical thickness and
 T1w/T2w image intensity). We use the spin test approach previously proposed in
-`(Alexander-Bloch et al., 2018) <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_, which preserve the auto-correlation of the
+`(Alexander-Bloch et al., 2018) <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_, 
+which preserves the spatial auto-correlation of the
 permuted feature(s) by rotating the feature data on the spherical domain.
 
 We will start by loading the conte69 surfaces for left and right hemispheres
@@ -55,7 +56,7 @@ burden.
 
 
 
-Let's see the data. We are going to append the data to both hemispheres
+Let's display the data. We are going to append the data to both hemispheres
 surfaces and spheres.
 
 
@@ -94,7 +95,7 @@ surfaces and spheres.
 
 
 
-We can also see the data on the spheres.
+We can also display the data on the spheres.
 
 
 .. code-block:: default
@@ -115,7 +116,7 @@ We can also see the data on the spheres.
 
 
 Because we are using a parcellation, we need to compute the centroids for each
-parcels and used them as the sphere coordinates
+parcel and leverage them as the spherical coordinates
 
 
 .. code-block:: default
@@ -263,7 +264,7 @@ in and after accounting for this using spin permutations.
 
 
 
-It is interesting to see that both p-values increase when taking into
-consideration the auto-correlation present in the surfaces. Also, we can see
-that the correlation with thickness is no longer statistically significant
-after spin permutations.
+It is interesting to see that p-values increase when taking into
+consideration the auto-correlation present in the surfaces. In effect, the initial 
+correlation between the first functional gradient and cortical thickness is no longer 
+statistically significant compared to spin permutations.

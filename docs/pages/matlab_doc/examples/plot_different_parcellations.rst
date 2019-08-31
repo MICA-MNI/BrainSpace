@@ -2,11 +2,12 @@ Functional gradients across spatial scales
 =================================================
 To assess consistency of gradient mapping, in this example we will compute the
 gradients across different spatial scales. Specifically we subdivide the conte69
-surface into 100, 200, 300, and 400 parcels based on a functional clustering
-`(Schaefer et al., 2017) <https://academic.oup.com/cercor/article-lookup/doi/10.1093/cercor/bhx179>`_ and built functional gradients from these
-representations.
+surface into 100, 200, 300, and 400 parcels based on a recently published functional clustering
+`(Schaefer et al., 2017) <https://academic.oup.com/cercor/article-lookup/doi/10.1093/cercor/bhx179>`_ 
+and build functional gradients from these representations.
 
-First, let's load the different parcellations and their corresponding mean connectivity matrices. We also load the conte69 surface. These files are provided with BrainSpace.
+First, let's load the different parcellations and their corresponding mean connectivity 
+matrices. We also load the conte69 surface. These files are provided with BrainSpace.
 
 
 .. code-block:: default

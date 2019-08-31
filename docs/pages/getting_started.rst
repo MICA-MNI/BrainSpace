@@ -3,8 +3,9 @@
 Getting Started
 ==============================
 
-BrainSpace offers a wide variety of approaches to build gradients. Here we are
-going to go through the basics to start using BrainSpace.
+BrainSpace is a compact and flexible toolbox that implements a wide variety of approaches to build macroscale gradients from neuroimaging and connectome data. The toolbox allows for (i) the identication of gradients (using dimensionality reduction techniques), (ii) their alignment (across
+subjects or modalities), and (iii) their visualization (in embedding or cortical
+space). The toolbox is implemented in both matlab and python. The steps below will help you to get stated and to build your first gradients. Please also see the tutorials for furtuer examples. 
 
 
 Let's start by loading the data:
@@ -49,8 +50,7 @@ We can plot the surfaces:
    :align: center
 
 
-And also load the mean connectivity matrix built from a subset of HCP. The
-package only comes with toy matrices using Schaefer parcellations `(Schaefer et al., 2017) <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. Lets load one of them. 
+And also load the mean connectivity matrix built from a subset of the human connectome project (HCP). The package comes with several example matrices, downsampled using the Schaefer parcellations `(Schaefer et al., 2017) <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. Lets load one of them. 
 
 .. tabs::
 
