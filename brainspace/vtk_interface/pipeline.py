@@ -5,7 +5,7 @@ VTK pipeline wrapper.
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
-# from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
+
 from vtk import vtkAlgorithm
 
 from .wrappers import BSDataObject, BSAlgorithm
@@ -67,8 +67,9 @@ def connect(ftr0, ftr1, port0=0, port1=0, add_conn=False):
 
         pinfo = ftr1.GetInputPortInformation(port1)
         if pinfo.Get(ftr1.INPUT_IS_REPEATABLE()) == 0:
-            raise ValueError("Input port {0} of '{1}' does not accept multiple "
-                             "connections.".format(ftr1.nip, ftr1.__vtkname__))
+            raise ValueError("Input port {0} of '{1}' does not accept "
+                             "multiple connections.".format(ftr1.nip,
+                                                            ftr1.__vtkname__))
 
         if type(add_conn) == int:
             if not hasattr(ftr1, 'GetUserManagedInputs') or \
@@ -78,14 +79,15 @@ def connect(ftr0, ftr1, port0=0, port1=0, add_conn=False):
                                                              ftr1.__vtkname__))
 
     if isinstance(ftr0, BSAlgorithm):
+        op = ftr0.GetOutputPort(port0)
         if type(add_conn) == bool and add_conn:
             # Connection for only 1 input port. Not tested.
-            ftr1.AddInputConnection(port1, ftr0.GetOutputPort(port0))
+            ftr1.AddInputConnection(port1, op)
         elif type(add_conn) == int:
             # Connection for only 1 input port. Not tested.
-            ftr1.SetInputConnectionByNumber(add_conn, ftr0.GetOutputPort(port0))
+            ftr1.SetInputConnectionByNumber(add_conn, op)
         else:
-            ftr1.SetInputConnection(port1, ftr0.GetOutputPort(port0))
+            ftr1.SetInputConnection(port1, op)
 
     elif isinstance(ftr0, BSDataObject):
         ftr0 = ftr0.VTKObject
@@ -270,7 +272,7 @@ def serial_connect(*filters, as_data=True, update=True, port=0):
               input port `ip` of filter `fi`. Default is None.
             * `ip` (int, optional) - This is the input port of `fi`. Must be
               specified when `ic` is not None. Default is 0.
-            * `fi` (vtkAlgorithm or :class:`.BSAlgorithm`) - This is the filter.
+            * `fi` (vtkAlgorithm or :class:`.BSAlgorithm`) - This is a filter.
             * `op` (int, optional) - This is the output port of `fi`.
               Default is 0.
 
