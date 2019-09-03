@@ -16,8 +16,8 @@ Usage
 
 ::
 
-    [mask_lh,mask_rh] = load_mask(type)
+    [mask_lh,mask_rh] = load_mask(name)
 
-- *type*: Type of mask: either 'midline' for the midline or 'temporal' for the temporal lobe.
+- *name*: Type of mask: either 'midline' for the midline or 'temporal' for the temporal lobe.
 - *mask_lh*: Left hemispheric mask. 
 - *mask_rh*: Right hemispheric mask.

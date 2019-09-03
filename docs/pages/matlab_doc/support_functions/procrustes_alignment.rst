@@ -26,5 +26,5 @@ Name-Value pairs
 ^^^^^^^^^^^^^^^^^
 
 - *nIterations*: Number of iterations to run (default: 100).
-- *first_alignment_target*: Template to align to on the first iteration (default: first provided gradient set)
+- *reference*: Template to align to on the first iteration (default: first provided gradient set)
 

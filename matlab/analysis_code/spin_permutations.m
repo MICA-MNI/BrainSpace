@@ -1,17 +1,16 @@
-function Y_rand = spin_permutations(Y,spheres,permutation_number,varargin)
+function Y_rand = spin_permutations(Y,spheres,n_rep,varargin)
 % SPIN_PERMUTATIONS   constructs null data through spin permutations.
 %
-%   Y_rand = SPIN_PERMUTATIONS(Y,spheres,permutation_number,varargin)
-%   performs spin permutations of n-by-m matrix Y, where n is number of
-%   vertices and m number of markers to perumute. Spheres is a structure
-%   containing a sphere, a path to a sphere, or a 2-element cell array
-%   containing two of the aforementioned. permutation_number denotes the
-%   number of spins to perform. 
+%   Y_rand = SPIN_PERMUTATIONS(Y,spheres,n_rep,varargin) performs spin
+%   permutations of n-by-m matrix Y, where n is number of vertices and m
+%   number of markers to perumute. Spheres is a structure containing a
+%   sphere, a path to a sphere, or a 2-element cell array containing two of
+%   the aforementioned. n_rep denotes the number of spins to perform.
 %
 %   Name-Value pairs
 %       'parcellation': an n-by-1 vector containing parcellations on the
 %                       surface.
-%       'type': The program used to construct the surface; 'FreeSurfer' 
+%       'surface_algorithm': The program used to construct the surface; 'FreeSurfer'
 %               (default) and 'CIVET' are supported. 
 %
 %   Original code by Aaron Alexander-Bloch & Siyuan Liu 
@@ -23,10 +22,15 @@ function Y_rand = spin_permutations(Y,spheres,permutation_number,varargin)
 % Make sure input is in the correct format. 
 p = inputParser;
 addParameter(p, 'parcellation', []);
-addParameter(p, 'type', 'freesurfer', @ischar);
+addParameter(p, 'surface_algorithm', 'freesurfer', @ischar);
+addParameter(p, 'random_state', nan);
 parse(p, varargin{:});
 parcellation = p.Results.parcellation;
-type = lower(p.Results.type);
+type = lower(p.Results.surface_algorithm);
+
+if ~isnan(p.Results.random_state)
+    rng(p.Results.random_state); 
+end
 
 if ~iscell(Y)
     Y = {Y}; 
@@ -95,7 +99,7 @@ I1 = diag([-1 1 1]);
 %permutation starts
 disp('Running Spin Permutation');
 
-for j=1:permutation_number
+for j=1:n_rep
     %the updated uniform sampling procedure
     A = normrnd(0,1,3,3);
     [rotation, temp] = qr(A);

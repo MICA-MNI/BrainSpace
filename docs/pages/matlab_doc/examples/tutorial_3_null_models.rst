@@ -33,22 +33,21 @@ cortical thickness data, and a template functional gradient.
     [sphere_lh, sphere_rh] = load_conte69('spheres');
 
     % Load the data 
-    [t1wt2w_lh,t1wt2w_rh] = load_metric('t1wt2w');
-    [thickness_lh,thickness_rh] = load_metric('thickness');
+    [t1wt2w_lh,t1wt2w_rh] = load_marker('t1wt2w');
+    [thickness_lh,thickness_rh] = load_marker('thickness');
     
     % Template functional gradient
-    embedding = load_template('fc',1);
+    embedding = load_gradient('fc',1);
     
 Let's first generate some null data using spintest. 
 
 .. code-block:: matlab
 
     % Let's create some rotations
-    rng(0); % For replicability
     n_permutations = 1000;
     y_rand = spin_permutations({[t1wt2w_lh,thickness_lh],[t1wt2w_rh,thickness_rh]}, ...
                       {sphere_lh,sphere_rh}, ...
-                      n_permutations);
+                      n_permutations,'random_state',0);
 
     % Merge the rotated data into single vectors
     t1wt2w_rotated = squeeze([y_rand{1}(:,1,:); y_rand{2}(:,1,:)]);
@@ -143,8 +142,8 @@ gradient.
     [surf_lh, surf_rh] = load_conte69();
 
     % Load the data 
-    t1wt2w_lh = load_metric('t1wt2w');
-    curv_lh = load_metric('curvature');
+    t1wt2w_lh = load_marker('t1wt2w');
+    curv_lh = load_marker('curvature');
 
     % Load mask
     temporal_mask_tmp = load_mask('temporal');
@@ -154,7 +153,7 @@ gradient.
     temporal_mask_lh = temporal_mask_tmp & ~isnan(t1wt2w_lh);
 
     % Load the embedding
-    embedding = load_template('fc',1);
+    embedding = load_gradient('fc',1);
     embedding_lh = embedding(1:end/2);
 
     % Keep only the temporal lobe. 
@@ -179,8 +178,8 @@ push the number of permutations a bit further.
 .. code-block:: matlab
 
     n_rand = 10000;
-    rng(0); % For replicability.
-    y_rand = moran_randomization([curv_tl,t1wt2w_tl],MEM,n_rand,'singleton',true);
+    y_rand = moran_randomization([curv_tl,t1wt2w_tl],MEM,n_rand, ...
+        'procedure','singleton','joint',true,'random_state',0);
 
     curv_rand = squeeze(y_rand(:,1,:));
     t1wt2w_rand = squeeze(y_rand(:,2,:));

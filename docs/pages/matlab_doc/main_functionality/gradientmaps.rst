@@ -69,11 +69,11 @@ be provided to alter its behavior.
    - a function handle (the function will be applied to the post-kernel data matrix)
 'alignment'
    - 'none', '' (default)
-   - 'procrustes analysis', 'pa'  
-   - 'joint alignment', 'ja'
+   - 'procrustes analysis', 'pa', 'procrustes'  
+   - 'joint alignment', 'ja', 'joint'
    - a function handle (the function will be applied to the post-manifold data matrix)
 'random_state' 
-   - Any input accepted by MATLAB's ``rng`` function. (default: 0)
+   - Any input accepted by MATLAB's ``rng`` function, or nan to use the current random state. (default: nan)
 'n_components'
    - Any natural number in double format. (default: 10)
 
@@ -96,9 +96,9 @@ fit
        The gamma parameter used in the Gaussian kernel. 
       - alpha (default: 0.5)
        The alpha paramter used in diffusion embedding.
-      - diffusiontime (default: 0)
+      - diffusion_time (default: 0)
        The diffusion time used in diffusion embedding. Leave at 0 for automatic estimation.
-      - niterations (default: 100)
+      - niterations (default: 10)
        The number of iterations in Procrustes analysis.
       - reference (default: gradients of the first data matrix)
        The target for alignment for the first iteration of Procrustes analysis.

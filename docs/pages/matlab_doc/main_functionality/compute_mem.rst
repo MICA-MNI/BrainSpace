@@ -38,4 +38,4 @@ Name-Value pairs
 ------------------
 - *n_ring*: Only used if W is a surface. Vertices that are within `n_ring` steps of each other have their distance computed (Default: 1).
 - *mask*: Only used if W is a surface. A n-by-1 logical denoting a mask. ``n`` denotes the number of vertices. Vertices corresponding to True values are discarded when computing the eigenvectors. You can also provide an empty logical array to discard nothing  (Default: []). 
-- *eigenvectors*: Determines the behavior for discarding eigenvectors with eigenvalue=0. Set to 'all' for discarding only one and reorthogonalizing the remainder. Set to any other character array for discarding all zero eigenvalues (Default: 'all').  
+- *spectrum*: Determines the behavior for discarding eigenvectors with eigenvalue=0. Set to 'all' for discarding only one and reorthogonalizing the remainder or 'NonZero' for discarding all zero eigenvalues (Default: 'all').  

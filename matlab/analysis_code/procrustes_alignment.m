@@ -4,7 +4,7 @@ function aligned = procrustes_alignment(gradients,varargin)
 %   aligned = PROCRUSTES_ALIGNMENT(gradients,varargin) performs a singular
 %   value decomposition of the vectors in cell array gradients to align
 %   them. Valid name-value pairs are  the number of iterations
-%   'nIterations' (default: 100) and the reference (default: first cell of
+%   'nIterations' (default: 10) and the reference (default: first cell of
 %   the gradients array). 
 %
 %   For more information, please consult our <a
@@ -12,7 +12,7 @@ function aligned = procrustes_alignment(gradients,varargin)
 
 % Parse input
 p = inputParser;
-addParameter(p, 'nIterations', 100, @isnumeric);
+addParameter(p, 'nIterations', 10, @isnumeric);
 addParameter(p, 'reference',nan);
 parse(p, varargin{:});
 
