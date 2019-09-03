@@ -62,7 +62,7 @@ follows:
    :align: center
 
 
-<<<<<<< HEAD
+
 And also load the mean connectivity matrix built from a subset of the human
 connectome project (HCP). The package comes with several example matrices,
 downsampled using the Schaefer parcellations `(Schaefer et al., 2017) <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_.
