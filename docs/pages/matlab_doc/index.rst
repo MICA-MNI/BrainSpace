@@ -3,11 +3,19 @@
 MATLAB Package
 ======================================
 
+<<<<<<< HEAD
+This page contains links to descriptions of all Matlab code available in this toolbox 
+as well as a few example applications. The code is divided into three groups: 
+"main functionality" which performs the computations, "visualization" which plots data, 
+and "support functions" which supports the other functions, but are not 
+intended for usage by the user.
+=======
 This page contains links to descriptions of all MATLAB code available in this
 toolbox as well as the tutorials. The code is divided into four groups: "main
 functionality" which performs the computations, "visualization" which plots
 data, "data loaders" which loads some sample data, and "support functions" which
 supports the other functions, but are not intended for usage by the user.
+>>>>>>> master
 
 Tutorials 
 ----------------
