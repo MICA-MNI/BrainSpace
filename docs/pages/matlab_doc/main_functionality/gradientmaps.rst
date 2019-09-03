@@ -1,4 +1,4 @@
-.. _gradientmaps:
+.. _gradientmaps_matlab:
 
 ==============================
 GradientMaps
@@ -7,7 +7,7 @@ GradientMaps
 Synopsis
 =============
 
-The core object of the Matlab BrainSpace package (`source code
+The core object of the MATLAB BrainSpace package (`source code
 <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/%40GradientMaps/GradientMaps.m>`_).
 
 Usage 
@@ -34,10 +34,10 @@ cannot be modifed afterwards. The fields are: "kernel", "approach", "alignment",
 and "n_components". 
 
 The **gradients** property is a cell array containing the (unaligned) gradients
-of each input matrix. Each cell is an n-by-m matrix why n is the number of
+of each input matrix. Each cell is an n-by-m matrix where n is the number of
 datapoints and m the number of components. In joint embedding the gradients of
 all data sets are computed simultaneously, and thus no unaligned gradients are
-stored. aligned
+stored.
 
 The **aligned** property is a cell array of identical dimensions to the
 gradients property. If an alignment was requested, then the aligned data are

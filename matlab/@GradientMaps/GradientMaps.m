@@ -97,7 +97,7 @@ classdef GradientMaps
                                     obj.method.kernel = 'Spearman';
                                 case {'g','gaussian'}
                                     obj.method.kernel = 'Gaussian';
-                                case {'cs','cosine','cosine similarity','cossim','cosine_similarity'}
+                                case {'cs','cosine','cosine similarity','cossim','cosine_similarity','cosinesimilarity'}
                                     obj.method.kernel = 'Cosine Similarity';
                                 case {'na','normalized angle','normalizedangle','normangle','normalized_angle'}
                                     obj.method.kernel = 'Normalized Angle';
@@ -113,7 +113,7 @@ classdef GradientMaps
                             change_string{end+1} = ('Set the approach to a custom function handle.');
                         else
                             switch lower(varargin{ii+1})
-                                case {'pca','principalcomponentananalysis','principal component analysis'}
+                                case {'pca','principalcomponentanalysis','principal component analysis'}
                                     obj.method.approach = 'Principal Component Analysis';
                                 case {'dm','diffusion embedding','diffusionembedding','diffemb'}
                                     obj.method.approach = 'Diffusion Embedding';
@@ -130,11 +130,11 @@ classdef GradientMaps
                             change_string{end+1} = ('Set the alignment to a custom function handle.');
                         else
                             switch lower(varargin{ii+1})
-                                case 'none'
+                                case {'','none'}
                                     obj.method.alignment = 'None';
                                 case {'pa','procrustes','procrustes analysis','procrustesanalysis'}
                                     obj.method.alignment = 'Procrustes Analysis';
-                                case {'j','joint','jointalignment'}
+                                case {'ja','joint','jointalignment'}
                                     obj.method.alignment = 'Joint Alignment';
                             end
                             change_string{end+1} = (['Set the alignment to: ' obj.method.alignment '.']);
@@ -199,7 +199,18 @@ classdef GradientMaps
                     error('Unknown kernel method');
             end
             
-            kernel_data(kernel_data < 0) = 0; 
+            % Check for negative numbers.
+            if any(kernel_data(:) < 0)
+                disp('Found negative numbers in the kernel matrix. These will be set to zero.');
+                kernel_data(kernel_data < 0) = 0; 
+            end
+            
+            % Check for vectors of zeros. 
+            if any(all(kernel_data == 0))
+                error(['After thresholding, a complete vector in the kernel ' ...
+                    'matrix consists of zeros. Consider using a kernel that ' ...
+                    'does not allow for negative numbers (e.g. normalized angle).']); 
+            end
             
             if ~issymmetric(kernel_data)
                 if max(max(abs(kernel_data - kernel_data'))) < p.Results.tolerance
@@ -235,11 +246,17 @@ classdef GradientMaps
             end
             
             if ~issymmetric(data)
-                error('Affinity matrix is not symmetric.')
+                if max(max(abs(data - data'))) > eps % floating point issues. 
+                    error('Affinity matrix is not symmetric.')
+                else
+                    data = tril(data) + tril(data,-1)'; % Attempt to force symmetry
+                end
             end
             
-            % Check if the graph is connected.
-            if ~all(conncomp(graph(abs(data))) == 1)
+            % Check if the graph is connected. Large matrices may remain
+            % floating point asymmetric despite the above check, so only
+            % use lower.
+            if ~all(conncomp(graph(abs(data),'lower')) == 1) 
                 error('Graph is not connected.')
             end
             

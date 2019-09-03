@@ -1,4 +1,4 @@
-.. _full2parcel:
+.. _full2parcel_matlab:
 
 full2parcel
 ==============================
@@ -23,5 +23,5 @@ Description
 --------------
 
 A useful tool for quickly moving data between vertex and parcel level,
-especially in combination with :ref:`parcel2full`. For more flexible usage, see
-also :ref:`labelmean`.
+especially in combination with :ref:`parcel2full_matlab`. For more flexible usage, see
+also :ref:`labelmean_matlab`.

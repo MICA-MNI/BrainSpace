@@ -1,4 +1,4 @@
-.. _procrustes_alignment:
+.. _procrustes_alignment_matlab:
 
 procrustes_alignment
 ==============================

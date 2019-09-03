@@ -22,7 +22,7 @@ function Y_rand = spin_permutations(Y,spheres,permutation_number,varargin)
 
 % Make sure input is in the correct format. 
 p = inputParser;
-addParameter(p, 'parcellation', [],   @isnumeric);
+addParameter(p, 'parcellation', []);
 addParameter(p, 'type', 'freesurfer', @ischar);
 parse(p, varargin{:});
 parcellation = p.Results.parcellation;
@@ -60,6 +60,19 @@ for ii = 1:numel(spheres)
     S{ii} = convert_surface(spheres{ii});
     vertices{ii} = S{ii}.coord';    
 
+    % If parcellated data on sphere, get centroids of vertices.
+    if ~isempty(parcellation)
+        % Get Euclidean mean of points within each parcel.
+        euclidean_mean = labelmean(vertices{ii}, parcellation{ii},'ignorewarning')';
+        
+        % parcellationmean adds nan-columns if the parcellations are not 1:N. 
+        euclidean_mean(any(isnan(euclidean_mean),2),:) = [];
+        
+        % Find the centroid i.e. closest point to the Euclidean mean. 
+        idx = knnsearch(vertices{ii},euclidean_mean);
+        vertices{ii} = vertices{ii}(idx,:);   
+    end
+    
     % Check for correct data dimensions. 
     if size(Y{ii},1) ~= size(vertices{ii},1)
         if size(Y{ii},2) == size(vertices{ii},1)
@@ -72,18 +85,6 @@ for ii = 1:numel(spheres)
         end
     end
     
-    % If parcellated data on sphere, get centroids of vertices.
-    if ~isempty(parcellation)
-        % Get Euclidean mean of points within each parcel.
-        euclidean_mean = parcellationmean(vertices{ii}, parcellation{ii},'ignorewarning')';
-        
-        % parcellationmean adds nan-columns if the parcellations are not 1:N. 
-        euclidean_mean(any(isnan(euclidean_mean),2),:) = [];
-        
-        % Find the centroid i.e. closest point to the Euclidean mean. 
-        idx = knnsearch(vertices{ii},euclidean_mean);
-        vertices{ii} = vertices{ii}(idx,:);   
-    end
     % Initalize the KD Tree
     tree{ii} = KDTreeSearcher(vertices{ii});
 end

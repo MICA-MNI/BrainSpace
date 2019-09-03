@@ -23,9 +23,9 @@ def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
 
     Parameters
     ----------
-    points_lh : ndarray, shape = (n_lh, 3)
+    points_lh : BSPolyData or ndarray, shape = (n_lh, 3)
         Array of points in a sphere, where `n_lh` is the number of points.
-    points_rh : ndarray, shape = (n_rh, 3), optional
+    points_rh : BSPolyData or ndarray, shape = (n_rh, 3), optional
         Array of points in a sphere, where `n_rh` is the number of points. If
         provided, rotations are derived from the rotations computed for
         `points_lh` by reflecting the rotation matrix across the Y-Z plane.
@@ -55,6 +55,14 @@ def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
     * https://netneurotools.readthedocs.io
 
     """
+
+    # Handle if user provides spheres
+    if not isinstance(points_lh, np.ndarray):
+        points_lh = me.get_points(points_lh)
+
+    if points_rh is not None:
+        if not isinstance(points_rh, np.ndarray):
+            points_rh = me.get_points(points_rh)
 
     pts = {'lh': points_lh}
     if points_rh is not None:
@@ -149,14 +157,6 @@ class SpinRandomization(BaseEstimator):
             Returns self.
 
         """
-
-        # Handle if user provides spheres
-        if not isinstance(points_lh, np.ndarray):
-            points_lh = me.get_points(points_lh)
-
-        if points_rh is not None:
-            if not isinstance(points_rh, np.ndarray):
-                points_rh = me.get_points(points_rh)
 
         spin_idx = generate_spin_samples(points_lh, points_rh=points_rh,
                                          unique=self.unique, n_rep=self.n_rep,

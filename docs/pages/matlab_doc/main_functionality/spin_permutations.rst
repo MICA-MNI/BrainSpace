@@ -1,4 +1,4 @@
-.. _spin_permutations:
+.. _spin_permutations_matlab:
 
 ==================
 spin_permutations
@@ -34,12 +34,12 @@ Spin test as described by `(Alexander-Bloch, 2018)
 either an n-by-m matrix where n is the number of vertices and/or parcels or,
 when spinning on two spheres, a two-element cell array each containing an n-by-m
 matrix. Spheres is either a sphere in a format readable by
-:ref:`convert_surface` or a two-element cell array containing spheres
+:ref:`convert_surface_matlab` or a two-element cell array containing spheres
 corresponding to the respective elements in the data cell array. 
 
 Name-Value pairs
 ------------------
 
-- *'parcellation'*: a n-by-1 vector containing the parcellation scheme. Do not provide for no vertex-level analysis.
+- *'parcellation'*: a n-by-1 vector containing the parcellation scheme. If you are performing vertexwise analysis, do not provide this pair. 
 
 - *'type'*: program used to generate the spheres. Either 'FreeSurfer' (default), or 'CIVET'. If Freesurfer, rotations are flipped along the x-axis for the second sphere. 

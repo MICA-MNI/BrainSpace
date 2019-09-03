@@ -17,14 +17,14 @@ data for computational efficiency.
     labeling = load_parcellation('schaefer',400);
 
     % The loader functions output data in a struct array for when you
-    % load multiple parcellations. Lets just bring them to numeric arrays.
+    % load multiple parcellations. Let's just bring them to numeric arrays.
     conn_matrix = conn_matrix.schaefer_400;
     labeling = labeling.schaefer_400;
 
     % and load the conte69 hemisphere surfaces
     [surf_lh, surf_rh] = load_conte69();
 
-Lets first look at the parcellation scheme we're using. 
+Let's first look at the parcellation scheme we're using. 
 
 .. code-block:: matlab    
     
@@ -35,7 +35,7 @@ Lets first look at the parcellation scheme we're using.
     :scale: 70%
     :align: center
 
-and lets construct our gradients. 
+and let's construct our gradients. 
 
 .. code-block:: matlab
 
@@ -45,28 +45,30 @@ and lets construct our gradients.
 
 Note that the default parameters (normalized angle kernel, diffusion embedding
 approach, 10 components) will be reported in the console. Once you have your
-gradients a good first step is to simply inspect what they look like. Lets have
+gradients a good first step is to simply inspect what they look like. Let's have
 a look at the first two gradients.
 
 .. code-block:: matlab
 
     plot_hemispheres(gm.gradients{1}(:,1:2),{surf_lh,surf_rh}, ...
-                     'parcellation', labeling);
+                 'parcellation', labeling, ...
+                 'labeltext',{'Gradient 1','Gradient 2'});
 
-.. image:: ./example_figs/g1-2_schaefer_400.png
+
+.. image:: ./example_figs/g1-2_schaefer_400_v2.png
     :scale: 70%
     :align: center
 
 But which gradients should you keep for your analysis? In some cases you may
 have an a-priori interest in some previously defined set of gradients. When you
-don't have a pre-defined set, you can instead look at the lambdas (eigenvalues)
-of each component in a scree plot. Higher eigenvalues (or lower in laplacian
-eigenmapping) are more important, so one can choose a cut-off based on a scree
-plot.
+don not have a pre-defined set, you can instead look at the lambdas
+(eigenvalues) of each component in a scree plot. Higher eigenvalues (or lower in
+laplacian eigenmapping) are more important, so one can choose a cut-off based on
+a scree plot.
 
 .. code-block:: matlab
 
-    scree_plot(gm.lambdas{1});
+    scree_plot(gm.lambda{1});
 
 .. image:: ./example_figs/scree.png
     :scale: 70%

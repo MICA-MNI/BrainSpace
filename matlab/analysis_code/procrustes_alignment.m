@@ -22,7 +22,7 @@ for ii = 1:numel(gradients)
 end
 
 % Set the first alignment target.
-if isnan(p.Results.first_alignment_target)
+if isnan(p.Results.reference)
     first_target = embs{1};
 else
     first_target = p.Results.reference;

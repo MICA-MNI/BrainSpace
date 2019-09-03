@@ -1,4 +1,4 @@
-.. _labelmean:
+.. _labelmean_matlab:
 
 labelmean
 ==============================

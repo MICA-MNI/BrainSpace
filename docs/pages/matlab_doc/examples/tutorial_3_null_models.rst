@@ -39,11 +39,11 @@ cortical thickness data, and a template functional gradient.
     % Template functional gradient
     embedding = load_template('fc',1);
     
-Lets first generate some null data using spintest. 
+Let's first generate some null data using spintest. 
 
 .. code-block:: matlab
 
-    % Lets create some rotations
+    % Let's create some rotations
     rng(0); % For replicability
     n_permutations = 1000;
     y_rand = spin_permutations({[t1wt2w_lh,thickness_lh],[t1wt2w_rh,thickness_rh]}, ...
@@ -54,7 +54,7 @@ Lets first generate some null data using spintest.
     t1wt2w_rotated = squeeze([y_rand{1}(:,1,:); y_rand{2}(:,1,:)]);
     thickness_rotated = squeeze([y_rand{1}(:,2,:); y_rand{2}(:,2,:)]);
 
-As an illustration of the rotation, lets plot the original t1w/t2w data
+As an illustration of the rotation, let's plot the original t1w/t2w data
 
 .. code-block:: matlab
  
@@ -108,15 +108,16 @@ consider the correlation to be significant if it is lower or higher than the
 .. code-block:: matlab
 
    % Compute percentile rank.
-    prctile_rank_thick = mean(r_original_thick > r_rand_thick);
+    prctile_rank_thick = mean(r_original_thick > r_rand_thick); % = 0.9410
     significant_thick = prctile_rank_thick < 0.025 || prctile_rank_thick >= 0.975;
 
-    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w);
+    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w); % = 0 
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
-If significant is true, the we've found a statistically significant correlation.
-Alternatively, one could also test the one-tailed hypothesis whether the
-percentile rank is lower or higher than the 5th/95th percentile, respectively.
+If significant is true, then we have found a statistically significant
+correlation. Alternatively, one could also test the one-tailed hypothesis
+whether the percentile rank is lower or higher than the 5th/95th percentile,
+respectively.
 
 Moran Spectral Randomization 
 --------------------------------
@@ -163,28 +164,29 @@ gradient.
 
 We will now compute the Moran eigenvectors. This can be done either by providing
 a weight matrix of spatial proximity between each vertex, or by providing a
-cortical surface (see also: :ref:`compute_mem`). Here we'll use a cortical
+cortical surface (see also: :ref:`compute_mem_matlab`). Here we'll use a cortical
 surface.
 
 .. code-block:: matlab
 
-    n_ring = 5; 
+    n_ring = 1; 
     MEM = compute_mem(surf_lh,'n_ring',n_ring,'mask',~temporal_mask_lh);
 
 Using the Moran eigenvectors we can now compute the randomized data. As the
-computationally intensive portion of MSR is mostly in :ref:`compute_mem`, we can
+computationally intensive portion of MSR is mostly in :ref:`compute_mem_matlab`, we can
 push the number of permutations a bit further. 
 
 .. code-block:: matlab
 
     n_rand = 10000;
+    rng(0); % For replicability.
     y_rand = moran_randomization([curv_tl,t1wt2w_tl],MEM,n_rand,'singleton',true);
 
     curv_rand = squeeze(y_rand(:,1,:));
     t1wt2w_rand = squeeze(y_rand(:,2,:));
 
 Now that we have the randomized data, we can compute correlations between the
-gradient and the real/randomised data.  
+gradient and the real/randomized data.  
 
 .. code-block:: matlab
 
@@ -202,17 +204,18 @@ consider the correlation to be significant if it is lower or higher than the
 
 .. code-block:: matlab
 
-    prctile_rank_curv = mean(r_original_curv > r_rand_curv);
+    prctile_rank_curv = mean(r_original_curv > r_rand_curv); % = 0.8249.
     significant_curv = prctile_rank_curv < 0.025 || prctile_rank_curv >= 0.975;
 
-    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w);
+    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w); % = 0.
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
 
-If significant is true, the we've found a statistically significant correlation.
-Alternatively, one could also test the one-tailed hypothesis whether the
-percentile rank is lower or higher than the 5th/95th percentile, respectively.
+If significant is true, then we have found a statistically significant
+correlation. Alternatively, one could also test the one-tailed hypothesis
+whether the percentile rank is lower or higher than the 5th/95th percentile,
+respectively.
 
 This concludes the third and last tutorial. You should now be familliar with all
 the functionality of the BrainSpace toolbox. For more details on any specific
-function, please see `ref`:matlab_package
+function, please see :ref:`matlab_package_matlab`.

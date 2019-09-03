@@ -3,7 +3,7 @@
 Installation Guide
 ==============================
 
-BrainSpace is available in Python and Matlab.
+BrainSpace is available in Python and MATLAB.
 
 
 Python installation
@@ -24,7 +24,7 @@ To use BrainSpace, the following Python packages are required:
 * `matplotlib <https://matplotlib.org/>`_
 * `nibabel <https://nipy.org/nibabel/index.html>`_
 
-Nibabel is required for reading/writing of Gifti surfaces. Matplotlib is only
+Nibabel is required for reading/writing Gifti surfaces. Matplotlib is only
 used for colormaps and we may remove this dependency in future releases.
 
 
@@ -67,10 +67,10 @@ the following in MATLAB: ::
     addpath('/path/to/BrainSpace/matlab/')
 
 If you want to load BrainSpace every time you start MATLAB, type ``edit
-startup`` and append the above line to the end of thils file. 
+startup`` and append the above line to the end of this file. 
 
-You can move the matlab directory to other locations. However, the example data
-loader functions used in our tutorials require the matlab and shared directories
+You can move the MATLAB directory to other locations. However, the example data
+loader functions used in our tutorials require the MATLAB and shared directories
 to both be in a parent directory called BrainSpace. 
     
 If you wish to open gifti files you will also need to install the `gifti library

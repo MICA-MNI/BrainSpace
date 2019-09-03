@@ -4,7 +4,7 @@ if nargin < 3
     group = 'main';
 end
 
-if ~iscell(name) || ~isstring(name)
+if ~iscell(name) && ~isstring(name)
     name = {name};
 end    
 

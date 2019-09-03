@@ -1,4 +1,4 @@
-.. _convert_surface:
+.. _convert_surface_matlab:
 
 convert_surface
 ==============================
@@ -6,7 +6,7 @@ convert_surface
 Synopsis
 ---------
 
-Loads and converts surfaces (`source code
+Loads, converts, and writes surfaces (`source code
 <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/surface_manipulation/convert_surface.m>`_).
 
 
@@ -25,11 +25,13 @@ Usage
 
 Description 
 ------------
-This function is BrainSpace's surface loader. When provided with the path to a
-surface file it will load gifti files (provided the gifti library is installed),
-freesurfer files, .mat files and .obj files. It can also be provided with a
-structure variable containing a surface in either MATLAB format or SurfStat
-format. 
+
+This function is BrainSpace's surface loader/writer. When provided with the path
+to a surface file it will load gifti files (provided the gifti library is
+installed), freesurfer files, .mat files and .obj files. It can also be provided
+with a structure variable containing a surface in either MATLAB format or
+SurfStat format. When provided with a 'path' name-value pair, the input surface
+will also be written to the disk.
 
 A MATLAB surface is a structure consisting of two fields: 'vertices', which is
 an n-by-3 list of vertex coordinates, and 'faces', which is an m-by-3 matrix of
