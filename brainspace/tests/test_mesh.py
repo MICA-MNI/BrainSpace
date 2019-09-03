@@ -296,7 +296,7 @@ def test_array_operations():
     assert isinstance(area, np.ndarray)
     assert area.shape == (s.n_cells, )
 
-    s2 = aop.compute_cell_area(s, append=True, array_name='CellArea')
+    s2 = aop.compute_cell_area(s, append=True, key='CellArea')
     assert s is s2
     assert np.allclose(s2.CellData['CellArea'], area)
 
@@ -305,7 +305,7 @@ def test_array_operations():
     assert isinstance(centers, np.ndarray)
     assert centers.shape == (s.n_cells, 3)
 
-    s2 = aop.compute_cell_center(s, append=True, array_name='CellCenter')
+    s2 = aop.compute_cell_center(s, append=True, key='CellCenter')
     assert s is s2
     assert np.allclose(s2.CellData['CellCenter'], centers)
 
@@ -314,7 +314,7 @@ def test_array_operations():
     assert isinstance(n_adj, np.ndarray)
     assert n_adj.shape == (s.n_points,)
 
-    s2 = aop.get_n_adjacent_cells(s, append=True, array_name='NAdjCells')
+    s2 = aop.get_n_adjacent_cells(s, append=True, key='NAdjCells')
     assert s is s2
     assert np.all(s2.PointData['NAdjCells'] == n_adj)
 
@@ -335,7 +335,7 @@ def test_array_operations():
 
         name = 'CellArea_{}'.format(op)
         s2 = aop.map_celldata_to_pointdata(s, 'CellArea', red_func=op,
-                                           append=True, array_name=name)
+                                           append=True, key=name)
         assert np.allclose(s2.PointData[name], ap)
 
     # map point data to cell  data
@@ -355,7 +355,7 @@ def test_array_operations():
 
         name = 'NAdjCells_{}'.format(op)
         s2 = aop.map_pointdata_to_celldata(s, 'NAdjCells', red_func=op,
-                                           append=True, array_name=name)
+                                           append=True, key=name)
         assert np.allclose(s2.CellData[name], ac)
 
     # Point area
@@ -363,12 +363,12 @@ def test_array_operations():
     assert isinstance(area, np.ndarray)
     assert area.shape == (s.n_points, )
 
-    s2 = aop.compute_point_area(s, append=True, array_name='PointArea')
+    s2 = aop.compute_point_area(s, append=True, key='PointArea')
     assert s is s2
     assert np.allclose(s2.PointData['PointArea'], area)
 
     s2 = aop.compute_point_area(s, cell_area='CellArea', append=True,
-                                array_name='PointArea2')
+                                key='PointArea2')
     assert s is s2
     assert np.allclose(s2.PointData['PointArea2'], area)
 
@@ -377,7 +377,7 @@ def test_array_operations():
     assert cc.shape == (s.n_points, )
     assert np.unique(cc).size == 1
 
-    s2 = aop.get_connected_components(s, append=True, array_name='components')
+    s2 = aop.get_connected_components(s, append=True, key='components')
     assert s is s2
     assert np.all(cc == s2.PointData['components'])
 
