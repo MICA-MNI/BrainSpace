@@ -94,13 +94,16 @@ def get_extent(surf):
 
 
 @wrap_input(0)
-def get_point2cell_connectivity(surf, dtype=np.uint8):
+def get_point2cell_connectivity(surf, mask=None, dtype=np.uint8):
     """Get point to cell connectivity.
 
     Parameters
     ----------
     surf : vtkDataSet or BSDataSet
         Input surface.
+    mask : 1D ndarray, optional
+        Binary mask. If specified, only get points within the mask.
+        Default is None.
     dtype : dtype, optional
         Data type. Default is uint8.
 
@@ -128,17 +131,21 @@ def get_point2cell_connectivity(surf, dtype=np.uint8):
     col = np.repeat(np.arange(surf.n_cells), cells.shape[1])
     shape = (surf.n_points, surf.n_cells)
 
-    return ssp.csr_matrix((data, (row, col)), shape=shape)
+    pc = ssp.csr_matrix((data, (row, col)), shape=shape)
+    return pc if mask is None else pc[mask]
 
 
 @wrap_input(0)
-def get_cell2point_connectivity(surf, dtype=np.uint8):
+def get_cell2point_connectivity(surf, mask=None, dtype=np.uint8):
     """Get cell to point connectivity.
 
     Parameters
     ----------
     surf : vtkDataSet or BSDataSet
         Input surface.
+    mask : 1D ndarray, optional
+        Binary mask. If specified, only get points within the mask.
+        Default is None.
     dtype : dtype, optional
         Data type. Default is uint8.
 
@@ -159,15 +166,8 @@ def get_cell2point_connectivity(surf, dtype=np.uint8):
 
     """
 
-    cells = surf.get_cells2D()
-
-    data = np.ones(cells.size, dtype=dtype)
-    col = cells.ravel()
-    row = np.repeat(np.arange(surf.n_cells), cells.shape[1])
-    shape = (surf.n_cells, surf.n_points)
-
-    return ssp.csr_matrix((data, (row, col)), shape=shape)
-    # return get_point2cell_connectivity(surf, dtype=dtype).T.tocsr(copy=False)
+    pc = get_point2cell_connectivity(surf, mask=mask, dtype=dtype)
+    return pc.T.tocsr(copy=False)
 
 
 def get_cell_neighbors(surf, include_self=True, with_edge=True,
@@ -251,9 +251,7 @@ def get_immediate_adjacency(surf, include_self=True, mask=None,
     share and edge with current point.
     """
 
-    adj = get_point2cell_connectivity(surf, dtype=np.bool)
-    if mask is not None:
-        adj = adj[mask]
+    adj = get_point2cell_connectivity(surf, mask=mask, dtype=np.bool)
     adj *= adj.T
     if not include_self:
         adj.setdiag(0)
@@ -334,9 +332,169 @@ def get_edges(surf, mask=None):
 
     adj = get_immediate_adjacency(surf, include_self=False, mask=mask,
                                   dtype=np.bool)
+    adj.sort_indices()
     adj_ud = ssp.triu(adj, k=1, format='coo')
     edges = np.column_stack([adj_ud.row, adj_ud.col])
     return edges
+
+
+@wrap_input(0)
+def get_point2edge_connectivity(surf, mask=None, dtype=np.uint8):
+    """Get point to edge connectivity.
+
+    Parameters
+    ----------
+    surf : vtkDataSet or BSDataSet
+        Input surface.
+    mask : 1D ndarray, optional
+        Binary mask. If specified, only use points within the mask.
+        Default is None.
+    dtype : dtype, optional
+        Data type. Default is uint8.
+
+    Returns
+    -------
+    output : sparse matrix, shape (n_points, n_edges)
+        The connectivity matrix. The (i,j) entry is 1 if the j-th edge
+        uses the i-th point.
+
+    Notes
+    -----
+    Edges are sorted by point ids, such as edge 0 is the one connecting the
+    points with the smallest ids.
+    This function returns the transpose of :func:`get_edge2point_connectivity`.
+
+    See Also
+    --------
+    :func:`get_edge2point_connectivity`
+    :func:`get_edges`
+
+    """
+
+    edges = get_edges(surf, mask=mask)
+    n_pts = surf.n_points if mask is None else np.count_nonzero(mask)
+
+    data = np.ones(edges.size, dtype=dtype)
+    row = edges.ravel()
+    col = np.repeat(np.arange(edges.shape[0]), 2)
+    shape = (n_pts, edges.shape[0])
+
+    return ssp.csr_matrix((data, (row, col)), shape=shape)
+
+
+@wrap_input(0)
+def get_edge2point_connectivity(surf, mask=None, dtype=np.uint8):
+    """Get edge to point connectivity.
+
+    Parameters
+    ----------
+    surf : vtkDataSet or BSDataSet
+        Input surface.
+    mask : 1D ndarray, optional
+        Binary mask. If specified, only use points within the mask.
+        Default is None.
+    dtype : dtype, optional
+        Data type. Default is uint8.
+
+    Returns
+    -------
+    output : sparse matrix, shape (n_edges, n_points)
+        The connectivity matrix. The (i,j) entry is 1 if the i-th edge
+        uses the j-th point.
+
+    Notes
+    -----
+    Edges are sorted by point ids, such as edge 0 is the one connecting the
+    points with the smallest ids.
+    This function returns the transpose of :func:`get_point2edge_connectivity`.
+
+    See Also
+    --------
+    :func:`get_point2edge_connectivity`
+    :func:`get_edges`
+
+    """
+
+    pe = get_point2edge_connectivity(surf, mask=mask, dtype=dtype)
+    return pe.T.tocsr(copy=False)
+
+
+@wrap_input(0)
+def get_edge2cell_connectivity(surf, mask=None, dtype=np.uint8):
+    """Get edge to cell connectivity.
+
+    Parameters
+    ----------
+    surf : vtkDataSet or BSDataSet
+        Input surface.
+    mask : 1D ndarray, optional
+        Binary mask. If specified, only use points within the mask.
+        Default is None.
+    dtype : dtype, optional
+        Data type. Default is uint8.
+
+    Returns
+    -------
+    output : sparse matrix, shape (n_edges, n_cells)
+        The connectivity matrix. The (i,j) entry is 1 if the j-th cell
+        uses the i-th edge.
+
+    Notes
+    -----
+    Edges are sorted by point ids, such as edge 0 is the one connecting the
+    points with the smallest ids.
+    This function returns the transpose of :func:`get_cell2edge_connectivity`.
+
+    See Also
+    --------
+    :func:`get_cell2edge_connectivity`
+    :func:`get_edges`
+
+    """
+
+    ec = get_edge2point_connectivity(surf, mask=mask, dtype=np.uint8)
+    ec *= get_point2cell_connectivity(surf, mask=mask, dtype=np.uint8)
+    ec.data = ec.data == 2
+    ec.eliminate_zeros()
+    ec.data = ec.data.astype(dtype, copy=False)
+    return ec
+
+
+@wrap_input(0)
+def get_cell2edge_connectivity(surf, mask=None, dtype=np.uint8):
+    """Get cell to edge connectivity.
+
+    Parameters
+    ----------
+    surf : vtkDataSet or BSDataSet
+        Input surface.
+    mask : 1D ndarray, optional
+        Binary mask. If specified, only use points within the mask.
+        Default is None.
+    dtype : dtype, optional
+        Data type. Default is uint8.
+
+    Returns
+    -------
+    output : sparse matrix, shape (n_cells, n_edges)
+        The connectivity matrix. The (i,j) entry is 1 if the i-th cell
+        uses the j-th edge.
+
+    Notes
+    -----
+    Edges are sorted by point ids, such as edge 0 is the one connecting the
+    points with the smallest ids.
+    This function returns the transpose of :func:`get_edge2cell_connectivity`.
+
+    See Also
+    --------
+    :func:`get_edge2cell_connectivity`
+    :func:`get_edges`
+
+    """
+
+    ec = get_edge2cell_connectivity(surf, mask=mask, dtype=dtype)
+    return ec.T.tocsr(copy=False)
 
 
 def get_edge_length(surf, metric='euclidean', mask=None):
@@ -516,7 +674,6 @@ def get_immediate_distance(surf, metric='euclidean', mask=None,
     """
 
     points = get_points(surf, mask=mask)
-    n_pts = points.shape[0]
     edges = get_edges(surf, mask=mask)
 
     dif = points[edges[:, 0]] - points[edges[:, 1]]
@@ -526,7 +683,7 @@ def get_immediate_distance(surf, metric='euclidean', mask=None,
 
     data = np.repeat(dist, 2).ravel()
     row, col = edges.ravel(), edges[:, ::-1].ravel()
-    shape = (n_pts, n_pts)
+    shape = (points.shape[0], points.shape[0])
 
     return ssp.csr_matrix((data, (row, col)), shape=shape, dtype=dtype)
 
@@ -582,14 +739,15 @@ def get_ring_distance(surf, n_ring=1, metric='geodesic', mask=None,
             idx_pnt = np.argmax(idx == i)
             d.data[d.indptr[i]:d.indptr[i + 1]] = \
                 dijkstra(csgraph=imm_dist[idx][:, idx], indices=idx_pnt)
+
+        d.data[np.isinf(d.data)] = 0
         d.eliminate_zeros()
 
         # Slower
         # d = get_ring_adjacency(surf, n_ring=n_ring, mask=mask,
         #                        include_self=False)
         # d = d.multiply(dijkstra(imm_dist)).astype(dtype)
-
-        d.data[np.isinf(d.data)] = 0
+        # d.data[np.isinf(d.data)] = 0
 
     elif metric in ['euclidean', 'sqeuclidean']:
         d = get_ring_adjacency(surf, n_ring=n_ring, mask=mask,
