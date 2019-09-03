@@ -4,15 +4,30 @@ Getting Started
 ==============================
 
 
+Introduction to Gradient
+-------------------------------------
+
+Classically, many neuroimaging studies have attempted to parcellate the human
+brain into distinct areas based on anatomical or functional features. Whilst
+effective, the strict boundaries assumed by these methods are often unrealistic
+and there lacks a clear ordering between parcels. More recently, "gradient"
+approaches, which define the brain as a set of continuous scores along manifold
+axes, have gained popularity (see also :ref:`references`). Core to these
+techniques is the computation of an affinity matrix that captures inter-area
+similarity of a given feature followed by the application of dimensionality
+reduction techniques to identify a gradual ordering of the input matrix in a
+lower dimensional manifold space.
+
 BrainSpace is a compact and flexible toolbox that implements a wide variety of
 approaches to build macroscale gradients from neuroimaging and connectome data.
-The toolbox allows for (i) the identication of gradients (using dimensionality
-reduction techniques), (ii) their alignment (across subjects or modalities),
-and (iii) their visualization (in embedding or cortical space). The toolbox is
-implemented in both matlab and python. The steps below will help you to get
-started and to build your first gradients. Please also see the tutorials for
-further examples.
+In this overview, we will show the the basic steps needed for the identication
+of gradients, and their visualization. The steps below will help you to get
+started and to build your first gradients. If you haven't done so yet, we
+recommend you install the package (:ref:`install_page`) so you can follow along
+with the examples. 
 
+Basic Gradient Construction
+-----------------------------
 
 The packages comes with the conte69 surface, and several cortical features and
 parcellations. Let's start by loading the conte69 surfaces:
@@ -39,10 +54,9 @@ parcellations. Let's start by loading the conte69 surfaces:
         [surf_lh, surf_rh] = load_conte69();
 
 
-To load your own surfaces, you can use our Matlab :func:`.convert_surface`
-function and :func:`.load_surface` when using Python. BrainSpace also provides
-surface plotting functionality. We can plot the conte69 hemisphere surfaces as
-follows:
+To load your own surfaces, you can use our Matlab :func:`.read_surface` function
+and :func:`.load_surface` when using Python. BrainSpace also provides surface
+plotting functionality. We can plot the conte69 surfaces as follows:
 
 .. tabs::
 
@@ -63,7 +77,7 @@ follows:
 
 
 
-And also load the mean connectivity matrix built from a subset of the human
+Let's also load the mean connectivity matrix built from a subset of the human
 connectome project (HCP). The package comes with several example matrices,
 downsampled using the Schaefer parcellations `(Schaefer et al., 2017) <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_.
 Let's load one of them.
@@ -135,3 +149,9 @@ Now we can visually inspect the gradients. Let's plot the first gradient:
 .. image:: ./matlab_doc/examples/example_figs/gettingstarted2.png
    :scale: 70%
    :align: center
+
+As we can see, this gradient corresponds to those observed previously in the
+literature i.e. running from default mode to sensory areas.
+
+That concludes this getting started section. For more full documentation and
+tutorials please see :ref:`matlab_package` and/or :ref:`python_package`.

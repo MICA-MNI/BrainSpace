@@ -1,3 +1,5 @@
+.. _python_package:
+
 Python Package
 ======================
 This page contains links to all the python related documents on python package.

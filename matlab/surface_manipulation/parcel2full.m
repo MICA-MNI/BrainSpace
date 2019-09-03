@@ -12,7 +12,7 @@ end
 % Check for correct size of parcellation.
 sz = size(parcellated_data,1); 
 if max(parcellation) ~= sz
-    error('Parcellation number must be eqiuvalent to length of parcellated data.');
+    error('The highest number in the parcellation scheme must be equivalent to length of the first dimension of the parcellated data.');
 end
 
 % Check if all numbers are included. 

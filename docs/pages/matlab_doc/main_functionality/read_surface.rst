@@ -23,6 +23,6 @@ Usage
 Description 
 ------------
 
-Reads surfaces from the disk. Accepted are identical to those accepted by
-:ref:`convert_surface_matlab`.
+Reads surfaces from the disk. Accepted formats are identical to those accepted
+by :ref:`convert_surface_matlab`.
 
