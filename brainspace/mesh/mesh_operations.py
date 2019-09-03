@@ -9,14 +9,12 @@ Basic functions on surface meshes.
 import warnings
 import numpy as np
 
-# from vtkmodules.vtkCommonDataModelPython import vtkDataObject
-# from vtkmodules.vtkFiltersCorePython import vtkThreshold
-# from vtkmodules.vtkFiltersGeometryPython import vtkGeometryFilter
+from vtk import (vtkDataObject, vtkThreshold, vtkGeometryFilter,
+                 vtkAppendPolyData)
 
-from vtk import vtkDataObject, vtkThreshold, vtkGeometryFilter
-
-from ..vtk_interface.pipeline import serial_connect
-from ..vtk_interface.wrappers import wrap_vtk
+from .array_operations import get_connected_components
+from ..vtk_interface import wrap_vtk, serial_connect, get_output
+from ..vtk_interface.pipeline import connect
 from ..vtk_interface.decorators import wrap_input
 
 
@@ -333,3 +331,62 @@ def mask_cells(surf, mask):
     """
 
     return _surface_mask(surf, mask, use_cell=True)
+
+
+def combine_surfaces(*surfs):
+    """ Combine surfaces.
+
+    Parameters
+    ----------
+    surfs : sequence of vtkPolyData and/or BSPolyData
+        Input surfaces.
+
+    Returns
+    -------
+    res : BSPolyData
+        Combination of input surfaces.
+
+    See Also
+    --------
+    :func:`split_surface`
+
+    """
+
+    alg = vtkAppendPolyData()
+    for s in surfs:
+        alg = connect(s, alg, add_conn=True)
+    return get_output(alg)
+
+
+@wrap_input(0)
+def split_surface(surf, labeling=None):
+    """ Split surface according to the labeling.
+
+    Parameters
+    ----------
+    surf : vtkPolyData or BSPolyData
+        Input surface.
+    labeling : str, 1D ndarray or None, optional
+        Array used to perform the splitting. If str, it must be an array in
+        the PointData attributes of `surf`. If None, split surface in its
+        connected components. Default is None.
+
+    Returns
+    -------
+    res : dict[int, BSPolyData]
+        Dictionary of sub-surfaces for each label.
+
+    See Also
+    --------
+    :func:`combine_surfaces`
+    :func:`mask_points`
+
+    """
+
+    if labeling is None:
+        labeling = get_connected_components(surf)
+    elif isinstance(labeling, str):
+        labeling = surf.get_array(labeling, at='p')
+
+    ulab = np.unique(labeling)
+    return {l: mask_points(surf, labeling == l) for l in ulab}
