@@ -30,16 +30,18 @@ Surface Handling
 ------------------
 .. toctree::
     :maxdepth: 1
+    
     main_functionality/read_surface
     main_functionality/write_surface
     main_functionality/combine_surfaces
     main_functionality/full2parcel
     main_functionality/parcel2full
 
-Null Models 
------------------
+Null Hypothesis Testing 
+-------------------------
 .. toctree::
     :maxdepth: 1
+    
     main_functionality/spin_permutations
     main_functionality/compute_mem
     main_functionality/moran_randomization
