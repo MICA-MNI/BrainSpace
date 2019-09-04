@@ -44,8 +44,8 @@ def test_io(ext):
     root_pth = os.path.dirname(__file__)
     io_pth = os.path.join(root_pth, 'test_sphere_io.{ext}').format(ext=ext)
 
-    mio.save_surface(s, io_pth)
-    s2 = mio.load_surface(io_pth)
+    mio.write_surface(s, io_pth)
+    s2 = mio.read_surface(io_pth)
 
     assert np.allclose(s.Points, s2.Points)
     assert np.all(s.get_cells2D() == s2.get_cells2D())
@@ -59,8 +59,8 @@ def test_io_nb():
 
     root_pth = os.path.dirname(__file__)
     io_pth = os.path.join(root_pth, 'test_sphere_io.gii')
-    mio.save_surface(s, io_pth)
-    s2 = mio.load_surface(io_pth)
+    mio.write_surface(s, io_pth)
+    s2 = mio.read_surface(io_pth)
 
     assert np.allclose(s.Points, s2.Points)
     assert np.all(s.get_cells2D() == s2.get_cells2D())
