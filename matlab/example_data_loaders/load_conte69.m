@@ -1,4 +1,12 @@
 function [surf_lh,surf_rh] = load_conte69(name)
+% LOAD_CONTE69   loads conte69 surfaces.
+%
+%   [surf_lh,surf_rh] = LOAD_CONTE69(name) loads conte69-32k surfaces of
+%   the left (surf_lh) and right (surf_rh) hemispheres. Name can be set to
+%   'surfaces' for cortical surface or 'spheres' for corresponding spheres.
+%
+%   For more information, please consult our <a
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/data_loaders/load_conte69.html">ReadTheDocs</a>.
 
 if ~exist('name','var')
     name = 'surfaces';

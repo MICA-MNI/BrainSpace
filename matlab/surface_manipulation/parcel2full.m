@@ -1,6 +1,17 @@
 function full_data = parcel2full(parcellated_data,parcellation)
-% Converts parcellated data to full data. Any missing data in the full set
-% (e.g. midline) should be denoted as either 0 or NaN. 
+% PARCEL2FULL   Upsamples parcel data to vertex data.
+%
+%   full_data = parcel2full(parcellated_data,parcellation) takes n-by-1
+%   vector parcellated_data and creates a new m-by-1 vector full_data,
+%   where each value in full data corresponds to the parcellated data as
+%   defined by the index in the m-by-1 parcellation vector i.e.
+%   full_data(ii) = parcellated_data(parcellation(ii)).
+%
+%   Any 0s or NaNs in the parcellation are set to NaN in the full_data. 
+%
+%   For more information, please consult our <a
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/parcel2full.html">ReadTheDocs</a>.
+
 
 if iscell(parcellated_data)
     for ii = 1:numel(parcellated_data)

@@ -1,4 +1,21 @@
 function h = plot_hemispheres(data,surface,varargin)
+% PLOT_HEMISPHERES   Plots data on the cortical surface.
+%
+%   h = PLOT_HEMISPHERES(data,surface,varargin) plots column vectors of the
+%   n-by-m data matrix on surfaces provided in one or two element cell
+%   arary surface. Vertices included in the surfaces must sum to n or the
+%   length of the parcellation vector (see below). All handles to the
+%   graphics objects are in the structure h. 
+%
+%   Valid name-value pairs:
+%       - 'labeltext': A length m cell array containing text labels to add to
+%       the surfaces of each column vector. 
+%       
+%       - 'parcellation': A v-by-1 column vector containing a parcellation
+%       scheme, with identical numbers denoting same parcel.
+%
+%   For more information, please consult our <a
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/visualization/plot_hemispheres.html">ReadTheDocs</a>.
 
 for ii = 1:2:numel(varargin)
     switch lower(varargin{ii})
