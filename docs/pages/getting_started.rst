@@ -4,7 +4,7 @@ Getting Started
 ==============================
 
 
-Introduction to Gradient
+Introduction to Gradients
 -------------------------------------
 
 Classically, many neuroimaging studies have attempted to parcellate the human
@@ -54,7 +54,7 @@ parcellations. Let's start by loading the conte69 surfaces:
         [surf_lh, surf_rh] = load_conte69();
 
 
-To load your own surfaces, you can use our Matlab :func:`.read_surface` function
+To load your own surfaces, you can use our MATLAB :func:`.read_surface` function
 and :func:`.load_surface` when using Python. BrainSpace also provides surface
 plotting functionality. We can plot the conte69 surfaces as follows:
 
