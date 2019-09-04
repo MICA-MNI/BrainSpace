@@ -79,7 +79,7 @@ def cluster_points(surf, n_clusters=100, is_size=False, mask=None,
     a.tolil().setdiag(1)
 
     # Embedding
-    _, evs = diffusion_mapping(a, n_components=30, alpha=0, diffusion_time=1,
+    evs, _ = diffusion_mapping(a, n_components=30, alpha=0, diffusion_time=1,
                                random_state=random_state)
     evs = normalize(evs)  # To find spherical clusters
 

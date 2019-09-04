@@ -57,13 +57,13 @@ embedding = load_gradient('fc', idx=0)
 
 import numpy as np
 
-from brainspace.null_models import SpinRandomization
+from brainspace.null_models import SpinPermutations
 from brainspace.plotting import plot_hemispheres
 
 # Let's create some rotations
 n_permutations = 1000
 
-sp = SpinRandomization(n_rep=n_permutations, random_state=0)
+sp = SpinPermutations(n_rep=n_permutations, random_state=0)
 sp.fit(sphere_lh, points_rh=sphere_rh)
 
 t1wt2w_rotated = np.hstack(sp.randomize(t1wt2w_lh, t1wt2w_rh))
@@ -153,7 +153,7 @@ curv_tl = load_curvature()[:n_pts_lh][mask_tl]
 # providing a weight matrix of spatial proximity between each vertex, or by
 # providing a cortical surface. Here we’ll use a cortical surface.
 
-from brainspace.null_models import MoranSpectralRandomization
+from brainspace.null_models import MoranRandomization
 
 # compute spatial weight matrix
 w = me.get_ring_distance(surf_lh, n_ring=1)
@@ -162,7 +162,7 @@ w.data **= -1
 
 n_rand = 1000
 
-msr = MoranSpectralRandomization(n_rep=n_rand, tol=1e-6, random_state=43)
+msr = MoranRandomization(n_rep=n_rand, tol=1e-6, random_state=43)
 msr.fit(w)
 
 

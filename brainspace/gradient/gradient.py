@@ -42,6 +42,9 @@ def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
         Gradients (i.e., eigenvectors).
     """
 
+    if callable(kernel):
+        x = kernel(x)
+        kernel = None
     a = compute_affinity(x, kernel=kernel, sparsity=sparsity, gamma=gamma)
 
     kwds_emb = {'n_components': n_components, 'random_state': random_state}
@@ -65,7 +68,7 @@ class GradientMaps(BaseEstimator):
 
     Parameters
     ----------
-    n_gradients : int, optional
+    n_components : int, optional
         Number of gradients. Default is 10.
     approach : {'dm', 'le', 'pca'} or object, optional
         Embedding approach. Default is 'dm'. It can be a string or instance:
@@ -75,9 +78,11 @@ class GradientMaps(BaseEstimator):
           eigenmaps.
         - 'pca' or :class:`.PCAMaps`: embedding using PCA.
 
-    kernel : str or None, optional
+    kernel : str, callable or None, optional
         Kernel function to build the affinity matrix. Possible options:
         {'pearson', 'spearman', 'cosine', 'normalized_angle', 'gaussian'}.
+        If callable, must receive a 2D array and return a 2D square array.
+        If None, use input matrix. Default is None.
     alignment : {'procrustes', 'joint'}, object or None
         Alignment approach. Only used when two or more datasets are provided.
         If None, no alignment is peformed. If `object`, it accepts an instance
@@ -94,18 +99,18 @@ class GradientMaps(BaseEstimator):
 
     Attributes
     ----------
-    lambdas_ : ndarray or list of arrays, shape = (n_gradients,)
+    lambdas_ : ndarray or list of arrays, shape = (n_components,)
         Eigenvalues for each datatset.
-    gradients_ : ndarray or list of arrays, shape = (n_samples, n_gradients)
+    gradients_ : ndarray or list of arrays, shape = (n_samples, n_components)
         Gradients (i.e., eigenvectors).
-    aligned_ : None or list of arrays, shape = (n_samples, n_gradients)
+    aligned_ : None or list of arrays, shape = (n_samples, n_components)
         Aligned gradients. None if ``alignment is None`` or only one dataset
         is used.
     """
 
-    def __init__(self, n_gradients=10, approach='dm', kernel=None,
+    def __init__(self, n_components=10, approach='dm', kernel=None,
                  alignment=None, random_state=None):
-        self.n_gradients = n_gradients
+        self.n_components = n_components
         self.approach = approach
         self.kernel = kernel
         self.alignment = alignment
@@ -145,7 +150,7 @@ class GradientMaps(BaseEstimator):
 
         if isinstance(x, np.ndarray):
             self.lambdas_, self.gradients_ = \
-                _fit_one(x, self.approach, self.kernel, self.n_gradients,
+                _fit_one(x, self.approach, self.kernel, self.n_components,
                          self.random_state, gamma=gamma, sparsity=sparsity,
                          **kwargs)
             self.aligned_ = None
