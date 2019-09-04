@@ -24,8 +24,9 @@ classdef GradientMaps
 %       - a function handle
 %   - n_components (default: 10)
 %       - Any natural number.
-%   - random_state (default: 0)
-%       - Any valid input for MATLAB's "rng" function.
+%   - random_state (default: nan)
+%       - Any valid input for MATLAB's "rng" function or nan for no
+%           initialization.
 %
 % For complete documentation, including descriptions of this object's
 % properties and methods please consult our <a

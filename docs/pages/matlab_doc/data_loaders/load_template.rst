@@ -22,3 +22,11 @@ Usage
 - *number*: The rank of the gradient, either 1 or 2. 
 - *data*: Output data. 
 
+------------------
+Description
+------------------
+
+Loads normative functional connectivity and microstructural profile covariance
+gradients, both computed from the HCP dataset. Gradients were computed with a
+cosine similarity kernel and diffusion mapping on a downsampled 5K cortical
+mesh. Resulting gradients were upsampled to the 32K mesh. 
