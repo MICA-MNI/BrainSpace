@@ -18,7 +18,11 @@ Usage
 
     conn_matrices = load_group_fc(parcellation,scale,group)
 
-- *parcellation*: Name of the parcellation, either 'schaeffer' for Schaeffer (functional) parcellations or 'vosdewael' for a subparcellation of aparc. Both may be provided as a cell or string array. 
+- *parcellation*: Name of the parcellation, either 'schaefer' for Schaefer (functional) parcellations or 'vosdewael' for a subparcellation of the `Desikan-Killiany atlas`__. Both may be provided as a cell or string array. 
 - *scale*: Scale of the parcellation. Either 100, 200, 300, or 400. Multiple may be provided as a vector.
 - *group*: Loads data from the main group if set to 'main' (default) or the holdout group if set to 'holdout'. 
 - *conn_matrices*: Structure of all requested data. 
+
+.. _DK: https://surfer.nmr.mgh.harvard.edu/ftp/articles/desikan06-parcellation.pdf
+
+__ DK_
