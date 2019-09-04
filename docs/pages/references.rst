@@ -38,7 +38,7 @@ Functional gradients in aging.
 * `Lowe A, Paquola C, Vos de Wael R, Girn M, Caldairou B, Larivière S, Tavakol S, Royer J, 
   Schrader DV, Bernasconi N, Bernasconi A, Spreng RN, Bernhardt BC (2019)
   Targeting age-related differences in brain and cognition with multimodal imaging and
-  connectome topography profiling. Human Brain Mapping, in press. Preprint: <https://onlinelibrary.wiley.com/doi/full/10.1002/hbm.24767>`_
+  connectome topography profiling. Human Brain Mapping, in press. <https://onlinelibrary.wiley.com/doi/full/10.1002/hbm.24767>`_
 
 Meta-analytic co-activation and functional gradients in the hippocampus.
 

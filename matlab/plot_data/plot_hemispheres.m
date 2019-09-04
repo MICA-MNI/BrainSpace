@@ -4,7 +4,7 @@ for ii = 1:2:numel(varargin)
     switch lower(varargin{ii})
         case 'labeltext'
             if ischar(varargin{ii+1})
-                label_text = cell(varargin{ii+1});
+                label_text = {varargin{ii+1}};
             else
                 label_text = varargin{ii+1};
             end
