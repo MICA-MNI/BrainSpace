@@ -40,7 +40,7 @@ parcellations. Let's start by loading the conte69 surfaces:
 
 
 To load your own surfaces, you can use our Matlab :func:`.convert_surface`
-function and :func:`.load_surface` when using Python. BrainSpace also provides
+function and :func:`.read_surface` when using Python. BrainSpace also provides
 surface plotting functionality. We can plot the conte69 hemisphere surfaces as
 follows:
 
