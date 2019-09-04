@@ -14,9 +14,9 @@ Usage
 ----------
 ::
 
-    surf_out = read_surface(path);
+    surf_out = read_surface(file);
 
-- *path*: Path to read from.
+- *file*: File to read from.
 - *surf_out*: Output surface.  
 
 
