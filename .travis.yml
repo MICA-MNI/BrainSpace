@@ -19,6 +19,15 @@ matrix:
       services: xvfb
       env: REPORT_COVERAGE=true
 
+    - name: "Python 3.7.1 setup.py install"
+      python: 3.7
+      install:
+        - python setup.py install
+        - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
+      script:
+          - cd $HOME
+          - python -m pytest $TRAVIS_BUILD_DIR/tests
+
     # ======= OSX ========
     - name: "Python 3.6.5 on macOS 10.13"
       os: osx
