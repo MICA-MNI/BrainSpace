@@ -62,7 +62,7 @@ MATLAB installation
 
 This toolbox has been tested with MATLAB versions R2018b, although we expect it
 to work with versions R2017a and newer. It will definitely throw errors with
-versions R2016 and older. The package was tested on macOS Mojave and Ubuntu
+versions R2016b and older. The package was tested on macOS Mojave and Ubuntu
 Xenial Xerus. Testing on Windows 10 has not been completed, but we expect it to
 work without error.
 
