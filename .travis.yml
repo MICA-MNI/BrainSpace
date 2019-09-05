@@ -24,8 +24,6 @@ matrix:
       services: xvfb
       install:
         - python setup.py install
-      script:
-        - py.test brainspace
 
     - name: "Python 3.7.1 sdist"
       python: 3.7
@@ -33,8 +31,6 @@ matrix:
       install:
         - python setup.py sdist;
         - pip install dist/*.tar.gz;
-      script:
-        - py.test brainspace
 
     - name: "Python 3.7.1 wheel"
       python: 3.7
@@ -42,8 +38,6 @@ matrix:
       install:
         - python setup.py bdist_wheel;
         - pip install dist/*.whl;
-      script:
-        - py.test brainspace
 
 
     # ======= OSX ========
@@ -82,7 +76,7 @@ script:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       python3 -m pytest;
     else
-      pytest;
+      py.test brainspace
     fi
 
 
