@@ -24,10 +24,11 @@ matrix:
       services: xvfb
       install:
         - python setup.py install
-#        - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
       script:
-          - cd $HOME
-          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
+#          - cd $HOME
+#          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
+#          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
+          - py.test brainspace
 
     - name: "Python 3.7.1 sdist"
       python: 3.7
