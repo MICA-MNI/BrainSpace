@@ -1,18 +1,26 @@
+
+.. _pymod-vtkinterface:
+
 VTK interface
 =================================
 
 Surface mesh functionality provided in BrainSpace is built on top of the
 `Visualization Toolkit (VTK) <https://vtk.org/>`_. BrainSpace provides several
 wrappers for most data objects and some filters in VTK. Here we present
-a subset of this functionality.
-
-- :ref:`Basic wrapping<Basic wrapping>`
-- :ref:`VTK wrappers<VTK wrappers>`
-- :ref:`VTK data object wrappers<VTK data object wrappers>`
-- :ref:`Pipeline functionality<Pipeline functionality>`
-- :ref:`Decorators<Decorators>`
+a subset of this functionality. Please also refer to
+:ref:`pypage-vtk_wrapping` document for an introduction to the wrapping
+interface.
 
 
+- :ref:`pysec-vtkinterface-basic_wrapping`
+- :ref:`pysec-vtkinterface-wrappers`
+- :ref:`pysec-vtkinterface-object_wrappers`
+- :ref:`pysec-vtkinterface-pipeline`
+- :ref:`pysec-vtkinterface-decorators`
+
+
+
+.. _pysec-vtkinterface-basic_wrapping:
 
 Basic wrapping
 -------------------------
@@ -26,6 +34,8 @@ Basic wrapping
    is_vtk
    is_wrapper
 
+
+.. _pysec-vtkinterface-wrappers:
 
 VTK wrappers
 -------------------------
@@ -44,6 +54,8 @@ VTK wrappers
    BSLookupTable
 
 
+.. _pysec-vtkinterface-object_wrappers:
+
 VTK data object wrappers
 -------------------------
 
@@ -60,6 +72,8 @@ VTK data object wrappers
     BSUnstructuredGrid
 
 
+.. _pysec-vtkinterface-pipeline:
+
 Pipeline functionality
 -------------------------
 
@@ -73,6 +87,8 @@ Pipeline functionality
    get_output
    to_data
 
+
+.. _pysec-vtkinterface-decorators:
 
 Decorators
 -------------------------

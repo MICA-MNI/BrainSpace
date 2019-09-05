@@ -58,6 +58,7 @@ To load your own surfaces, you can use our MATLAB :func:`.read_surface` function
 and :func:`.load_surface` when using Python. BrainSpace also provides surface
 plotting functionality. We can plot the conte69 surfaces as follows:
 
+
 .. tabs::
 
    .. code-tab:: py

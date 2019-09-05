@@ -15,6 +15,12 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 
+import brainspace
+brainspace.OFF_SCREEN = True  # off screen rendering for examples
+
+from brainspace.plotting.sphinx_gallery_scrapper import _get_sg_image_scraper
+
+
 # -- Project information -----------------------------------------------------
 
 project = 'BrainSpace'
@@ -52,7 +58,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.autosectionlabel',
+    # 'sphinx.ext.autosectionlabel',
     'sphinx.ext.doctest',
     'sphinx_gallery.gen_gallery',
     # 'sphinxcontrib.apidoc',
@@ -80,7 +86,8 @@ sphinx_gallery_conf = {
      'examples_dirs': '../brainspace/examples',
      'gallery_dirs': 'python_doc/auto_examples',
      # 'plot_gallery': 'False',
-     'thumbnail_size': (250, 250)
+     'thumbnail_size': (250, 250),
+     'image_scrapers': ('matplotlib', _get_sg_image_scraper()),
 }
 
 

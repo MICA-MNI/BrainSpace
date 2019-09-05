@@ -6,6 +6,7 @@ Plotting functionality based on VTK.
 # License: BSD 3 clause
 
 
+import weakref
 import warnings
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
@@ -16,18 +17,12 @@ from PIL import Image
 from ..vtk_interface import wrap_vtk
 from ..vtk_interface.decorators import wrap_input
 
-# from vtkmodules.vtkCommonCorePython import vtkCommand
-# from vtkmodules.vtkIOImagePython import vtkPNGWriter
-# from vtkmodules.vtkRenderingCorePython import (vtkRenderWindowInteractor,
-#                                                vtkWindowToImageFilter,
-#                                                vtkRenderWindow)
-# from vtkmodules import qt as vtk_qt
-
 from vtk import (vtkCommand, vtkPNGWriter, vtkRenderWindowInteractor,
                  vtkWindowToImageFilter, vtkRenderWindow)
 
 import vtk.qt as vtk_qt
 
+from brainspace import OFF_SCREEN
 from ..vtk_interface.wrappers import BSRenderer
 from ..vtk_interface.pipeline import get_output
 
@@ -52,8 +47,6 @@ except ImportError:
 
 
 try:
-    # from vtkmodules.qt.QVTKRenderWindowInteractor import \
-    #     QVTKRenderWindowInteractor
     from vtk.qt.QVTKRenderWindowInteractor import \
         QVTKRenderWindowInteractor
     from PyQt5 import QtGui
@@ -87,15 +80,95 @@ def in_notebook():
     return is_nb
 
 
+# def _create_grid(nrow, ncol):
+#     dx, dy = 1 / ncol, 1 / nrow
+#     x_min = np.tile(np.arange(0, 1, dx), nrow)
+#     x_max = x_min + dx
+#     y_min = np.repeat(np.arange(0, 1, dy), ncol)[::-1]
+#     y_max = y_min + dy
+#     g = np.column_stack([x_min, y_min, x_max, y_max])
+#
+#     strides = (4*g.itemsize*ncol, 4*g.itemsize, g.itemsize)
+#     return as_strided(g, shape=(nrow, ncol, 4), strides=strides)
+
+
 def _create_grid(nrow, ncol):
-    dx, dy = 1 / ncol, 1 / nrow
-    x_min = np.tile(np.arange(0, 1, dx), nrow)
-    x_max = x_min + dx
-    y_min = np.repeat(np.arange(0, 1, dy), ncol)[::-1]
-    y_max = y_min + dy
+    """ Create bounds for vtk rendering
+
+    Parameters
+    ----------
+    nrow : int or array-like
+        Number of rows. If array-like, must be an array with values in
+        ascending order between 0 and 1.
+    ncol : int or array-like
+        Number of columns. If array-like, must be an array with values in
+        ascending order between 0 and 1.
+
+    Returns
+    -------
+    grid: ndarray, shape = (nrow, ncol, 4)
+        Grid for vtk rendering.
+
+    Examples
+    --------
+    >>> _create_grid(1, 2)
+    array([[[0. , 0. , 0.5, 1. ],
+            [0.5, 0. , 1. , 1. ]]])
+    >>> _create_grid(1, [0, .5, 1])
+    array([[[0. , 0. , 0.5, 1. ],
+            [0.5, 0. , 1. , 1. ]]])
+    >>> _create_grid(1, [0, .5, .9])
+    array([[[0. , 0. , 0.5, 1. ],
+            [0.5, 0. , 0.9, 1. ]]])
+    >>> _create_grid(1, [0, .5, .9, 1])
+    array([[[0. , 0. , 0.5, 1. ],
+            [0.5, 0. , 0.9, 1. ],
+            [0.9, 0. , 1. , 1. ]]])
+    >>> _create_grid(2, [.5, .6, .7])
+    array([[[0.5, 0.5, 0.6, 1. ],
+            [0.6, 0.5, 0.7, 1. ]],
+
+           [[0.5, 0. , 0.6, 0.5],
+            [0.6, 0. , 0.7, 0.5]]])
+    """
+
+    if not isinstance(nrow, int):
+        nrow = np.atleast_1d(nrow)
+        if nrow.size < 2 or np.any(np.sort(nrow) != nrow) or \
+                nrow[0] < 0 or nrow[-1] > 1:
+            raise ValueError('Incorrect row values.')
+
+    if not isinstance(ncol, int):
+        ncol = np.atleast_1d(ncol)
+        if ncol.size < 2 or np.any(np.sort(ncol) != ncol) or \
+                ncol[0] < 0 or ncol[-1] > 1:
+            raise ValueError('Incorrect column values.')
+
+    if isinstance(ncol, np.ndarray):
+        x_min, x_max = ncol[:-1], ncol[1:]
+        ncol = x_min.size
+    else:
+        dx = 1 / ncol
+        x_min = np.arange(0, 1, dx)
+        x_max = x_min + dx
+
+    if isinstance(nrow, np.ndarray):
+        y_min, y_max = nrow[:-1], nrow[1:]
+        nrow = y_min.size
+    else:
+        dy = 1 / nrow
+        y_min = np.arange(0, 1, dy)
+        y_max = y_min + dy
+
+    y_min = np.repeat(y_min, ncol)[::-1]
+    y_max = np.repeat(y_max, ncol)[::-1]
+
+    x_min = np.tile(x_min, nrow)
+    x_max = np.tile(x_max, nrow)
+
     g = np.column_stack([x_min, y_min, x_max, y_max])
 
-    strides = (4*g.itemsize*ncol, 4*g.itemsize, g.itemsize)
+    strides = (4 * g.itemsize * ncol, 4 * g.itemsize, g.itemsize)
     return as_strided(g, shape=(nrow, ncol, 4), strides=strides)
 
 
@@ -121,13 +194,23 @@ def _create_grid(nrow, ncol):
 
 class BasePlotter(object):
 
+    DICT_PLOTTERS = dict()
+
     @wrap_input('ren_win', 'iren')
     def __init__(self, n_rows=1, n_cols=1, offscreen=None, ren_win=None,
                  iren=None, **kwargs):
 
-        self.n_rows = n_rows
-        self.n_cols = n_cols
-        self.offscreen = offscreen
+        self.n_renderers = 0
+        self.renderers = dict()
+        self.bounds = dict()
+        self.grid = _create_grid(n_rows, n_cols)
+        self.n_rows, self.n_cols = self.grid.shape[:2]
+        self.populated = -np.ones((self.n_rows, self.n_cols), dtype=np.int32)
+
+        if offscreen is None:
+            self.offscreen = OFF_SCREEN
+        else:
+            self.offscreen = offscreen
 
         self.ren_win = ren_win
         if self.ren_win is None:
@@ -138,11 +221,12 @@ class BasePlotter(object):
         if self.iren is None:
             self.iren = wrap_vtk(vtkRenderWindowInteractor)
 
-        self.n_renderers = 0
-        self.renderers = dict()
-        self.bounds = dict()
-        self.populated = -np.ones((self.n_rows, self.n_cols), dtype=np.int32)
-        self.grid = _create_grid(self.n_rows, self.n_cols)
+        self.DICT_PLOTTERS[id(self)] = self
+
+    @classmethod
+    def close_all(cls):
+        for k in list(cls.DICT_PLOTTERS.keys()):
+            cls.DICT_PLOTTERS.pop(k).close()
 
     def AddRenderer(self, row=None, col=None, renderer=None, **kwargs):
 
@@ -318,6 +402,12 @@ class Plotter(BasePlotter):
 
     def __init__(self, n_rows=1, n_cols=1, try_qt=True, offscreen=None,
                  **kwargs):
+
+        if offscreen is None:
+            self.offscreen = OFF_SCREEN
+        else:
+            self.offscreen = offscreen
+
         self.try_qt = try_qt
         self.use_qt = has_pyqt and try_qt and offscreen is not True
 
@@ -355,7 +445,8 @@ class Plotter(BasePlotter):
         if embed_nb and interactive and not has_panel:
             interactive = False
 
-        if self.use_qt and not as_mpl and not embed_nb and self.offscreen is not True:
+        if self.use_qt and not as_mpl and not embed_nb and \
+                self.offscreen is not True:
             self.iren.Initialize()
             if not interactive:
                 self.iren.SetInteractorStyle(None)

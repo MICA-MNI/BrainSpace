@@ -9,10 +9,10 @@ import vtk
 from brainspace.vtk_interface import wrap_vtk
 from brainspace.vtk_interface.pipeline import to_data
 from brainspace.mesh import mesh_elements as me
-from brainspace.null_models.moran import (compute_mem, spectral_randomization,
-                                          MoranSpectralRandomization)
-from brainspace.null_models.spin import (generate_spin_samples,
-                                         SpinRandomization)
+from brainspace.null_models.moran import (compute_mem, moran_randomization,
+                                          MoranRandomization)
+from brainspace.null_models.spin import (_generate_spins, spin_permutations,
+                                         SpinPermutations)
 
 
 def test_moran():
@@ -31,29 +31,29 @@ def test_moran():
     a.data **= -1
 
     # test default
-    w, v = compute_mem(a, tol=1e-7)
+    v, w = compute_mem(a, tol=1e-7)
     assert w.shape[0] <= (n_pts - 1)
     assert v.shape == (n_pts, w.shape[0])
 
-    r1 = spectral_randomization(feats[:, 0], v, n_rep=10, random_state=0)
+    r1 = moran_randomization(feats[:, 0], v, n_rep=10, random_state=0)
     assert r1.shape == (10, n_pts)
 
-    r2 = spectral_randomization(feats, v, n_rep=10, random_state=0)
+    r2 = moran_randomization(feats, v, n_rep=10, random_state=0)
     assert r2.shape == (10, n_pts, 2)
 
     # test default dense
-    ev, mem = compute_mem(a.toarray(), tol=1e-7)
+    mem, ev = compute_mem(a.toarray(), tol=1e-7)
     assert np.allclose(w, ev)
     assert np.allclose(v, mem)
 
-    r1 = spectral_randomization(feats[:, 0], mem, n_rep=10, random_state=0)
+    r1 = moran_randomization(feats[:, 0], mem, n_rep=10, random_state=0)
     assert r1.shape == (10, n_pts)
 
-    r2 = spectral_randomization(feats, mem, n_rep=10, random_state=0)
+    r2 = moran_randomization(feats, mem, n_rep=10, random_state=0)
     assert r2.shape == (10, n_pts, 2)
 
     # test object api
-    msr = MoranSpectralRandomization(n_rep=10, random_state=0, tol=1e-7)
+    msr = MoranRandomization(n_rep=10, random_state=0, tol=1e-7)
     msr.fit(a)
     assert np.allclose(msr.mev_, ev)
     assert np.allclose(msr.mem_, mem)
@@ -61,7 +61,7 @@ def test_moran():
     assert np.allclose(r2, msr.randomize(feats))
 
     # test object api with PolyData
-    msr = MoranSpectralRandomization(n_rep=10, random_state=0, tol=1e-7)
+    msr = MoranRandomization(n_rep=10, random_state=0, tol=1e-7)
     msr.fit(sphere)
     assert np.allclose(msr.mev_, ev)
     assert np.allclose(msr.mem_, mem)
@@ -90,17 +90,17 @@ def test_spin():
     feats_rh = rs.randn(n_pts_rh, 2)
 
     # generate spin indices
-    ridx1 = generate_spin_samples(pts_lh, n_rep=10, random_state=0)
+    ridx1 = _generate_spins(pts_lh, n_rep=10, random_state=0)
     assert ridx1['lh'].shape == (10, n_pts_lh)
     assert 'rh' not in ridx1
 
-    ridx2 = generate_spin_samples(pts_lh, points_rh=pts_rh, n_rep=10,
-                                  random_state=0)
+    ridx2 = _generate_spins(pts_lh, points_rh=pts_rh, n_rep=10,
+                            random_state=0)
     assert ridx2['lh'].shape == (10, n_pts_lh)
     assert ridx2['rh'].shape == (10, n_pts_rh)
 
     # test api lh
-    sp = SpinRandomization(n_rep=10, random_state=0)
+    sp = SpinPermutations(n_rep=10, random_state=0)
     sp.fit(pts_lh)
     assert np.all(sp.spin_lh_ == ridx1['lh'])
     assert sp.spin_rh_ is None
@@ -108,7 +108,7 @@ def test_spin():
     assert sp.randomize(feats_lh).shape == (10, n_pts_lh, 2)
 
     # test api lh and rh
-    sp = SpinRandomization(n_rep=10, random_state=0)
+    sp = SpinPermutations(n_rep=10, random_state=0)
     sp.fit(pts_lh, points_rh=pts_rh)
     assert np.all(sp.spin_lh_ == ridx2['lh'])
     assert np.all(sp.spin_rh_ == ridx2['rh'])
@@ -117,14 +117,33 @@ def test_spin():
     assert r1[0].shape == (10, n_pts_lh)
     assert r1[1] is None
 
+    r1bis = spin_permutations(pts_lh, feats_lh[:, 0], n_rep=10, random_state=0)
+    assert np.all(r1[0] == r1bis)
+
     r2 = sp.randomize(feats_lh)
     assert r2[0].shape == (10, n_pts_lh, 2)
     assert r2[1] is None
+
+    r2bis = spin_permutations(pts_lh, feats_lh, n_rep=10, random_state=0)
+    assert np.all(r2[0] == r2bis)
 
     r1 = sp.randomize(feats_lh[:, 0], x_rh=feats_rh[:, 0])
     assert r1[0].shape == (10, n_pts_lh)
     assert r1[1].shape == (10, n_pts_rh)
 
+    r1bis = spin_permutations({'lh': pts_lh, 'rh': pts_rh},
+                              {'lh': feats_lh[:, 0], 'rh': feats_rh[:, 0]},
+                              n_rep=10, random_state=0)
+    assert np.all(r1[0] == r1bis[0])
+    assert np.all(r1[1] == r1bis[1])
+
     r2 = sp.randomize(feats_lh, x_rh=feats_rh)
     assert r2[0].shape == (10, n_pts_lh, 2)
     assert r2[1].shape == (10, n_pts_rh, 2)
+
+    r2bis = spin_permutations({'lh': pts_lh, 'rh': pts_rh},
+                              {'lh': feats_lh, 'rh': feats_rh},
+                              n_rep=10, random_state=0)
+    assert np.all(r2[0] == r2bis[0])
+    assert np.all(r2[1] == r2bis[1])
+

@@ -14,11 +14,12 @@ from scipy.spatial import cKDTree
 from sklearn.utils import check_random_state
 from sklearn.base import BaseEstimator
 
+from ..vtk_interface.wrappers import BSPolyData
 from ..mesh import mesh_elements as me
 
 
-def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
-                          random_state=None):
+def _generate_spins(points_lh, points_rh=None, unique=False, n_rep=100,
+                    random_state=None, surface_algorithm='FreeSurfer'):
     """ Generate rotational spins based on points that lie on a sphere.
 
     Parameters
@@ -36,6 +37,10 @@ def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
         Default is False.
     n_rep : int, optional
         Number of random rotations. Default is 100.
+    surface_algorithm : {'FreeSurfer', 'CIVET'}
+        For 'CIVET', no flip is required to generate the spins for the right
+        hemisphere. Only used when ``points_rh is not None``.
+        Default is 'FreeSurfer'.
     random_state : int or None, optional
         Random state. Default is None.
 
@@ -72,7 +77,8 @@ def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
         reflect = np.array([[-1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
     idx = {k: np.arange(p.shape[0]) for k, p in pts.items()}
-    spin = {k: np.empty((n_rep, p.shape[0]), dtype=int) for k, p in pts.items()}
+    spin = {k: np.empty((n_rep, p.shape[0]), dtype=int)
+            for k, p in pts.items()}
     if not unique:
         tree = {k: cKDTree(p, leafsize=20) for k, p in pts.items()}
 
@@ -88,7 +94,10 @@ def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
 
         # reflect the left rotation across Y-Z plane
         if 'rh' in pts:
-            rot['rh'] = reflect @ rot['lh'] @ reflect
+            if surface_algorithm.lower() == 'freesurfer':
+                rot['rh'] = reflect @ rot['lh'] @ reflect
+            else:
+                rot['rh'] = rot['lh']
 
         for k, p in pts.items():
             if unique:
@@ -101,7 +110,98 @@ def generate_spin_samples(points_lh, points_rh=None, unique=False, n_rep=100,
     return spin
 
 
-class SpinRandomization(BaseEstimator):
+def spin_permutations(spheres, data, unique=False, n_rep=100,
+                      random_state=None, surface_algorithm='FreeSurfer'):
+    """ Generate null data using spin permutations.
+
+    Parameters
+    ----------
+    spheres : dict[str, ndarray or BSPolyData], BSPolyData or ndarray
+        Dictionary of points in a sphere, for left ('lh' key) and
+        right ('rh' key) hemispheres. The right hemisphere is optional. If
+        provided, rotations are derived from the rotations computed for
+        `points_lh` by reflecting the rotation matrix across the Y-Z plane.
+    data : dict[str, ndarray] or ndarray
+        Dictionary of data to randomize. Array of variables arranged in
+        columns for each hemisphere.
+    unique : bool, optional
+        Whether to enforce a one-to-one correspondence between original points
+        and rotated ones. If true, the Hungarian algorithm is used.
+        Default is False.
+    n_rep : int, optional
+        Number of random rotations. Default is 100.
+    surface_algorithm : {'FreeSurfer', 'CIVET'}
+        For 'CIVET', no flip is required to generate the spins for the right
+        hemisphere. Only used when ``points_rh is not None``.
+        Default is 'FreeSurfer'.
+    random_state : int or None, optional
+        Random state. Default is None.
+
+    Returns
+    -------
+    rand_lh : ndarray, shape = (n_rep, n_lh, n_feat)
+        Permutations of data in left hemisphere.
+    rand_rh : ndarray, shape = (n_rep, n_rh, n_feat)
+        Permutations of data in right hemisphere. Only if right data and
+        sphere are provided.
+
+    See Also
+    --------
+    :class:`.SpinPermutations`
+
+    References
+    ----------
+    * Alexander-Bloch A, Shou H, Liu S, Satterthwaite TD, Glahn DC,
+      Shinohara RT, Vandekar SN and Raznahan A (2018). On testing for spatial
+      correspondence between maps of human brain structure and function.
+      NeuroImage, 178:540-51.
+    * Blaser R and Fryzlewicz P (2016). Random Rotation Ensembles.
+      Journal of Machine Learning Research, 17(4): 1–26.
+    * https://netneurotools.readthedocs.io
+
+    """
+
+    if isinstance(data, np.ndarray):
+        data = {'lh': data}
+
+    if isinstance(spheres, BSPolyData) or isinstance(spheres, np.ndarray):
+        spheres = {'lh': spheres}
+
+    if data.keys() != spheres.keys():
+        raise ValueError("Keys for data and spheres do not coincide.")
+
+    if len(data) > 2:
+        raise ValueError("Unknown keys. Possible keys: {'lh', 'rh'}.")
+
+    if len(data) == 1 and 'lh' not in data.keys():
+        raise ValueError("Key must be 'lh'.")
+    elif len(data) == 2 and ('lh' not in data or 'rh' not in data):
+        raise ValueError("Unknown keys. Possible keys: {'lh', 'rh'}.")
+
+    points_lh = spheres['lh']
+    points_rh = spheres.pop('rh', None)
+
+    spin_idx = _generate_spins(points_lh, points_rh=points_rh, unique=unique,
+                               n_rep=n_rep, random_state=random_state,
+                               surface_algorithm=surface_algorithm)
+
+    spin_lh = spin_idx['lh']
+    spin_rh = spin_idx.pop('rh', None)
+
+    x_lh = data['lh']
+    rand_lh = x_lh[spin_lh]
+    if spin_rh is None:
+        return rand_lh
+
+    x_rh = data.pop('rh', None)
+    rand_rh = None
+    if x_rh is not None:
+        rand_rh = x_rh[spin_rh]
+
+    return rand_lh, rand_rh
+
+
+class SpinPermutations(BaseEstimator):
     """ Spin permutations.
 
     Parameters
@@ -114,6 +214,10 @@ class SpinRandomization(BaseEstimator):
         Number of randomizations. Default is 100.
     random_state : int or None, optional
         Random state. Default is None.
+    surface_algorithm : {'FreeSurfer', 'CIVET'}
+        For 'CIVET', no flip is required to generate the spins for the right
+        hemisphere. Only used when ``points_rh is not None``.
+        Default is 'FreeSurfer'.
 
     Attributes
     ----------
@@ -125,7 +229,8 @@ class SpinRandomization(BaseEstimator):
 
     See Also
     --------
-    :class:`.MoranSpectralRandomization`
+    :func:`.spin_permutations`
+    :class:`.MoranRandomization`
 
     Notes
     -----
@@ -134,10 +239,12 @@ class SpinRandomization(BaseEstimator):
 
     """
 
-    def __init__(self, unique=False, n_rep=100, random_state=None):
+    def __init__(self, unique=False, n_rep=100, random_state=None,
+                 surface_algorithm='FreeSurfer'):
         self.unique = unique
         self.n_rep = n_rep
         self.random_state = random_state
+        self.surface_algorithm = surface_algorithm
 
     def fit(self, points_lh, points_rh=None):
         """ Compute spin indices by random rotation.
@@ -158,9 +265,10 @@ class SpinRandomization(BaseEstimator):
 
         """
 
-        spin_idx = generate_spin_samples(points_lh, points_rh=points_rh,
-                                         unique=self.unique, n_rep=self.n_rep,
-                                         random_state=self.random_state)
+        spin_idx = _generate_spins(points_lh, points_rh=points_rh,
+                                   unique=self.unique, n_rep=self.n_rep,
+                                   random_state=self.random_state,
+                                   surface_algorithm=self.surface_algorithm)
 
         self.spin_lh_ = spin_idx['lh']
         self.spin_rh_ = spin_idx.pop('rh', None)
@@ -172,8 +280,8 @@ class SpinRandomization(BaseEstimator):
         Parameters
         ----------
         x_lh : ndarray, shape = (n_lh,) or (n_lh, n_feat)
-            Array of variables arranged in columns, where `n_feat` is the number
-            of variables.
+            Array of variables arranged in columns, where `n_feat` is the
+            number of variables.
         x_rh : ndarray, shape = (n_rh,) or (n_rh, n_feat), optional
             Array of variables arranged in columns for the right hemisphere.
             Default is None.
@@ -182,7 +290,6 @@ class SpinRandomization(BaseEstimator):
         -------
         rand_lh : ndarray, shape = (n_rep, n_lh, n_feat)
             Permutations of `x_rh`. If ``n_feat == 1``, shape = (n_rep, n_lh).
-
         rand_lh : ndarray, shape = (n_rep, n_rh, n_feat)
             Permutations of `x_rh`. If ``n_feat == 1``, shape = (n_rep, n_rh).
             None if `x_rh` is None. Only if `spin_rh_` is not None.
