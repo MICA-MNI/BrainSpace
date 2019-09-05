@@ -25,8 +25,8 @@ Usage
 Description 
 ------------
 This can be used to merge left and right hemisphere surfaces into a single
-surface. The input surfaces can be any surface readable by
-:ref:`convert_surface_matlab`. 
+surface. The input surfaces can be any file readable by
+:ref:`read_surface_matlab` or a surface loaded into memory. 
 
 A MATLAB structure consists of two fields: vertices, which is a n-by-3 list of
 vertex coordinates, and faces, which is a m-by-3 matrix of triangles. A SurfStat

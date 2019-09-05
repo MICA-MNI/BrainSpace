@@ -35,7 +35,7 @@ def get_colorbar(lut, is_discrete=False):
 
     tp = wrap_vtk(cb.labelTextProperty)
     tp.setVTK(color=(0, 0, 0), italic=False, shadow=False,
-              bold=True, fontFamily='Arial', fontSize=12)
+              bold=True, fontFamily='Arial', fontSize=16)
 
     return cb
 
@@ -200,9 +200,6 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
     kwargs.update({'n_rows': grow, 'n_cols': gcol, 'try_qt': False,
                    'size': size})
-    # kwargs.update({'n_rows': nrow, 'n_cols': ncol, 'try_qt': False,
-    #                'size': size, 'offscreen': True})
-    # p = Plotter(n_rows=nrow, n_cols=ncol, try_qt=False, size=size, **kwargs)
     p = Plotter(**kwargs)
 
     bg = (1, 1, 1)
@@ -266,15 +263,15 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
                 raise NotImplementedError
 
         ren1.ResetCamera()
-        ren1.GetActiveCamera().Zoom(1.1)
+        # ren1.GetActiveCamera().Zoom(1.1)
+        ren1.GetActiveCamera().Zoom(1.2)
 
         # Fix conte69:
-        if icol in np.array([0, 3]) + add_text:
-            ren1.GetActiveCamera().Zoom(1.19)
-        elif icol in np.array([1, 2]) + add_text:
-            ren1.GetActiveCamera().Zoom(1.1)
+        # if icol in np.array([0, 3]) + add_text:
+        #     ren1.GetActiveCamera().Zoom(1.19)
+        # elif icol in np.array([1, 2]) + add_text:
+        #     ren1.GetActiveCamera().Zoom(1.1)
 
-    # return p.show(interactive=interactive, embed_nb=embed_nb, as_mpl=True)
     return p.show(interactive=interactive, embed_nb=embed_nb)
 
 
@@ -318,7 +315,7 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
 
     Returns
     -------
-    figure : Ipython Image or panel or None
+    figure : Ipython Image or None
         Figure to plot. None if using vtk for rendering (i.e.,
         ``embed_nb == False``).
 

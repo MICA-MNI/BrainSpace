@@ -24,6 +24,7 @@ Spin permutations
    spin_permutations
 
 
+
 .. _pysec-nullmodels-moran:
 
 Moran spectral randomization

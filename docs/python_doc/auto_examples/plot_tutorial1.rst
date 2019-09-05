@@ -47,7 +47,7 @@ Let’s first look at the parcellation scheme we’re using.
 
     from brainspace.plotting import plot_hemispheres
 
-    plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(800, 150), cmap='tab20')
+    plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(1200, 300), cmap='tab20')
 
 
 
@@ -98,7 +98,7 @@ two gradients.
         # map the gradient to the parcels
         grad[i] = map_to_labels(gm.gradients_[:, i], labeling, mask=mask, fill=np.nan)
 
-    plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(800, 300), cmap='viridis',
+    plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600), cmap='viridis_r',
                      color_bar=True, label_text=['Grad1', 'Grad2'])
 
 
@@ -143,7 +143,7 @@ alignments.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.861 seconds)
+   **Total running time of the script:** ( 0 minutes  1.687 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial1.py:

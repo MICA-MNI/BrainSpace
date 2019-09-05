@@ -54,9 +54,9 @@ parcellations. Let's start by loading the conte69 surfaces:
         [surf_lh, surf_rh] = load_conte69();
 
 
-To load your own surfaces, you can use our MATLAB :func:`.read_surface` function
-and :func:`.load_surface` when using Python. BrainSpace also provides surface
-plotting functionality. We can plot the conte69 surfaces as follows:
+To load your own surfaces, you can use the :func:`.read_surface` function.
+BrainSpace also provides surface plotting functionality. We can plot the
+conte69 surfaces as follows:
 
 
 .. tabs::
@@ -64,8 +64,8 @@ plotting functionality. We can plot the conte69 surfaces as follows:
    .. code-tab:: py
 
         >>> from brainspace.plotting import plot_hemispheres
-        >>> plot_hemispheres(surf_lh, surf_rh, interactive=False,
-        ...                  embed_nb=True, size=(800, 200))
+
+        >>> plot_hemispheres(surf_lh, surf_rh, size=(800, 200))
 
    .. code-tab:: matlab
 
@@ -87,15 +87,17 @@ Let's load one of them.
 
    .. code-tab:: py
 
-        >>> from brainspace.datasets import load_group_hcp
-        >>> m = load_group_hcp('schaefer', n_parcels=400)
+        >>> from brainspace.datasets import load_group_fc, load_parcellation
+
+        >>> labeling = load_parcellation('schaefer', scale=400, join=True)
+        >>> m = load_group_fc('schaefer', scale=400)
         >>> m.shape
         (400, 400)
 
    .. code-tab:: matlab
 
         labeling = load_parcellation('schaefer',400);
-        conn_matices = load_group_hcp('schaefer',400);
+        conn_matices = load_group_fc('schaefer',400);
         m = conn_matices.schaefer_400; 
 
 To compute the gradients of our connectivity matrix `m` we create the
@@ -109,13 +111,12 @@ To compute the gradients of our connectivity matrix `m` we create the
         >>> from brainspace.gradient import GradientMaps
 
         >>> # Build gradients using diffusion maps and normalized angle
-        >>> gm = GradientMaps(n_gradients=2, approach='dm',
-        ...                   kernel='normalized_angle', random_state=0)
+        >>> gm = GradientMaps(n_components=2, approach='dm', kernel='normalized_angle')
 
         >>> # and fit to the data
-        >>> gm = gm.fit(m)
+        >>> gm.fit(m)
         GradientMaps(alignment=None, approach='dm', kernel='normalized_angle',
-                     n_gradients=2, random_state=0)
+                     n_components=2, random_state=None)
 
         >>> # The gradients are in
         >>> gm.gradients_.shape
@@ -136,15 +137,22 @@ Now we can visually inspect the gradients. Let's plot the first gradient:
 
    .. code-tab:: py
 
+        >>> import numpy as np
+        >>> from brainspace.utils.parcellation import map_to_labels
+
+        >>> # map to original size
+        >>> grad = map_to_labels(gm.gradients_[:, 0], labeling, mask=labeling != 0,
+        ...                      fill=np.nan)
+
         >>> # Plot first gradient on the cortical surface.
-        >>> plot_hemispheres(surf_lh, surf_rh, array_name=gm.gradients_[:, 0],
-        ...                  size=(800, 200))
+        >>> plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(800, 200))
 
 
    .. code-tab:: matlab
 
         % Plot the first gradient on the cortical surface.
-        plot_hemispheres(gm.gradients{1}(:,1), {surf_lh,surf_rh});
+        plot_hemispheres(gm.gradients{1}(:,1), {surf_lh,surf_rh}, ...
+                'parcellation',labeling.schaefer_400);
 
 
 .. image:: ./matlab_doc/examples/example_figs/gettingstarted2.png

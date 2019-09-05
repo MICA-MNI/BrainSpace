@@ -8,9 +8,13 @@ BrainSpace is available in Python and MATLAB.
 
 Python installation
 -------------------
-BrainSpace works on Python 3.6+, and probably with older versions of Python 3,
-although it is not tested.
 
+BrainSpace works on Python 3.6+, and probably with older versions of Python 3,
+although it is not tested. 
+
+This package have been tested in macOS Mojave and Ubuntu Xenial Xerus. Testing
+on Windows 10 has not been completed. At the time, we expect that the Python
+version may still throw errors on Windows 10.
 
 Dependencies
 ^^^^^^^^^^^^
@@ -58,7 +62,7 @@ MATLAB installation
 
 This toolbox has been tested with MATLAB versions R2018b, although we expect it
 to work with versions R2017a and newer. It will definitely throw errors with
-versions R2016 and older
+versions R2016b and older. 
 
 To install the MATLAB toolbox simply `download
 <https://github.com/MICA-MNI/BrainSpace>`_ and unzip the GitHub toolbox and run

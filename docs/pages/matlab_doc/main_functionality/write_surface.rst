@@ -23,6 +23,10 @@ Usage
 Description 
 ------------
 
-Writes surfaces to the designated output path. Accepted input and output formats
-are identical to those accepted by :ref:`convert_surface_matlab`.
+Writes surfaces to the designated output path. Accepted formats are .gii files
+(provided the gifti library is installed), freesurfer files, .mat files and .obj
+files. File type is determined by the extension; if the filetype is not
+recognized the default is freesurfer format.
 
+When saving a .mat file, the first will save the fields inside the surface
+structure. 
