@@ -18,6 +18,9 @@ randomization.
 
 
 ###############################################################################
+# Spin Permutations
+# ------------------------------
+#
 # Here, we use the spin permutations approach previously proposed in
 # `(Alexander-Bloch et al., 2018)
 # <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_,
@@ -85,6 +88,16 @@ plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3], size=(800, 450
 
 
 ###############################################################################
+#
+# .. warning::
+#
+#    With spin permutations, midline vertices (i.e,, NaNs) from both the
+#    original and rotated data are discarded. Depending on the overlap of
+#    midlines in the, statistical comparisons between them may compare
+#    different numbers of features. This can bias your test statistics.
+#    Therefore, if a large portion of the sphere is not used, we recommend
+#    using Moran spectral randomization instead.
+#
 # Now we simply compute the correlations between the first gradient and the
 # original data, as well as all rotated data.
 
@@ -93,15 +106,18 @@ from scipy.stats import spearmanr
 feats = {'t1wt2w': t1wt2w, 'thickness': thickness}
 rotated = {'t1wt2w': t1wt2w_rotated, 'thickness': thickness_rotated}
 
-for fn, data in rotated.items():
-    r_obs, pv_obs = spearmanr(feats[fn], embedding, nan_policy='omit')
+r_spin = np.empty(n_permutations)
+mask = ~np.isnan(thickness)
+for fn, feat in feats.items():
+    r_orig, pv_orig = spearmanr(feat[mask], embedding[mask])
 
-    r_spin = [spearmanr(embedding, d, nan_policy='omit')[0] for d in data]
-    pv_spin = (np.count_nonzero(r_spin > r_obs) + 1) / (n_permutations + 1)
+    for i, perm in enumerate(rotated[fn]):
+        mask_rot = mask & ~np.isnan(perm)  # Remove non-cortex
+        r_spin[i] = spearmanr(perm[mask_rot], embedding[mask_rot])[0]
+    pv_spin = np.mean(np.abs(r_spin) > np.abs(r_orig))
 
-    print('{0}:\n Orig: {1:.5e}\n Spin: {2:.5e}'.format(fn.capitalize(),
-                                                        pv_obs, pv_spin))
-    print()
+    print('{0}:\n Obs : {1:.5e}\n Spin: {2:.5e}\n'.
+          format(fn.capitalize(), pv_orig, pv_spin))
 
 ###############################################################################
 # It is interesting to see that both p-values increase when taking into
@@ -109,6 +125,10 @@ for fn, data in rotated.items():
 # that the correlation with thickness is no longer statistically significant
 # after spin permutations.
 #
+#
+#
+# Moran Spectral Randomization
+# ------------------------------
 #
 # Moran Spectral Randomization (MSR) computes Moran's I, a metric for spatial
 # auto-correlation and generates normally distributed data with similar
@@ -149,7 +169,8 @@ w.data **= -1
 
 n_rand = 1000
 
-msr = MoranRandomization(n_rep=n_rand, procedure='singleton', tol=1e-6, random_state=0)
+msr = MoranRandomization(n_rep=n_rand, procedure='singleton', tol=1e-6,
+                         random_state=0)
 msr.fit(w)
 
 
@@ -162,10 +183,8 @@ t1wt2w_rand = msr.randomize(t1wt2w_tl)
 
 ###############################################################################
 # Now that we have the randomized data, we can compute correlations between
-# the gradient and the real/randomised data.
-
-
-from scipy.stats import spearmanr
+# the gradient and the real/randomised data and generate the non-parametric
+# p-values.
 
 feats = {'t1wt2w': t1wt2w_tl, 'curvature': curv_tl}
 rand = {'t1wt2w': t1wt2w_rand, 'curvature': curv_rand}
@@ -173,13 +192,9 @@ rand = {'t1wt2w': t1wt2w_rand, 'curvature': curv_rand}
 for fn, data in rand.items():
     r_obs, pv_obs = spearmanr(feats[fn], embedding_tl, nan_policy='omit')
 
-    r_spin = [spearmanr(embedding_tl, d)[0] for d in data]
-    pv_spin = (np.count_nonzero(r_spin > r_obs) + 1) / (n_permutations + 1)
+    r_rand = np.asarray([spearmanr(embedding_tl, d)[0] for d in data])
+    pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
 
-    print('{0}:\n Orig: {1:.5e}\n Spin: {2:.5e}'.format(fn.capitalize(),
-                                                        pv_obs, pv_spin))
-    print()
+    print('{0}:\n Obs  : {1:.5e}\n Moran: {2:.5e}\n'.
+          format(fn.capitalize(), pv_obs, pv_rand))
 
-###############################################################################
-# Finally, the p-values can be computed using the same approach used with
-# spin permutations.

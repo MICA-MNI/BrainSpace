@@ -18,6 +18,9 @@ randomization.
 
 
 ###############################################################################
+# Spin Permutations
+# ------------------------------
+#
 # Here, we use the spin permutations approach previously proposed in
 # `(Alexander-Bloch et al., 2018)
 # <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_,
@@ -85,6 +88,16 @@ plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3], size=(800, 450
 
 
 ###############################################################################
+#
+# .. warning::
+#
+#    With spin permutations, midline vertices (i.e,, NaNs) from both the
+#    original and rotated data are discarded. Depending on the overlap of
+#    midlines in the, statistical comparisons between them may compare
+#    different numbers of features. This can bias your test statistics.
+#    Therefore, if a large portion of the sphere is not used, we recommend
+#    using Moran spectral randomization instead.
+#
 # Now we simply compute the correlations between the first gradient and the
 # original data, as well as all rotated data.
 
@@ -112,6 +125,10 @@ for fn, feat in feats.items():
 # that the correlation with thickness is no longer statistically significant
 # after spin permutations.
 #
+#
+#
+# Moran Spectral Randomization
+# ------------------------------
 #
 # Moran Spectral Randomization (MSR) computes Moran's I, a metric for spatial
 # auto-correlation and generates normally distributed data with similar
@@ -166,7 +183,8 @@ t1wt2w_rand = msr.randomize(t1wt2w_tl)
 
 ###############################################################################
 # Now that we have the randomized data, we can compute correlations between
-# the gradient and the real/randomised data.
+# the gradient and the real/randomised data and generate the non-parametric
+# p-values.
 
 feats = {'t1wt2w': t1wt2w_tl, 'curvature': curv_tl}
 rand = {'t1wt2w': t1wt2w_rand, 'curvature': curv_rand}

@@ -22,6 +22,9 @@ randomization.
     we recommend randomizing the non-gradient markers as these randomizations
     need not maintain the statistical independence between gradients.
 
+Spin Permutations
+------------------------------
+
 Here, we use the spin permutations approach previously proposed in
 `(Alexander-Bloch et al., 2018)
 <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_,
@@ -75,7 +78,7 @@ Let’s first generate some null data using spintest.
     from brainspace.plotting import plot_hemispheres
 
     # Let's create some rotations
-    n_permutations = 10
+    n_permutations = 1000
 
     sp = SpinPermutations(n_rep=n_permutations, random_state=0)
     sp.fit(sphere_lh, points_rh=sphere_rh)
@@ -131,6 +134,15 @@ as well as a few rotated versions.
 
 
 
+.. warning::
+
+   With spin permutations, midline vertices (i.e,, NaNs) from both the
+   original and rotated data are discarded. Depending on the overlap of
+   midlines in the, statistical comparisons between them may compare
+   different numbers of features. This can bias your test statistics.
+   Therefore, if a large portion of the sphere is not used, we recommend
+   using Moran spectral randomization instead.
+
 Now we simply compute the correlations between the first gradient and the
 original data, as well as all rotated data.
 
@@ -138,41 +150,23 @@ original data, as well as all rotated data.
 .. code-block:: default
 
 
-    from scipy.stats import pearsonr, spearmanr
+    from scipy.stats import spearmanr
 
     feats = {'t1wt2w': t1wt2w, 'thickness': thickness}
     rotated = {'t1wt2w': t1wt2w_rotated, 'thickness': thickness_rotated}
 
-    for fn, rot in rotated.items():
-        r_spin = np.empty(n_permutations)
-        for i, r in enumerate(t1wt2w_rotated):
-            r_spin[i] = spearmanr(embedding, rot[i], nan_policy='omit')[0]
+    r_spin = np.empty(n_permutations)
+    mask = ~np.isnan(thickness)
+    for fn, feat in feats.items():
+        r_orig, pv_orig = spearmanr(feat[mask], embedding[mask])
 
-        r_obs, pv_obs = spearmanr(feats[fn], embedding, nan_policy='omit')
-        pv_spin = (np.count_nonzero(r_spin > r_obs) + 1) / (n_permutations + 1)
+        for i, perm in enumerate(rotated[fn]):
+            mask_rot = mask & ~np.isnan(perm)  # Remove non-cortex
+            r_spin[i] = spearmanr(perm[mask_rot], embedding[mask_rot])[0]
+        pv_spin = np.mean(np.abs(r_spin) > np.abs(r_orig))
 
-        print('{0}:\n Orig: {1:.5e}\n Spin: {2:.5e}'.format(fn.capitalize(),
-                                                            pv_obs, pv_spin))
-        print()
-
-    # mask = ~np.isnan(thickness)
-    # r_spin = {k: np.empty(n_permutations) for k in feats.keys()}
-    # for fn, feat in feats.items():
-    #
-    #     r_spin = np.empty(n_permutations)
-    #     for i in range(n_permutations):
-    #         # Remove non-cortex
-    #         mask_rot = mask & ~np.isnan(rotated[fn][i])
-    #         emb = embedding[mask_rot]
-    #         r_spin[i] = pearsonr(rotated[fn][i][mask_rot], emb)[0]
-    #
-    #     r_obs, pv_obs = pearsonr(feat[mask], embedding[mask])
-    #     pv_spin = (np.count_nonzero(r_spin > r_obs) + 1) / (n_permutations + 1)
-    #
-    #     print('{0}:\n Orig: {1:.5e}\n Spin: {2:.5e}'.format(fn.capitalize(),
-    #                                                         pv_obs, pv_spin))
-    #     print()
-
+        print('{0}:\n Obs : {1:.5e}\n Spin: {2:.5e}\n'.
+              format(fn.capitalize(), pv_orig, pv_spin))
 
 
 
@@ -185,12 +179,12 @@ original data, as well as all rotated data.
  .. code-block:: none
 
     T1wt2w:
-     Orig: 0.00000e+00
-     Spin: 1.00000e+00
+     Obs : 0.00000e+00
+     Spin: 1.00000e-03
 
     Thickness:
-     Orig: 0.00000e+00
-     Spin: 9.09091e-02
+     Obs : 0.00000e+00
+     Spin: 1.37000e-01
 
 
 
@@ -201,81 +195,126 @@ that the correlation with thickness is no longer statistically significant
 after spin permutations.
 
 
+
+Moran Spectral Randomization
+------------------------------
+
+Moran Spectral Randomization (MSR) computes Moran's I, a metric for spatial
+auto-correlation and generates normally distributed data with similar
+auto-correlation. MSR relies on a weight matrix denoting the spatial
+proximity of features to one another. Within neuroimaging, one
+straightforward example of this is inverse geodesic distance i.e. distance
+along the cortical surface.
+
+In this example we will show how to use MSR to assess statistical
+significance between cortical markers (here curvature and cortical t1wt2w
+intensity) and the first functional connectivity gradient. We will start by
+loading the left temporal lobe mask, t1w/t2w intensity as well as cortical
+thickness data, and a template functional gradient
+
+
 .. code-block:: default
 
 
 
+    from brainspace.datasets import load_mask
+    from brainspace.mesh import mesh_elements as me
 
-    # ###############################################################################
-    # # Moran Spectral Randomization (MSR) computes Moran's I, a metric for spatial
-    # # auto-correlation and generates normally distributed data with similar
-    # # auto-correlation. MSR relies on a weight matrix denoting the spatial
-    # # proximity of features to one another. Within neuroimaging, one
-    # # straightforward example of this is inverse geodesic distance i.e. distance
-    # # along the cortical surface.
-    # #
-    # # In this example we will show how to use MSR to assess statistical
-    # # significance between cortical markers (here curvature and cortical t1wt2w
-    # # intensity) and the first functional connectivity gradient. We will start by
-    # # loading the left temporal lobe mask, t1w/t2w intensity as well as cortical
-    # # thickness data, and a template functional gradient
-    #
-    #
-    # from brainspace.datasets import load_curvature, load_mask
-    # from brainspace.mesh import mesh_elements as me
-    #
-    # mask_tl = load_mask(region='temporal')[:n_pts_lh]
-    #
-    # # Keep only the temporal lobe.
-    # embedding_tl = embedding[:n_pts_lh][mask_tl]
-    # t1wt2w_tl = t1wt2w[:n_pts_lh][mask_tl]
-    # curv_tl = load_curvature()[:n_pts_lh][mask_tl]
-    #
-    #
-    # ###############################################################################
-    # # We will now compute the Moran eigenvectors. This can be done either by
-    # # providing a weight matrix of spatial proximity between each vertex, or by
-    # # providing a cortical surface. Here we’ll use a cortical surface.
-    #
-    # from brainspace.null_models import MoranSpectralRandomization
-    #
-    # # compute spatial weight matrix
-    # w = me.get_ring_distance(surf_lh, n_ring=1)
-    # w = w[mask_tl][:, mask_tl]
-    # w.data **= -1
-    #
-    # n_rand = 1000
-    #
-    # msr = MoranSpectralRandomization(n_rep=n_rand, tol=1e-6, random_state=43)
-    # msr.fit(w)
-    #
-    #
-    # ###############################################################################
-    # # Using the Moran eigenvectors we can now compute the randomized data.
-    #
-    # curv_rand = msr.randomize(curv_tl)
-    # t1wt2w_rand = msr.randomize(t1wt2w_tl)
-    #
-    #
-    # ###############################################################################
-    # # Now that we have the randomized data, we can compute correlations between
-    # # the gradient and the real/randomised data.
-    #
-    # from scipy.stats import pearsonr
-    # from scipy.spatial.distance import cdist
-    #
-    # r_orig_curv = pearsonr(curv_tl, embedding_tl)[0]
-    # r_rand_curv = 1 - cdist(curv_rand, embedding_tl[None], metric='correlation')
-    #
-    # r_orig_t1wt2w = pearsonr(t1wt2w_tl, embedding_tl)[0]
-    # r_rand_t1wt2w = 1 - cdist(t1wt2w_rand, embedding_tl[None], metric='correlation')
-    #
-    #
-    # ###############################################################################
-    # # Finally, the p-values can be computed using the same approach used with
-    # # spin permutations.
+    n_pts_lh = surf_lh.n_points
+    mask_tl, _ = load_mask(name='temporal')
+
+    # Keep only the temporal lobe.
+    embedding_tl = embedding[:n_pts_lh][mask_tl]
+    t1wt2w_tl = t1wt2w_lh[mask_tl]
+    curv_tl = load_marker('curvature')[0][mask_tl]
 
 
+
+
+
+
+
+
+We will now compute the Moran eigenvectors. This can be done either by
+providing a weight matrix of spatial proximity between each vertex, or by
+providing a cortical surface. Here we’ll use a cortical surface.
+
+
+.. code-block:: default
+
+
+    from brainspace.null_models import MoranRandomization
+
+    # compute spatial weight matrix
+    w = me.get_ring_distance(surf_lh, n_ring=1, mask=mask_tl)
+    w.data **= -1
+
+    n_rand = 1000
+
+    msr = MoranRandomization(n_rep=n_rand, procedure='singleton', tol=1e-6,
+                             random_state=0)
+    msr.fit(w)
+
+
+
+
+
+
+
+
+Using the Moran eigenvectors we can now compute the randomized data.
+
+
+.. code-block:: default
+
+
+    curv_rand = msr.randomize(curv_tl)
+    t1wt2w_rand = msr.randomize(t1wt2w_tl)
+
+
+
+
+
+
+
+
+Now that we have the randomized data, we can compute correlations between
+the gradient and the real/randomised data and generate the non-parametric
+p-values.
+
+
+.. code-block:: default
+
+
+    feats = {'t1wt2w': t1wt2w_tl, 'curvature': curv_tl}
+    rand = {'t1wt2w': t1wt2w_rand, 'curvature': curv_rand}
+
+    for fn, data in rand.items():
+        r_obs, pv_obs = spearmanr(feats[fn], embedding_tl, nan_policy='omit')
+
+        r_rand = np.asarray([spearmanr(embedding_tl, d)[0] for d in data])
+        pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
+
+        print('{0}:\n Obs  : {1:.5e}\n Moran: {2:.5e}\n'.
+              format(fn.capitalize(), pv_obs, pv_rand))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    T1wt2w:
+     Obs  : 0.00000e+00
+     Moran: 0.00000e+00
+
+    Curvature:
+     Obs  : 6.63802e-05
+     Moran: 3.50000e-01
 
 
 
@@ -283,7 +322,7 @@ after spin permutations.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  34.852 seconds)
+   **Total running time of the script:** ( 3 minutes  24.503 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial3.py:

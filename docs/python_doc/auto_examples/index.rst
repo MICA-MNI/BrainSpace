@@ -36,26 +36,6 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 2">
-
-.. only:: html
-
-    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial2_thumb.png
-
-        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial2.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /python_doc/auto_examples/plot_tutorial2
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 3">
 
 .. only:: html
@@ -73,6 +53,26 @@ Examples
    :hidden:
 
    /python_doc/auto_examples/plot_tutorial3
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 2">
+
+.. only:: html
+
+    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial2_thumb.png
+
+        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial2.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /python_doc/auto_examples/plot_tutorial2
 .. raw:: html
 
     <div style='clear:both'></div>
