@@ -25,10 +25,7 @@ matrix:
       install:
         - python setup.py install
       script:
-#          - cd $HOME
-#          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
-#          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
-          - py.test brainspace
+        - py.test brainspace
 
     - name: "Python 3.7.1 sdist"
       python: 3.7
