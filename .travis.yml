@@ -10,35 +10,34 @@ matrix:
       python: 3.5
       services: xvfb
 
-#    - name: "Python 3.6.7 on Xenial Linux"
-#      python: 3.6
-#      services: xvfb
-#
-#    - name: "Python 3.7.1 on Xenial Linux"
-#      python: 3.7
-#      services: xvfb
-#      env: REPORT_COVERAGE=true
-#
-#    - name: "Python 3.7.1 setup.py install"
-#      python: 3.7
-#      services: xvfb
-#      install:
-#        - python setup.py install
-#
-#    - name: "Python 3.7.1 sdist"
-#      python: 3.7
-#      services: xvfb
-#      install:
-#        - python setup.py sdist;
-#        - pip install dist/*.tar.gz;
-#
-#    - name: "Python 3.7.1 wheel"
-#      python: 3.7
-#      services: xvfb
-#      install:
-#        - python setup.py bdist_wheel;
-#        - pip install dist/*.whl;
+    - name: "Python 3.6.7 on Xenial Linux"
+      python: 3.6
+      services: xvfb
 
+    - name: "Python 3.7.1 on Xenial Linux"
+      python: 3.7
+      services: xvfb
+      env: REPORT_COVERAGE=true
+
+    - name: "Python 3.7.1 setup.py install"
+      python: 3.7
+      services: xvfb
+      install:
+        - python setup.py install
+
+    - name: "Python 3.7.1 sdist"
+      python: 3.7
+      services: xvfb
+      install:
+        - python setup.py sdist;
+        - pip install dist/*.tar.gz;
+
+    - name: "Python 3.7.1 wheel"
+      python: 3.7
+      services: xvfb
+      install:
+        - python setup.py bdist_wheel;
+        - pip install dist/*.whl;
 
     - name: "Python 3.7.1 conda"
       python: 3.7
@@ -64,16 +63,16 @@ matrix:
         - pip install nibabel
         - pip install --no-deps .
 
-#    # ======= OSX ========
-#    - name: "Python 3.6.5 on macOS 10.13"
-#      os: osx
-#      osx_image: xcode9.4
-#      language: generic
-#
-#    - name: "Python 3.7.4 on macOS 10.14"
-#      os: osx
-#      osx_image: xcode11
-#      language: generic
+    # ======= OSX ========
+    - name: "Python 3.6.5 on macOS 10.13"
+      os: osx
+      osx_image: xcode9.4
+      language: generic
+
+    - name: "Python 3.7.4 on macOS 10.14"
+      os: osx
+      osx_image: xcode11
+      language: generic
 
 
 before_install:
