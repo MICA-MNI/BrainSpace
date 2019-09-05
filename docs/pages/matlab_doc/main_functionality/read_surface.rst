@@ -14,15 +14,15 @@ Usage
 ----------
 ::
 
-    surf_out = read_surface(path);
+    surf_out = read_surface(file);
 
-- *path*: Path to read from.
+- *file*: File to read from.
 - *surf_out*: Output surface.  
 
 
 Description 
 ------------
 
-Reads surfaces from the disk. Accepted are identical to those accepted by
-:ref:`convert_surface_matlab`.
+Reads surfaces from the disk. Accepted formats are identical to those accepted
+by :ref:`convert_surface_matlab`.
 

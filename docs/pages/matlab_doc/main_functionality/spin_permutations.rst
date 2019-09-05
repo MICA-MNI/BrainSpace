@@ -17,11 +17,11 @@ Usage
 
 ::
 
-    null_data = spin_permutations(data,spheres,permutation_number,varargin);
+    null_data = spin_permutations(data,spheres,n_rep,varargin);
 
 - *data*: An n-by-m matrix of data to be randomised (single sphere) or cell array of n-by-m matrices (two spheres).  
 - *spheres*: Cell array containing spheres. 
-- *permutation_number*: The number of permutation to perform.
+- *n_rep*: The number of permutation to perform.
 - *null_data*: The randomised data. 
 - *varargin*: See name-value pairs below. 
 
@@ -41,5 +41,4 @@ Name-Value pairs
 ------------------
 
 - *'parcellation'*: a n-by-1 vector containing the parcellation scheme. If you are performing vertexwise analysis, do not provide this pair. 
-
-- *'type'*: program used to generate the spheres. Either 'FreeSurfer' (default), or 'CIVET'. If Freesurfer, rotations are flipped along the x-axis for the second sphere. 
+- *'surface_algorithm'*: program used to generate the spheres. Either 'FreeSurfer' (default), or 'CIVET'. If Freesurfer, rotations are flipped along the x-axis for the second sphere. 
