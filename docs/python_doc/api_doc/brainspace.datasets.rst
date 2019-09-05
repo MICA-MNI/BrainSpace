@@ -9,7 +9,7 @@ Datasets
 - :ref:`pysec-datasets-connectivity_matrices`
 
 
-.. currentmodule:: brainspace.datasets.base
+.. currentmodule:: brainspace.datasets
 
 
 .. _pysec-datasets-surfaces:
@@ -33,9 +33,7 @@ Cortical features
 
     load_mask
     load_parcellation
-    load_curvature
-    load_thickness
-    load_t1t2
+    load_marker
     load_gradient
 
 
@@ -47,5 +45,4 @@ Connectivity matrices
 .. autosummary::
    :toctree: ../../generated/
 
-    load_group_hcp
-    load_holdout_hcp
+    load_group_fc
