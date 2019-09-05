@@ -1,4 +1,3 @@
-# from os.path import dirname, join
 import os
 import numpy as np
 
@@ -34,7 +33,7 @@ def load_group_fc(parcellation, scale=400, group='main'):
 
     root_pth = os.path.dirname(__file__)
     fname = '{0}_{1}_mean_connectivity_matrix.csv'.format(parcellation, scale)
-    ipth = os.path.join(root_pth, 'matrices/{0}_group', fname).format(group)
+    ipth = os.path.join(root_pth, 'matrices', '{0}_group', fname).format(group)
     return np.loadtxt(ipth, dtype=np.float, delimiter=',')
 
 
@@ -90,7 +89,7 @@ def load_mask(name='midline', join=False):
     """
 
     root_pth = os.path.dirname(__file__)
-    ipth = os.path.join(root_pth, 'surfaces/conte69_32k_{0}{1}_mask.csv')
+    ipth = os.path.join(root_pth, 'surfaces', 'conte69_32k_{0}{1}_mask.csv')
     if name == 'midline':
         name = ''
     else:
@@ -145,8 +144,8 @@ def load_conte69(as_sphere=False, with_normals=True, join=False):
 
 def _load_feat(feat_name, parcellation=None, mask=None):
     root_pth = os.path.dirname(__file__)
-    ipth = os.path.join(root_pth, 'matrices/main_group/'
-                                  '{0}.csv'.format(feat_name))
+    ipth = os.path.join(root_pth, 'matrices', 'main_group',
+                        '{0}.csv'.format(feat_name))
     x = np.loadtxt(ipth, dtype=np.float)
     if mask is not None:
         x = x[mask]
