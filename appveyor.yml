@@ -1,23 +1,59 @@
 image:
-- Visual Studio 2017
+  - Visual Studio 2017
+  - Visual Studio 2019
 
-stack: python 3.7
+#stack: python 3.7
 
-environment:
-  PY_DIR: C:\Python37-x64
+#environment:
+#  PY_DIR: C:\Python37-x64
 
-clone_depth: 25
+matrix:
+
+  - PYTHON: "C:\\Python37"
+    PYTHON_VERSION: "3.7.x"
+    PYTHON_ARCH: "32"
+
+  - PYTHON: "C:\\Python37-x64"
+    PYTHON_VERSION: "3.7.x"
+    PYTHON_ARCH: "64"
+
+  - PYTHON: "C:\\Python36"
+    PYTHON_VERSION: "3.6.x"
+    PYTHON_ARCH: "32"
+
+  - PYTHON: "C:\\Python36-x64"
+    PYTHON_VERSION: "3.6.x"
+    PYTHON_ARCH: "64"
+
+  - PYTHON: "C:\\Python35"
+    PYTHON_VERSION: "3.5.0"
+    PYTHON_ARCH: "32"
+
+  - PYTHON: "C:\\Python35-x64"
+    PYTHON_VERSION: "3.5.0"
+    PYTHON_ARCH: "64"
+
+#clone_depth: 25
 
 build: false
 
-init:
-  - cmd: set PATH=%PY_DIR%;%PY_DIR%\Scripts;%PATH%
+#init:
+#  - cmd: set PATH=%PY_DIR%;%PY_DIR%\Scripts;%PATH%
 
 install:
-  - python --version
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+
+  # Check that we have the expected version and architecture for Python
+  - "python --version"
+  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+
+  # Upgrade to the latest version of pip to avoid it displaying warnings
+  # about it being out of date.
+  - "python -m pip install --upgrade pip"
+
+#  - python --version
   - python -m pip install -e .[test]
   - "git clone --depth 1 git://github.com/vtkiorg/ci-helpers.git"
-  - dir ci-helpers
   - "powershell ci-helpers/appveyor/install_opengl.ps1"
 
 test_script:
