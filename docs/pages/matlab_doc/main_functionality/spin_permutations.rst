@@ -33,9 +33,10 @@ Spin test as described by `(Alexander-Bloch, 2018)
 <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_. Data is
 either an n-by-m matrix where n is the number of vertices and/or parcels or,
 when spinning on two spheres, a two-element cell array each containing an n-by-m
-matrix. Spheres is either a sphere in a format readable by
-:ref:`convert_surface_matlab` or a two-element cell array containing spheres
-corresponding to the respective elements in the data cell array. 
+matrix. Spheres is either a file in a format readable by
+:ref:`read_surface_matlab`, a sphere loaded into memory, or a two-element cell
+array containing files/spheres corresponding to the respective elements in the
+data cell array. 
 
 Name-Value pairs
 ------------------
