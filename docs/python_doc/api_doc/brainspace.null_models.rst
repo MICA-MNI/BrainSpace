@@ -24,7 +24,6 @@ Spin permutations
    spin_permutations
 
 
-.. _pysec-nullmodels-moran:
 
 .. _pysec-nullmodels-moran:
 

@@ -19,6 +19,35 @@ matrix:
       services: xvfb
       env: REPORT_COVERAGE=true
 
+    - name: "Python 3.7.1 setup.py install"
+      python: 3.7
+      services: xvfb
+      install:
+        - python setup.py install
+      script:
+        - py.test brainspace
+
+    - name: "Python 3.7.1 sdist"
+      python: 3.7
+      services: xvfb
+      install:
+        - python setup.py sdist;
+        - pip install dist/*.tar.gz;
+      script:
+          - cd $HOME
+          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
+
+    - name: "Python 3.7.1 wheel"
+      python: 3.7
+      services: xvfb
+      install:
+        - python setup.py bdist_wheel;
+        - pip install dist/*.whl;
+      script:
+          - cd $HOME
+          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
+
+
     # ======= OSX ========
     - name: "Python 3.6.5 on macOS 10.13"
       os: osx

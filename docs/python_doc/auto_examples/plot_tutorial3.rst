@@ -100,7 +100,7 @@ As an illustration of the rotation, let’s plot the original t1w/t2w data
 
 
     # Plot original data
-    plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w, size=(800, 150), cmap='viridis',
+    plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w, size=(1200, 300), cmap='viridis',
                      nan_color=(0.5, 0.5, 0.5, 1), color_bar=True)
 
 
@@ -119,8 +119,9 @@ as well as a few rotated versions.
 .. code-block:: default
 
 
+    # sphinx_gallery_thumbnail_number = 2
     # Plot some rotations
-    plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3], size=(800, 450),
+    plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3], size=(1200, 800),
                      cmap='viridis', nan_color=(0.5, 0.5, 0.5, 1), color_bar=True,
                      label_text=['Rot0', 'Rot1', 'Rot2'])
 
@@ -322,7 +323,7 @@ p-values.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 3 minutes  24.503 seconds)
+   **Total running time of the script:** ( 2 minutes  23.000 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial3.py:

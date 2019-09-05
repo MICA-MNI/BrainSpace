@@ -29,7 +29,7 @@ surf_lh, surf_rh = load_conte69()
 
 from brainspace.plotting import plot_hemispheres
 
-plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(800, 150), cmap='tab20')
+plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(1200, 300), cmap='tab20')
 
 
 ###############################################################################
@@ -59,7 +59,7 @@ for i in range(2):
     # map the gradient to the parcels
     grad[i] = map_to_labels(gm.gradients_[:, i], labeling, mask=mask, fill=np.nan)
 
-plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(800, 300), cmap='viridis',
+plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600), cmap='viridis_r',
                  color_bar=True, label_text=['Grad1', 'Grad2'])
 
 

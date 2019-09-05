@@ -12,6 +12,7 @@ tutorial will only show you how to apply these techniques.
 ###############################################################################
 # As before, we’ll start by loading the sample data.
 
+
 import warnings
 warnings.simplefilter('ignore')
 
@@ -20,6 +21,7 @@ from brainspace.datasets import load_group_fc, load_parcellation, load_conte69
 # First load mean connectivity matrix and Schaefer parcellation
 conn_matrix = load_group_fc('schaefer', scale=400)
 labeling = load_parcellation('schaefer', scale=400, join=True)
+
 mask = labeling != 0
 
 # and load the conte69 hemisphere surfaces
@@ -48,8 +50,8 @@ for i, k in enumerate(kernels):
 
 
 label_text = ['Pearson', 'Spearman', 'Normalized\nAngle']
-plot_hemispheres(surf_lh, surf_rh, array_name=gradients_kernel, size=(800, 450),
-                 cmap='viridis', color_bar=True, label_text=label_text)
+plot_hemispheres(surf_lh, surf_rh, array_name=gradients_kernel, size=(1200, 800),
+                 cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 ###############################################################################
@@ -71,9 +73,10 @@ for i, emb in enumerate(embeddings):
                                            fill=np.nan)
 
 
+# sphinx_gallery_thumbnail_number = 2
 label_text = ['PCA', 'LE', 'DM']
-plot_hemispheres(surf_lh, surf_rh, array_name=gradients_embedding, size=(800, 450),
-                 cmap='viridis', color_bar=True, label_text=label_text)
+plot_hemispheres(surf_lh, surf_rh, array_name=gradients_embedding, size=(1200, 800),
+                 cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 ###############################################################################
@@ -103,8 +106,8 @@ for i in range(2):
                                            mask=mask, fill=np.nan)
 
 label_text = ['Unaligned Group 1', 'Unaligned Group 2']
-plot_hemispheres(surf_lh, surf_rh, array_name=gradients_unaligned, size=(800, 300),
-                 cmap='viridis', color_bar=True, label_text=label_text)
+plot_hemispheres(surf_lh, surf_rh, array_name=gradients_unaligned, size=(1200, 500),
+                 cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 ###############################################################################
@@ -116,8 +119,8 @@ for i in range(2):
                                             fill=np.nan)
 
 label_text = ['Procrustes Group 1', 'Procrustes Group 2']
-plot_hemispheres(surf_lh, surf_rh, array_name=gradients_procrustes, size=(800, 300),
-                 cmap='viridis', color_bar=True, label_text=label_text)
+plot_hemispheres(surf_lh, surf_rh, array_name=gradients_procrustes, size=(1200, 500),
+                 cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 ###############################################################################
@@ -129,8 +132,8 @@ for i in range(2):
                                        fill=np.nan)
 
 label_text = ['Joint Group 1', 'Joint Group 2']
-plot_hemispheres(surf_lh, surf_rh, array_name=gradients_joint, size=(800, 300),
-                 cmap='viridis', color_bar=True, label_text=label_text)
+plot_hemispheres(surf_lh, surf_rh, array_name=gradients_joint, size=(1200, 500),
+                 cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 ###############################################################################

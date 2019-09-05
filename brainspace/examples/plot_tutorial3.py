@@ -74,15 +74,16 @@ thickness_rotated = np.hstack(sp.randomize(thickness_lh, thickness_rh))
 # As an illustration of the rotation, let’s plot the original t1w/t2w data
 
 # Plot original data
-plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w, size=(800, 150), cmap='viridis',
+plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w, size=(1200, 300), cmap='viridis',
                  nan_color=(0.5, 0.5, 0.5, 1), color_bar=True)
 
 
 ###############################################################################
 # as well as a few rotated versions.
 
+# sphinx_gallery_thumbnail_number = 2
 # Plot some rotations
-plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3], size=(800, 450),
+plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3], size=(1200, 800),
                  cmap='viridis', nan_color=(0.5, 0.5, 0.5, 1), color_bar=True,
                  label_text=['Rot0', 'Rot1', 'Rot2'])
 

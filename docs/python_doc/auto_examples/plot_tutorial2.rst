@@ -21,6 +21,7 @@ As before, we’ll start by loading the sample data.
 .. code-block:: default
 
 
+
     import warnings
     warnings.simplefilter('ignore')
 
@@ -29,6 +30,7 @@ As before, we’ll start by loading the sample data.
     # First load mean connectivity matrix and Schaefer parcellation
     conn_matrix = load_group_fc('schaefer', scale=400)
     labeling = load_parcellation('schaefer', scale=400, join=True)
+
     mask = labeling != 0
 
     # and load the conte69 hemisphere surfaces
@@ -66,8 +68,8 @@ reduction techniques. Let’s have a look at three different kernels.
 
 
     label_text = ['Pearson', 'Spearman', 'Normalized\nAngle']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_kernel, size=(800, 450),
-                     cmap='viridis', color_bar=True, label_text=label_text)
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_kernel, size=(1200, 800),
+                     cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 
@@ -101,9 +103,10 @@ reduction techniques.
                                                fill=np.nan)
 
 
+    # sphinx_gallery_thumbnail_number = 2
     label_text = ['PCA', 'LE', 'DM']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_embedding, size=(800, 450),
-                     cmap='viridis', color_bar=True, label_text=label_text)
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_embedding, size=(1200, 800),
+                     cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 
@@ -154,8 +157,8 @@ organized.
                                                mask=mask, fill=np.nan)
 
     label_text = ['Unaligned Group 1', 'Unaligned Group 2']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_unaligned, size=(800, 300),
-                     cmap='viridis', color_bar=True, label_text=label_text)
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_unaligned, size=(1200, 500),
+                     cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 
@@ -178,8 +181,8 @@ organized.
                                                 fill=np.nan)
 
     label_text = ['Procrustes Group 1', 'Procrustes Group 2']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_procrustes, size=(800, 300),
-                     cmap='viridis', color_bar=True, label_text=label_text)
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_procrustes, size=(1200, 500),
+                     cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 
@@ -202,8 +205,8 @@ organized.
                                            fill=np.nan)
 
     label_text = ['Joint Group 1', 'Joint Group 2']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_joint, size=(800, 300),
-                     cmap='viridis', color_bar=True, label_text=label_text)
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_joint, size=(1200, 500),
+                     cmap='viridis_r', color_bar=True, label_text=label_text)
 
 
 
@@ -255,7 +258,7 @@ null hypothesis testing of comparisons between gradients and other markers.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.012 seconds)
+   **Total running time of the script:** ( 0 minutes  3.399 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial2.py:
