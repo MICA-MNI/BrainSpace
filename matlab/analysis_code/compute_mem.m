@@ -24,10 +24,15 @@ function MEM = compute_mem(W,varargin)
 p = inputParser;
 addParameter(p, 'n_ring', 1, @isnumeric);
 addParameter(p, 'mask', [], @islogical);
-addParameter(p, 'eigenvectors', 'all', @ischar);
+addParameter(p, 'spectrum', 'all', @ischar);
 
 parse(p, varargin{:});
 R = p.Results;
+
+% Check correct spectrum input
+if ~ismember(lower(p.Results.spectrum),{'all','nonzero'})
+    error('Spectrum must be ''all'' or ''nonzero''.');
+end
 
 % If input is cell array, combine surfaces.
 if iscell(W)
@@ -91,7 +96,7 @@ end
 
 % Remove zero eigenvector
 idx = find(abs(lambda) < 1e-10); 
-if strcmp(R.eigenvectors,'all')
+if strcmp(R.spectrum,'all')
     if numel(idx) == 1
         MEM(:,idx) = [];
         lambda(idx) = []; 

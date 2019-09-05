@@ -373,7 +373,7 @@ def append_vtk(to='point'):
       #. append (bool, optional)
           If True, append data to surface. Otherwise, return data.
 
-      #. array_name (str, optional)
+      #. key (str, optional)
           Array names of data.
 
     See Also
@@ -392,9 +392,9 @@ def append_vtk(to='point'):
             data = func(ws, *args, **kwds)
             if not kwds['append']:
                 return data
-            if kwds['array_name'] is None:
-                raise ValueError('Array name is None. Cannot append data.')
-            ws.append_array(data, name=kwds['array_name'], at=to)
+            if kwds['key'] is None:
+                raise ValueError('Key is None. Cannot append data.')
+            ws.append_array(data, name=kwds['key'], at=to)
             return surf
         return _wrapper_append
     return _wrapper_decorator

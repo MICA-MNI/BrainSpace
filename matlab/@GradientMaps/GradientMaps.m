@@ -24,8 +24,9 @@ classdef GradientMaps
 %       - a function handle
 %   - n_components (default: 10)
 %       - Any natural number.
-%   - random_state (default: 0)
-%       - Any valid input for MATLAB's "rng" function.
+%   - random_state (default: nan)
+%       - Any valid input for MATLAB's "rng" function or nan for no
+%           initialization.
 %
 % For complete documentation, including descriptions of this object's
 % properties and methods please consult our <a
@@ -57,7 +58,7 @@ classdef GradientMaps
             addParameter(p, 'approach', 'diffusion embedding', in_fun);
             addParameter(p, 'alignment', 'none', in_fun);
             addParameter(p, 'n_components', 10, @isnumeric);
-            addParameter(p, 'random_state', 0);
+            addParameter(p, 'random_state', nan);
             
             parse(p, varargin{:});
             R = p.Results;
@@ -142,7 +143,11 @@ classdef GradientMaps
                         
                     case 'random_state'
                         obj.random_state = varargin{ii+1};
-                        change_string{end+1} = ['Set the random state initialization to: ' num2str(varargin{ii+1}) '.'];
+                        if ~isnan(varargin{ii+1})
+                            change_string{end+1} = ['Set the random state initialization to: ' num2str(varargin{ii+1}) '.'];
+                        else
+                            change_string{end+1} = ['No random state initialization set.'];
+                        end
                         
                     case 'n_components'
                         obj.method.n_components = varargin{ii+1};
@@ -233,7 +238,7 @@ classdef GradientMaps
             
             p = inputParser;
             addParameter(p, 'alpha'         , 0.5       , @isnumeric    );
-            addParameter(p, 'diffusionTime' , 0         , @isnumeric    );
+            addParameter(p, 'diffusion_time' , 0         , @isnumeric    );
             
             % Parse the input
             parse(p, varargin{:});
@@ -262,7 +267,9 @@ classdef GradientMaps
             
             %% Embedding.
             % Set the random state for reproducibility.
-            rng(obj.random_state);
+            if ~isnan(obj.random_state) 
+                rng(obj.random_state)
+            end
             
             % Run manifold learning
             switch obj.method.approach
@@ -271,11 +278,11 @@ classdef GradientMaps
                     embedding = embedding(:,1:obj.method.n_components);
                 case 'Laplacian Eigenmap'
                     disp(['Requested ' num2str(obj.method.n_components) ' components.']);
-                    [embedding, lambda] = laplacian_eigenmap(data, obj.method.n_components);
+                    [embedding, lambda] = laplacian_eigenmaps(data, obj.method.n_components);
                 case 'Diffusion Embedding'
                     disp(['Running with alpha parameter: ' num2str(in.alpha)]);
-                    disp(['Running with diffusion time: ' num2str(in.diffusionTime)]);
-                    [embedding, lambda] = diffusion_embedding(data, obj.method.n_components, in.alpha, in.diffusionTime);
+                    disp(['Running with diffusion time: ' num2str(in.diffusion_time)]);
+                    [embedding, lambda] = diffusion_mapping(data, obj.method.n_components, in.alpha, in.diffusion_time);
                 otherwise
                     error('Unknown manifold technique.');
             end

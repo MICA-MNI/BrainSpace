@@ -76,8 +76,7 @@ Connectivity
    get_cell2point_connectivity
    get_point2cell_connectivity
 
-   get_cell_point_neighbors
-   get_cell_edge_neighbors
+   get_cell_neighbors
 
    get_immediate_adjacency
    get_ring_adjacency

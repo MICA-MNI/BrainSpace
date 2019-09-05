@@ -6,13 +6,13 @@ laplacian_eigenmap
 Synopsis
 ---------
 
-Performs the laplacian eigenmap computations (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/laplacian_eigenmap.m>`_). 
+Performs the laplacian eigenmap computations (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/laplacian_eigenmaps.m>`_). 
 
 Usage 
 ----------
 ::
 
-    [gradients, mapping] = laplacian_eigenmap(data, n_components)
+    [gradients, lambdas] = laplacian_eigenmap(data, n_components)
 
 - *data*: the data matrix to perform the laplacian eigenmapping on. 
 - *n_components*: the number of components to return.

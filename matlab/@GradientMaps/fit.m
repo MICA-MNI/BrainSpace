@@ -12,7 +12,7 @@ function obj = fit(obj,connectivity_matrix,varargin)
 %       - Gamma (default: 1/number_of_features)
 %           - Any numeric
 %   - Approach arguments
-%       - diffusiontime (default: 0)
+%       - diffusion_time (default: 0)
 %           - Any positive numeric or zero
 %       - alpha (default: 0.5)
 %           - Numeric in the range [0 1].
@@ -34,7 +34,7 @@ for ii = 1:2:numel(varargin)
         case {'sparsity','tolerance','gamma'}
             kernel_arg{end+1} = varargin{ii};
             kernel_arg{end+1} = varargin{ii+1};
-        case {'diffusiontime','alpha'}
+        case {'diffusion_time','alpha'}
             approach_arg{end+1} = varargin{ii};
             approach_arg{end+1} = varargin{ii+1};
         case {'niterations','reference'}

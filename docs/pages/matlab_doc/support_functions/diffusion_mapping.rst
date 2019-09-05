@@ -1,23 +1,24 @@
-.. _diffusion_embedding_matlab:
+.. _diffusion_mapping_matlab:
 
-diffusion_embedding
+diffusion_mapping
 ==============================
 
 Synopsis
 ---------
 
-Performs the diffusion embedding computations (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/diffusion_embedding.m>`_). 
+Performs the diffusion mapping computations (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/analysis_code/diffusion_mapping.m>`_). 
 
 Usage 
 ----------
 ::
 
-    [gradients,lambdas] = diffusion_embedding(data, n_components, alpha, diffusion_time);
+    [gradients,lambdas] = diffusion_mapping(data, n_components, alpha, diffusion_time, random_state);
 
-- *data*: the data matrix to perform the diffusion embedding on. 
+- *data*: the data matrix to perform the diffusion mapping on. 
 - *n_components*: the number of components to return.
 - *alpha*: the alpha parameter.
 - *diffusion_time*: the diffusion_time parameter; set to 0 for automatic estimation.
+- *random_state*: Input passed to the rng() function for randomization initialization (default: no initialization). 
 - *gradients*: the output gradients.
 - *lambdas*: the output eigenvalues. 
 

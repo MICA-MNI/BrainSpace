@@ -145,6 +145,22 @@ resolve changes in the order of the gradients. However, you should always
 inspect the output of an alignment; if the input data are sufficiently dissimilar
 then the alignment may produce odd results.
 
+In some instances, you may want to align gradients to an out-of-sample gradient,
+for example when aligning individuals to a hold-out group gradient. When
+performing a Procrustes alignemnt, a 'reference' can be specified. The first
+alignment iteration will then be to the reference. For purposes of this example,
+we will use the gradient of the hold-out group as the reference. 
+
+.. code-block:: matlab    
+    
+    Gref = GradientMaps('kernel','na','approach','le');
+    Gref = Gref.fit(conn_matrix2);
+
+    Galign = GradientMaps('kernel','na','approach','le','alignment','pa');
+    Galign = Galign.fit(conn_matrix,'reference',Gref.gradients{1});
+
+The gradients in ``Galign.aligned`` are now aligned to the reference gradients. 
+
 That concludes the second tutorial. In the third tutorial we will consider null
 hypothesis testing of comparisons between gradients and other markers. 
 

@@ -18,13 +18,12 @@ Usage
 
 ::
 
-    Y_rand = moran_randomization(Y,MEM,n_perm,procedure,joint);
+    Y_rand = moran_randomization(Y,MEM,n_rep,varargin);
 
 - *Y*: An n-by-m data matrix to randomize where n is number of datapoints and m are different modalities. 
 - *MEM*: Moran eigenvectors as returned by :ref:`compute_mem_matlab`.
-- *n_perm*: Number of perutations
-- *procedure*: Randomization procedure; either 'singleton' or 'pair'.
-- *joint*: If true, randomizes different modalities identically. 
+- *n_rep*: Number of perutations
+- *varargin*: See name-value pairs below. 
 - *Y_rand*: Randomized data. 
 
 ------------------ 
@@ -41,5 +40,13 @@ more closely at the cost of fewer possible randomizations (max: 2\ :sup:`n`). In
 most use-cases this allows for ample randomizations. In cases where the maximum
 number of randomizations becomes restrictive, we recommend using the pair
 procedure instead. 
+
+-----------------------
+Name-Value Pairs
+-----------------------
+
+- *procedure*: Randomization procedure; either 'singleton' or 'pair'.
+- *joint*: If true, randomizes different modalities identically. 
+- *random_state*: Initilaization of the random state. Accepts any argument accepted by rng() or nan for no initialization. 
 
 

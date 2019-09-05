@@ -57,7 +57,7 @@ def compute_mem(a, spectrum='nonzero', tol=1e-10):
 
     # Doubly centering weight matrix
     if ssp.issparse(a):
-        m = a.mean(axis=0)
+        m = a.mean(axis=0).A
         ac = a.mean() - m - m.T
 
         if not ssp.isspmatrix_coo(a):
@@ -74,10 +74,8 @@ def compute_mem(a, spectrum='nonzero', tol=1e-10):
         ac = a.mean() - m - m.T
         ac += a
 
-    w, v = np.linalg.eigh(ac)
-    if ssp.issparse(a):
-        v = v.A
-
+    # when using float64, eigh is unstable for sparse matrices
+    w, v = np.linalg.eigh(ac.astype(np.float32))
     w, v = w[::-1], v[:, ::-1]
 
     # Remove zero eigen-value/vector

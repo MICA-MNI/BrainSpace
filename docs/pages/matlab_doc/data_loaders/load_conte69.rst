@@ -16,9 +16,9 @@ Usage
 
 ::
 
-   [surf_lh,surf_rh] = load_conte69(type)
+   [surf_lh,surf_rh] = load_conte69(name)
 
-- *type* The type of surface. Either 'surfaces' for neocortex, 'spheres' for cortical spheres or '5k_surfaces' for downsampled neocortex. 
+- *name* The type of surface. Either 'surfaces' for neocortex, 'spheres' for cortical spheres or '5k_surfaces' for downsampled neocortex. 
 - *surf_lh* Left hemispheric surface.
 - *surf_rh* Right hemispheric surface.
 

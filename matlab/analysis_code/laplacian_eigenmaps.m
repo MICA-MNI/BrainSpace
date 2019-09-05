@@ -1,4 +1,4 @@
-function [embedding, lambda] = laplacian_eigenmap(data, n_components)
+function [embedding, lambdas] = laplacian_eigenmaps(data, n_components, random_state)
 %LAPLACIAN_EIGENMAP Performs non-linear dimensionality reduction using Laplacian Eigenmaps
 %
 % [embedding, lambda] = laplacian_eigenmap(data, n_components)
@@ -24,11 +24,16 @@ function [embedding, lambda] = laplacian_eigenmap(data, n_components)
 % - Enforced double input for the eigs function.
 % - Only outputting lambdas as the second output. 
 % - Changed some variable names. 
-% - Computation of the Gaussian kernel removed. 
+% - Computation of the Gaussian kernel removed.
+% - Added random_state initialization.
 %
 % For complete documentation please consult our <a
-% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/laplacian_eigenmap.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/laplacian_eigenmaps.html">ReadTheDocs</a>.
 
+
+if exist('random_state','var')
+    rng(random_state);
+end
 
 if ~exist('n_components', 'var')
     n_components = 2;
@@ -55,12 +60,12 @@ tol = 0;
 options.disp = 0;
 options.isreal = 1;
 % Add a v0 options i.e. random initialization. 
-[embedding, lambda] = eigs(double(L), double(D), n_components + 1, tol, options);			% only need bottom (no_dims + 1) eigenvectors
+[embedding, lambdas] = eigs(double(L), double(D), n_components + 1, tol, options);			% only need bottom (no_dims + 1) eigenvectors
 
 % Sort eigenvectors in ascending order
-lambda = diag(lambda);
-[lambda, ind] = sort(lambda, 'ascend');
-lambda = lambda(2:n_components + 1);
+lambdas = diag(lambdas);
+[lambdas, ind] = sort(lambdas, 'ascend');
+lambdas = lambdas(2:n_components + 1);
 
 % Final embedding
 embedding = embedding(:,ind(2:n_components + 1));
