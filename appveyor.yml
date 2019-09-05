@@ -1,6 +1,5 @@
 image:
 - Visual Studio 2017
-- Ubuntu1804
 
 stack: python 3.7
 
@@ -17,6 +16,7 @@ init:
 install:
   - python --version
   - python -m pip install -e .[test]
+  - "git clone --depth 1 git://github.com/vtkiorg/ci-helpers.git"
   - "powershell appveyor/install_opengl.ps1"
 
 test_script:
