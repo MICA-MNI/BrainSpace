@@ -6,8 +6,8 @@
 
 .. _examples_index:
 
-Examples
-========
+Tutorials
+=========
 
 .. contents:: **Contents**
     :local:
@@ -36,26 +36,6 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 3">
-
-.. only:: html
-
-    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial3_thumb.png
-
-        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial3.py`
-
-.. raw:: html
-
-    </div>
-
-
-.. toctree::
-   :hidden:
-
-   /python_doc/auto_examples/plot_tutorial3
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 2">
 
 .. only:: html
@@ -73,27 +53,30 @@ Examples
    :hidden:
 
    /python_doc/auto_examples/plot_tutorial2
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 3">
+
+.. only:: html
+
+    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial3_thumb.png
+
+        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial3.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /python_doc/auto_examples/plot_tutorial3
 .. raw:: html
 
     <div style='clear:both'></div>
 
-
-
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-gallery
-
-
-  .. container:: sphx-glr-download
-
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//media/oualid/hd500/oualid/BrainSpace_forked/docs/python_doc/auto_examples/auto_examples_python.zip>`
-
-
-
-  .. container:: sphx-glr-download
-
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//media/oualid/hd500/oualid/BrainSpace_forked/docs/python_doc/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

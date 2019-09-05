@@ -82,12 +82,16 @@ add_function_parentheses = False
 autosummary_generate = True
 
 
+from sphinx_gallery.sorting import FileNameSortKey
+
 sphinx_gallery_conf = {
-     'examples_dirs': '../brainspace/examples',
-     'gallery_dirs': 'python_doc/auto_examples',
-     # 'plot_gallery': 'False',
-     'thumbnail_size': (250, 250),
-     'image_scrapers': ('matplotlib', _get_sg_image_scraper()),
+    'examples_dirs': '../brainspace/examples',
+    'gallery_dirs': 'python_doc/auto_examples',
+    # 'plot_gallery': 'False',
+    'thumbnail_size': (250, 250),
+    'image_scrapers': ('matplotlib', _get_sg_image_scraper()),
+    'within_subsection_order': FileNameSortKey,
+    'download_all_examples': False,
 }
 
 
