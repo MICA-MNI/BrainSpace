@@ -26,7 +26,10 @@ matrix:
         - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
       script:
           - cd $HOME
-          - pytest
+          - echo $TRAVIS_BUILD_DIR
+          - ls $TRAVIS_BUILD_DIR
+          - ls /home/travis/build
+          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
 
     # ======= OSX ========
     - name: "Python 3.6.5 on macOS 10.13"
