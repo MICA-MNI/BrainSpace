@@ -88,12 +88,14 @@ original data, as well as all rotated data.
 .. code-block:: matlab
 
     % Find correlation between FC-G1 with thickness and T1w/T2w
-    r_original_thick = corr(embedding,[thickness_lh;thickness_rh], ...
+    [r_original_thick, pval_thick_spin] = corr(embedding,[thickness_lh;thickness_rh], ...
                     'rows','pairwise','type','spearman');
+    % Original p-value: 0. 
     r_rand_thick = corr(embedding,thickness_rotated, ...
                 'rows','pairwise','type','spearman');
-    r_original_t1wt2w = corr(embedding,[t1wt2w_lh;t1wt2w_rh], ...
+    [r_original_t1wt2w, pval_t1wt2w_spin] = corr(embedding,[t1wt2w_lh;t1wt2w_rh], ...
                     'rows','pairwise','type','spearman');
+    % Original p-value: 0. 
     r_rand_t1wt2w = corr(embedding,t1wt2w_rotated, ...
                 'rows','pairwise','type','spearman');
           
@@ -107,10 +109,12 @@ consider the correlation to be significant if it is lower or higher than the
 .. code-block:: matlab
 
    % Compute percentile rank.
-    prctile_rank_thick = mean(r_original_thick > r_rand_thick); % = 0.9410
+    prctile_rank_thick = mean(r_original_thick > r_rand_thick); 
+    % Percentile rank = 0.9410
     significant_thick = prctile_rank_thick < 0.025 || prctile_rank_thick >= 0.975;
 
-    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w); % = 0 
+    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w); 
+    % Percentile rank = 0 
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
 If significant is true, then we have found a statistically significant
@@ -189,10 +193,12 @@ gradient and the real/randomized data.
 
 .. code-block:: matlab
 
-    r_original_curv = corr(embedding_tl,curv_tl,'type','spearman');
+    [r_original_curv,pval_curv_moran] = corr(embedding_tl,curv_tl,'type','spearman');
+    % Original p-value: 6.6380e-05
     r_rand_curv = corr(embedding_tl,curv_rand,'type','spearman');
 
-    r_original_t1wt2w = corr(embedding_tl,t1wt2w_tl,'type','spearman');
+    [r_original_t1wt2w,pval_t1wt2w_moran] = corr(embedding_tl,t1wt2w_tl,'type','spearman');
+    % Original p-value: 0
     r_rand_t1wt2w = corr(embedding_tl,t1wt2w_rand,'type','spearman');
 
 To find a p-value, we simply compute the percentile rank of the true correlation
@@ -203,10 +209,12 @@ consider the correlation to be significant if it is lower or higher than the
 
 .. code-block:: matlab
 
-    prctile_rank_curv = mean(r_original_curv > r_rand_curv); % = 0.8249.
+    prctile_rank_curv = mean(r_original_curv > r_rand_curv); 
+    % Percentile rank = 0.8249
     significant_curv = prctile_rank_curv < 0.025 || prctile_rank_curv >= 0.975;
 
-    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w); % = 0.
+    prctile_rank_t1wt2w = mean(r_original_t1wt2w > r_rand_t1wt2w); 
+    % Percentile rank = 0
     significant_t1wt2w = prctile_rank_t1wt2w < 0.025 || prctile_rank_t1wt2w >= 0.975;
 
 
