@@ -24,7 +24,7 @@ matrix:
       services: xvfb
       install:
         - python setup.py install
-        - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
+#        - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
       script:
           - cd $HOME
           - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
@@ -35,7 +35,6 @@ matrix:
       install:
         - python setup.py sdist;
         - pip install dist/*.tar.gz;
-#        - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
       script:
           - cd $HOME
           - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
@@ -46,7 +45,6 @@ matrix:
       install:
         - python setup.py bdist_wheel;
         - pip install dist/*.whl;
-#        - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
       script:
           - cd $HOME
           - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
