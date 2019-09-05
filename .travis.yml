@@ -26,7 +26,7 @@ matrix:
         - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
       script:
           - cd $HOME
-          - python -m pytest $TRAVIS_BUILD_DIR/tests
+          - pytest
 
     # ======= OSX ========
     - name: "Python 3.6.5 on macOS 10.13"
