@@ -17,9 +17,8 @@ the wrapping scheme used in BrainSpace and some basic usage examples. Note,
 however, that this part is not a requirement to start using BrainSpace. In the
 :ref:`Mesh<pymod-mesh>` module you can find most of the functionality you need to
 work with surfaces. Reading/writing of several formats is supported through
-the :func:`.load_surface` and :func:`.save_surface` functions.
-
-A surface in BrainSpace is represented as :class:`.BSPolyData` object.
+the :func:`.read_surface` and :func:`.write_surface` functions. A surface in
+BrainSpace is represented as :class:`.BSPolyData` object.
 
 
 

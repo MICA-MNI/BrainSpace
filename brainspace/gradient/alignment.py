@@ -52,8 +52,8 @@ def procrustes(source, target):
 
 
 # Generalized procrustes analysis
-def generalized_procrustes(data, reference=None, n_iter=10, tol=1e-5,
-                           return_reference=False, verbose=False):
+def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
+                         return_reference=False, verbose=False):
     """Iterative alignment using generalized procrustes analysis.
 
     Parameters
@@ -76,8 +76,8 @@ def generalized_procrustes(data, reference=None, n_iter=10, tol=1e-5,
     Returns
     -------
     aligned : list of ndarray, shape = (n_samples, n_feat)
-        Aligned datasets.
-    reference : ndarray, shape = (n_samples, n_feat)
+        Aligned datsets.
+    mean_dataset : ndarray, shape = (n_samples, n_feat)
         Reference dataset built in the last iteration. Only if
         ``return_reference == True``.
     """
@@ -163,7 +163,7 @@ class ProcrustesAlignment(BaseEstimator):
         """
 
         self.aligned_, self.mean_ = \
-            generalized_procrustes(data, reference=reference, tol=self.tol,
-                                   n_iter=self.n_iter, return_reference=True,
-                                   verbose=self.verbose)
+            procrustes_alignment(data, reference=reference, tol=self.tol,
+                                 n_iter=self.n_iter, return_reference=True,
+                                 verbose=self.verbose)
         return self

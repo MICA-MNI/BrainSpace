@@ -57,7 +57,7 @@ Alignment
    :toctree: ../../generated/
 
     ProcrustesAlignment
-    generalized_procrustes
+    procrustes_alignment
     procrustes
 
 

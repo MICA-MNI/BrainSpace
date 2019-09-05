@@ -18,6 +18,9 @@ randomization.
 
 
 ###############################################################################
+# Spin Permutations
+# ------------------------------
+#
 # Here, we use the spin permutations approach previously proposed in
 # `(Alexander-Bloch et al., 2018)
 # <https://www.sciencedirect.com/science/article/pii/S1053811918304968>`_,
@@ -31,25 +34,22 @@ randomization.
 import warnings
 warnings.simplefilter('ignore')
 
-
-from brainspace.datasets import (load_gradient, load_t1t2, load_thickness,
-                                 load_conte69)
+import numpy as np
+from brainspace.datasets import load_gradient, load_marker, load_conte69
 
 # load the conte69 hemisphere surfaces and spheres
 surf_lh, surf_rh = load_conte69()
 sphere_lh, sphere_rh = load_conte69(as_sphere=True)
 
-n_pts_lh = surf_lh.n_points
-
 # Load the data
-t1wt2w = load_t1t2()
-t1wt2w_lh, t1wt2w_rh = t1wt2w[:n_pts_lh], t1wt2w[n_pts_lh:]
+t1wt2w_lh, t1wt2w_rh = load_marker('t1wt2w')
+t1wt2w = np.concatenate([t1wt2w_lh, t1wt2w_rh])
 
-thickness = load_thickness()
-thickness_lh, thickness_rh = thickness[:n_pts_lh], thickness[n_pts_lh:]
+thickness_lh, thickness_rh = load_marker('thickness')
+thickness = np.concatenate([thickness_lh, thickness_rh])
 
 # Template functional gradient
-embedding = load_gradient('fc', idx=0)
+embedding = load_gradient('fc', idx=0, join=True)
 
 
 ###############################################################################
@@ -57,13 +57,13 @@ embedding = load_gradient('fc', idx=0)
 
 import numpy as np
 
-from brainspace.null_models import SpinRandomization
+from brainspace.null_models import SpinPermutations
 from brainspace.plotting import plot_hemispheres
 
 # Let's create some rotations
 n_permutations = 1000
 
-sp = SpinRandomization(n_rep=n_permutations, random_state=0)
+sp = SpinPermutations(n_rep=n_permutations, random_state=0)
 sp.fit(sphere_lh, points_rh=sphere_rh)
 
 t1wt2w_rotated = np.hstack(sp.randomize(t1wt2w_lh, t1wt2w_rh))
@@ -73,56 +73,63 @@ thickness_rotated = np.hstack(sp.randomize(thickness_lh, thickness_rh))
 ###############################################################################
 # As an illustration of the rotation, let’s plot the original t1w/t2w data
 
-
-plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w,
-                 size=(800, 150), cmap_name='viridis',
-                 nan_color=(0.5, 0.5, 0.5, 1))
+# Plot original data
+plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w, size=(800, 150), cmap='viridis',
+                 nan_color=(0.5, 0.5, 0.5, 1), color_bar=True)
 
 
 ###############################################################################
 # as well as a few rotated versions.
 
-plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3],
-                 size=(800, 450), cmap_name='viridis',
-                 nan_color=(0.5, 0.5, 0.5, 1))
+# Plot some rotations
+plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3], size=(800, 450),
+                 cmap='viridis', nan_color=(0.5, 0.5, 0.5, 1), color_bar=True,
+                 label_text=['Rot0', 'Rot1', 'Rot2'])
 
 
 ###############################################################################
+#
+# .. warning::
+#
+#    With spin permutations, midline vertices (i.e,, NaNs) from both the
+#    original and rotated data are discarded. Depending on the overlap of
+#    midlines in the, statistical comparisons between them may compare
+#    different numbers of features. This can bias your test statistics.
+#    Therefore, if a large portion of the sphere is not used, we recommend
+#    using Moran spectral randomization instead.
+#
 # Now we simply compute the correlations between the first gradient and the
 # original data, as well as all rotated data.
 
-from scipy.stats import pearsonr
+from scipy.stats import spearmanr
 
 feats = {'t1wt2w': t1wt2w, 'thickness': thickness}
 rotated = {'t1wt2w': t1wt2w_rotated, 'thickness': thickness_rotated}
 
+r_spin = np.empty(n_permutations)
 mask = ~np.isnan(thickness)
-r_spin = {k: np.empty(n_permutations) for k in feats.keys()}
 for fn, feat in feats.items():
+    r_orig, pv_orig = spearmanr(feat[mask], embedding[mask])
 
-    r_spin = np.empty(n_permutations)
-    for i in range(n_permutations):
-        # Remove non-cortex
-        mask_rot = mask & ~np.isnan(rotated[fn][i])
-        emb = embedding[mask_rot]
-        r_spin[i] = pearsonr(rotated[fn][i][mask_rot], emb)[0]
+    for i, perm in enumerate(rotated[fn]):
+        mask_rot = mask & ~np.isnan(perm)  # Remove non-cortex
+        r_spin[i] = spearmanr(perm[mask_rot], embedding[mask_rot])[0]
+    pv_spin = np.mean(np.abs(r_spin) > np.abs(r_orig))
 
-    r_orig, pv_orig = pearsonr(feat[mask], embedding[mask])
-    pv_spin = (np.count_nonzero(r_spin > r_orig) + 1) / (n_permutations + 1)
-
-    print('{0}:\n Orig: {1:.5e}\n Spin: {2:.5e}'.format(fn.capitalize(),
-                                                        pv_orig, pv_spin))
-    print()
-
+    print('{0}:\n Obs : {1:.5e}\n Spin: {2:.5e}\n'.
+          format(fn.capitalize(), pv_orig, pv_spin))
 
 ###############################################################################
 # It is interesting to see that both p-values increase when taking into
 # consideration the auto-correlation present in the surfaces. Also, we can see
 # that the correlation with thickness is no longer statistically significant
 # after spin permutations.
-
-
-###############################################################################
+#
+#
+#
+# Moran Spectral Randomization
+# ------------------------------
+#
 # Moran Spectral Randomization (MSR) computes Moran's I, a metric for spatial
 # auto-correlation and generates normally distributed data with similar
 # auto-correlation. MSR relies on a weight matrix denoting the spatial
@@ -137,15 +144,16 @@ for fn, feat in feats.items():
 # thickness data, and a template functional gradient
 
 
-from brainspace.datasets import load_curvature, load_mask
+from brainspace.datasets import load_mask
 from brainspace.mesh import mesh_elements as me
 
-mask_tl = load_mask(region='temporal')[:n_pts_lh]
+n_pts_lh = surf_lh.n_points
+mask_tl, _ = load_mask(name='temporal')
 
 # Keep only the temporal lobe.
 embedding_tl = embedding[:n_pts_lh][mask_tl]
-t1wt2w_tl = t1wt2w[:n_pts_lh][mask_tl]
-curv_tl = load_curvature()[:n_pts_lh][mask_tl]
+t1wt2w_tl = t1wt2w_lh[mask_tl]
+curv_tl = load_marker('curvature')[0][mask_tl]
 
 
 ###############################################################################
@@ -153,16 +161,16 @@ curv_tl = load_curvature()[:n_pts_lh][mask_tl]
 # providing a weight matrix of spatial proximity between each vertex, or by
 # providing a cortical surface. Here we’ll use a cortical surface.
 
-from brainspace.null_models import MoranSpectralRandomization
+from brainspace.null_models import MoranRandomization
 
 # compute spatial weight matrix
-w = me.get_ring_distance(surf_lh, n_ring=1)
-w = w[mask_tl][:, mask_tl]
+w = me.get_ring_distance(surf_lh, n_ring=1, mask=mask_tl)
 w.data **= -1
 
 n_rand = 1000
 
-msr = MoranSpectralRandomization(n_rep=n_rand, tol=1e-6, random_state=43)
+msr = MoranRandomization(n_rep=n_rand, procedure='singleton', tol=1e-6,
+                         random_state=0)
 msr.fit(w)
 
 
@@ -175,18 +183,18 @@ t1wt2w_rand = msr.randomize(t1wt2w_tl)
 
 ###############################################################################
 # Now that we have the randomized data, we can compute correlations between
-# the gradient and the real/randomised data.
+# the gradient and the real/randomised data and generate the non-parametric
+# p-values.
 
-from scipy.stats import pearsonr
-from scipy.spatial.distance import cdist
+feats = {'t1wt2w': t1wt2w_tl, 'curvature': curv_tl}
+rand = {'t1wt2w': t1wt2w_rand, 'curvature': curv_rand}
 
-r_orig_curv = pearsonr(curv_tl, embedding_tl)[0]
-r_rand_curv = 1 - cdist(curv_rand, embedding_tl[None], metric='correlation')
+for fn, data in rand.items():
+    r_obs, pv_obs = spearmanr(feats[fn], embedding_tl, nan_policy='omit')
 
-r_orig_t1wt2w = pearsonr(t1wt2w_tl, embedding_tl)[0]
-r_rand_t1wt2w = 1 - cdist(t1wt2w_rand, embedding_tl[None], metric='correlation')
+    r_rand = np.asarray([spearmanr(embedding_tl, d)[0] for d in data])
+    pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
 
+    print('{0}:\n Obs  : {1:.5e}\n Moran: {2:.5e}\n'.
+          format(fn.capitalize(), pv_obs, pv_rand))
 
-###############################################################################
-# Finally, the p-values can be computed using the same approach used with
-# spin permutations.

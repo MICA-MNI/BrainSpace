@@ -45,10 +45,10 @@ def diffusion_mapping(adj, n_components=10, alpha=0.5, diffusion_time=0,
 
     Returns
     -------
-    w : ndarray, shape (n_components,)
-        Eigenvalues of the affinity matrix in descending order.
     v : ndarray, shape (n, n_components)
         Eigenvectors of the affinity matrix in same order.
+    w : ndarray, shape (n_components,)
+        Eigenvalues of the affinity matrix in descending order.
 
     References
     ----------
@@ -159,7 +159,7 @@ def diffusion_mapping(adj, n_components=10, alpha=0.5, diffusion_time=0,
 
     # Consistent sign (s.t. largest value of element eigenvector is pos)
     v *= np.sign(v[np.abs(v).argmax(axis=0), range(v.shape[1])])
-    return w, v
+    return v, w
 
 
 def laplacian_eigenmaps(adj, n_components=10, norm_laplacian=True,
@@ -181,11 +181,11 @@ def laplacian_eigenmaps(adj, n_components=10, norm_laplacian=True,
 
     Returns
     -------
-    w : 1D ndarray, shape (n_components,)
-        Eigenvalues of the affinity matrix in ascending order.
     v : 2D ndarray, shape (n, n_components)
         Eigenvectors of the affinity matrix in same order. Where `n` is
         the number of rows of the affinity matrix.
+    w : 1D ndarray, shape (n_components,)
+        Eigenvalues of the affinity matrix in ascending order.
 
     References
     ----------
@@ -228,7 +228,7 @@ def laplacian_eigenmaps(adj, n_components=10, norm_laplacian=True,
 
     # Consistent sign (s.t. largest value of element eigenvector is pos)
     v *= np.sign(v[np.abs(v).argmax(axis=0), range(v.shape[1])])
-    return w, v
+    return v, w
 
 
 class Embedding(BaseEstimator, metaclass=ABCMeta):
@@ -323,7 +323,7 @@ class DiffusionMaps(Embedding):
 
         """
 
-        self.lambdas_, self.maps_ = \
+        self.maps_, self.lambdas_ = \
             diffusion_mapping(affinity, n_components=self.n_components,
                               alpha=self.alpha,
                               diffusion_time=self.diffusion_time,
@@ -379,7 +379,7 @@ class LaplacianEigenmaps(Embedding):
 
         """
 
-        self.lambdas_, self.maps_ = \
+        self.maps_, self.lambdas_ = \
             laplacian_eigenmaps(affinity, n_components=self.n_components,
                                 norm_laplacian=self.norm_laplacian,
                                 random_state=self.random_state)

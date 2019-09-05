@@ -20,9 +20,11 @@ Spin permutations
    :toctree: ../../generated/
 
 
-   SpinRandomization
-   generate_spin_samples
+   SpinPermutations
+   spin_permutations
 
+
+.. _pysec-nullmodels-moran:
 
 .. _pysec-nullmodels-moran:
 
@@ -35,6 +37,6 @@ Moran spectral randomization
    :toctree: ../../generated/
 
 
-   MoranSpectralRandomization
+   MoranRandomization
    compute_mem
-   spectral_randomization
+   moran_randomization

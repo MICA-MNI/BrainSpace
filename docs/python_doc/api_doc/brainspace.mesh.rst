@@ -28,8 +28,8 @@ Read/Write functionality
    :toctree: ../../generated/
 
 
-   load_surface
-   save_surface
+   read_surface
+   write_surface
 
 
 .. _pysec-mesh-creation:
@@ -147,6 +147,5 @@ Clustering and sampling of surface vertices.
 
    cluster_points
    sample_points_clustering
-   sample_points_decimation
 
 

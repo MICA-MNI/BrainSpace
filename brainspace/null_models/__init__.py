@@ -1,10 +1,10 @@
-from .moran import (compute_mem, spectral_randomization,
-                    MoranSpectralRandomization)
-from .spin import generate_spin_samples, SpinRandomization
+from .moran import (compute_mem, moran_randomization,
+                    MoranRandomization)
+from .spin import spin_permutations, SpinPermutations
 
 
-__all__ = ['SpinRandomization',
-           'MoranSpectralRandomization',
+__all__ = ['SpinPermutations',
+           'MoranRandomization',
            'compute_mem',
-           'spectral_randomization',
-           'generate_spin_samples']
+           'moran_randomization',
+           'spin_permutations']

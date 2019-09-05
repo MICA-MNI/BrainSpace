@@ -410,7 +410,7 @@ is a wrapper of :class:`~vtk.vtkRenderWindow`. Let's see a simple example: ::
     >>> from brainspace.plotting.base import Plotter
     >>> # from brainspace.vtk_interface.wrappers import BSLookupTable
 
-    >>> surf = mio.load_surface(ipth, return_data=True)
+    >>> surf = mio.read_surface(ipth, return_data=True)
 
     >>> yeo7_colors = np.array([[0, 0, 0, 255],
     ...                         [0, 118, 14, 255],
