@@ -6,7 +6,7 @@ import numpy as np
 from scipy.sparse import coo_matrix
 
 from brainspace.gradient import compute_affinity
-from brainspace.gradient.alignment import (generalized_procrustes,
+from brainspace.gradient.alignment import (procrustes_alignment,
                                            ProcrustesAlignment)
 from brainspace.gradient import embedding as emb
 from brainspace.gradient import GradientMaps
@@ -41,7 +41,7 @@ def test_alignment():
     assert len(pa.aligned_) == len(list_data)
     assert pa.mean_.shape == list_data[0].shape
 
-    aligned2, ref2 = generalized_procrustes(list_data, return_reference=True)
+    aligned2, ref2 = procrustes_alignment(list_data, return_reference=True)
     assert np.allclose(ref2, pa.mean_)
     for i in range(3):
         assert np.allclose(aligned2[i], pa.aligned_[i])
@@ -52,8 +52,8 @@ def test_alignment():
     assert len(pa2.aligned_) == len(list_data)
     assert pa2.mean_.shape == list_data[0].shape
 
-    aligned2, ref2 = generalized_procrustes(list_data, reference=ref,
-                                            return_reference=True)
+    aligned2, ref2 = procrustes_alignment(list_data, reference=ref,
+                                          return_reference=True)
     assert np.allclose(ref2, pa2.mean_)
     for i in range(3):
         assert np.allclose(aligned2[i], pa2.aligned_[i])

@@ -14,11 +14,11 @@ organization of the gradients looks like.
 import warnings
 warnings.simplefilter('ignore')
 
-from brainspace.datasets import load_group_hcp, load_parcellation, load_conte69
+from brainspace.datasets import load_group_fc, load_parcellation, load_conte69
 
 # First load mean connectivity matrix and Schaefer parcellation
-conn_matrix = load_group_hcp('schaefer', n_parcels=400)
-labeling = load_parcellation('schaefer', n_parcels=400)
+conn_matrix = load_group_fc('schaefer', scale=400)
+labeling = load_parcellation('schaefer', scale=400, join=True)
 
 # and load the conte69 hemisphere surfaces
 surf_lh, surf_rh = load_conte69()
@@ -29,8 +29,7 @@ surf_lh, surf_rh = load_conte69()
 
 from brainspace.plotting import plot_hemispheres
 
-plot_hemispheres(surf_lh, surf_rh, array_name=labeling,
-                 size=(800, 150), cmap_name='tab20')
+plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(800, 150), cmap='tab20')
 
 
 ###############################################################################
@@ -38,8 +37,8 @@ plot_hemispheres(surf_lh, surf_rh, array_name=labeling,
 
 from brainspace.gradient import GradientMaps
 
-# Construct the gradients
-gm = GradientMaps(random_state=0)
+# Ask for 10 gradients (default)
+gm = GradientMaps(n_components=10, random_state=0)
 gm.fit(conn_matrix)
 
 
@@ -55,15 +54,13 @@ from brainspace.utils.parcellation import map_to_labels
 
 mask = labeling != 0
 
-gradients = [None] * 2
+grad = [None] * 2
 for i in range(2):
     # map the gradient to the parcels
-    gradients[i] = map_to_labels(gm.gradients_[:, i], labeling,
-                                 mask=mask, fill=np.nan)
+    grad[i] = map_to_labels(gm.gradients_[:, i], labeling, mask=mask, fill=np.nan)
 
-
-plot_hemispheres(surf_lh, surf_rh, array_name=gradients,
-                 size=(800, 300), cmap_name='viridis')
+plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(800, 300), cmap='viridis',
+                 color_bar=True, label_text=['Grad1', 'Grad2'])
 
 
 ###############################################################################

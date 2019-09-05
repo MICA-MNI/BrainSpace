@@ -1,12 +1,19 @@
+
+.. _pymod-gradient:
+
 Gradient Maps
 ===========================
 
-- :ref:`Gradients<Gradients>`
-- :ref:`Embedding<Embedding>`
-- :ref:`Alignment<Alignment>`
-- :ref:`Kernels<Kernels>`
-- :ref:`Utility functions<Utility functions>`
 
+- :ref:`pysec-gradient-gradient`
+- :ref:`pysec-gradient-embedding`
+- :ref:`pysec-gradient-alignment`
+- :ref:`pysec-gradient-kernels`
+- :ref:`pysec-gradient-utils`
+
+
+
+.. _pysec-gradient-gradient:
 
 Gradients
 ------------
@@ -19,6 +26,8 @@ Gradients
 
     GradientMaps
 
+
+.. _pysec-gradient-embedding:
 
 Embedding
 ------------
@@ -37,6 +46,8 @@ Embedding
     laplacian_eigenmaps
 
 
+.. _pysec-gradient-alignment:
+
 Alignment
 ---------
 
@@ -46,9 +57,11 @@ Alignment
    :toctree: ../../generated/
 
     ProcrustesAlignment
-    generalized_procrustes
+    procrustes_alignment
     procrustes
 
+
+.. _pysec-gradient-kernels:
 
 Kernels
 ---------
@@ -60,6 +73,8 @@ Kernels
 
     compute_affinity
 
+
+.. _pysec-gradient-utils:
 
 Utility functions
 ------------------
