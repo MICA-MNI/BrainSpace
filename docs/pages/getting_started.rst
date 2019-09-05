@@ -94,7 +94,7 @@ Let's load one of them.
    .. code-tab:: matlab
 
         labeling = load_parcellation('schaefer',400);
-        conn_matices = load_group_hcp('schaefer',400);
+        conn_matices = load_group_fc('schaefer',400);
         m = conn_matices.schaefer_400; 
 
 To compute the gradients of our connectivity matrix `m` we create the
@@ -143,7 +143,8 @@ Now we can visually inspect the gradients. Let's plot the first gradient:
    .. code-tab:: matlab
 
         % Plot the first gradient on the cortical surface.
-        plot_hemispheres(gm.gradients{1}(:,1), {surf_lh,surf_rh});
+        plot_hemispheres(gm.gradients{1}(:,1), {surf_lh,surf_rh}, ...
+                'parcellation',labeling.schaefer_400);
 
 
 .. image:: ./matlab_doc/examples/example_figs/gettingstarted2.png
