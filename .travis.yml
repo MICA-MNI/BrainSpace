@@ -21,6 +21,7 @@ matrix:
 
     - name: "Python 3.7.1 setup.py install"
       python: 3.7
+      services: xvfb
       install:
         - python setup.py install
         - pip install $(basename $TRAVIS_REPO_SLUG)[tests]
