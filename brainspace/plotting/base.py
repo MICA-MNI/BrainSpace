@@ -172,24 +172,24 @@ def _create_grid(nrow, ncol):
     return as_strided(g, shape=(nrow, ncol, 4), strides=strides)
 
 
-# def _capture_as_array(ren_win, scale=None, transparent_bg=True):
-#     scale = (1, 1) if scale is None else scale
-#     bg = 'RGBA' if transparent_bg else 'RGB'
-#
-#     w2if = wrap_vtk(vtkWindowToImageFilter, readFrontBuffer=False,
-#                     input=ren_win, scale=scale, inputBufferType=bg)
-#
-#     img = get_output(w2if)
-#     array = img.get_array(name='ImageScalars', at='p')
-#     shape = img.dimensions[::-1][1:] + (-1,)
-#     return array.reshape(shape)[::-1]
-#
-#     # writer = wrap_vtk(vtkPNGWriter, writeToMemory=True,
-#     #                   inputConnection=w2if.outputPort)
-#     # writer.Write()
-#     # data = memoryview(writer.result).tobytes()
-#     # from IPython.display import Image
-#     # return Image(data)
+def _screenshot_png(ren_win, scale=None, transparent_bg=True, fname=None):
+    scale = (1, 1) if scale is None else scale
+    bg = 'RGBA' if transparent_bg else 'RGB'
+
+    w2if = wrap_vtk(vtkWindowToImageFilter, readFrontBuffer=False,
+                    input=ren_win.VTKObject, scale=scale, inputBufferType=bg)
+
+    writer = wrap_vtk(vtkPNGWriter, writeToMemory=fname is None,
+                      inputConnection=w2if.outputPort)
+
+    if fname:
+        writer.filename = fname
+    writer.Write()
+
+    if fname is None:
+        data = memoryview(writer.result).tobytes()
+        from IPython.display import Image
+        return Image(data)
 
 
 class BasePlotter(object):
@@ -301,8 +301,8 @@ class BasePlotter(object):
                 pass
 
         if embed_nb:
-            return self._capture_image(scale=scale,
-                                       transparent_bg=transparent_bg)
+            return self._display_notebook(scale=scale, use_pil=True,
+                                          transparent_bg=transparent_bg)
 
         if as_mpl:
             return self._plot_mpl(scale=scale, transparent_bg=transparent_bg)
@@ -327,7 +327,7 @@ class BasePlotter(object):
         return self.panel
 
     def _capture_image(self, scale=None, transparent_bg=True):
-        # self.ren_win.Render()
+        self.ren_win.Render()
         scale = (1, 1) if scale is None else scale
         bg = 'RGBA' if transparent_bg else 'RGB'
 
@@ -340,13 +340,15 @@ class BasePlotter(object):
         shape = img.dimensions[::-1][1:] + (-1,)
         return Image.fromarray(array.reshape(shape)[::-1])
 
-    def _display_notebook(self, scale=None, transparent_bg=True):
-        return self._capture_image(scale=scale, transparent_bg=transparent_bg)
+    def _display_notebook(self, scale=None, transparent_bg=True, use_pil=True):
+        if use_pil:
+            return self._capture_image(scale=scale,
+                                       transparent_bg=transparent_bg)
+
+        return _screenshot_png(self.ren_win, scale=scale,
+                               transparent_bg=transparent_bg)
 
     def screenshot(self, filename=None, scale=None, transparent_bg=True):
-        # if not self.active:
-        #     raise ValueError("Cannot take screenshot. Call 'show' first.")
-
         img = self._capture_image(scale=scale, transparent_bg=transparent_bg)
         if filename is None:
             return img
