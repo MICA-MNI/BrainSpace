@@ -225,4 +225,4 @@ respectively.
 
 This concludes the third and last tutorial. You should now be familliar with all
 the functionality of the BrainSpace toolbox. For more details on any specific
-function, please see :ref:`matlab_package_matlab`.
+function, please see :ref:`matlab_package`.
