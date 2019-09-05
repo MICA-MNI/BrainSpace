@@ -34,8 +34,7 @@ matrix:
         - python setup.py sdist;
         - pip install dist/*.tar.gz;
       script:
-          - cd $HOME
-          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
+        - py.test brainspace
 
     - name: "Python 3.7.1 wheel"
       python: 3.7
@@ -44,8 +43,7 @@ matrix:
         - python setup.py bdist_wheel;
         - pip install dist/*.whl;
       script:
-          - cd $HOME
-          - python -m pytest $TRAVIS_BUILD_DIR/brainspace/tests
+        - py.test brainspace
 
 
     # ======= OSX ========
