@@ -17,8 +17,8 @@ install:
   - python --version
   - python -m pip install -e .[test]
   - "git clone --depth 1 git://github.com/vtkiorg/ci-helpers.git"
-  - dir
-  - "powershell appveyor/install_opengl.ps1"
+  - dir ci-helpers
+  - "powershell ci-helpers/appveyor/install_opengl.ps1"
 
 test_script:
   - python -m pytest -r a -v
