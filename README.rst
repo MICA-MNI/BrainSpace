@@ -16,16 +16,23 @@ For installation instructions, examples and documentation of BrainSpace see
 https://brainspace.readthedocs.io.
 
 
-## Authors: 
-* Reinder Vos de Wael, MICA Lab - Montreal Neurological Institute
-* Oualid Benkarim, MICA Lab - Montreal Neurological Institute
-* Boris Bernhardt, MICA Lab - Montreal Neurological Institute
+Authors: 
 
-## License
+Reinder Vos de Wael, MICA Lab - Montreal Neurological Institute
+
+Oualid Benkarim, MICA Lab - Montreal Neurological Institute
+
+Boris Bernhardt, MICA Lab - Montreal Neurological Institute
+
+
+
+License
+
 The BrainSpace source code is available under the BSD (3-Clause) license.
 
 
-## Support
+Support
+
 If you have problems installing the software or questions about usage 
 and documentation, or something else related to BrainSpace, 
 you can post to the Issues section of our repository.
