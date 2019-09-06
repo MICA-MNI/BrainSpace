@@ -145,33 +145,34 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         min_rg.flat[i] = np.nanmin(array)
         max_rg.flat[i] = np.nanmax(array)
 
-    # Build lookup tables
-    if share in ['both', 'b']:
-        min_rg[:] = np.nanmin(min_rg)
-        max_rg[:] = np.nanmax(max_rg)
+    if not np.all([a is None for a in array_name.flat]):
+        # Build lookup tables
+        if share in ['both', 'b']:
+            min_rg[:] = np.nanmin(min_rg)
+            max_rg[:] = np.nanmax(max_rg)
 
-        # Assume everything is discrete
-        if is_discrete.all():
-            v = np.concatenate([v for v in vals.ravel() if v is not None])
-            n_vals[:] = np.unique(v).size
+            # Assume everything is discrete
+            if is_discrete.all():
+                v = [v for v in vals.ravel() if v is not None]
+                n_vals[:] = np.unique(v).size
 
-    elif share in ['row', 'r']:
-        min_rg[:] = np.nanmin(min_rg, axis=1, keepdims=True)
-        max_rg[:] = np.nanmax(max_rg, axis=1, keepdims=True)
-        is_discrete_row = is_discrete.all(axis=1)
-        for i, dr in enumerate(is_discrete_row):
-            if dr:
-                v = np.concatenate([v for v in vals[i] if v is not None])
-                n_vals[i, :] = np.unique(v).size
+        elif share in ['row', 'r']:
+            min_rg[:] = np.nanmin(min_rg, axis=1, keepdims=True)
+            max_rg[:] = np.nanmax(max_rg, axis=1, keepdims=True)
+            is_discrete_row = is_discrete.all(axis=1)
+            for i, dr in enumerate(is_discrete_row):
+                if dr:
+                    v = [v for v in vals[i] if v is not None]
+                    n_vals[i, :] = np.unique(v).size
 
-    elif share in ['col', 'c']:
-        min_rg[:] = np.nanmin(min_rg, axis=0, keepdims=True)
-        max_rg[:] = np.nanmax(max_rg, axis=0, keepdims=True)
-        is_discrete_col = is_discrete.all(axis=0)
-        for i, dc in enumerate(is_discrete_col):
-            if dc:
-                v = np.concatenate([v for v in vals[:, i] if v is not None])
-                n_vals[i, :] = np.unique(v).size
+        elif share in ['col', 'c']:
+            min_rg[:] = np.nanmin(min_rg, axis=0, keepdims=True)
+            max_rg[:] = np.nanmax(max_rg, axis=0, keepdims=True)
+            is_discrete_col = is_discrete.all(axis=0)
+            for i, dc in enumerate(is_discrete_col):
+                if dc:
+                    v = [v for v in vals[:, i] if v is not None]
+                    n_vals[i, :] = np.unique(v).size
 
     add_text = label_text is not None
     grow, gcol = nrow, ncol
