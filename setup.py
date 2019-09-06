@@ -68,6 +68,7 @@ setup(
         'test': TEST_REQUIRES + INSTALL_REQUIRES,
     },
     include_package_data=True,
+    zip_safe=False,
     # package_data={  # Optional
     #     'mydata': ['brainspace_data/*'],
     # },
