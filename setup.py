@@ -77,4 +77,6 @@ setup(
         'Bug Reports': 'https://github.com/MICA-MNI/BrainSpace/issues',
         'Source': 'https://github.com/MICA-MNI/BrainSpace',
     },
+    download_url='https://github.com/MICA-MNI/BrainSpace/archive/'
+                 '{ver}.tar.gz'.format(ver=__version__),
 )

@@ -1,1 +1,1 @@
-v0.1, September 2019 -- Initial release
+v0.1.0, September 2019 -- Initial release
