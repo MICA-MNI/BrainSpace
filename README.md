@@ -1,9 +1,3 @@
----
-title: "BrainSpace"
-urlcolor: blue
-output: html_document
----
-
 # BrainSpace
 BrainSpace is a lightweight cross-platform toolbox primarily intended 
 for macroscale gradient mapping and analysis of 
@@ -31,4 +25,4 @@ The BrainSpace source code is available under the BSD (3-Clause) license.
 ## Support
 If you have problems installing the software or questions about usage 
 and documentation, or something else related to BrainSpace, 
-you can post to the Issues section of our repository (https://github.com/MICA-MNI/BrainSpace/issues).
+you can post to the Issues section of our repository.
