@@ -8,21 +8,27 @@ communities. The toolbox also contains several maps that allow for
 exploratory analysis of gradient correspondence with other 
 brain-derived features, together with tools to generate spatial null models.
 
-
 For installation instructions, examples and documentation of BrainSpace see
 https://brainspace.readthedocs.io.
 
-
-## Authors: 
-* Reinder Vos de Wael, MICA Lab - Montreal Neurological Institute
-* Oualid Benkarim, MICA Lab - Montreal Neurological Institute
-* Boris Bernhardt, MICA Lab - Montreal Neurological Institute
+Happy gradient analysis! 
 
 ## License
 The BrainSpace source code is available under the BSD (3-Clause) license.
-
 
 ## Support
 If you have problems installing the software or questions about usage 
 and documentation, or something else related to BrainSpace, 
 you can post to the Issues section of our repository (https://github.com/MICA-MNI/BrainSpace/issues).
+
+## Paper
+If you consider using BrainSpace, please cite our current preprint: 
+Vos de Wael R, Benkarim O, Paquola C, Lariviere S, Royer S, Tavakol S, Xu T, Hong S, Valk SL, 
+Misic B, Milham MP, Margulies DS, Smallwood J, Bernhardt BC (2019) BrainSpace:  a toolbox for the analysis of macroscalegradients in neuroimaging and connectomics datasets. Biorxiv. 
+
+## Core development team: 
+* Reinder Vos de Wael, MICA Lab - Montreal Neurological Institute
+* Oualid Benkarim, MICA Lab - Montreal Neurological Institute
+* Boris Bernhardt, MICA Lab - Montreal Neurological Institute
+
+
