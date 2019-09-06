@@ -1,4 +1,7 @@
-# BrainSpace
+=======================
+BrainSpace
+=======================
+
 BrainSpace is a lightweight cross-platform toolbox primarily intended 
 for macroscale gradient mapping and analysis of 
 neuroimaging and connectome level data. The current version 
