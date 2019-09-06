@@ -18,7 +18,7 @@ function MEM = compute_mem(W,varargin)
 %       eigenvector with eigenvalue zero.
 % 
 %   For complete documentation, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/compute_mem.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/compute_mem.html">ReadTheDocs</a>.
 
 % Parse input
 p = inputParser;

@@ -9,7 +9,7 @@ function SC = combine_surfaces(S1,S2,format)
 %
 %   This script is part of the BrainSpace toolbox. For more information
 %   please consult our <a
-%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/combine_surfaces.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/combine_surfaces.html">ReadTheDocs</a>.
 
 
 if nargin < 3

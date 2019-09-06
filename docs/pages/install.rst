@@ -65,7 +65,7 @@ to work with versions R2017a and newer. It will definitely throw errors with
 versions R2016b and older. 
 
 To install the MATLAB toolbox simply `download
-<https://github.com/MICA-MNI/BrainSpace>`_ and unzip the GitHub toolbox and run
+<https://github.com/MICA-MNI/BrainSpace/releases>`_ and unzip the GitHub toolbox and run
 the following in MATLAB: ::
 
     addpath('/path/to/BrainSpace/matlab/')

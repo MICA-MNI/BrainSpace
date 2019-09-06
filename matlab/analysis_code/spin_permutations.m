@@ -17,7 +17,7 @@ function Y_rand = spin_permutations(Y,spheres,n_rep,varargin)
 %   Modified for use in the BrainSpace toolbox by Reinder Vos de Wael
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/spin_permutations.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/spin_permutations.html">ReadTheDocs</a>.
 
 % Make sure input is in the correct format. 
 p = inputParser;
