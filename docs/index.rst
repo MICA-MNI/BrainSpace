@@ -7,21 +7,12 @@ Welcome to BrainSpace's documentation!
 ======================================
 
 BrainSpace is a lightweight cross-platform toolbox primarily intended for
-<<<<<<< Updated upstream
 macroscale gradient mapping and analysis of neuroimaging and connectome level data. 
 The current version of BrainSpace is available in Python and MATLAB, programming 
 languages widely used by the neuroimaging and network neuroscience communities. 
 The toolbox also contains several maps that allow for exploratory analysis of gradient 
 correspondence with other brain-derived features, together with tools to generate spatial 
 null models.
-=======
-macroscale gradient mapping and analysis of human brain imaging and 
-connectivity datasets. The current version of BrainSpace is
-available in Python and Matlab, programming languages widely used by the
-neuroimaging and network neuroscience communities. The toolbox also contains
-several maps that allow for exploratory analysis of gradient correspondence
-with several features, together with tools to generate spatial null models.
->>>>>>> Stashed changes
 
 
 .. toctree::
@@ -38,9 +29,9 @@ with several features, together with tools to generate spatial null models.
 Authors
 -------
 
-- Reinder Vos de Wael, `MICA Lab <http://mica-mni.github.io>`- Montreal Neurological Institute
-- Oualid Benkarim, `MICA Lab <http://mica-mni.github.io>` - Montreal Neurological Institute
-- Boris Bernhardt, `MICA Lab <http://mica-mni.github.io>` - Montreal Neurological Institute
+- Reinder Vos de Wael, MICA Lab - Montreal Neurological Institute
+- Oualid Benkarim, MICA Lab - Montreal Neurological Institute
+- Boris Bernhardt, MICA Lab - Montreal Neurological Institute
 
 
 License

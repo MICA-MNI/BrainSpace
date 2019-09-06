@@ -77,18 +77,11 @@ conte69 surfaces as follows:
    :align: center
 
 
-<<<<<<< Updated upstream
 
 Let's also load the mean connectivity matrix built from a subset of the human
 connectome project (HCP). The package comes with several example matrices,
 downsampled using the Schaefer parcellations `(Schaefer et al., 2017) <https://academic.oup.com/cercor/article/28/9/3095/3978804>`_.
 Let's load one of them.
-=======
-Lets load a mean functional connectivity matrix built from a subset of 
-the Human Connectome Project Young Adult cohort. This package comes with 
-connectivity matrices subdivided based on functional parcellations `(Schaefer et al., 2017) 
-<https://academic.oup.com/cercor/article/28/9/3095/3978804>`_. 
->>>>>>> Stashed changes
 
 .. tabs::
 
