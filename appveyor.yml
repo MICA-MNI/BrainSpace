@@ -1,0 +1,43 @@
+image:
+  - Visual Studio 2017
+  - Visual Studio 2019
+
+platform: x64
+
+
+environment:
+
+  matrix:
+
+    - PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: "3.7.x"
+
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.x"
+
+    - PYTHON: "C:\\Python35-x64"
+      PYTHON_VERSION: "3.5.0"
+
+build: false
+
+
+install:
+
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+
+  # Check that we have the expected version and architecture for Python
+  - "python --version"
+  - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
+
+  # Upgrade to the latest version of pip to avoid it displaying warnings
+  # about it being out of date.
+  - "python -m pip install --upgrade pip"
+
+#  - python --version
+  - python -m pip install -e .[test]
+  - "git clone --depth 1 git://github.com/vtkiorg/ci-helpers.git"
+  - "powershell ci-helpers/appveyor/install_opengl.ps1"
+
+
+test_script:
+  - python -m pytest -r a -v

@@ -9,12 +9,9 @@ BrainSpace is available in Python and MATLAB.
 Python installation
 -------------------
 
-BrainSpace works on Python 3.6+, and probably with older versions of Python 3,
+BrainSpace works on Python 3.5+, and probably with older versions of Python 3,
 although it is not tested. 
 
-This package have been tested in macOS Mojave and Ubuntu Xenial Xerus. Testing
-on Windows 10 has not been completed. At the time, we expect that the Python
-version may still throw errors on Windows 10.
 
 Dependencies
 ^^^^^^^^^^^^

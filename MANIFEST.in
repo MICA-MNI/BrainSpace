@@ -1,0 +1,2 @@
+recursive-include brainspace/datasets *
+include README.rst LICENSE
