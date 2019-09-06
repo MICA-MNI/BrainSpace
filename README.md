@@ -1,9 +1,3 @@
----
-title: "BrainSpace"
-urlcolor: blue
-output: html_document
----
-
 # BrainSpace
 BrainSpace is a lightweight cross-platform toolbox primarily intended 
 for macroscale gradient mapping and analysis of 
