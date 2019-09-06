@@ -43,14 +43,17 @@ is still experimental.
 
 Installation
 ^^^^^^^^^^^^
-You can install the python Package using ``pip``: ::
 
-    pip install -U brainspace
+BrainSpace can be installed using ``pip``: ::
+
+    pip install brainspace
 
 
-To install with ``conda``: ::
+Alternatively, you can install the package from Github as follows: ::
 
-    conda install brainspace
+    git clone https://github.com/MICA-MNI/BrainSpace.git
+    cd BrainSpace
+    python setup.py install
 
 
 
