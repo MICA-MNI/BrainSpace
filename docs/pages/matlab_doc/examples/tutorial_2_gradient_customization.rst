@@ -6,7 +6,7 @@ In this tutorial you'll learn about the methods available within the
 customization of gradient computation with different kernels and dimensionality
 reductions, as well as aligning gradients from different datasets. This tutorial
 will only show you how to apply these techniques, for in-depth descriptions we
-recommend you read the main manuscript [[ADD HYPERLINK]]. 
+recommend you read the `main manuscript <https://www.biorxiv.org/content/10.1101/761460v1>`_. 
 
 As before, we'll start by loading the sample data.
 

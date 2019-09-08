@@ -8,8 +8,8 @@ When using BrainSpace, please cite the following manuscript:
 * `Vos de Wael R, Benkarim O, Paquola C, Larivière S, Royer J, Tavakol S,
   Hong S, Xu T, Valk SL, Milham MP, Margulies DS, Smallwood J, Bernhardt BC
   (2019) BrainSpace: a toolbox for the analysis of macroscale gradients in
-  neuroimaging and connectomics datasets. Preprint not available yet.
-  <https://mica-mni.github.io>`_
+  neuroimaging and connectomics datasets. Preprint: https://www.biorxiv.org/content/10.1101/761460v1.
+  <https://www.biorxiv.org/content/10.1101/761460v1>`_
 
 
 The following references used methodology similar, or identical, to those
