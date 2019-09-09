@@ -182,7 +182,10 @@ classdef GradientMaps
                 return
             end
             
-            sparse_data = data .* bsxfun(@gt, data, prctile(data,p.Results.sparsity));
+            % Sparsify input data. 
+            sparse_data = data;
+            sparse_data(data < prctile(data,p.Results.sparsity)) = 0; 
+            
             switch kernel
                 case 'None'
                     kernel_data = sparse_data;
