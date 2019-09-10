@@ -182,7 +182,11 @@ classdef GradientMaps
                 return
             end
             
-            sparse_data = data .* bsxfun(@ge, data, prctile(data,p.Results.sparsity));
+            % Sparsify input data. 
+            disp(['Running with sparsity parameter: ' num2str(p.Results.sparsity)]);
+            sparse_data = data;
+            sparse_data(data <= prctile(data,p.Results.sparsity)) = 0; 
+            
             switch kernel
                 case 'None'
                     if p.Results.sparsity ~= 0
@@ -195,7 +199,6 @@ classdef GradientMaps
                     disp(['Running with gamma parameter: ' num2str(p.Results.gamma) '.']);
                     kernel_data = exp(-p.Results.gamma .* squareform(pdist(sparse_data').^2));
                 case {'Cosine Similarity','Normalized Angle'}
-                    disp(['Running with sparsity parameter: ' num2str(p.Results.sparsity)]);
                     cosine_similarity = 1-squareform(pdist(sparse_data','cosine'));
                     switch kernel
                         case 'Cosine Similarity'
