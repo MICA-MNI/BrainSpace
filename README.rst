@@ -32,7 +32,7 @@ Paper
 -----------
 
 If you consider using BrainSpace, please cite our current preprint: 
-Vos de Wael R, Benkarim O, Paquola C, Lariviere S, Royer S, Tavakol S, Xu T, Hong S, Valk SL, 
+Vos de Wael R, Benkarim O, Paquola C, Lariviere S, Royer S, Tavakol S, Xu T, Hong S, Langs G, Valk SL, 
 Misic B, Milham MP, Margulies DS, Smallwood J, Bernhardt BC (2019) BrainSpace:  a toolbox for the analysis of macroscalegradients in neuroimaging and connectomics datasets. Biorxiv. 
 
 Core development team
