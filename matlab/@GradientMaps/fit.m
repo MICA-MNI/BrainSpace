@@ -85,7 +85,7 @@ if strcmp(obj.method.alignment,'Joint Alignment')
             rethrow(ME)
         end
     end
-    size_connectivity = cellfun(@(x)size(x,2),connectivity_matrix);
+    size_connectivity = cellfun(@(x)size(x,1),connectivity_matrix);
     clearvars connectivity_matrix
     connectivity_matrix{1} = tmp; 
 end

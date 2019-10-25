@@ -51,8 +51,6 @@ if nargin > 1
     % If parcellated data is provided, bring it to the full mesh.
     if exist('parcellation','var')
         D_full = parcel2full((1:size(C,1))',parcellation);
-    else
-        D_full = (1:size(C,1))';
     end
     
     % Deal with nans.
