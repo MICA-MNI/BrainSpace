@@ -5,5 +5,5 @@ __all__ = ['load_conte69',
            'load_mask',
            'load_group_fc',
            'load_gradient',
-           'load_parcellation',
-           'load_marker']
+           'load_marker',
+           'load_parcellation']
