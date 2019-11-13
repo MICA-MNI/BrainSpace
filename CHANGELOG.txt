@@ -7,8 +7,13 @@ MATLAB:
 - The "Running with sparsity parameter..." message will now correctly display with every kernel. 
 - Fixed a bug where joint embedding of non-square matrices would fail.
 - Improved several warning/error messages.
-
+- All MATLAB ReadTheDocs hyperlinks now refer to the stable version of ReadTheDocs, rather than the latest. 
 
 Python:
+
+
+ReadTheDocs:
+- Added matrix fusion example to MATLAB tutorial 2.
+
 
 v0.1.0, September 2019 -- Initial release
