@@ -5,66 +5,315 @@ Wrappers for some VTK objects.
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
+
 import string
 import warnings
 import numpy as np
 
-# from vtkmodules.util.numpy_support import numpy_to_vtk, vtk_to_numpy
-# from vtkmodules.numpy_interface import dataset_adapter as dsa
-# from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
-# from vtkmodules.vtkCommonCorePython import vtkObject, vtkLookupTable
-# from vtkmodules.vtkRenderingCorePython import vtkMapper
-# from vtkmodules.vtkCommonDataModelPython import vtkDataSet
-
+import vtk
 from vtk.util.numpy_support import numpy_to_vtk, vtk_to_numpy
 from vtk.numpy_interface import dataset_adapter as dsa
-from vtk import vtkAlgorithm, vtkObject, vtkLookupTable, vtkMapper, vtkDataSet
 
 from .checks import (get_cell_types, get_number_of_cell_types,
                      has_unique_cell_type, has_only_triangle,
                      has_only_line, has_only_vertex)
-
-from .base import BSVTKObjectWrapper
+from .base import call_vtk, get_vtk_methods, _generate_random_string
 from .decorators import wrap_output, unwrap_input
 
 
-def _generate_random_string(size=20, n_reps=10, exclude_list=None,
-                            random_state=None):
-    """Generate random string.
+class VTKMethodWrapper:
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return self.name.__repr__()
+
+    def __call__(self, *args, **kwargs):
+        out = self.name(*args, **kwargs)
+        return wrap_vtk(out) if is_vtk(out) else out
+
+
+class BSVTKObjectWrapperMeta(type):
+    """ Metaclass for our VTK wrapper
+
+        BSVTKObjectWrapper __setattr__ does not allow creating attributes
+        This metaclass, hides __setattr__ (delegates to object.__setattr__)
+        during __init__
+
+        Postpones setting VTK kwds after __init__ because some subclasses
+        may forward them to other vtkobjects within.
+        See for example BSActor, which forwards to its property (GetProperty()).
+        But this is not known until the actor is created.
+        E.g.:    actor = BSActor(visibility=1, opacity=.2)
+        Here visibility is forwarded to vtkActor. But we cannot forward
+        opacity because it belongs to the actor's property and this is created
+        after BSVTKObjectWrapper __init__.
+
+
+    """
+
+    # def __new__(mcs, name, bases, dic):
+    #     cls = type.__new__(mcs, name, bases, dic)
+    #     cls._override = []
+    #     cls._set_override = False
+    #     return cls
+
+    def __call__(cls, *args, **kwargs):
+        real_setattr = cls.__setattr__
+        cls.__setattr__ = object.__setattr__
+
+        self = super().__call__(*args, **kwargs)
+
+        # To capture vtk methods reimplemented by the wrapper subclasses
+        # if not cls._set_override:
+        #     override_vtk = [m for m in dir(self) if not m.startswith('__')
+        #                     and hasattr(self.VTKObject, m)]
+        #     cls._override = override_vtk
+        #     cls._set_override = True
+
+        # Cannot use kwargs directly cause subclasses may define additional
+        # kwargs. This just captures kwargs in BSVTKObjectWrapper
+        self.setVTK(**self._vtk_kwargs)
+        del self._vtk_kwargs
+
+        cls.__setattr__ = real_setattr
+        return self
+
+
+class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
+                         metaclass=BSVTKObjectWrapperMeta):
+    """Base class for all classes that wrap VTK objects.
+
+    Adapted from dataset_adapter, with additional setVTK and getVTK methods.
+    Create an instance if class is passed instead of object.
+
+    This class holds a reference to the wrapped VTK object. It also
+    forwards unresolved methods to the underlying object by overloading
+    __getattr__. This class also supports all VTK setters and getters to be
+    used like properties/attributes dropping the get/set prefix. This is case
+    insensitive.
 
     Parameters
     ----------
-    size : int, optional
-        String length. Default is 20.
-    n_reps : int, optional
-        Number of attempts to generate string that in not in `exclude_list`.
-        Default is 10.
-    exclude_list : list of str, optional
-        List of string to exclude. Default is None.
-    random_state : int or None, optional
-        Random state. Default is None.
+    vtkobject : type or object
+        VTK class or object.
+    kwargs : optional keyword parameters
+        Parameters used to invoke set methods on the vtk object.
 
-    Returns
-    -------
-    str
-        Random string.
+    Attributes
+    ----------
+    VTKObject : vtkObject
+        A VTK object.
+
+    Examples
+    --------
+    >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+    >>> from brainspace.vtk_interface.wrappers import BSVTKObjectWrapper
+    >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+    >>> m1
+    <brainspace.vtk_interface.base.BSVTKObjectWrapper at 0x7f38a4b70198>
+    >>> m1.VTKObject
+    (vtkRenderingOpenGL2Python.vtkOpenGLPolyDataMapper)0x7f38a4bee888
+
+    Passing class and additional keyword arguments:
+
+    >>> m2 = BSVTKObjectWrapper(vtkPolyDataMapper, arrayId=3,
+    ...                         colorMode='mapScalars')
+    >>> # Get color name, these are all the same
+    >>> m2.VTKObject.GetColorModeAsString()
+    'MapScalars'
+    >>> m2.GetColorModeAsString()
+    'MapScalars'
+    >>> m2.colorModeAsString
+    'MapScalars'
+    >>> # Get array id
+    >>> m2.VTKObject.GetArrayId()
+    3
+    >>> m2.GetArrayId()
+    3
+    >>> m2.arrayId
+    3
+
+    We can change array id and color mode as follows:
+
+    >>> m2.arrayId = 0
+    >>> m2.VTKObject.GetArrayId()
+    0
+    >>> m2.colorMode = 'default'
+    >>> m2.VTKObject.GetColorModeAsString()
+    'Default'
+
     """
 
-    if isinstance(random_state, np.random.RandomState):
-        r = random_state
-    else:
-        r = np.random.RandomState(random_state)
+    _vtk_map = dict()
 
-    choices = list(string.ascii_letters + string.digits)
-    if exclude_list is None:
-        return ''.join(r.choice(choices, size=size))
+    def __init__(self, vtkobject, **kwargs):
 
-    for i in range(n_reps):
-        s = ''.join(r.choice(choices, size=size))
-        if s not in exclude_list:
-            return s
+        if vtkobject is None:
+            name = type(self).__name__.replace('BS', 'vtk', 1)
+            vtkobject = getattr(vtk, name)()
+        elif type(vtkobject) == type:
+            vtkobject = vtkobject()
 
-    return None
+        if isinstance(vtkobject, type(self)):
+            vtkobject = vtkobject.VTKObject
+
+        super().__init__(vtkobject)
+
+        if self.VTKObject.__vtkname__ not in self._vtk_map:
+            self._vtk_map[self.VTKObject.__vtkname__] = \
+                get_vtk_methods(self.VTKObject)
+
+        # Has to be postponed (see metaclass) cause we may forward some kwds
+        # to a different vtk object (e.g., BSActor forwards to its BSProperty)
+        # that is not defined at this moment
+        self._vtk_kwargs = kwargs
+
+    def _handle_call(self, key, name, args):
+        method = self.vtk_map[key][name.lower()]
+        # obj = self.VTKObject
+        # if method in self._override:
+        #     obj = self
+        if isinstance(method, dict):
+            if isinstance(args, str) and args.lower() in method['options']:
+                return call_vtk(self, method['options'][args.lower()])
+            elif 'name' in method:
+                return call_vtk(self, method['name'], args)
+            else:
+                raise AttributeError("Cannot find VTK name '%s'" % name)
+
+        return call_vtk(self, method, args)
+
+    def __getattr__(self, name):
+        """ Forwards unknown attribute requests to vtk object.
+
+        Examples
+        --------
+        >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+        >>> from brainspace.vtk_interface.wrappers import BSVTKObjectWrapper
+        >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+        >>> m1.GetArrayId()  # same as self.VTKObject.GetArrayId()
+        -1
+        >>> self.arrayId  # same as self.VTKObject.GetArrayId()
+        -1
+
+        """
+
+        # We are here cause name is not in self
+        # First forward to vtkobject
+        # If it doesn't exist, look for it in vtk_map, find its corresponding
+        # vtk name and forward again
+        try:
+            return VTKMethodWrapper(super().__getattr__(name))
+        except:
+            return self._handle_call('get', name, None)
+
+    def __setattr__(self, name, value):
+        """ Forwards unknown set requests to vtk object.
+
+        Examples
+        --------
+        >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+        >>> from brainspace.vtk_interface.wrappers import BSVTKObjectWrapper
+        >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+        >>> m1.GetArrayId()
+        -1
+        >>> self.arrayId = 3  # same as self.VTKObject.SetArrayId(3)
+        >>> m1.GetArrayId()
+        3
+
+        """
+
+        # Check self attributes first
+        # Note: With this we cannot create attributes dynamically
+        if name in self.__dict__:
+            super().__setattr__(name, value)
+        else:
+            # if is_wrapper(value):
+            #     value = value.VTKObject
+            self._handle_call('set', name, value)
+
+    def setVTK(self, *args, **kwargs):
+        """ Invoke set methods on the vtk object.
+
+        Parameters
+        ----------
+        args : list of str
+            Setter methods that require no arguments.
+        kwargs : list of keyword-value arguments
+            key-word arguments can be use for methods that require arguments.
+            When several arguments are required, use a tuple.
+            Methods that require no arguments can also be used here using
+            None as the argument.
+
+        Returns
+        -------
+        self : BSVTKObjectWrapper object
+            Return self.
+
+        Examples
+        --------
+        >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+        >>> from brainspace.vtk_interface.wrappers import BSVTKObjectWrapper
+        >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+        >>> m1.setVTK(arrayId=3, colorMode='mapScalars')
+        <brainspace.vtk_interface.base.BSVTKObjectWrapper at 0x7f38a4ace320>
+        >>> m1.arrayId
+        3
+        >>> m1.colorModeAsString
+        'MapScalars'
+
+        """
+
+        kwargs = dict(zip(args, [None] * len(args)), **kwargs)
+        for k, v in kwargs.items():
+            self._handle_call('set', k, v)
+
+        return self
+
+    def getVTK(self, *args, **kwargs):
+        """ Invoke get methods on the vtk object.
+
+        Parameters
+        ----------
+        args : list of str
+            Method that require no arguments.
+        kwargs : list of keyword-value arguments
+            key-word arguments can be use for methods that require arguments.
+            When several arguments are required, use a tuple.
+            Methods that require no arguments can also be used here using
+            None as the argument.
+
+        Returns
+        -------
+        results : dict
+            Dictionary of results where the keys are the method names and
+            the values the results.
+
+        Examples
+        --------
+        >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
+        >>> from brainspace.vtk_interface.wrappers import BSVTKObjectWrapper
+        >>> m1 = BSVTKObjectWrapper(vtkPolyDataMapper())
+        >>> m1.getVTK('arrayId', colorModeAsString=None)
+        {'arrayId': -1, 'colorModeAsString': 'Default'}
+        >>> m1.getVTK('colorModeAsString', arrayId=None)
+        {'colorModeAsString': 'Default', 'arrayId': -1}
+        >>> m1.getVTK(numberOfInputConnections=0)
+        {'numberOfInputConnections': 0}
+
+        """
+
+        kwargs = dict(zip(args, [None] * len(args)), **kwargs)
+        output = {}
+        for k, v in kwargs.items():
+            output[k] = self._handle_call('get', k, v)
+        return output
+
+    @property
+    def vtk_map(self):
+        """dict: Dictionary of vtk setter and getter methods."""
+        return self._vtk_map[self.VTKObject.__vtkname__]
 
 
 class BSAlgorithm(BSVTKObjectWrapper):
@@ -108,45 +357,45 @@ class BSAlgorithm(BSVTKObjectWrapper):
         """
         return not (self.is_source and self.is_sink)
 
-    @wrap_output
-    def GetInputDataObject(self, *args):
-        """Return input data object.
+    # @wrap_output
+    # def GetInputDataObject(self, *args):
+    #     """Return input data object.
+    #
+    #     Wraps the `GetInputDataObject` method of `vtkAlgorithm` to return
+    #     a wrapped object.
+    #
+    #     Parameters
+    #     ----------
+    #     args : list of arguments
+    #         Arguments to be passed to the `GetInputDataObject` method of the
+    #         vtk object.
+    #
+    #     Returns
+    #     -------
+    #     data : BSVTKObjectWrapper
+    #         Data object after wrapping.
+    #     """
+    #     return self.VTKObject.GetInputDataObject(*args)
 
-        Wraps the `GetInputDataObject` method of `vtkAlgorithm` to return
-        a wrapped object.
-
-        Parameters
-        ----------
-        args : list of arguments
-            Arguments to be passed to the `GetInputDataObject` method of the
-            vtk object.
-
-        Returns
-        -------
-        data : BSVTKObjectWrapper
-            Data object after wrapping.
-        """
-        return self.VTKObject.GetInputDataObject(*args)
-
-    @wrap_output
-    def GetOutputDataObject(self, *args):
-        """Return output data object.
-
-        Wraps the `GetOutputDataObject` method of `vtkAlgorithm` to return
-        a wrapped object.
-
-        Parameters
-        ----------
-        args : list of arguments
-            Arguments to be passed to the `GetOutputDataObject` method of the
-            vtk object.
-
-        Returns
-        -------
-        data : BSVTKObjectWrapper
-            Data object after wrapping.
-        """
-        return self.VTKObject.GetOutputDataObject(*args)
+    # @wrap_output
+    # def GetOutputDataObject(self, *args):
+    #     """Return output data object.
+    #
+    #     Wraps the `GetOutputDataObject` method of `vtkAlgorithm` to return
+    #     a wrapped object.
+    #
+    #     Parameters
+    #     ----------
+    #     args : list of arguments
+    #         Arguments to be passed to the `GetOutputDataObject` method of the
+    #         vtk object.
+    #
+    #     Returns
+    #     -------
+    #     data : BSVTKObjectWrapper
+    #         Data object after wrapping.
+    #     """
+    #     return self.VTKObject.GetOutputDataObject(*args)
 
     @unwrap_input(0, skip=True)
     def SetInputDataObject(self, *args):
@@ -165,7 +414,7 @@ class BSAlgorithm(BSVTKObjectWrapper):
 
     @unwrap_input(0, skip=True)
     def AddInputDataObject(self, *args):
-        """Set input data object.
+        """Add input data object.
 
         Wraps the `AddInputDataObject` function of `vtkAlgorithm` to
         accept a vtk object or a wrapped object.
@@ -259,7 +508,8 @@ class BSDataSet(dsa.DataSet, BSDataObject):
 
     @property
     def has_only_triangle(self):
-        """bool: Returns True if object has only triangles. False, otherwise."""
+        """bool: Returns True if object has only triangles.
+        False, otherwise."""
         return has_only_triangle(self)
 
     @property
@@ -316,7 +566,8 @@ class BSDataSet(dsa.DataSet, BSDataObject):
                 if convert_bool == 'warn':
                     warnings.warn('Input array is boolean. Casting to uint8.')
             else:
-                warnings.warn('Array was not appended. Input array is boolean.')
+                warnings.warn('Array was not appended. Input array is '
+                              'boolean.')
                 return None
 
         # Check array name
@@ -342,8 +593,8 @@ class BSDataSet(dsa.DataSet, BSDataObject):
             elif to_cell:
                 at = 'cell'
             else:
-                raise ValueError('Array shape is not valid. Please provide the '
-                                 'attributes to use.')
+                raise ValueError('Array shape is not valid. Please provide '
+                                 'the attributes to use.')
 
         def _array_overwrite(attributes, has_same_shape):
             if has_same_shape in [True, None]:
@@ -414,11 +665,11 @@ class BSDataSet(dsa.DataSet, BSDataObject):
                 Array names. If None, return all arrays. Cannot be None
                 if ``at == None``. Default is None.
             at : {'point', 'cell', 'field', 'p', 'c', 'f'} or None, optional.
-                Attributes to get the array from. Points (i.e., 'point' or 'p'),
-                cells (i.e., 'cell' or 'c') or field (i.e., 'field' or 'f').
-                If None, get array name from all attributes that have an array
-                with the same array name. Cannot be None if ``name == None``.
-                Default is None.
+                Attributes to get the array from. Points (i.e., 'point' or
+                'p'), cells (i.e., 'cell' or 'c') or field (i.e., 'field' or
+                'f'). If None, get array name from all attributes that have an
+                array with the same array name. Cannot be None
+                if ``name == None``. Default is None.
             return_name : bool, optional
                 Whether to return array names too. Default is False.
 
@@ -594,37 +845,37 @@ class BSLookupTable(BSVTKObjectWrapper):
 
 
 class BSMapper(BSAlgorithm):
-    """Wrapper for vtkLookupTable."""
+    """Wrapper for vtkMapper."""
     def __init__(self, vtkobject=None, **kwargs):
         super().__init__(vtkobject=vtkobject, **kwargs)
 
-    @wrap_output
-    def GetInput(self):
-        """Get input.
-
-        Wraps the `GetInput` method of `vtkMapper` to return a
-        wrapped object.
-
-        Returns
-        -------
-        data : BSVTKObjectWrapper
-            Data object after wrapping.
-        """
-        return self.VTKObject.GetInput()
-
-    @wrap_output
-    def GetInputAsDataSet(self):
-        """Get input as dataset.
-
-        Wraps the `GetInputAsDataSet` method of `vtkMapper` to return a
-        wrapped object.
-
-        Returns
-        -------
-        data : BSVTKObjectWrapper
-            Data object after wrapping.
-        """
-        return self.VTKObject.GetInputAsDataSet()
+    # @wrap_output
+    # def GetInput(self):
+    #     """Get input.
+    #
+    #     Wraps the `GetInput` method of `vtkMapper` to return a
+    #     wrapped object.
+    #
+    #     Returns
+    #     -------
+    #     data : BSVTKObjectWrapper
+    #         Data object after wrapping.
+    #     """
+    #     return self.VTKObject.GetInput()
+    #
+    # @wrap_output
+    # def GetInputAsDataSet(self):
+    #     """Get input as dataset.
+    #
+    #     Wraps the `GetInputAsDataSet` method of `vtkMapper` to return a
+    #     wrapped object.
+    #
+    #     Returns
+    #     -------
+    #     data : BSVTKObjectWrapper
+    #         Data object after wrapping.
+    #     """
+    #     return self.VTKObject.GetInputAsDataSet()
 
     def SetLookupTable(self, lut=None, **kwargs):
         """Set lookup table.
@@ -648,19 +899,19 @@ class BSMapper(BSAlgorithm):
         self.VTKObject.SetLookupTable(lut.VTKObject)
         return lut
 
-    @wrap_output
-    def GetLookupTable(self):
-        """Get lookup table.
-
-        Wraps the `GetLookupTable` method of `vtkMapper` to return a
-        BSLookupTable.
-
-        Returns
-        -------
-        lut : BSLookupTable
-            Wrapped lookup table.
-        """
-        return self.VTKObject.GetLookupTable()
+    # @wrap_output
+    # def GetLookupTable(self):
+    #     """Get lookup table.
+    #
+    #     Wraps the `GetLookupTable` method of `vtkMapper` to return a
+    #     BSLookupTable.
+    #
+    #     Returns
+    #     -------
+    #     lut : BSLookupTable
+    #         Wrapped lookup table.
+    #     """
+    #     return self.VTKObject.GetLookupTable()
 
     def SetArrayName(self, name):
         """Set array id.
@@ -709,6 +960,78 @@ class BSPolyDataMapper(BSMapper):
             Input poly data.
         """
         self.VTKObject.SetInputData(poly_data)
+
+
+class BSActor2D(BSVTKObjectWrapper):
+    """Wrapper for vtkActor2D.
+
+    Unresolved requests are forwarded to its 2D property.
+
+    """
+    def __init__(self, vtkobject=None, **kwargs):
+        super().__init__(vtkobject=vtkobject, **kwargs)
+        self._property = BSWrapVTKObject(self.VTKObject.GetProperty())
+
+    def _handle_call(self, key, name, args):
+        try:
+            return super()._handle_call(key, name, args)
+        except (AttributeError, KeyError):
+            return self._property._handle_call(key, name, args)
+
+    def __getattr__(self, name):
+        try:
+            return super().__getattr__(name)
+        except (AttributeError, KeyError):
+            return self._property.__getattr__(name)
+
+    def __setattr__(self, name, value):
+        try:
+            super().__setattr__(name, value)
+        except (AttributeError, KeyError):
+            self._property.__setattr__(name, value)
+
+    def GetProperty(self):
+        """Get property.
+
+        Wraps the `GetProperty` method of `vtkActor` to return a wrapped
+        property.
+
+        Returns
+        -------
+        prop : BSVTKObjectWrapper
+            Actor's property.
+        """
+        return self._property
+
+
+class BSScalarBarActor(BSActor2D):
+    """Wrapper for vtkScalarBarActor.
+
+    Unresolved requests are forwarded to its 2D property.
+
+    """
+    def __init__(self, vtkobject=None, **kwargs):
+        super().__init__(vtkobject=vtkobject, **kwargs)
+
+
+class BSTexturedActor2D(BSActor2D):
+    """Wrapper for vtkTexturedActor2D.
+
+    Unresolved requests are forwarded to its 2D property.
+
+    """
+    def __init__(self, vtkobject=None, **kwargs):
+        super().__init__(vtkobject=vtkobject, **kwargs)
+
+
+class BSTextActor(BSTexturedActor2D):
+    """Wrapper for vtkTextActor.
+
+    Unresolved requests are forwarded to its 2D property.
+
+    """
+    def __init__(self, vtkobject=None, **kwargs):
+        super().__init__(vtkobject=vtkobject, **kwargs)
 
 
 class BSActor(BSVTKObjectWrapper):
@@ -773,18 +1096,18 @@ class BSActor(BSVTKObjectWrapper):
         self.VTKObject.SetMapper(mapper.VTKObject)
         return mapper
 
-    @wrap_output
-    def GetMapper(self):
-        """Get mapper.
-
-        Wraps the `GetMapper` method of `vtkActor` to return a BSMapper.
-
-        Returns
-        -------
-        mapper : BSMapper
-            Actor's mapper.
-        """
-        return self.VTKObject.GetMapper()
+    # @wrap_output
+    # def GetMapper(self):
+    #     """Get mapper.
+    #
+    #     Wraps the `GetMapper` method of `vtkActor` to return a BSMapper.
+    #
+    #     Returns
+    #     -------
+    #     mapper : BSMapper
+    #         Actor's mapper.
+    #     """
+    #     return self.VTKObject.GetMapper()
 
     def GetProperty(self):
         """Get property.
@@ -800,7 +1123,41 @@ class BSActor(BSVTKObjectWrapper):
         return self._property
 
 
-class BSRenderer(BSVTKObjectWrapper):
+class BSViewport(BSVTKObjectWrapper):
+    """Wrapper for vtkViewport."""
+
+    def __init__(self, vtkobject=None, **kwargs):
+        super().__init__(vtkobject=vtkobject, **kwargs)
+
+    def AddActor2D(self, actor, **kwargs):
+        """Set mapper.
+
+        Wraps the `AddActor2D` method of `vtkViewport` to accept a
+        `vtkActor2D` or BSActor2D.
+
+        Parameters
+        ----------
+        actor : vtkActor or BSActor
+            2D Actor.
+        kwargs : optional keyword arguments
+            Arguments are used to set the actor.
+        """
+        actor = BSActor2D(vtkobject=actor, **kwargs)
+        self.VTKObject.AddActor2D(actor.VTKObject)
+        return actor
+
+    def AddScalarBarActor(self, actor=None, **kwargs):
+        actor = BSScalarBarActor(vtkobject=actor, **kwargs)
+        self.VTKObject.AddActor2D(actor.VTKObject)
+        return actor
+
+    def AddTextActor(self, actor=None, **kwargs):
+        actor = BSTextActor(vtkobject=actor, **kwargs)
+        self.VTKObject.AddActor2D(actor.VTKObject)
+        return actor
+
+
+class BSRenderer(BSViewport):
     """Wrapper for vtkRenderer."""
 
     def __init__(self, vtkobject=None, **kwargs):
@@ -853,7 +1210,7 @@ def is_vtk(obj):
     res : bool
         True if `obj` is a VTK object. False, otherwise.
     """
-    return isinstance(obj, vtkObject)
+    return isinstance(obj, vtk.vtkObject)
 
 
 def BSWrapVTKObject(obj):
@@ -900,16 +1257,22 @@ def BSWrapVTKObject(obj):
         except:
             pass
 
-    if isinstance(obj, vtkMapper):
+    if isinstance(obj, vtk.vtkTexturedActor2D):
+        return BSTexturedActor2D(obj)
+
+    if isinstance(obj, vtk.vtkActor2D):
+        return BSActor2D(obj)
+
+    if isinstance(obj, vtk.vtkMapper):
         return BSMapper(obj)
 
-    if isinstance(obj, vtkLookupTable):
+    if isinstance(obj, vtk.vtkLookupTable):
         return BSLookupTable(obj)
 
-    if isinstance(obj, vtkDataSet):
+    if isinstance(obj, vtk.vtkDataSet):
         return BSDataSet(obj)
 
-    if isinstance(obj, vtkAlgorithm):
+    if isinstance(obj, vtk.vtkAlgorithm):
         return BSAlgorithm(obj)
 
     # Fall back to generic wrapper
