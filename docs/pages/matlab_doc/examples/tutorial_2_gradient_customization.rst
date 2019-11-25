@@ -8,6 +8,9 @@ reductions, as well as aligning gradients from different datasets. This tutorial
 will only show you how to apply these techniques, for in-depth descriptions we
 recommend you read the `main manuscript <https://www.biorxiv.org/content/10.1101/761460v1>`_. 
 
+Customizing Gradient Computation
+---------------------------------
+
 As before, we'll start by loading the sample data.
 
 .. code-block:: matlab    
@@ -89,6 +92,9 @@ visual, whereas LE and DM both find the canonical first gradient but their signs
 are flipped! Fortunately, the sign of gradients is arbitrary, so we could simply
 multiply either the LM and DM gradient by -1 to make them more comparable. 
 
+Gradient Alignment
+-------------------
+
 A more principled way of increasing comparability across gradients are alignment
 techniques. BrainSpace provides two alignment techniques: Procrustes analysis,
 and joint alignment. For this example we will load functional connectivity data
@@ -161,6 +167,80 @@ we will use the gradient of the hold-out group as the reference.
 
 The gradients in ``Galign.aligned`` are now aligned to the reference gradients. 
 
+Gradient Fusion
+-------------------
+
+We can also fuse data across multiple modalities and build mutli-modal
+gradients. In this case we only look at one set of output gradients, rather than
+one per modality.
+
+First, let's load the example data of microstructural profile covariance
+`(Paquola et al., 2019) <https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3000284>`_
+and functional connectivity. 
+
+.. code-block:: matlab
+
+    addpath(genpath('/path/to/BrainSpace/matlab'));
+
+    % First load mean connectivity matrix and parcellation
+    mpc = load_group_mpc('vosdewael',200);
+    fc = load_group_fc('vosdewael',200);
+    labeling = load_parcellation('vosdewael',200);
+
+    % The loader functions output data in a struct array for when you
+    % load multiple parcellations. Let's just bring them to numeric arrays.
+    mpc = mpc.vosdewael_200;
+    fc = fc.vosdewael_200;
+    labeling = labeling.vosdewael_200;
+
+    % and load the conte69 hemisphere surfaces
+    [surf_lh, surf_rh] = load_conte69();
+
+    % visualise the features from a seed region
+    h = plot_hemispheres([fc(:,1),mpc(:,1)], ...
+                {surf_lh,surf_rh}, ...
+                 'parcellation', labeling, ...
+                 'labeltext',{'FC','MPC'});
+
+.. image:: ./example_figs/mpc_fc.png
+    :scale: 70%
+    :align: center
+
+In order to fuse the matrices, we simply pass the matrices to the fusion command
+which will rescale and horizontally concatenate the matrices. 
+
+.. code-block:: matlab
+
+    % Negative numbers are not allowed in fusion.
+    fc(fc<0) = 0;
+
+    % fuse the matrices
+    fused_matrix = fusion({fc,mpc});
+
+We then use this output in the fit function. This will convert the long
+horizontal array into a square affinity matrix, and then perform embedding. 
+
+.. code-block:: matlab
+
+    % resolve the gradients
+    gm = GradientMaps( 'kernel','na');
+    gm = gm.fit(fused_matrix, 'Sparsity', 0);
+    h = plot_hemispheres(gm.gradients{1}(:,1:2), ...
+            {surf_lh,surf_rh}, ...
+             'parcellation', labeling, ...
+             'labeltext',{'eigenvector1','eigenvector2'});
+
+.. image:: ./example_figs/multimodal_gradients.png
+    :scale: 70%
+    :align: center
+
+.. note ::
+    The mpc matrix presented here match the subject cohort of `(Paquola et al.,
+    2019)
+    <https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3000284>`_.
+    Other matrices in this package match the subject groups used by `(Vos de Wael et
+    al., 2018) <https://www.pnas.org/content/115/40/10154.short>`_. We make direct
+    comparisons in our tutorial for didactic purposes only. 
+
 That concludes the second tutorial. In the third tutorial we will consider null
 hypothesis testing of comparisons between gradients and other markers. 
-
