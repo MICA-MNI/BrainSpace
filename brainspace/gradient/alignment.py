@@ -58,7 +58,7 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
 
     Parameters
     ----------
-    data :  list of ndarrays, shape = (n_samples, n_feat)
+    data :  list of ndarray, shape = (n_samples, n_feat)
         List of datasets to align.
     reference : ndarray, shape = (n_samples, n_feat), optional
         Dataset to use as reference in the first iteration. If None, the first
@@ -87,7 +87,11 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
 
     if reference is None:
         # Use the first item to build the initial reference
-        aligned = [data[0]] + [procrustes(d, data[0]) for d in data[1:]]
+        # aligned = [data[0]] + [procrustes(d, data[0]) for d in data[1:]]
+        aligned = [data[0]] + [None] * len(data[1:])
+        for k, d in enumerate(data[1:]):
+            u, w, vt = np.linalg.svd(data[0].T.dot(d).T)
+            aligned[k+1] = d.dot(u.dot(vt))
         reference = np.mean(aligned, axis=0)
     else:
         aligned = [None] * len(data)
@@ -96,15 +100,16 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
     dist = np.inf
     for i in range(n_iter):
         # Align to reference
-        aligned = [procrustes(d, reference) for d in data]
+        # aligned = [procrustes(d, reference) for d in data]
+        for k, d in enumerate(data):
+            u, w, vt = np.linalg.svd(reference.T.dot(d).T)
+            aligned[k] = d.dot(u.dot(vt))
 
         # Compute new mean
         new_reference = np.mean(aligned, axis=0)
 
         # Compute distance
-        reference -= new_reference
-        reference **= 2
-        new_dist = reference.sum()
+        new_dist = np.square(reference - new_reference).sum()
 
         # Update reference
         reference = new_reference
@@ -117,7 +122,7 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
 
         dist = new_dist
 
-    return aligned, reference if return_reference else aligned
+    return (aligned, reference) if return_reference else aligned
 
 
 class ProcrustesAlignment(BaseEstimator):
