@@ -5,6 +5,10 @@ Surface plotting functions.
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
+
+import itertools
+from collections import namedtuple
+
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -23,19 +27,10 @@ orientations = {'lateral': (0, -90, -90),
                 'ventral': (0, 180, 0),
                 'dorsal': (0, 0, 0)}
 
+Entry = namedtuple('Entry', ['label', 'orient', 'row', 'col'])
+
 
 def add_colorbar(ren, lut, is_discrete=False):
-
-    # fmt = '%-#6.3g' if is_discrete else '%-#6.2e'
-    #
-    # cb = wrap_vtk(vtk.vtkScalarBarActor, lookuptable=lut, numberOfLabels=2,
-    #               height=0.5, position=(0.08, 0.25), width=.8, barRatio=.27,
-    #               # labelFormat=fmt,
-    #               UnconstrainedFontSize=True)
-    #
-    # tp = wrap_vtk(cb.labelTextProperty)
-    # tp.setVTK(color=(0, 0, 0), italic=False, shadow=False,
-    #           bold=True, fontFamily='Arial', fontSize=16)
 
     cb = ren.AddScalarBarActor(lookuptable=lut, numberOfLabels=2, height=0.5,
                                position=(0.08, 0.25), width=.8, barRatio=.27,
@@ -53,20 +48,11 @@ def add_text_actor(ren, name):
                            bold=True, fontFamily='Arial', fontSize=40,
                            verticaljustification='centered',
                            justification='centered')
-
-    # ta = wrap_vtk(vtk.vtkTextActor)
-    # ta.positionCoordinate.SetCoordinateSystemToNormalizedViewport()
-    #
-    # ta.setVTK(input=name, textScaleMode='viewport', orientation=90,
-    #           position=(0.5, 0.5))
-    # tp = wrap_vtk(ta.textProperty)
-    # tp.setVTK(color=(0, 0, 0), italic=False, shadow=False,
-    #           bold=True, fontFamily='Arial', fontSize=40,
-    #           Verticaljustification='centered', justification='centered')
     return ta
 
 
-def _compute_range(surfs, layout, array_name, share=None, nvals=256):
+def _compute_range(surfs, layout, array_name, color_range, share=None,
+                   nvals=256):
 
     if share not in [None, 'row', 'r', 'col', 'c', 'both', 'b']:
         raise ValueError("Unknown share=%s" % share)
@@ -124,118 +110,71 @@ def _compute_range(surfs, layout, array_name, share=None, nvals=256):
     return min_rg, max_rg, n_vals, is_discrete
 
 
-# def _extend_layout(nrow, ncol, label_text=None, color_bar=None, share=None,
-#                    size_color_bar=0.11, size_label_text=0.05):
-#
-#     grid = np.indices((nrow, ncol))
-#     row_idx = np.zeros(nrow)
-#     col_idx = np.zeros(ncol)
-#
-#     if share in ['row', 'r', 'both', 'b'] and color_bar in ['left', 'right']:
-#         if color_bar == 'left':
-#             grid[1] += 1
-#             col_idx = np.insert(col_idx, 0, size_color_bar)
-#         else:
-#             col_idx = np.insert(col_idx, col_idx.size, size_color_bar)
-#     elif share in ['col', 'c', 'both', 'b'] and color_bar in ['top', 'bottom']:
-#         if color_bar == 'top':
-#             grid[0] += 1
-#             row_idx = np.insert(row_idx, 0, size_color_bar)
-#         else:
-#             row_idx = np.insert(row_idx, row_idx.size, size_color_bar)
-#
-#     if isinstance(label_text, dict):
-#         for k, v in label_text.items():
-#             if k == 'left':
-#                 grid[1] += 1
-#                 col_idx = np.insert(col_idx, 0, size_label_text)
-#             elif k == 'right':
-#                 col_idx = np.insert(col_idx, col_idx.size, size_label_text)
-#             elif k == 'top':
-#                 grid[0] += 1
-#                 row_idx = np.insert(row_idx, 0, size_label_text)
-#             elif k == 'bottom':
-#                 row_idx = np.insert(row_idx, row_idx.size, size_label_text)
-#
-#     grow, gcol = row_idx.copy(), col_idx.copy()
-#     grow[grow == 0] = (1 - grow.sum()) / grow[grow == 0].size
-#     grow = np.insert(np.cumsum(grow), 0, 0)
-#     gcol[gcol == 0] = (1 - gcol.sum()) / gcol[gcol == 0].size
-#     gcol = np.insert(np.cumsum(gcol), 0, 0)
-#
-#     return grow, gcol, grid
+def _gen_entries(idx, shift, n_entries, pos, labs):
+    n = len(labs)
+    if n_entries % n != 0:
+        raise ValueError('Labels not compatible with number of columns')
 
-def _extend_layout(nrow, ncol, label_text=None, color_bar=None, share=None,
-                   size_color_bar=0.11, size_label_text=0.05):
-    grid = np.indices((nrow, ncol))
-    row_step = np.zeros(nrow)
-    col_step = np.zeros(ncol)
+    st = n_entries // n
+    res = [labs, [pos] * n, [idx] * n,
+           [(i, i + st) for i in range(shift, shift + n_entries, st)]]
 
-    ridx = np.arange(nrow).astype(np.object)
-    cidx = np.arange(ncol).astype(np.object)
+    if pos in ['left', 'right']:
+        res[2:] = res[3:1:-1]
 
-    share = None if share is None else share[0]
+    return list(map(lambda x: Entry(*x), zip(*res)))
 
-    map_data = {}
 
-    # colorbar
-    if color_bar in ['left', 'right'] and share in ['r', 'b']:
-        if color_bar == 'left':
-            grid[1] += 1
-            col_step = np.insert(col_step, 0, size_color_bar)
-            cidx = np.insert(cidx, 0, 'cb')
+def _gen_grid(nrow, ncol, lab_text, cbar, share, size_bar=0.11, size_lab=0.05):
+    lpos = ['top', 'bottom', 'left', 'right']
+    ridx, cidx = list(range(nrow)), list(range(ncol))
+
+    def _extend_index(pos, lab):
+        nonlocal cidx, ridx
+        if pos in ['left', 'right']:
+            cidx.insert(0 if pos == 'left' else len(cidx), lab)
         else:
-            col_step = np.insert(col_step, col_step.size, size_color_bar)
-            cidx = np.insert(cidx, cidx.size, 'cb')
-    elif color_bar in ['top', 'bottom'] and share in ['c', 'b']:
-        if color_bar == 'top':
-            grid[0] += 1
-            row_step = np.insert(row_step, 0, size_color_bar)
-            ridx = np.insert(ridx, 0, 'cb')
-        else:
-            row_step = np.insert(row_step, row_step.size, size_color_bar)
-            ridx = np.insert(ridx, ridx.size, 'cb')
+            ridx.insert(0 if pos == 'top' else len(ridx), lab)
 
-    # label text
-    if isinstance(label_text, (np.ndarray, list)):
-        label_text = np.atleast_2d(label_text)
-        if label_text.shape != (nrow, ncol):
-            raise ValueError(
-                "The shape 'label_text' does not coincide with the layout.")
-    elif isinstance(label_text, dict):
-        for k, v in label_text.items():
-            if k == 'left':
-                grid[1] += 1
-                col_step = np.insert(col_step, 0, size_label_text)
-                cidx = np.insert(cidx, 0, 'll')
-                map_data['ll'] = v
-            elif k == 'right':
-                col_step = np.insert(col_step, col_step.size, size_label_text)
-                cidx = np.insert(cidx, cidx.size, 'lr')
-                map_data['lr'] = v
-            elif k == 'top':
-                grid[0] += 1
-                row_step = np.insert(row_step, 0, size_label_text)
-                ridx = np.insert(ridx, 0, 'lt')
-                map_data['lt'] = v
-            elif k == 'bottom':
-                row_step = np.insert(row_step, row_step.size, size_label_text)
-                ridx = np.insert(ridx, ridx.size, 'lb')
-                map_data['lb'] = v
+    # Color bar
+    if cbar is not None and share:
+        _extend_index(cbar, 'cb')
 
-    grow, gcol = row_step.copy(), col_step.copy()
-    grow[grow == 0] = (1 - grow.sum()) / grow[grow == 0].size
-    grow = np.insert(np.cumsum(grow), 0, 0)
-    gcol[gcol == 0] = (1 - gcol.sum()) / gcol[gcol == 0].size
-    gcol = np.insert(np.cumsum(gcol), 0, 0)
+    # Label text
+    for pos in lab_text.keys():
+        _extend_index(pos, pos)
 
-    return grow, gcol, ridx, cidx, map_data
+    # generate grid
+    grid = [np.zeros_like(idx, dtype=float) for idx in [ridx, cidx]]
+    for i, (idx, g, n) in enumerate(zip([ridx, cidx], grid, [nrow, ncol])):
+        np.place(g, np.isin(idx, lpos), size_lab)
+        np.place(g, np.isin(idx, ['cb']), size_bar)
+        g[g == 0] = (1 - g.sum()) / n
+        grid[i] = np.insert(np.cumsum(g), 0, 0)
+
+    # generate entries
+    rshift = min([i for i, v in enumerate(ridx) if isinstance(v, int)])
+    cshift = min([i for i, v in enumerate(cidx) if isinstance(v, int)])
+    entries = []
+    for idx, ne, shift in zip([ridx, cidx], [ncol, nrow], [cshift, rshift]):
+        for i, k in enumerate(idx):
+            if k == 'cb':
+                if share in ['both', 'b']:
+                    entries += _gen_entries(i, shift, ne, cbar,
+                                            [(rshift, cshift)])
+                else:
+                    entries += _gen_entries(i, shift, ne, cbar,
+                                            [(rshift, cshift)] * ne)
+            elif isinstance(k, str):
+                entries += _gen_entries(i, shift, ne, k, lab_text[k])
+
+    return grid, ridx, cidx, entries
 
 
 def plot_surf(surfs, layout, array_name=None, view=None, share=None,
               color_bar=False, label_text=None, nan_color=(0, 0, 0, 1),
               cmap='viridis', color=(0, 0, 0.5), size=(400, 400),
-              interactive=True, embed_nb=False,
+              interactive=True, embed_nb=False, color_range=None,
               scale=None, transparent_bg=True, as_mpl=False, screenshot=False,
               filename=None, **kwargs):
     """Plot surfaces arranged according to the `layout`.
@@ -293,179 +232,102 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
     the shape of `layout`.
     """
 
+    # Check color bar
+    if color_bar is True:
+        color_bar = 'right'
+    elif color_bar is False:
+        color_bar = None
+
+    if color_bar in ['left', 'right'] and share in ['c', 'col']:
+        raise ValueError("Incompatible color_bar=%s and "
+                         "share=%s" % (color_bar, share))
+
+    if color_bar in ['top', 'bottom'] and share in ['r', 'row']:
+        raise ValueError("Incompatible color_bar=%s and "
+                         "share=%s" % (color_bar, share))
+
+    # Check label text
+    if label_text is None:
+        label_text = {}
+    elif isinstance(label_text, (list, np.ndarray)):
+        label_text = {'top': label_text}
+
+    if color is None:
+        color = (1, 1, 1)
+
+    bg = (1, 1, 1)
+
     layout = np.atleast_2d(layout)
     array_name = np.broadcast_to(array_name, layout.shape)
     view = np.broadcast_to(view, layout.shape)
     cmap = np.broadcast_to(cmap, layout.shape)
 
     min_rg, max_rg, n_vals, is_discrete = \
-        _compute_range(surfs, layout, array_name, share=share, nvals=256)
-
-    if color is None:
-        color = (1, 1, 1)
+        _compute_range(surfs, layout, array_name, color_range, share=share,
+                       nvals=256)
 
     nrow, ncol = layout.shape
-
-    # add_text = label_text is not None
-    # grow, gcol = nrow, ncol
-    # if color_bar or add_text:
-    #     pad0 = 0.05 if add_text else 0
-    #     pad1 = 0.11 if color_bar else 0
-    #
-    #     if share in ['c', 'col']:
-    #         ly = 1 - (pad0 + pad1)
-    #         dy = ly / nrow
-    #         grow = np.arange(pad0, ly, dy)
-    #         if color_bar:
-    #             grow = np.concatenate([grow, grow[-1:] + dy])
-    #         if pad0 > 0:
-    #             grow = np.concatenate([[0], grow])
-    #         grow = np.concatenate([grow, [1]])
-    #     elif share in ['r', 'row']:
-    #         lx = 1 - (pad0 + pad1)
-    #         dx = lx / ncol
-    #         gcol = np.arange(pad0, lx, dx)
-    #         if color_bar:
-    #             gcol = np.concatenate([gcol, gcol[-1:]+dx])
-    #         if pad0 > 0:
-    #             gcol = np.concatenate([[0], gcol])
-    #         gcol = np.concatenate([gcol, [1]])
-
-    # grow, gcol, grid = _extend_layout(nrow, ncol, label_text=label_text,
-    #                                   color_bar=color_bar, share=share)
-
-    grow, gcol, ridx, cidx, map_lt = \
-        _extend_layout(nrow, ncol, label_text=label_text, color_bar=color_bar,
-                       share=share)
-
+    grid, ridx, cidx, entries = _gen_grid(nrow, ncol, label_text, color_bar,
+                                          share)
+    grow, gcol = grid
+    print(grow)
+    print(gcol)
+    print(ridx)
+    print(cidx)
     kwargs.update({'n_rows': grow, 'n_cols': gcol, 'try_qt': False,
                    'size': size})
     if screenshot or as_mpl:
         kwargs.update({'offscreen': True})
     p = Plotter(**kwargs)
 
-    bg = (1, 1, 1)
-    import itertools
-    for i, j in itertools.product(range(ridx.size), range(cidx.size)):
-        irow, icol = ridx[i], cidx[j]
-        ren1 = p.AddRenderer(row=i, col=j, background=bg)
-
-        print(i, j, irow, icol)
+    for irow, icol in itertools.product(range(len(ridx)), range(len(cidx))):
+        i, j = ridx[irow], cidx[icol]
 
         # plot color bar, label_text of white ren
-        if isinstance(irow, str) and isinstance(icol, str):
+        if isinstance(i, str) or isinstance(j, str):
+            if isinstance(i, str) and isinstance(j, str):
+                ren1 = p.AddRenderer(row=irow, col=icol, background=bg)
             continue
 
-        if irow in map_lt:
-            map_lt
+        ren1 = p.AddRenderer(row=irow, col=icol, background=bg)
+        s = surfs[layout[i, j]]
+        if s is None:
+            continue
 
-        # irow, icol = grid[0].flat[k], grid[1].flat[k]
+        ac1 = ren1.AddActor(color=color, specular=0.1, specularPower=1,
+                            diffuse=1, ambient=0.05)
+        #
+        if view[i, j] is not None:
+            ac1.orientation = orientations[view[i, j]]
 
-        # ren1 = p.AddRenderer(row=irow, col=icol, background=bg)
-        # s = surfs[layout.flat[k]]
-        # if s is None:
-        #     continue
-        #
-        # ac1 = ren1.AddActor(color=color, specular=0.1, specularPower=1,
-        #                     diffuse=1, ambient=0.05)
-        #
-        # if view.flat[k] is not None:
-        #     ac1.orientation = orientations[view.flat[k]]
-        #
-        # # Only interpolate if floating
-        # interpolate = not is_discrete.flat[k]
-        # m1 = ac1.SetMapper(InputDataObject=s, ColorMode='MapScalars',
-        #                    ScalarMode='UsePointFieldData',
-        #                    InterpolateScalarsBeforeMapping=interpolate,
-        #                    UseLookupTableScalarRange=True)
-        #
-        # if array_name.flat[k] is None:
-        #     m1.ScalarVisibility = False
-        # else:
-        #     m1.ArrayName = array_name.flat[k]
-        #
-        # # Set lookuptable
-        # if cmap.flat[k] is not None:
-        #     if cmap.flat[k] in colormaps:
-        #         table = colormaps[cmap.flat[k]]
-        #     else:
-        #         cm = plt.get_cmap(cmap.flat[k])
-        #         table = cm(np.linspace(0, 1, n_vals.flat[k])) * 255
-        #         table = table.astype(np.uint8)
-        #     lut1 = m1.SetLookupTable(NumberOfTableValues=n_vals.flat[k],
-        #                              Range=(min_rg.flat[k], max_rg.flat[k]),
-        #                              # Range=(-0.5, 2),
-        #
-        #                              Table=table)
-        #     if nan_color is not None:
-        #         lut1.NanColor = nan_color
-        #     lut1.Build()
+        # Only interpolate if floating
+        interpolate = not is_discrete[i, j]
+        m1 = ac1.SetMapper(InputDataObject=s, ColorMode='MapScalars',
+                           ScalarMode='UsePointFieldData',
+                           InterpolateScalarsBeforeMapping=interpolate,
+                           UseLookupTableScalarRange=True)
 
+        if array_name[i, j] is None:
+            m1.ScalarVisibility = False
+        else:
+            m1.ArrayName = array_name[i, j]
 
-    # for k in range(layout.size):
-    #     irow, icol = grid[0].flat[k], grid[1].flat[k]
-    #
-    #     ren1 = p.AddRenderer(row=irow, col=icol, background=bg)
-    #     s = surfs[layout.flat[k]]
-    #     if s is None:
-    #         continue
-    #
-    #     ac1 = ren1.AddActor(color=color, specular=0.1, specularPower=1,
-    #                         diffuse=1, ambient=0.05)
-    #
-    #     if view.flat[k] is not None:
-    #         ac1.orientation = orientations[view.flat[k]]
-    #
-    #     # Only interpolate if floating
-    #     interpolate = not is_discrete.flat[k]
-    #     m1 = ac1.SetMapper(InputDataObject=s, ColorMode='MapScalars',
-    #                        ScalarMode='UsePointFieldData',
-    #                        InterpolateScalarsBeforeMapping=interpolate,
-    #                        UseLookupTableScalarRange=True)
-    #
-    #     if array_name.flat[k] is None:
-    #         m1.ScalarVisibility = False
-    #     else:
-    #         m1.ArrayName = array_name.flat[k]
-    #
-    #     # Set lookuptable
-    #     if cmap.flat[k] is not None:
-    #         if cmap.flat[k] in colormaps:
-    #             table = colormaps[cmap.flat[k]]
-    #         else:
-    #             cm = plt.get_cmap(cmap.flat[k])
-    #             table = cm(np.linspace(0, 1, n_vals.flat[k])) * 255
-    #             table = table.astype(np.uint8)
-    #         lut1 = m1.SetLookupTable(NumberOfTableValues=n_vals.flat[k],
-    #                                  Range=(min_rg.flat[k], max_rg.flat[k]),
-    #                                  # Range=(-0.5, 2),
-    #
-    #                                  Table=table)
-    #         if nan_color is not None:
-    #             lut1.NanColor = nan_color
-    #         lut1.Build()
+        # Set lookuptable
+        if cmap[i, j] is not None:
+            if cmap[i, j] in colormaps:
+                table = colormaps[cmap[i, j]]
+            else:
+                cm = plt.get_cmap(cmap[i, j])
+                table = cm(np.linspace(0, 1, n_vals[i, j])) * 255
+                table = table.astype(np.uint8)
+            lut1 = m1.SetLookupTable(NumberOfTableValues=n_vals[i, j],
+                                     Range=(min_rg[i, j], max_rg[i, j]),
+                                     # Range=(-0.5, 2),
 
-
-        # if k % ncol == ncol - 1
-        # if share in ['b', 'both'] and color_bar:
-
-        # if share in ['r', 'row'] and icol == ncol - 1:
-        #     pad = 0
-        #     if add_text:
-        #         ren2 = p.AddRenderer(row=irow, col=0, background=bg)
-        #         add_text_actor(ren2, label_text[irow])
-        #         # ren2.AddActor2D(get_actor_text(label_text[irow]))
-        #         pad = 1
-        #     if color_bar:
-        #         ren2 = p.AddRenderer(row=irow, col=ncol + pad, background=bg)
-        #         add_colorbar(ren2, m1.lookupTable.VTKObject)
-        #         # cb = get_colorbar(m1.lookupTable.VTKObject,
-        #         #                   is_discrete=is_discrete.flat[k])
-        #         # ren2.AddActor2D(cb.VTKObject)
-        #
-        # if share in ['c', 'col'] and irow == nrow - 1:
-        #     if label_text is not None or color_bar:
-        #         raise NotImplementedError
+                                     Table=table)
+            if nan_color is not None:
+                lut1.NanColor = nan_color
+            lut1.Build()
 
         ren1.ResetCamera()
         # ren1.GetActiveCamera().Zoom(1.1)
@@ -477,6 +339,17 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         # elif icol in np.array([1, 2]) + add_text:
         #     ren1.GetActiveCamera().Zoom(1.1)
 
+    print(p.populated)
+    for e in entries:
+        ren1 = p.AddRenderer(row=e.row, col=e.col, background=bg)
+        if isinstance(e.label, str):
+            add_text_actor(ren1, e.label)
+        else:  # color bar
+            ren_lut = p.renderers[p.populated[e.label]]
+            lut = ren_lut.actors.lastActor.mapper.lookupTable
+            add_colorbar(ren1, lut.VTKObject)
+        print(e)
+
     if screenshot:
         p.show(interactive=interactive, embed_nb=embed_nb, scale=scale,
                transparent_bg=transparent_bg, as_mpl=as_mpl)
@@ -484,88 +357,6 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
                             transparent_bg=transparent_bg)
     return p.show(interactive=interactive, embed_nb=embed_nb, scale=scale,
                   transparent_bg=transparent_bg, as_mpl=as_mpl)
-
-    # bg = (1, 1, 1)
-    # for k in range(layout.size):
-    #     irow, icol = k // ncol, k % ncol
-    #     if add_text:
-    #         icol += 1
-    #
-    #     ren1 = p.AddRenderer(row=irow, col=icol, background=bg)
-    #     s = surfs[layout.flat[k]]
-    #     if s is None:
-    #         continue
-    #
-    #     ac1 = ren1.AddActor(color=color, specular=0.1, specularPower=1,
-    #                         diffuse=1, ambient=0.05)
-    #
-    #     if view.flat[k] is not None:
-    #         ac1.orientation = orientations[view.flat[k]]
-    #
-    #     # Only interpolate if floating
-    #     interpolate = not is_discrete.flat[k]
-    #     m1 = ac1.SetMapper(InputDataObject=s, ColorMode='MapScalars',
-    #                        ScalarMode='UsePointFieldData',
-    #                        InterpolateScalarsBeforeMapping=interpolate,
-    #                        UseLookupTableScalarRange=True)
-    #
-    #     if array_name.flat[k] is None:
-    #         m1.ScalarVisibility = False
-    #     else:
-    #         m1.ArrayName = array_name.flat[k]
-    #
-    #     # Set lookuptable
-    #     if cmap.flat[k] is not None:
-    #         if cmap.flat[k] in colormaps:
-    #             table = colormaps[cmap.flat[k]]
-    #         else:
-    #             cm = plt.get_cmap(cmap.flat[k])
-    #             table = cm(np.linspace(0, 1, n_vals.flat[k])) * 255
-    #             table = table.astype(np.uint8)
-    #         lut1 = m1.SetLookupTable(NumberOfTableValues=n_vals.flat[k],
-    #                                  Range=(min_rg.flat[k], max_rg.flat[k]),
-    #                                  # Range=(-0.5, 2),
-    #
-    #                                  Table=table)
-    #         if nan_color is not None:
-    #             lut1.NanColor = nan_color
-    #         lut1.Build()
-    #
-    #     if share in ['r', 'row'] and icol == ncol - 1:
-    #         pad = 0
-    #         if add_text:
-    #             ren2 = p.AddRenderer(row=irow, col=0, background=bg)
-    #             add_text_actor(ren2, label_text[irow])
-    #             # ren2.AddActor2D(get_actor_text(label_text[irow]))
-    #             pad = 1
-    #         if color_bar:
-    #             ren2 = p.AddRenderer(row=irow, col=ncol + pad, background=bg)
-    #             add_colorbar(ren2, m1.lookupTable.VTKObject)
-    #             # cb = get_colorbar(m1.lookupTable.VTKObject,
-    #             #                   is_discrete=is_discrete.flat[k])
-    #             # ren2.AddActor2D(cb.VTKObject)
-    #
-    #     if share in ['c', 'col'] and irow == nrow - 1:
-    #         if label_text is not None or color_bar:
-    #             raise NotImplementedError
-    #
-    #     ren1.ResetCamera()
-    #     # ren1.GetActiveCamera().Zoom(1.1)
-    #     ren1.GetActiveCamera().Zoom(1.2)
-    #
-    #     # Fix conte69:
-    #     # if icol in np.array([0, 3]) + add_text:
-    #     #     ren1.GetActiveCamera().Zoom(1.19)
-    #     # elif icol in np.array([1, 2]) + add_text:
-    #     #     ren1.GetActiveCamera().Zoom(1.1)
-    #
-    # if screenshot:
-    #     p.show(interactive=interactive, embed_nb=embed_nb, scale=scale,
-    #            transparent_bg=transparent_bg, as_mpl=as_mpl)
-    #     return p.screenshot(filename=filename, scale=scale,
-    #                         transparent_bg=transparent_bg)
-    # return p.show(interactive=interactive, embed_nb=embed_nb, scale=scale,
-    #               transparent_bg=transparent_bg, as_mpl=as_mpl)
 
 
 @wrap_input(0, 1)
