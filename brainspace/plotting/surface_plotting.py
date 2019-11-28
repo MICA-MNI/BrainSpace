@@ -27,22 +27,37 @@ orientations = {'lateral': (0, -90, -90),
                 'ventral': (0, 180, 0),
                 'dorsal': (0, 0, 0)}
 
-Entry = namedtuple('Entry', ['label', 'orient', 'row', 'col'])
+Entry = namedtuple('Entry', ['label', 'pos', 'row', 'col'])
 
 
-def add_colorbar(ren, lut, is_discrete=False):
+def add_colorbar(ren, lut, position, is_discrete=False):
+
+    orientation = 'horizontal'
+    if position in ['left', 'right']:
+        orientation = 'vertical'
+
+    text_pos = 'succeedScalarBar'
+    if position in ['left', 'bottom']:
+        text_pos = 'precedeScalarBar'
 
     cb = ren.AddScalarBarActor(lookuptable=lut, numberOfLabels=2, height=0.5,
                                position=(0.08, 0.25), width=.8, barRatio=.27,
-                               unconstrainedFontSize=True)
+                               unconstrainedFontSize=True,
+                               orientation=orientation, textPosition=text_pos)
     cb.labelTextProperty.setVTK(color=(0, 0, 0), italic=False, shadow=False,
                                 bold=True, fontFamily='Arial', fontSize=16)
     return cb
 
 
-def add_text_actor(ren, name):
-    ta = ren.AddTextActor(input=name, textScaleMode='viewport', orientation=90,
-                          position=(0.5, 0.5))
+def add_text_actor(ren, name, position):
+    orientation = 0
+    if position == 'left':
+        orientation = 90
+    elif position == 'right':
+        orientation = -90
+
+    ta = ren.AddTextActor(input=name, textScaleMode='viewport',
+                          orientation=orientation, position=(0.5, 0.5))
     ta.positionCoordinate.coordinateSystem = 'NormalizedViewport'
     ta.textProperty.setVTK(color=(0, 0, 0), italic=False, shadow=False,
                            bold=True, fontFamily='Arial', fontSize=40,
@@ -51,17 +66,31 @@ def add_text_actor(ren, name):
     return ta
 
 
-def _compute_range(surfs, layout, array_name, color_range, share=None,
-                   nvals=256):
+def _set_lut(mapper, cmap, n_vals, lut_rg, nan_color):
+    if cmap in colormaps:
+        table = colormaps[cmap]
+    else:
+        cm = plt.get_cmap(cmap)
+        table = cm(np.linspace(0, 1, n_vals)) * 255
+        table = table.astype(np.uint8)
+    lut1 = mapper.SetLookupTable(NumberOfTableValues=n_vals, Range=lut_rg,
+                                 Table=table)
+    if nan_color is not None:
+        lut1.NanColor = nan_color
+    lut1.Build()
 
-    if share not in [None, 'row', 'r', 'col', 'c', 'both', 'b']:
-        raise ValueError("Unknown share=%s" % share)
+def _compute_range(surfs, layout, array_name, color_range=None, share=None,
+                   nvals=256):
 
     # Compute data ranges
     n_vals = np.full_like(layout, nvals, dtype=np.uint)
     min_rg = np.full_like(layout, np.nan, dtype=np.float)
     max_rg = np.full_like(layout, np.nan, dtype=np.float)
     is_discrete = np.zeros_like(layout, dtype=np.bool)
+
+    it = np.nditer([layout, array_name])
+    for k, a in it:#np.nditer([layout, array_name]):
+        print(k, a, it.index)
 
     vals = np.full_like(layout, np.nan, dtype=np.object)
     for i in range(layout.size):
@@ -75,8 +104,11 @@ def _compute_range(surfs, layout, array_name, color_range, share=None,
             vals.flat[i] = np.unique(x)
             n_vals.flat[i] = vals.flat[i].size
 
-        min_rg.flat[i] = np.nanmin(x)
-        max_rg.flat[i] = np.nanmax(x)
+        if color_range is None:
+            min_rg.flat[i] = np.nanmin(x)
+            max_rg.flat[i] = np.nanmax(x)
+        # else:
+
 
     if share and not np.all([a is None for a in array_name.ravel()]):
         # Build lookup tables
@@ -110,6 +142,69 @@ def _compute_range(surfs, layout, array_name, color_range, share=None,
     return min_rg, max_rg, n_vals, is_discrete
 
 
+
+# def _compute_range(surfs, layout, array_name, color_range=None, share=None,
+#                    nvals=256):
+#
+#     if share not in [None, 'row', 'r', 'col', 'c', 'both', 'b']:
+#         raise ValueError("Unknown share=%s" % share)
+#
+#     # Compute data ranges
+#     n_vals = np.full_like(layout, nvals, dtype=np.uint)
+#     min_rg = np.full_like(layout, np.nan, dtype=np.float)
+#     max_rg = np.full_like(layout, np.nan, dtype=np.float)
+#     is_discrete = np.zeros_like(layout, dtype=np.bool)
+#
+#     vals = np.full_like(layout, np.nan, dtype=np.object)
+#     for i in range(layout.size):
+#         s = surfs[layout.flat[i]]
+#         if s is None or array_name.flat[i] not in s.point_keys:
+#             continue
+#
+#         x = s.PointData[array_name.flat[i]]
+#         if not np.issubdtype(x.dtype, np.floating):
+#             is_discrete.flat[i] = True
+#             vals.flat[i] = np.unique(x)
+#             n_vals.flat[i] = vals.flat[i].size
+#
+#         if color_range is None:
+#             min_rg.flat[i] = np.nanmin(x)
+#             max_rg.flat[i] = np.nanmax(x)
+#         else:
+#
+#
+#     if share and not np.all([a is None for a in array_name.ravel()]):
+#         # Build lookup tables
+#         if share in ['both', 'b']:
+#             min_rg[:] = np.nanmin(min_rg)
+#             max_rg[:] = np.nanmax(max_rg)
+#
+#             # Assume everything is discrete
+#             if is_discrete.all():
+#                 v = [v for v in vals.ravel() if v != np.nan]
+#                 n_vals[:] = np.unique(v).size
+#
+#         elif share in ['row', 'r']:
+#             min_rg[:] = np.nanmin(min_rg, axis=1, keepdims=True)
+#             max_rg[:] = np.nanmax(max_rg, axis=1, keepdims=True)
+#             is_discrete_row = is_discrete.all(axis=1)
+#             for i, dr in enumerate(is_discrete_row):
+#                 if dr:
+#                     v = [v for v in vals[i] if v != np.nan]
+#                     n_vals[i, :] = np.unique(v).size
+#
+#         elif share in ['col', 'c']:
+#             min_rg[:] = np.nanmin(min_rg, axis=0, keepdims=True)
+#             max_rg[:] = np.nanmax(max_rg, axis=0, keepdims=True)
+#             is_discrete_col = is_discrete.all(axis=0)
+#             for i, dc in enumerate(is_discrete_col):
+#                 if dc:
+#                     v = [v for v in vals[:, i] if v != np.nan]
+#                     n_vals[i, :] = np.unique(v).size
+#
+#     return min_rg, max_rg, n_vals, is_discrete
+
+
 def _gen_entries(idx, shift, n_entries, pos, labs):
     n = len(labs)
     if n_entries % n != 0:
@@ -126,7 +221,6 @@ def _gen_entries(idx, shift, n_entries, pos, labs):
 
 
 def _gen_grid(nrow, ncol, lab_text, cbar, share, size_bar=0.11, size_lab=0.05):
-    lpos = ['top', 'bottom', 'left', 'right']
     ridx, cidx = list(range(nrow)), list(range(ncol))
 
     def _extend_index(pos, lab):
@@ -147,10 +241,11 @@ def _gen_grid(nrow, ncol, lab_text, cbar, share, size_bar=0.11, size_lab=0.05):
     # generate grid
     grid = [np.zeros_like(idx, dtype=float) for idx in [ridx, cidx]]
     for i, (idx, g, n) in enumerate(zip([ridx, cidx], grid, [nrow, ncol])):
-        np.place(g, np.isin(idx, lpos), size_lab)
+        np.place(g, np.isin(idx, ['top', 'bottom', 'left', 'right']), size_lab)
         np.place(g, np.isin(idx, ['cb']), size_bar)
         g[g == 0] = (1 - g.sum()) / n
         grid[i] = np.insert(np.cumsum(g), 0, 0)
+    grid[0] = 1 - grid[0][::-1]
 
     # generate entries
     rshift = min([i for i, v in enumerate(ridx) if isinstance(v, int)])
@@ -232,11 +327,17 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
     the shape of `layout`.
     """
 
+    layout = np.atleast_2d(layout)
+    nrow, ncol = layout.shape
+
     # Check color bar
     if color_bar is True:
         color_bar = 'right'
     elif color_bar is False:
         color_bar = None
+
+    if share not in [None, 'row', 'r', 'col', 'c', 'both', 'b']:
+        raise ValueError("Unknown share=%s" % share)
 
     if color_bar in ['left', 'right'] and share in ['c', 'col']:
         raise ValueError("Incompatible color_bar=%s and "
@@ -245,6 +346,23 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
     if color_bar in ['top', 'bottom'] and share in ['r', 'row']:
         raise ValueError("Incompatible color_bar=%s and "
                          "share=%s" % (color_bar, share))
+
+    # color range
+    if color_bar is None:
+        color_range = None
+
+    if color_range is not None:
+        if share in ['both', 'b']:
+            n_cbar = 1
+        elif color_bar in ['left', 'right']:
+            n_cbar = nrow
+        elif color_bar in ['top', 'bottom']:
+            n_cbar = ncol
+
+        if isinstance(color_range, tuple):
+            color_range = [color_range] * n_cbar
+        elif len(color_range) != n_cbar:
+            raise ValueError('Color ranges and color bars do not coincide')
 
     # Check label text
     if label_text is None:
@@ -257,7 +375,6 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
     bg = (1, 1, 1)
 
-    layout = np.atleast_2d(layout)
     array_name = np.broadcast_to(array_name, layout.shape)
     view = np.broadcast_to(view, layout.shape)
     cmap = np.broadcast_to(cmap, layout.shape)
@@ -266,15 +383,10 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         _compute_range(surfs, layout, array_name, color_range, share=share,
                        nvals=256)
 
-    nrow, ncol = layout.shape
     grid, ridx, cidx, entries = _gen_grid(nrow, ncol, label_text, color_bar,
                                           share)
-    grow, gcol = grid
-    print(grow)
-    print(gcol)
-    print(ridx)
-    print(cidx)
-    kwargs.update({'n_rows': grow, 'n_cols': gcol, 'try_qt': False,
+
+    kwargs.update({'n_rows': grid[0], 'n_cols': grid[1], 'try_qt': False,
                    'size': size})
     if screenshot or as_mpl:
         kwargs.update({'offscreen': True})
@@ -314,20 +426,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
 
         # Set lookuptable
         if cmap[i, j] is not None:
-            if cmap[i, j] in colormaps:
-                table = colormaps[cmap[i, j]]
-            else:
-                cm = plt.get_cmap(cmap[i, j])
-                table = cm(np.linspace(0, 1, n_vals[i, j])) * 255
-                table = table.astype(np.uint8)
-            lut1 = m1.SetLookupTable(NumberOfTableValues=n_vals[i, j],
-                                     Range=(min_rg[i, j], max_rg[i, j]),
-                                     # Range=(-0.5, 2),
-
-                                     Table=table)
-            if nan_color is not None:
-                lut1.NanColor = nan_color
-            lut1.Build()
+            _set_lut(m1, cmap[i, j], n_vals[i, j], (min_rg[i, j], max_rg[i, j]),
+                     nan_color)
 
         ren1.ResetCamera()
         # ren1.GetActiveCamera().Zoom(1.1)
@@ -343,11 +443,11 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
     for e in entries:
         ren1 = p.AddRenderer(row=e.row, col=e.col, background=bg)
         if isinstance(e.label, str):
-            add_text_actor(ren1, e.label)
+            add_text_actor(ren1, e.label, e.pos)
         else:  # color bar
             ren_lut = p.renderers[p.populated[e.label]]
             lut = ren_lut.actors.lastActor.mapper.lookupTable
-            add_colorbar(ren1, lut.VTKObject)
+            add_colorbar(ren1, lut.VTKObject, e.pos)
         print(e)
 
     if screenshot:
