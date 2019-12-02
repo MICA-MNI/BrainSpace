@@ -79,6 +79,7 @@ def _set_lut(mapper, cmap, n_vals, lut_rg, nan_color):
         lut1.NanColor = nan_color
     lut1.Build()
 
+
 def _compute_range(surfs, layout, array_name, color_range=None, share=None,
                    nvals=256):
 
@@ -88,9 +89,11 @@ def _compute_range(surfs, layout, array_name, color_range=None, share=None,
     max_rg = np.full_like(layout, np.nan, dtype=np.float)
     is_discrete = np.zeros_like(layout, dtype=np.bool)
 
+    layout = np.vectorize(lambda k: surfs[k])(layout)
+
     it = np.nditer([layout, array_name])
-    for k, a in it:#np.nditer([layout, array_name]):
-        print(k, a, it.index)
+    for s, a in it:#np.nditer([layout, array_name]):
+        print(s, a, it.index)
 
     vals = np.full_like(layout, np.nan, dtype=np.object)
     for i in range(layout.size):
