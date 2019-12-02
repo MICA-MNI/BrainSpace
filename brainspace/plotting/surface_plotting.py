@@ -89,15 +89,15 @@ def _compute_range(surfs, layout, array_name, color_range=None, share=None,
     max_rg = np.full_like(layout, np.nan, dtype=np.float)
     is_discrete = np.zeros_like(layout, dtype=np.bool)
 
-    layout = np.vectorize(lambda k: surfs[k])(layout)
-
-    it = np.nditer([layout, array_name])
-    for s, a in it:#np.nditer([layout, array_name]):
-        print(s, a, it.index)
+    # layout = np.vectorize(lambda k: surfs[k])(layout)
+    #
+    # it = np.nditer([layout, array_name])
+    # for s, a in it:#np.nditer([layout, array_name]):
+    #     print(s, a, it.index)
 
     vals = np.full_like(layout, np.nan, dtype=np.object)
     for i in range(layout.size):
-        s = surfs[layout.flat[i]]
+        s = surfs.get(layout.flat[i])
         if s is None or array_name.flat[i] not in s.point_keys:
             continue
 
@@ -107,11 +107,8 @@ def _compute_range(surfs, layout, array_name, color_range=None, share=None,
             vals.flat[i] = np.unique(x)
             n_vals.flat[i] = vals.flat[i].size
 
-        if color_range is None:
-            min_rg.flat[i] = np.nanmin(x)
-            max_rg.flat[i] = np.nanmax(x)
-        # else:
-
+        min_rg.flat[i] = np.nanmin(x)
+        max_rg.flat[i] = np.nanmax(x)
 
     if share and not np.all([a is None for a in array_name.ravel()]):
         # Build lookup tables
@@ -269,12 +266,12 @@ def _gen_grid(nrow, ncol, lab_text, cbar, share, size_bar=0.11, size_lab=0.05):
     return grid, ridx, cidx, entries
 
 
-def plot_surf(surfs, layout, array_name=None, view=None, share=None,
-              color_bar=False, label_text=None, nan_color=(0, 0, 0, 1),
-              cmap='viridis', color=(0, 0, 0.5), size=(400, 400),
-              interactive=True, embed_nb=False, color_range=None,
-              scale=None, transparent_bg=True, as_mpl=False, screenshot=False,
-              filename=None, **kwargs):
+def plot_surf(surfs, layout, array_name=None, view=None, color_bar=False,
+              share=None, color_range=None, label_text=None,
+              nan_color=(0, 0, 0, 1), cmap='viridis', color=(0, 0, 0.5),
+              background=(1, 1, 1), size=(400, 400), interactive=True,
+              embed_nb=False, scale=None, transparent_bg=True, as_mpl=False,
+              screenshot=False, filename=None, **kwargs):
     """Plot surfaces arranged according to the `layout`.
 
     Parameters
@@ -331,16 +328,20 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
     """
 
     layout = np.atleast_2d(layout)
+    array_name = np.broadcast_to(array_name, layout.shape)
+    view = np.broadcast_to(view, layout.shape)
+    cmap = np.broadcast_to(cmap, layout.shape)
+
     nrow, ncol = layout.shape
+
+    if share not in [None, 'row', 'r', 'col', 'c', 'both', 'b']:
+        raise ValueError("Unknown share=%s" % share)
 
     # Check color bar
     if color_bar is True:
         color_bar = 'right'
-    elif color_bar is False:
-        color_bar = None
-
-    if share not in [None, 'row', 'r', 'col', 'c', 'both', 'b']:
-        raise ValueError("Unknown share=%s" % share)
+    elif color_bar in [False, None]:
+        color_bar = share = color_range = None
 
     if color_bar in ['left', 'right'] and share in ['c', 'col']:
         raise ValueError("Incompatible color_bar=%s and "
@@ -350,21 +351,17 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         raise ValueError("Incompatible color_bar=%s and "
                          "share=%s" % (color_bar, share))
 
-    # color range
-    if color_bar is None:
-        color_range = None
-
     if color_range is not None:
-        if share in ['both', 'b']:
-            n_cbar = 1
-        elif color_bar in ['left', 'right']:
+        n_cbar = 1
+        if color_bar in ['left', 'right']:
             n_cbar = nrow
         elif color_bar in ['top', 'bottom']:
             n_cbar = ncol
 
         if isinstance(color_range, tuple):
             color_range = [color_range] * n_cbar
-        elif len(color_range) != n_cbar:
+
+        if len(color_range) != n_cbar:
             raise ValueError('Color ranges and color bars do not coincide')
 
     # Check label text
@@ -373,14 +370,10 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
     elif isinstance(label_text, (list, np.ndarray)):
         label_text = {'top': label_text}
 
-    if color is None:
-        color = (1, 1, 1)
+    # if color is None:
+    #     color = (1, 1, 1)
 
-    bg = (1, 1, 1)
-
-    array_name = np.broadcast_to(array_name, layout.shape)
-    view = np.broadcast_to(view, layout.shape)
-    cmap = np.broadcast_to(cmap, layout.shape)
+    # bg = (1, 1, 1)
 
     min_rg, max_rg, n_vals, is_discrete = \
         _compute_range(surfs, layout, array_name, color_range, share=share,
@@ -401,10 +394,10 @@ def plot_surf(surfs, layout, array_name=None, view=None, share=None,
         # plot color bar, label_text of white ren
         if isinstance(i, str) or isinstance(j, str):
             if isinstance(i, str) and isinstance(j, str):
-                ren1 = p.AddRenderer(row=irow, col=icol, background=bg)
+                ren1 = p.AddRenderer(row=irow, col=icol, background=background)
             continue
 
-        ren1 = p.AddRenderer(row=irow, col=icol, background=bg)
+        ren1 = p.AddRenderer(row=irow, col=icol, background=background)
         s = surfs[layout[i, j]]
         if s is None:
             continue
