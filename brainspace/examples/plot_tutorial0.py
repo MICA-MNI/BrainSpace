@@ -32,19 +32,27 @@ To remove confound regressors from the output of the fmriprep pipeline, first ex
 Then regress these confounds from the preprocessed data using `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_signal_extraction.html#extract-signals-on-a-parcellation-defined-by-labels/>`_::
 
     from nilearn import datasets
-    destrieux_atlas = datasets.fetch_atlas_surf_destrieux()
-
-
     fsaverage = datasets.fetch_surf_fsaverage()
+    destrieux_atlas = datasets.fetch_atlas_surf_destrieux()
+    labels = destrieux_atlas['labels']
 
-    
+    parcellation = destrieux_atlas['map_left']
+
+
+    timeseries = nib.load('../../shared/data/preprocessing/sub-01_task-rest.fsa5.lh.mgz').get_data()
 
     from nilearn.input_data import NiftiLabelsMasker
-    masker = NiftiLabelsMasker(labels_img=atlas_filename, standardize=True)
+    masker = NiftiLabelsMasker(labels_img=destrieux_atlas, standardize=True)
     time_series = masker.fit_transform(fmri_filenames, confounds=confounds_out)
 
+    import numpy as np
 
-Calculate the functional connectivity matrix using `nilearn https://nilearn.github.io/auto_examples/03_connectivity/plot_signal_extraction.html#compute-and-display-a-correlation-matrix/>`_::
+    for i in ....:
+        roi_ind = np.where(parcellation == labels[i][0])[0]
+        seed_timeseries = np.mean(timeseries[roi_ind], axis=0)
+
+
+Calculate the functional connectivity matrix using `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_signal_extraction.html#compute-and-display-a-correlation-matrix/>`_::
 
     from nilearn.connectome import ConnectivityMeasure
     correlation_measure = ConnectivityMeasure(kind='correlation')
@@ -57,6 +65,22 @@ Plot the correlation matrix::
     np.fill_diagonal(correlation_matrix, 0)
     plotting.plot_matrix(correlation_matrix, figure=(10, 8), labels=labels[1:],
                          vmax=0.8, vmin=-0.8, reorder=True)
+
+In summary
+----------------------
+
+Load surfaces::
+
+    fsaverage = datasets.fetch_surf_fsaverage()
+
+Load labels::
+
+    from nilearn import datasets
+    destrieux_atlas = datasets.fetch_atlas_surf_destrieux()
+
+
+Load matrix::
+
 
 """
 
