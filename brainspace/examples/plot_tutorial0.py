@@ -97,8 +97,10 @@ mat_mask = np.where(np.std(correlation_matrix, axis=1) > 0.1)[0]
 masked_labels = [label_list[i] for i in mat_mask]
 # np.fill_diagonal(correlation_matrix, 0)
 c = correlation_matrix[mat_mask,:][:,mat_mask]
-plotting.plot_matrix(c, figure=(12, 12),
-                     labels=masked_labels, vmax=0.8, vmin=-0.8, reorder=True)
+plotting.plot_matrix(c, figure=(15, 15),
+                     labels=masked_labels,
+                     vmax=0.8, vmin=-0.8,
+                     reorder=True)
 
 ################################################################################
 # In summary
@@ -138,6 +140,8 @@ from brainspace.utils.parcellation import map_to_labels
 labeling = np.concatenate((destrieux_atlas['map_left'],
                            destrieux_atlas['map_right'] + max(destrieux_atlas['map_left']) + 1))
 mask = (labeling != 0) * (labeling != medial_wall_ind)
+mask = mask * (labeling != medial_wall_ind +
+                           max(destrieux_atlas['map_left']) + 1)
 # this only works because of left hemisphere
 removed_labels = list(set(label_list) - set(masked_labels))
 rm_label_ind = []
@@ -146,12 +150,13 @@ for i in range(len(removed_labels)):
     mask = mask * (labeling != removed_label_ind)
     rm_label_ind.append(removed_label_ind)
 
-emb = np.zeros((152,5))
-rm_label_ind.append(0)
-rm_label_ind.append(75)
+emb = np.zeros((150,5))
+#rm_label_ind.append(0)
+#rm_label_ind.append(75)
 rm_label_ind.append(medial_wall_ind)
-rm_label_ind.append(medial_wall_ind + max(destrieux_atlas['map_left']))
-ind = np.setdiff1d(range(76*2), rm_label_ind)
+rm_label_ind.append(medial_wall_ind +
+                    max(destrieux_atlas['map_left']) + 1)
+ind = np.setdiff1d(range(75*2), rm_label_ind)
 emb[ind,:] = gm.gradients_
 
 grad = [None] * 2
