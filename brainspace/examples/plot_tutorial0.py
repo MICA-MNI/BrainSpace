@@ -18,7 +18,10 @@ Following is example code to run `fmriprep <http://fmriprep.readthedocs.io/>`_ u
       /data /out participant
 
 *Note: For this tutorial, it is crucial to output the data onto a cortical surface template space.*
-
+"""
+import warnings
+warnings.simplefilter('ignore')
+"""
 Confound regression
 ++++++++++++++++++++++++
 To remove confound regressors from the output of the fmriprep pipeline, first extract the confound columns. For example::
