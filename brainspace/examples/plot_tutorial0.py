@@ -61,12 +61,11 @@ hemi = ['left', 'right']
 hh = ['lh', 'rh']
 
 for h in [0,1]:
-    timeseries = nib.load('../../shared/data/preprocessing/sub-010001_ses-02_task-rest_acq-PA_run-02.fsa5.%s.mgz' % hh[h]).get_data().squeeze()
-    # cortex = np.where(np.sum(timeseries,axis=1))[0]
+    timeseries = nib.load('../../shared/data/preprocessing/sub-010188_ses-02_task-rest_acq-AP_run-01.fsa5.%s.mgz' % hh[h]).get_data().squeeze()
 
     # remove confounds
-    timeseries_clean = signal.clean(timeseries.T,confounds=confounds_out)
-    timeseries_clean = timeseries_clean.transpose()
+    # timeseries_clean = signal.clean(timeseries.T,confounds=confounds_out).T
+    timeseries_clean = timeseries.copy()
 
     parcellation = destrieux_atlas['map_%s' % hemi[h] ]
     parcel_ind = np.unique(parcellation)
@@ -103,45 +102,40 @@ plotting.plot_matrix(c, figure=(15, 15),
                      reorder=True)
 
 ################################################################################
-# In summary
+# Load data and run gradient analysis
 # ----------------------
 # Load fsaverage5 surfaces
 
-from nilearn import datasets
-fsaverage = datasets.fetch_surf_fsaverage()
-
-################################################################################
-# Load labels
-
-from nilearn import datasets
-destrieux_atlas = datasets.fetch_atlas_surf_destrieux()
-
-################################################################################
-# Load matrix
-
-
-from brainspace.datasets import load_group_fc, load_parcellation, load_conte69
-
-# First load mean connectivity matrix and Schaefer parcellation
 from brainspace.mesh.mesh_io import read_surface
 surf_lh = read_surface('../../shared/surfaces/fsa5.pial.lh.gii')
 surf_rh = read_surface('../../shared/surfaces/fsa5.pial.rh.gii')
 
-from brainspace.gradient import GradientMaps
-
-# Ask for 10 gradients (default)
-gm = GradientMaps(n_components=5, random_state=0)
-mat_mask = np.where(np.std(correlation_matrix, axis=1) > 0.1)[0]
-gm.fit(correlation_matrix[mat_mask,:][:,mat_mask])
+################################################################################
+# Load labels
 
 import numpy as np
+from nilearn import datasets
 from brainspace.utils.parcellation import map_to_labels
 
+destrieux_atlas = datasets.fetch_atlas_surf_destrieux()
 labeling = np.concatenate((destrieux_atlas['map_left'],
                            destrieux_atlas['map_right'] + max(destrieux_atlas['map_left']) + 1))
 mask = (labeling != 0) * (labeling != medial_wall_ind)
 mask = mask * (labeling != medial_wall_ind +
                            max(destrieux_atlas['map_left']) + 1)
+
+################################################################################
+# Run gradient analysis
+
+from brainspace.gradient import GradientMaps
+
+gm = GradientMaps(n_components=5, random_state=0)
+mat_mask = np.where(np.std(correlation_matrix, axis=1) > 0.1)[0]
+gm.fit(correlation_matrix[mat_mask,:][:,mat_mask])
+
+################################################################################
+# Visualize results
+
 # this only works because of left hemisphere
 removed_labels = list(set(label_list) - set(masked_labels))
 rm_label_ind = []
@@ -150,13 +144,13 @@ for i in range(len(removed_labels)):
     mask = mask * (labeling != removed_label_ind)
     rm_label_ind.append(removed_label_ind)
 
-emb = np.zeros((150,5))
-#rm_label_ind.append(0)
-#rm_label_ind.append(75)
+emb = np.zeros((152,5))
+rm_label_ind.append(0)
+rm_label_ind.append(76)
 rm_label_ind.append(medial_wall_ind)
 rm_label_ind.append(medial_wall_ind +
                     max(destrieux_atlas['map_left']) + 1)
-ind = np.setdiff1d(range(75*2), rm_label_ind)
+ind = np.setdiff1d(range(76*2), rm_label_ind)
 emb[ind,:] = gm.gradients_
 
 grad = [None] * 2
