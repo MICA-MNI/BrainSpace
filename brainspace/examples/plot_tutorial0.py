@@ -4,9 +4,9 @@ Tutorial 0: Preparing your data for gradient analysis
 In this example, we will introduce how to preprocess raw MRI data and how
 to prepare it for subsequent gradient analysis in the next tutorials.
 
-Preprocessing
-----------------------
-Begin with an MRI dataset that is organized in `BIDS <https://bids.neuroimaging.io/>`_ format. We recommend preprocessing your data using `fmriprep <http://fmriprep.readthedocs.io/>`_, as described below, but any preprocessing pipeline will work.
+Preprocessing ---------------------- Begin with an MRI dataset that is organized in `BIDS
+<https://bids.neuroimaging.io/>`_ format. We recommend preprocessing your data using `fmriprep
+<http://fmriprep.readthedocs.io/>`_, as described below, but any preprocessing pipeline will work.
 
 Following is example code to run `fmriprep <http://fmriprep.readthedocs.io/>`_ using docker from the command line::
 
@@ -38,8 +38,10 @@ Otherwise, simply read in:
 import numpy as np
 confounds_out = np.loadtxt('../../shared/data/preprocessing/sub-010188_ses-02_task-rest_acq-AP_run-01_confounds.txt')
 
-################################################################################
-# Then regress these confounds from the preprocessed data using `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_signal_extraction.html#extract-signals-on-a-parcellation-defined-by-labels/>`_
+# ############################################################################### Then regress these confounds from
+# the preprocessed data using `nilearn
+# <https://nilearn.github.io/auto_examples/03_connectivity/plot_signal_extraction.html#extract-signals-on-a
+# -parcellation-defined-by-labels/>`_
 
 
 from nilearn import datasets
@@ -64,7 +66,8 @@ hemi = ['left', 'right']
 hh = ['lh', 'rh']
 
 for h in [0,1]:
-    timeseries = nib.load('../../shared/data/preprocessing/sub-010188_ses-02_task-rest_acq-AP_run-01.fsa5.%s.mgz' % hh[h]).get_data().squeeze()
+    timeseries = nib.load('../../shared/data/preprocessing/sub-010188_ses-02_task-rest_acq-AP_run-01.fsa5.%s.mgz' %
+                          hh[h]).get_data().squeeze()
 
     # remove confounds
     # timeseries_clean = signal.clean(timeseries.T,confounds=confounds_out).T
@@ -81,8 +84,10 @@ for h in [0,1]:
 seed_timeseries = np.asarray(seed_timeseries)
 seed_timeseries[np.isnan(seed_timeseries)] = 0
 
-################################################################################
-# Calculate the functional connectivity matrix using `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_signal_extraction.html#compute-and-display-a-correlation-matrix/>`_
+# ###############################################################################
+# Calculate the functional connectivity matrix using
+# `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_signal_extraction
+# .html#compute-and-display-a-correlation-matrix/>`_
 
 from nilearn.connectome import ConnectivityMeasure
 correlation_measure = ConnectivityMeasure(kind='correlation')
@@ -166,5 +171,6 @@ from brainspace.plotting import plot_hemispheres
 plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600), cmap='viridis_r',
                  color_bar=True, label_text=['Grad1', 'Grad2'])
 
-###############################################################################
-# This concludes the setup tutorial. The following tutorials can be run using either the output generated here or the example data.
+# ##############################################################################
+# This concludes the setup tutorial.
+# The following tutorials can be run using either the output generated here or the example data.
