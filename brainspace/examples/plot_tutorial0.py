@@ -22,9 +22,6 @@ Following is example code to run `fmriprep <http://fmriprep.readthedocs.io/>`_ u
 *Note: For this tutorial, it is crucial to output the data onto a cortical surface template space.*
 """
 
-import warnings
-warnings.simplefilter('ignore')
-
 ################################################################################
 # Confound regression
 # ++++++++++++++++++++++++
@@ -40,6 +37,8 @@ warnings.simplefilter('ignore')
 ################################################################################
 # Otherwise, simply read in:
 
+import warnings
+warnings.filterwarnings('ignore')
 
 import numpy as np
 
@@ -64,6 +63,8 @@ label_list = list(np.concatenate((lh_labels, rh_labels)))
 
 ################################################################################
 # Do the confound regression
+
+warnings.filterwarnings('ignore')
 
 from nilearn import signal
 import nibabel as nib
@@ -116,7 +117,7 @@ c = correlation_matrix[mat_mask, :][:, mat_mask]
 plotting.plot_matrix(c, figure=(15, 15),
                      labels=masked_labels,
                      vmax=0.8, vmin=-0.8,
-                     reorder=True)
+                     reorder=True);
 
 ################################################################################
 # Load data and run gradient analysis
