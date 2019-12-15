@@ -26,7 +26,8 @@ warnings.simplefilter('ignore')
 ################################################################################
 # Confound regression
 # ++++++++++++++++++++++++
-# To remove confound regressors from the output of the fmriprep pipeline, first extract the confound columns. For example::
+# To remove confound regressors from the output of the fmriprep pipeline, first extract the confound columns.
+# For example::
 #
 #    from brainspace.utils.confound_loader import load_confounds
 #    confounds_out = load_confounds("path to confound file",
@@ -35,7 +36,7 @@ warnings.simplefilter('ignore')
 #                               motion_model="6params")
 
 ################################################################################
-#Otherwise, simply read in:
+# Otherwise, simply read in:
 
 
 import numpy as np
