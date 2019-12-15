@@ -19,21 +19,24 @@ Following is example code to run `fmriprep <http://fmriprep.readthedocs.io/>`_ u
 
 *Note: For this tutorial, it is crucial to output the data onto a cortical surface template space.*
 """
+
 import warnings
 warnings.simplefilter('ignore')
-"""
-Confound regression
-++++++++++++++++++++++++
-To remove confound regressors from the output of the fmriprep pipeline, first extract the confound columns. For example::
 
-    from brainspace.utils.confound_loader import load_confounds
-    confounds_out = load_confounds("path to confound file",
-                                   strategy=["minimal"],
-                                   n_components=0.95,
-                                   motion_model="6params")
+################################################################################
+# Confound regression
+# ++++++++++++++++++++++++
+# To remove confound regressors from the output of the fmriprep pipeline, first extract the confound columns. For example::
+#
+#    from brainspace.utils.confound_loader import load_confounds
+#    confounds_out = load_confounds("path to confound file",
+#                               strategy=["minimal"],
+#                               n_components=0.95,
+#                               motion_model="6params")
 
-Otherwise, simply read in:
-"""
+################################################################################
+#Otherwise, simply read in:
+
 
 import numpy as np
 confounds_out = np.loadtxt('../../shared/data/preprocessing/sub-010188_ses-02_task-rest_acq-AP_run-01_confounds.txt')
