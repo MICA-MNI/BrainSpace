@@ -46,8 +46,9 @@ medial_wall_ind = destrieux_atlas['labels'].index(b'Medial_wall')
 labels = destrieux_atlas['labels']
 labels.remove(b'Medial_wall')
 labels.remove(b'Unknown')
-label_list = list(np.concatenate((labels,labels)))
-label_list = [i.decode() for i in label_list]
+lh_labels = ['L_' + i.decode() for i in labels]
+rh_labels = ['R_' + i.decode() for i in labels]
+label_list = list(np.concatenate((lh_labels,rh_labels)))
 
 ################################################################################
 # Do the confound regression
@@ -93,13 +94,9 @@ np.save('../../shared/data/preprocessing/correlation_matrix.npy', correlation_ma
 import numpy as np
 from nilearn import plotting
 mat_mask = np.where(np.std(correlation_matrix, axis=1) > 0.1)[0]
-print(len(label_list))
 masked_labels = [label_list[i] for i in mat_mask]
-print(len(masked_labels))
-np.fill_diagonal(correlation_matrix, 0)
-print(np.shape(correlation_matrix))
+# np.fill_diagonal(correlation_matrix, 0)
 c = correlation_matrix[mat_mask,:][:,mat_mask]
-print(np.shape(c))
 plotting.plot_matrix(c, figure=(12, 12),
                      labels=masked_labels, vmax=0.8, vmin=-0.8, reorder=True)
 
@@ -132,19 +129,35 @@ from brainspace.gradient import GradientMaps
 
 # Ask for 10 gradients (default)
 gm = GradientMaps(n_components=5, random_state=0)
-mat_mask = np.where(np.std(correlation_matrix, axis=1) != 0.)[0]
+mat_mask = np.where(np.std(correlation_matrix, axis=1) > 0.1)[0]
 gm.fit(correlation_matrix[mat_mask,:][:,mat_mask])
 
 import numpy as np
 from brainspace.utils.parcellation import map_to_labels
 
-labeling = np.concatenate((destrieux_atlas['map_left'], destrieux_atlas['map_right']))
-mask = labeling != 0
+labeling = np.concatenate((destrieux_atlas['map_left'],
+                           destrieux_atlas['map_right'] + max(destrieux_atlas['map_left']) + 1))
+mask = (labeling != 0) * (labeling != medial_wall_ind)
+# this only works because of left hemisphere
+removed_labels = list(set(label_list) - set(masked_labels))
+rm_label_ind = []
+for i in range(len(removed_labels)):
+    removed_label_ind = destrieux_atlas['labels'].index(removed_labels[i][2:].encode())
+    mask = mask * (labeling != removed_label_ind)
+    rm_label_ind.append(removed_label_ind)
+
+emb = np.zeros((152,5))
+rm_label_ind.append(0)
+rm_label_ind.append(75)
+rm_label_ind.append(medial_wall_ind)
+rm_label_ind.append(medial_wall_ind + max(destrieux_atlas['map_left']))
+ind = np.setdiff1d(range(76*2), rm_label_ind)
+emb[ind,:] = gm.gradients_
 
 grad = [None] * 2
 for i in range(2):
     # map the gradient to the parcels
-    grad[i] = map_to_labels(gm.gradients_[:, i], labeling, mask=mask, fill=np.nan)
+    grad[i] = map_to_labels(emb[:, i], labeling, mask=mask, fill=np.nan)
 
 from brainspace.plotting import plot_hemispheres
 
