@@ -41,10 +41,10 @@ import warnings
 warnings.filterwarnings('ignore')
 
 import numpy as np
-
 confounds_out = np.loadtxt('../../shared/data/preprocessing/sub-010188_ses-02_task-rest_acq-AP_run-01_confounds.txt')
 
-# ############################################################################### Then regress these confounds from
+################################################################################
+# Then regress these confounds from
 # the preprocessed data using `nilearn
 # <https://nilearn.github.io/auto_examples/03_connectivity/plot_signal_extraction.html#extract-signals-on-a
 # -parcellation-defined-by-labels/>`_
@@ -114,10 +114,10 @@ mat_mask = np.where(np.std(correlation_matrix, axis=1) > 0.1)[0]
 masked_labels = [label_list[i] for i in mat_mask]
 # np.fill_diagonal(correlation_matrix, 0)
 c = correlation_matrix[mat_mask, :][:, mat_mask]
-plotting.plot_matrix(c, figure=(15, 15),
+corr_plot = plotting.plot_matrix(c, figure=(15, 15),
                      labels=masked_labels,
                      vmax=0.8, vmin=-0.8,
-                     reorder=True);
+                     reorder=True)
 
 ################################################################################
 # Load data and run gradient analysis
