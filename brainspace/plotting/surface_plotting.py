@@ -27,17 +27,17 @@ orientations = {'lateral': (0, -90, -90),
                 'ventral': (0, 180, 0),
                 'dorsal': (0, 0, 0)}
 
-Entry = namedtuple('Entry', ['label', 'pos', 'row', 'col'])
+Entry = namedtuple('Entry', ['label', 'loc', 'row', 'col'])
 
 
-def add_colorbar(ren, lut, position, is_discrete=False):
+def add_colorbar(ren, lut, location, is_discrete=False):
 
     orientation = 'horizontal'
-    if position in ['left', 'right']:
+    if location in ['left', 'right']:
         orientation = 'vertical'
 
     text_pos = 'succeedScalarBar'
-    if position in ['left', 'bottom']:
+    if location in ['left', 'bottom']:
         text_pos = 'precedeScalarBar'
 
     cb = ren.AddScalarBarActor(lookuptable=lut, numberOfLabels=2, height=0.5,
@@ -49,14 +49,14 @@ def add_colorbar(ren, lut, position, is_discrete=False):
     return cb
 
 
-def add_text_actor(ren, name, position):
+def add_text_actor(ren, text, position):
     orientation = 0
     if position == 'left':
         orientation = 90
     elif position == 'right':
         orientation = -90
 
-    ta = ren.AddTextActor(input=name, textScaleMode='viewport',
+    ta = ren.AddTextActor(input=text, textScaleMode='viewport',
                           orientation=orientation, position=(0.5, 0.5))
     ta.positionCoordinate.coordinateSystem = 'NormalizedViewport'
     ta.textProperty.setVTK(color=(0, 0, 0), italic=False, shadow=False,
@@ -167,11 +167,10 @@ def _compute_range(surfs, layout, array_name, color_range=None, share=None,
 #             vals.flat[i] = np.unique(x)
 #             n_vals.flat[i] = vals.flat[i].size
 #
-#         if color_range is None:
-#             min_rg.flat[i] = np.nanmin(x)
-#             max_rg.flat[i] = np.nanmax(x)
-#         else:
-#
+#         # if color_range is None:
+#         #     min_rg.flat[i] = np.nanmin(x)
+#         #     max_rg.flat[i] = np.nanmax(x)
+#         # else:
 #
 #     if share and not np.all([a is None for a in array_name.ravel()]):
 #         # Build lookup tables
@@ -205,16 +204,17 @@ def _compute_range(surfs, layout, array_name, color_range=None, share=None,
 #     return min_rg, max_rg, n_vals, is_discrete
 
 
-def _gen_entries(idx, shift, n_entries, pos, labs):
+def _gen_entries(idx, shift, n_entries, loc, labs):
     n = len(labs)
     if n_entries % n != 0:
-        raise ValueError('Labels not compatible with number of columns')
+        raise ValueError('Incompatible number of text labels: '
+                         'len({}) != {}'.format(labs, n_entries))
 
-    st = n_entries // n
-    res = [labs, [pos] * n, [idx] * n,
-           [(i, i + st) for i in range(shift, shift + n_entries, st)]]
+    step = n_entries // n
+    res = [labs, [loc] * n, [idx] * n]
+    res += [[(i, i + step) for i in range(shift, shift + n_entries, step)]]
 
-    if pos in ['left', 'right']:
+    if loc in ['left', 'right']:
         res[2:] = res[3:1:-1]
 
     return list(map(lambda x: Entry(*x), zip(*res)))
@@ -223,20 +223,20 @@ def _gen_entries(idx, shift, n_entries, pos, labs):
 def _gen_grid(nrow, ncol, lab_text, cbar, share, size_bar=0.11, size_lab=0.05):
     ridx, cidx = list(range(nrow)), list(range(ncol))
 
-    def _extend_index(pos, lab):
+    def _extend_index(loc, lab):
         nonlocal cidx, ridx
-        if pos in ['left', 'right']:
-            cidx.insert(0 if pos == 'left' else len(cidx), lab)
+        if loc in ['left', 'right']:
+            cidx.insert(0 if loc == 'left' else len(cidx), lab)
         else:
-            ridx.insert(0 if pos == 'top' else len(ridx), lab)
+            ridx.insert(0 if loc == 'top' else len(ridx), lab)
 
     # Color bar
     if cbar is not None and share:
         _extend_index(cbar, 'cb')
 
     # Label text
-    for pos in lab_text.keys():
-        _extend_index(pos, pos)
+    for loc in lab_text.keys():
+        _extend_index(loc, loc)
 
     # generate grid
     grid = [np.zeros_like(idx, dtype=float) for idx in [ridx, cidx]]
@@ -255,11 +255,14 @@ def _gen_grid(nrow, ncol, lab_text, cbar, share, size_bar=0.11, size_lab=0.05):
         for i, k in enumerate(idx):
             if k == 'cb':
                 if share in ['both', 'b']:
-                    entries += _gen_entries(i, shift, ne, cbar,
-                                            [(rshift, cshift)])
+                    labs = [(rshift, cshift)]  # lut locition
+                    entries += _gen_entries(i, shift, ne, cbar, labs)
+                elif share in ['row', 'r']:
+                    labs = [(i+rshift, cshift) for i in range(nrow)]
+                    entries += _gen_entries(i, shift, ne, cbar, labs)
                 else:
-                    entries += _gen_entries(i, shift, ne, cbar,
-                                            [(rshift, cshift)] * ne)
+                    labs = [(rshift, i+cshift) for i in range(ncol)]
+                    entries += _gen_entries(i, shift, ne, cbar, labs)
             elif isinstance(k, str):
                 entries += _gen_entries(i, shift, ne, k, lab_text[k])
 
@@ -351,29 +354,24 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=False,
         raise ValueError("Incompatible color_bar=%s and "
                          "share=%s" % (color_bar, share))
 
-    if color_range is not None:
-        n_cbar = 1
-        if color_bar in ['left', 'right']:
-            n_cbar = nrow
-        elif color_bar in ['top', 'bottom']:
-            n_cbar = ncol
-
-        if isinstance(color_range, tuple):
-            color_range = [color_range] * n_cbar
-
-        if len(color_range) != n_cbar:
-            raise ValueError('Color ranges and color bars do not coincide')
+    # if color_range is not None:
+    #     n_cbar = 1
+    #     if color_bar in ['left', 'right']:
+    #         n_cbar = nrow
+    #     elif color_bar in ['top', 'bottom']:
+    #         n_cbar = ncol
+    #
+    #     if isinstance(color_range, tuple):
+    #         color_range = [color_range] * n_cbar
+    #
+    #     if len(color_range) != n_cbar:
+    #         raise ValueError('Color ranges and color bars do not coincide')
 
     # Check label text
     if label_text is None:
         label_text = {}
     elif isinstance(label_text, (list, np.ndarray)):
-        label_text = {'top': label_text}
-
-    # if color is None:
-    #     color = (1, 1, 1)
-
-    # bg = (1, 1, 1)
+        label_text = {'left': label_text}
 
     min_rg, max_rg, n_vals, is_discrete = \
         _compute_range(surfs, layout, array_name, color_range, share=share,
@@ -437,13 +435,13 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=False,
 
     print(p.populated)
     for e in entries:
-        ren1 = p.AddRenderer(row=e.row, col=e.col, background=bg)
+        ren1 = p.AddRenderer(row=e.row, col=e.col, background=background)
         if isinstance(e.label, str):
-            add_text_actor(ren1, e.label, e.pos)
+            add_text_actor(ren1, e.label, e.loc)
         else:  # color bar
             ren_lut = p.renderers[p.populated[e.label]]
             lut = ren_lut.actors.lastActor.mapper.lookupTable
-            add_colorbar(ren1, lut.VTKObject, e.pos)
+            add_colorbar(ren1, lut.VTKObject, e.loc)
         print(e)
 
     if screenshot:
