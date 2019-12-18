@@ -27,10 +27,18 @@ orientations = {'lateral': (0, -90, -90),
                 'ventral': (0, 180, 0),
                 'dorsal': (0, 0, 0)}
 
+default_actor_kwds = {'specular': 0.1, 'specularPower': 1, 'diffuse': 1,
+                      'ambient': 0.05, 'forceOpaque': True}
+
+default_mapper_kwds = {'colorMode': 'MapScalars',
+                       'scalarMode': 'UsePointFieldData',
+                       'useLookupTableScalarRange': True,
+                       'InterpolateScalarsBeforeMapping': True}
+
 Entry = namedtuple('Entry', ['label', 'loc', 'row', 'col'])
 
 
-def add_colorbar(ren, lut, location, is_discrete=False):
+def _add_colorbar(ren, lut, location, is_discrete=False):
 
     orientation = 'horizontal'
     if location in ['left', 'right']:
@@ -49,7 +57,7 @@ def add_colorbar(ren, lut, location, is_discrete=False):
     return cb
 
 
-def add_text_actor(ren, text, position):
+def _add_text(ren, text, position):
     orientation = 0
     if position == 'left':
         orientation = 90
@@ -66,18 +74,59 @@ def add_text_actor(ren, text, position):
     return ta
 
 
-def _set_lut(mapper, cmap, n_vals, lut_rg, nan_color):
-    if cmap in colormaps:
-        table = colormaps[cmap]
+# def _set_lut(mapper, cmap, n_vals, lut_rg, nan_color):
+#     if cmap in colormaps:
+#         table = colormaps[cmap]
+#     else:
+#         cm = plt.get_cmap(cmap)
+#         table = cm(np.linspace(0, 1, n_vals)) * 255
+#         table = table.astype(np.uint8)
+#     lut1 = mapper.SetLookupTable(NumberOfTableValues=n_vals, Range=lut_rg,
+#                                  Table=table)
+#     if nan_color is not None:
+#         lut1.NanColor = nan_color
+#     lut1.Build()
+
+
+def _add_surf(ren, surf, cmap=None, **kwargs):
+    # Add actor
+    kwds = default_actor_kwds.copy()
+    kwds.update({k.split('__')[1]: v for k, v in kwargs.items()
+                 if k.startswith('actor__')})
+    kwds.update(kwargs.get('actor', {}))
+    kwds = {k: v for k, v in kwds.items() if v is not None}
+    a = ren.AddActor(**kwds)
+
+    # Set mapper
+    kwds = default_mapper_kwds.copy()
+    kwds.update({k.split('__')[1]: v for k, v in kwargs.items()
+                 if k.startswith('mapper__')})
+    kwds.update(kwargs.get('mapper', {}))
+    kwds = {k: v for k, v in kwds.items() if v is not None}
+    m = a.SetMapper(InputDataObject=surf, **kwds)
+
+    # Set lookuptable
+    kwds = {k.lower().split('__')[1]: v for k, v in kwargs.items()
+            if k.startswith('lut__')}
+    kwds.update(kwargs.get('lut', {}))
+    kwds = {k: v for k, v in kwds.items() if v is not None}
+    if 'numberoftablevalues' in kwds:
+        n_vals = kwds['numberoftablevalues']
     else:
-        cm = plt.get_cmap(cmap)
-        table = cm(np.linspace(0, 1, n_vals)) * 255
-        table = table.astype(np.uint8)
-    lut1 = mapper.SetLookupTable(NumberOfTableValues=n_vals, Range=lut_rg,
-                                 Table=table)
-    if nan_color is not None:
-        lut1.NanColor = nan_color
-    lut1.Build()
+        n_vals = kwds['numberoftablevalues'] = 256
+
+    if cmap is not None:
+        if cmap in colormaps:
+            table = colormaps[cmap]
+        else:
+            cm = plt.get_cmap(cmap)
+            table = cm(np.linspace(0, 1, n_vals)) * 255
+            table = table.astype(np.uint8)
+        kwds.update({'table': table})
+    lut = m.SetLookupTable(**kwds)
+    lut.Build()
+
+    return a
 
 
 def _compute_range(surfs, layout, array_name, color_range=None, share=None,
@@ -255,7 +304,7 @@ def _gen_grid(nrow, ncol, lab_text, cbar, share, size_bar=0.11, size_lab=0.05):
         for i, k in enumerate(idx):
             if k == 'cb':
                 if share in ['both', 'b']:
-                    labs = [(rshift, cshift)]  # lut locition
+                    labs = [(rshift, cshift)]  # lut location
                     entries += _gen_entries(i, shift, ne, cbar, labs)
                 elif share in ['row', 'r']:
                     labs = [(i+rshift, cshift) for i in range(nrow)]
@@ -269,12 +318,52 @@ def _gen_grid(nrow, ncol, lab_text, cbar, share, size_bar=0.11, size_lab=0.05):
     return grid, ridx, cidx, entries
 
 
+def _expand_arg(nrow, ncol, arg, is_tuple=False, ref=None):
+    if not isinstance(arg, list):
+        arg = [[arg] * ncol] * nrow
+
+    if all([not isinstance(a, list) for a in arg]):
+        if len(arg) == ncol:
+            arg = [arg] * nrow
+        else:
+            arg = [[a] * ncol for a in arg]
+
+    elif len(arg) == nrow:
+        for i in range(nrow):
+            if not isinstance(arg[i], list):
+                arg[i] = [arg[i]]
+            if len(arg[i]) == 1:
+                arg[i] = arg[i] * ncol
+    else:
+        raise ValueError('Number of rows must be %d' % nrow)
+
+    tupled_arg = np.empty((nrow, ncol), dtype=object)
+    for i, a in enumerate(arg):
+        for j, el in enumerate(a):
+            if not isinstance(el, tuple):
+                tupled_arg[i, j] = tuple([el])
+            elif not isinstance(el[0], tuple) and is_tuple:
+                tupled_arg[i, j] = tuple([el])
+            else:
+                tupled_arg[i, j] = el
+
+            if ref is not None:
+                t = tupled_arg[i, j]
+                tref = ref[i, j]
+                if len(tref) >= len(t) == 1:
+                    tupled_arg[i, j] = t * len(tref)
+                else:
+                    raise ValueError('...')
+
+    return tupled_arg
+
+
 def plot_surf(surfs, layout, array_name=None, view=None, color_bar=False,
               share=None, color_range=None, label_text=None,
               nan_color=(0, 0, 0, 1), cmap='viridis', color=(0, 0, 0.5),
               background=(1, 1, 1), size=(400, 400), interactive=True,
               embed_nb=False, scale=None, transparent_bg=True, as_mpl=False,
-              screenshot=False, filename=None, **kwargs):
+              screenshot=False, filename=None, range_cbar=None, **kwargs):
     """Plot surfaces arranged according to the `layout`.
 
     Parameters
@@ -354,6 +443,14 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=False,
         raise ValueError("Incompatible color_bar=%s and "
                          "share=%s" % (color_bar, share))
 
+    if isinstance(range_cbar, (tuple, str)):
+        if share not in ['both', 'b']:
+            if color_bar in ['left', 'right']:
+                range_cbar = [range_cbar] * nrow
+            elif color_bar in ['left', 'right']:
+                range_cbar = [range_cbar] * ncol
+
+
     # if color_range is not None:
     #     n_cbar = 1
     #     if color_bar in ['left', 'right']:
@@ -400,28 +497,39 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=False,
         if s is None:
             continue
 
-        ac1 = ren1.AddActor(color=color, specular=0.1, specularPower=1,
-                            diffuse=1, ambient=0.05)
+        # ac1 = ren1.AddActor(color=color, specular=0.1, specularPower=1,
+        #                     diffuse=1, ambient=0.05)
+        # #
+        # if view[i, j] is not None:
+        #     ac1.orientation = orientations[view[i, j]]
         #
-        if view[i, j] is not None:
-            ac1.orientation = orientations[view[i, j]]
-
-        # Only interpolate if floating
-        interpolate = not is_discrete[i, j]
-        m1 = ac1.SetMapper(InputDataObject=s, ColorMode='MapScalars',
-                           ScalarMode='UsePointFieldData',
-                           InterpolateScalarsBeforeMapping=interpolate,
-                           UseLookupTableScalarRange=True)
-
-        if array_name[i, j] is None:
-            m1.ScalarVisibility = False
-        else:
-            m1.ArrayName = array_name[i, j]
+        # # Only interpolate if floating
+        # interpolate = not is_discrete[i, j]
+        # m1 = ac1.SetMapper(InputDataObject=s, ColorMode='MapScalars',
+        #                    ScalarMode='UsePointFieldData',
+        #                    InterpolateScalarsBeforeMapping=interpolate,
+        #                    UseLookupTableScalarRange=True)
+        #
+        # if array_name[i, j] is None:
+        #     m1.ScalarVisibility = False
+        # else:
+        #     m1.ArrayName = array_name[i, j]
 
         # Set lookuptable
-        if cmap[i, j] is not None:
-            _set_lut(m1, cmap[i, j], n_vals[i, j], (min_rg[i, j], max_rg[i, j]),
-                     nan_color)
+        # if cmap[i, j] is not None:
+        #     _set_lut(m1, cmap[i, j], n_vals[i, j], (min_rg[i, j], max_rg[i, j]),
+        #              nan_color)
+
+        actor = {'color': color, 'orientation': None}
+        if view[i, j] is not None:
+            actor['orientation'] = orientations[view[i, j]]
+        mapper = {'interpolateScalarsBeforeMapping': not is_discrete[i, j],
+                  'scalarVisibility': array_name[i, j] is not None,
+                  'arrayName': array_name[i, j]}
+        lut = {'numberOfTableValues': n_vals[i, j], 'nanColor': nan_color,
+               'range': (min_rg[i, j], max_rg[i, j])}
+        _add_surf(ren1, s, cmap=cmap[i, j], actor=actor, mapper=mapper,
+                  lut=lut)
 
         ren1.ResetCamera()
         # ren1.GetActiveCamera().Zoom(1.1)
@@ -437,11 +545,11 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=False,
     for e in entries:
         ren1 = p.AddRenderer(row=e.row, col=e.col, background=background)
         if isinstance(e.label, str):
-            add_text_actor(ren1, e.label, e.loc)
+            _add_text(ren1, e.label, e.loc)
         else:  # color bar
             ren_lut = p.renderers[p.populated[e.label]]
             lut = ren_lut.actors.lastActor.mapper.lookupTable
-            add_colorbar(ren1, lut.VTKObject, e.loc)
+            _add_colorbar(ren1, lut.VTKObject, e.loc)
         print(e)
 
     if screenshot:
