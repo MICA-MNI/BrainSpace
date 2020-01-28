@@ -1,5 +1,5 @@
 """
-Base wrapper class for VTK objects.
+Utility functions for vtk wrappers.
 """
 
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
@@ -9,7 +9,10 @@ Base wrapper class for VTK objects.
 import re
 import string
 from collections import defaultdict
+
 import numpy as np
+
+from vtk.util.vtkConstants import VTK_BIT, VTK_STRING, VTK_UNICODE_STRING
 
 
 re_state = 'Set(?P<state>(?P<root>[A-Z0-9].*)To(?P<value>[A-Z0-9].*))'
@@ -37,9 +40,9 @@ def get_vtk_methods(obj):
 
     Examples
     --------
-    >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
-    >>> from brainspace.vtk_interface.base import get_vtk_methods
-    >>> vtk_map = get_vtk_methods(vtkPolyDataMapper)
+    >>> import vtk
+    >>> from brainspace.vtk_interface.wrappers.base import get_vtk_methods
+    >>> vtk_map = get_vtk_methods(vtk.vtkPolyDataMapper)
     >>> vtk_map.keys()
     dict_keys(['set', 'get'])
 
@@ -110,9 +113,9 @@ def call_vtk(obj, method, args=None):
 
     Examples
     --------
-    >>> from vtkmodules.vtkRenderingCorePython import vtkPolyDataMapper
-    >>> from brainspace.vtk_interface.base import call_vtk
-    >>> m = vtkPolyDataMapper()
+    >>> import vtk
+    >>> from brainspace.vtk_interface.wrappers.base import call_vtk
+    >>> m = vtk.vtkPolyDataMapper()
 
     Get array id of the mapper:
 
@@ -132,7 +135,13 @@ def call_vtk(obj, method, args=None):
     # Function takes no args -> use None
     # e.g., SetColorModeToMapScalars() -> colorModeToMapScalars=None
     if args is None:
-        return getattr(obj, method)()
+        try:
+            return getattr(obj, method)()
+        except:
+            return getattr(obj, method)(None)
+
+    if isinstance(args, dict):
+        return getattr(obj, method)(**args)
 
     # If iterable try first with multiple arguments
     if isinstance(args, (tuple, list)):
@@ -144,8 +153,8 @@ def call_vtk(obj, method, args=None):
     return getattr(obj, method)(args)
 
 
-def _generate_random_string(size=20, n_reps=10, exclude_list=None,
-                            random_state=None):
+def generate_random_string(size=20, n_reps=10, exclude_list=None,
+                           random_state=None):
     """Generate random string.
 
     Parameters
@@ -167,17 +176,27 @@ def _generate_random_string(size=20, n_reps=10, exclude_list=None,
     """
 
     if isinstance(random_state, np.random.RandomState):
-        r = random_state
+        rs = random_state
     else:
-        r = np.random.RandomState(random_state)
+        rs = np.random.RandomState(random_state)
 
     choices = list(string.ascii_letters + string.digits)
     if exclude_list is None:
-        return ''.join(r.choice(choices, size=size))
+        return ''.join(rs.choice(choices, size=size))
 
     for i in range(n_reps):
-        s = ''.join(r.choice(choices, size=size))
+        s = ''.join(rs.choice(choices, size=size))
         if s not in exclude_list:
             return s
 
     return None
+
+
+def is_numpy_string(dtype):
+    if np.issubdtype(dtype, np.string_) or np.issubdtype(dtype, np.unicode_):
+        return True
+    return False
+
+
+def is_vtk_string(vtype):
+    return vtype in [VTK_STRING, VTK_UNICODE_STRING]
