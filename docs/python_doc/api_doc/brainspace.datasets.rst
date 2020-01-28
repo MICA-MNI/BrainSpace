@@ -46,3 +46,4 @@ Connectivity matrices
    :toctree: ../../generated/
 
     load_group_fc
+    load_group_mpc

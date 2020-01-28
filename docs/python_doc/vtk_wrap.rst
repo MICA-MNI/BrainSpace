@@ -344,7 +344,7 @@ additional features: ::
     (144,)
 
     >>> # we further provide an additional method to recover the polygons:
-    >>> output2.get_cells2D().shape
+    >>> output2.GetCells2D().shape
     (36, 3)
 
     >>> # this method raises an exception if the polydata holds different
@@ -455,6 +455,6 @@ not provided as an argument. The same happens with methods :meth:`~.BSRenderer.A
 :class:`.BSRenderer`, :class:`.BSActor` and :class:`.BSPolyDataMapper` wrapper
 classes, respectively.
 
-The only difference between :class:`Plotter` and  :class:`GridPlotter` is that
+The only difference between :class:`.Plotter` and  :class:`.GridPlotter` is that
 in the latter a renderer is restricted to a single entry, cannot span more than one
 entry.
