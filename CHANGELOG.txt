@@ -20,7 +20,48 @@ MATLAB:
       ReadTheDocs, rather than the latest. 
 
 Python:
+- gradient:
+    - Fix bug in alignment (remove centering and scaling)
+    - Add support for procrutes alignment of one subject to reference in
+      GradientMaps
+    - Remove dependency on _graph_is_connected from scikit-learn
 
+- datasets:
+    - Add load_group_mpc
+
+- mesh:
+    - Update build_polydata with new vtk_interface
+    - Add downsample_with_parcellation to mesh_operations
+    - Fixed a bug with mask for smooth_array and add support for
+      multicomponent arrays (columns). Smooth columns separately.
+
+- parcellation
+    - Fixed a bug in find_label_correspondence
+
+- plotting:
+    - Add plotting defaults
+    - Add build_plotter
+    - Update plot_surf
+    - Remove numpy warning plot_hemispheres
+
+- vtk_interface:
+    - Reorganize and add several wrappers
+    - Update wrap_vtk to look for superclasses is BS wrapper doesn't exist
+    - Add support for vtkSringArray and vtkVariantArray
+    - Add vtype kwarg in decorators for unwarpping numpy to vtk abstractarray
+    - Add support for dict arguments
+    - Add automatic wrap/unwrap output/input of vtk methods
+    - Add new repr
+    - Add wrappers BSActor2D, BSScalarBarActor, BSTexturedActor2D, BSTextActor
+    - Add AddScalarBarActor and AddTextActor methods for BSViewport
+    - Add io_support from mesh here
+
+- tests:
+    - Update tests with new vtk_interface
+
+- requiremnts:
+    - Update to scikit-learn>=0.22.0
+    - Remove pillow
 
 ReadTheDocs:
 - Added matrix fusion example to MATLAB tutorial 2.
