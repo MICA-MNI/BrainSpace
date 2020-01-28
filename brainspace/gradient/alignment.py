@@ -11,7 +11,7 @@ import numpy as np
 from sklearn.base import BaseEstimator
 
 
-def procrustes(source, target):
+def procrustes(source, target, center=False, scale=False):
     """Align `source` to `target` using procrustes analysis.
 
     Parameters
@@ -20,6 +20,10 @@ def procrustes(source, target):
         Source dataset.
     target : 2D ndarray, shape = (n_samples, n_feat)
         Target dataset.
+    center : bool, optional
+        Center data before alignment. Default is False.
+    scale : bool, optional
+        Remove scale before alignment. Default is False.
 
     Returns
     -------
@@ -28,26 +32,31 @@ def procrustes(source, target):
     """
 
     # Translate to origin
-    ms = source.mean(axis=0)
-    mt = target.mean(axis=0)
+    if center:
+        ms = source.mean(axis=0)
+        mt = target.mean(axis=0)
 
-    source = source - ms
-    target = target - mt
+        source = source - ms
+        target = target - mt
 
     # Remove scale
-    ns = np.linalg.norm(source)
-    nt = np.linalg.norm(target)
-    source /= ns
-    target /= nt
+    if scale:
+        ns = np.linalg.norm(source)
+        nt = np.linalg.norm(target)
+        source /= ns
+        target /= nt
 
     # orthogonal transformation: rotation + reflection
     u, w, vt = np.linalg.svd(target.T.dot(source).T)
     t = u.dot(vt)
 
     # Recover target scale
-    t *= w.sum() * nt
+    if scale:
+        t *= w.sum() * nt
 
-    aligned = source.dot(t) + mt
+    aligned = source.dot(t)
+    if center:
+        aligned += mt
     return aligned
 
 
@@ -87,11 +96,7 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
 
     if reference is None:
         # Use the first item to build the initial reference
-        # aligned = [data[0]] + [procrustes(d, data[0]) for d in data[1:]]
-        aligned = [data[0]] + [None] * len(data[1:])
-        for k, d in enumerate(data[1:]):
-            u, w, vt = np.linalg.svd(data[0].T.dot(d).T)
-            aligned[k+1] = d.dot(u.dot(vt))
+        aligned = [data[0]] + [procrustes(d, data[0]) for d in data[1:]]
         reference = np.mean(aligned, axis=0)
     else:
         aligned = [None] * len(data)
@@ -100,10 +105,7 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
     dist = np.inf
     for i in range(n_iter):
         # Align to reference
-        # aligned = [procrustes(d, reference) for d in data]
-        for k, d in enumerate(data):
-            u, w, vt = np.linalg.svd(reference.T.dot(d).T)
-            aligned[k] = d.dot(u.dot(vt))
+        aligned = [procrustes(d, reference) for d in data]
 
         # Compute new mean
         new_reference = np.mean(aligned, axis=0)
