@@ -39,9 +39,6 @@ cortical thickness data, and a template functional gradient.
 
 
 
-    import warnings
-    warnings.simplefilter('ignore')
-
     import numpy as np
     from brainspace.datasets import load_gradient, load_marker, load_conte69
 
@@ -58,6 +55,7 @@ cortical thickness data, and a template functional gradient.
 
     # Template functional gradient
     embedding = load_gradient('fc', idx=0, join=True)
+
 
 
 
@@ -93,6 +91,7 @@ Let’s first generate some null data using spintest.
 
 
 
+
 As an illustration of the rotation, let’s plot the original t1w/t2w data
 
 
@@ -109,6 +108,7 @@ As an illustration of the rotation, let’s plot the original t1w/t2w data
 
 .. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial3_001.png
     :class: sphx-glr-single-img
+
 
 
 
@@ -131,6 +131,7 @@ as well as a few rotated versions.
 
 .. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial3_002.png
     :class: sphx-glr-single-img
+
 
 
 
@@ -190,6 +191,7 @@ original data, as well as all rotated data.
 
 
 
+
 It is interesting to see that both p-values increase when taking into
 consideration the auto-correlation present in the surfaces. Also, we can see
 that the correlation with thickness is no longer statistically significant
@@ -236,6 +238,7 @@ thickness data, and a template functional gradient
 
 
 
+
 We will now compute the Moran eigenvectors. This can be done either by
 providing a weight matrix of spatial proximity between each vertex, or by
 providing a cortical surface. Here we’ll use a cortical surface.
@@ -261,6 +264,16 @@ providing a cortical surface. Here we’ll use a cortical surface.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    MoranRandomization(joint=False, n_rep=1000, n_ring=1, procedure='singleton',
+                       random_state=0, spectrum='nonzero', tol=1e-06)
+
 
 
 Using the Moran eigenvectors we can now compute the randomized data.
@@ -271,6 +284,7 @@ Using the Moran eigenvectors we can now compute the randomized data.
 
     curv_rand = msr.randomize(curv_tl)
     t1wt2w_rand = msr.randomize(t1wt2w_tl)
+
 
 
 
@@ -321,9 +335,10 @@ p-values.
 
 
 
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  23.000 seconds)
+   **Total running time of the script:** ( 3 minutes  22.341 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial3.py:
