@@ -71,7 +71,7 @@ def get_cells(surf):
 
     """
 
-    return surf.get_cells2D()
+    return surf.GetCells2D()
 
 
 def get_extent(surf):
@@ -124,7 +124,7 @@ def get_point2cell_connectivity(surf, mask=None, dtype=np.uint8):
 
     """
 
-    cells = surf.get_cells2D()
+    cells = surf.GetCells2D()
 
     data = np.ones(cells.size, dtype=dtype)
     row = cells.ravel()
@@ -604,7 +604,7 @@ def get_boundary_edges(surf):
     bs, bp = _get_boundary(surf)
     if bs.n_cells == 0:
         return np.array([])
-    be = bp[bs.get_cells2D()]
+    be = bp[bs.GetCells2D()]
     return np.sort(be, axis=1)
 
 
@@ -617,7 +617,7 @@ def get_boundary_cells(surf, with_edge=True):
         Input surface.
     with_edge : bool, optional
         If True, boundary cells need to have, at least, one boundary edge.
-        Otherwise, boundary cells have, at least, one one boundary point.
+        Otherwise, boundary cells have, at least, one boundary point.
         Default is True.
 
     Returns
