@@ -105,14 +105,14 @@ def test_plotter_screenshot():
 
     p = plotter_single_renderer()
     pth = p.screenshot(os.path.join(root_pth, '_test_single_screenshot.png'))
-    assert pth.exists()
-    pth.unlink()
+    assert os.path.exists(pth)
+    os.remove(pth)
     p.close()
 
     p = plotter_multiple_renderers()
     pth = p.screenshot(os.path.join(root_pth, '_test_multiple_screenshot.png'))
-    assert pth.exists()
-    pth.unlink()
+    assert os.path.exists(pth)
+    os.remove(pth)
     p.close()
 
 

@@ -6,9 +6,10 @@ Plotting functionality based on VTK.
 # License: BSD 3 clause
 
 
+import os
 import warnings
 from collections import defaultdict
-from pathlib import Path
+
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
@@ -412,8 +413,9 @@ class Plotter(object):
         return img
 
     def _to_image(self, filename, transparent_bg, scale):
-        pth = Path(filename).expanduser().resolve()
-        ext = pth.suffix.lower()[1:]
+        pth = os.path.abspath(os.path.expanduser(filename))
+        pth_no_ext, ext = os.path.splitext(filename)
+        ext = ext[1:]
 
         fmts1 = {'bmp', 'jpeg', 'jpg', 'png', 'tif', 'tiff'}
         fmts2 = {'eps', 'pdf', 'ps', 'svg'}
@@ -439,7 +441,7 @@ class Plotter(object):
 
             w = BSGL2PSExporter(input=self.ren_win, fileFormat=ext,
                                 compress=False, simpleLineOffset=True,
-                                filePrefix=str(pth.parent.joinpath(pth.stem)),
+                                filePrefix=pth_no_ext,
                                 title='', write3DPropsAsRasterImage=True)
             w.UsePainterSettings()
             w.Update()
