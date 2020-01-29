@@ -83,6 +83,7 @@ from nilearn import signal
 # Fetch timeseries
 timeseries = fetch_timeseries_preprocessing()
 
+
 # Remove confounds
 clean_ts = [None] * 2
 for i, ts in enumerate(timeseries):
