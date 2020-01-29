@@ -6,14 +6,14 @@ function [surf_lh,surf_rh] = load_conte69(name)
 %   'surfaces' for cortical surface or 'spheres' for corresponding spheres.
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/data_loaders/load_conte69.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/data_loaders/load_conte69.html">ReadTheDocs</a>.
 
 if ~exist('name','var')
     name = 'surfaces';
 end
 
 P = mfilename('fullpath');
-brainspace_path = regexp(P,'.*BrainSpace','match','once');
+brainspace_path = fileparts(fileparts(fileparts(P)));
 surface_path = [brainspace_path filesep 'shared' filesep 'surfaces' filesep]; 
 
 if strcmpi(name,'spheres')

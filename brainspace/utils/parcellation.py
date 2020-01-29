@@ -97,7 +97,7 @@ def find_label_correspondence(lab1, lab2):
 
     cost = np.full((u1.size, u2.size), max(lab1.size, lab2.size),
                    dtype=np.float32)
-    cost[tuple([*upairs.T])] /= n_overlap
+    cost[tuple([*upairs.T])] -= n_overlap
     ridx, cidx = linear_sum_assignment(cost)
 
     return dict(zip(u1[ridx], u2[cidx]))

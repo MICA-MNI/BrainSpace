@@ -6,14 +6,14 @@ function [mask_lh, mask_rh] = load_mask(name)
 %   'midline' for a midline mask and 'temporal' for a temporal mask.
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/data_loaders/load_mask.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/data_loaders/load_mask.html">ReadTheDocs</a>.
 
 if nargin < 1
     name = 'midline';
 end
 
 P = mfilename('fullpath');
-brainspace_path = regexp(P,'.*BrainSpace','match','once');
+brainspace_path = fileparts(fileparts(fileparts(P)));
 surface_path = [brainspace_path filesep 'shared' filesep 'surfaces' filesep]; 
 
 mask_lh = logical(load([surface_path filesep 'conte69_32k_lh_' name '_mask.csv']));

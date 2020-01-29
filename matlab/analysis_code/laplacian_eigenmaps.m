@@ -1,7 +1,7 @@
 function [embedding, lambdas] = laplacian_eigenmaps(data, n_components, random_state)
-%LAPLACIAN_EIGENMAP Performs non-linear dimensionality reduction using Laplacian Eigenmaps
+%LAPLACIAN_EIGENMAPS Performs non-linear dimensionality reduction using Laplacian Eigenmaps
 %
-% [embedding, lambda] = laplacian_eigenmap(data, n_components)
+% [embedding, lambda] = LAPLACIAN_EIGENMAPS(data, n_components)
 %
 % Performs non-linear dimensionality reduction using Laplacian Eigenmaps.
 % The data is in matrix data, in which the rows are the observations and the
@@ -28,7 +28,7 @@ function [embedding, lambdas] = laplacian_eigenmaps(data, n_components, random_s
 % - Added random_state initialization.
 %
 % For complete documentation please consult our <a
-% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/laplacian_eigenmaps.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/support_functions/laplacian_eigenmaps.html">ReadTheDocs</a>.
 
 
 if exist('random_state','var')

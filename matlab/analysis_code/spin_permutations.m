@@ -17,7 +17,7 @@ function Y_rand = spin_permutations(Y,spheres,n_rep,varargin)
 %   Modified for use in the BrainSpace toolbox by Reinder Vos de Wael
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/spin_permutations.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/spin_permutations.html">ReadTheDocs</a>.
 
 % Make sure input is in the correct format. 
 p = inputParser;
@@ -99,7 +99,14 @@ I1 = diag([-1 1 1]);
 %permutation starts
 disp('Running Spin Permutation');
 
+% Initialize
+for ii = 1:numel(spheres)
+    Y_rand{ii} = nan(size(Y{ii},1),size(Y{ii},2),n_rep);
+end
+
+% Perform the spins. 
 for j=1:n_rep
+      
     %the updated uniform sampling procedure
     A = normrnd(0,1,3,3);
     [rotation, temp] = qr(A);
@@ -115,7 +122,8 @@ for j=1:n_rep
         end
         rotated_vertices = vertices{ii}*rotation;
         nearest_neighbour = knnsearch(tree{ii}, rotated_vertices); % added 2019-06-18 see home page
-        Y_rand{ii}= cat(3,Y_rand{ii}, Y{ii}(nearest_neighbour,:));
+        %Y_rand{ii}= cat(3,Y_rand{ii}, Y{ii}(nearest_neighbour,:));
+        Y_rand{ii}(:,:,j) = Y{ii}(nearest_neighbour,:);
     end
 end
 end

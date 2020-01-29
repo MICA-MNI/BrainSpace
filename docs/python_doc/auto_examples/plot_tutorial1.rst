@@ -20,8 +20,6 @@ parcellated data for computational efficiency.
 .. code-block:: default
 
 
-    import warnings
-    warnings.simplefilter('ignore')
 
     from brainspace.datasets import load_group_fc, load_parcellation, load_conte69
 
@@ -31,6 +29,7 @@ parcellated data for computational efficiency.
 
     # and load the conte69 hemisphere surfaces
     surf_lh, surf_rh = load_conte69()
+
 
 
 
@@ -59,6 +58,7 @@ Let’s first look at the parcellation scheme we’re using.
 
 
 
+
 and let’s construct our gradients.
 
 
@@ -75,6 +75,18 @@ and let’s construct our gradients.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /media/oualid/hd500/oualid/BrainSpace/brainspace/gradient/embedding.py:70: UserWarning: Affinity is not symmetric. Making symmetric.
+      warnings.warn('Affinity is not symmetric. Making symmetric.')
+
+    GradientMaps(alignment=None, approach='dm', kernel=None, n_components=10,
+                 random_state=0)
 
 
 
@@ -111,6 +123,7 @@ two gradients.
 
 
 
+
 But which gradients should you keep for your analysis? In some cases you may
 have an a priori interest in some previously defined set of gradients. When
 you do not have a pre-defined set, you can instead look at the lambdas
@@ -134,6 +147,15 @@ on a scree plot.
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    <matplotlib.collections.PathCollection object at 0x7fc8dde41c90>
+
 
 
 This concludes the first tutorial. In the next tutorial we will have a look
@@ -143,7 +165,7 @@ alignments.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.687 seconds)
+   **Total running time of the script:** ( 0 minutes  0.924 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial1.py:

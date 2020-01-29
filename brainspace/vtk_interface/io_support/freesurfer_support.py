@@ -9,14 +9,12 @@ VTK read/write filters for FreeSurfer geometry files.
 import re
 import numpy as np
 
-# from vtkmodules.vtkCommonDataModelPython import vtkPolyData
-# from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
 from vtk import vtkPolyData
 from vtk.util.vtkAlgorithm import VTKPythonAlgorithmBase
 
-from ...vtk_interface.decorators import wrap_input
-from ...vtk_interface.checks import has_only_triangle
-from ..mesh_creation import build_polydata
+from ..checks import has_only_triangle
+from ..decorators import wrap_input
+from ...mesh.mesh_creation import build_polydata
 
 
 TRIANGLE_MAGIC = 16777214
@@ -94,7 +92,7 @@ def _read_geometry_fs(ipth, is_ascii=False):
                 n_cells = 2 * n_quad
                 x_cells = np.zeros((n_cells, 3), dtype=np.uintp)
 
-                # Face splitting follows (Remove loop in nibabel) -> Not tested!
+                # Face splitting follows (Remove loop in nib) -> Not tested!
                 m0 = (quads[:, 0] % 2) == 0
                 m0d = np.repeat(m0, 2)
                 x_cells[m0d].flat[:] = quads[m0][:, [0, 1, 3, 2, 3, 1]]

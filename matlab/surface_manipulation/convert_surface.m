@@ -15,7 +15,7 @@ function S2 = convert_surface(S,varargin)
 %   provided in S when writing surfaces. 
 %
 %   For more information, pleasse consult our <a
-% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/convert_surface.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/support_functions/convert_surface.html">ReadTheDocs</a>.
 
 p = inputParser;
 check_input = @(x) iscell(x) || ischar(x);
