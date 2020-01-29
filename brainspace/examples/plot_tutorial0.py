@@ -41,10 +41,9 @@ using docker from the command line::
 
 ###############################################################################
 # Otherwise, simply read in:
+from brainspace.datasets import load_confounds_preprocessing
 
-import numpy as np
-confounds_out = np.loadtxt('../../shared/data/preprocessing/sub-010188_ses-02_'
-                           'task-rest_acq-AP_run-01_confounds.txt')
+confounds_out = load_confounds_preprocessing()
 
 
 ###############################################################################
@@ -53,71 +52,64 @@ confounds_out = np.loadtxt('../../shared/data/preprocessing/sub-010188_ses-02_'
 # plot_signal_extraction.html#extract-signals-on-a-parcellation-
 # defined-by-labels/>`_
 
+import numpy as np
 from nilearn import datasets
 
-destrieux_atlas = datasets.fetch_atlas_surf_destrieux()
+atlas = datasets.fetch_atlas_surf_destrieux()
 
 # Remove non-cortex regions
-regions = destrieux_atlas['labels'].copy()
+regions = atlas['labels'].copy()
 masked_regions = [b'Medial_wall', b'Unknown']
 masked_labels = [regions.index(r) for r in masked_regions]
 for r in masked_regions:
     regions.remove(r)
 
 # Build Destrieux parcellation and mask
-labeling = np.concatenate([destrieux_atlas['map_left'],
-                           destrieux_atlas['map_right']])
+labeling = np.concatenate([atlas['map_left'], atlas['map_right']])
 mask = ~np.isin(labeling, masked_labels)
 
 # Distinct labels for left and right hemispheres
-lab_lh = destrieux_atlas['map_left']
+lab_lh = atlas['map_left']
 labeling[lab_lh.size:] += lab_lh.max() + 1
 
 
 ###############################################################################
 # Do the confound regression
 
+from brainspace.datasets import fetch_timeseries_preprocessing
 from brainspace.utils.parcellation import reduce_by_labels
 from nilearn import signal
-import nibabel as nib
 
-timeseries_clean = [None] * 2
-for i, h in enumerate(['lh', 'rh']):
+# Fetch timeseries
+timeseries = fetch_timeseries_preprocessing()
 
-    timeseries = nib.load('../../shared/data/preprocessing/sub-010188_ses-02_'
-                          'task-rest_acq-AP_run-01.fsa5.%s.'
-                          'mgz' % h).get_fdata().squeeze()
 
-    # remove confounds
-    # timeseries_clean = signal.clean(timeseries.T, confounds=confounds_out).T
-    timeseries_clean[i] = timeseries.copy()
+# Remove confounds
+clean_ts = [None] * 2
+for i, ts in enumerate(timeseries):
+    clean_ts[i] = signal.clean(ts.T, confounds=confounds_out).T
 
-seed_timeseries = np.vstack(timeseries_clean)
-seed_timeseries = reduce_by_labels(seed_timeseries[mask], labeling[mask],
-                                   axis=1, red_op='mean')
+seed_ts = np.vstack(clean_ts)
+seed_ts = reduce_by_labels(seed_ts[mask], labeling[mask], axis=1, red_op='mean')
 
 
 ###############################################################################
 # Calculate the functional connectivity matrix using
 # `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_
-# signal_extraction.html#compute-and-display-a-correlation-matrix/>`_.
+# signal_extraction.html#compute-and-display-a-correlation-matrix/>`_:
 
 from nilearn.connectome import ConnectivityMeasure
 
 correlation_measure = ConnectivityMeasure(kind='correlation')
-correlation_matrix = correlation_measure.fit_transform([seed_timeseries.T])[0]
-
-# save correlation matrix
-# np.save('../../shared/data/preprocessing/correlation_matrix.npy',
-#         correlation_matrix)
+correlation_matrix = correlation_measure.fit_transform([seed_ts.T])[0]
 
 
 ###############################################################################
-# Plot the correlation matrix
+# Plot the correlation matrix:
 
 from nilearn import plotting
 
-# Reduce matrix size, only visualization purposes
+# Reduce matrix size, only for visualization purposes
 mat_mask = np.where(np.std(correlation_matrix, axis=1) > 0.2)[0]
 c = correlation_matrix[mat_mask][:, mat_mask]
 
@@ -133,15 +125,7 @@ corr_plot = plotting.plot_matrix(c, figure=(15, 15), labels=masked_regions,
 ###############################################################################
 # Run gradient analysis and visualize
 # -----------------------------------
-# Load fsaverage5 surfaces
-
-from brainspace.mesh.mesh_io import read_surface
-
-surf_lh = read_surface('../../shared/surfaces/fsa5.pial.lh.gii')
-surf_rh = read_surface('../../shared/surfaces/fsa5.pial.rh.gii')
-
-
-###############################################################################
+#
 # Run gradient analysis
 
 from brainspace.gradient import GradientMaps
@@ -152,23 +136,22 @@ gm.fit(correlation_matrix)
 
 ###############################################################################
 # Visualize results
+from brainspace.datasets import load_fsa5
 from brainspace.plotting import plot_hemispheres
 from brainspace.utils.parcellation import map_to_labels
 
-# remove_labels = np.unique(labeling[mask])[~mat_mask]
-# mask &= np.isin(labeling, remove_labels)
-
+# Map gradients to original parcels
 grad = [None] * 2
-for i in range(2):
-    # map the gradient to the parcels
-    grad[i] = map_to_labels(gm.gradients_[:, i], labeling, mask=mask,
-                            fill=np.nan)
+for i, g in enumerate(gm.gradients_.T):
+    grad[i] = map_to_labels(g, labeling, mask=mask, fill=np.nan)
+
+
+# Load fsaverage5 surfaces
+surf_lh, surf_rh = load_fsa5()
 
 # sphinx_gallery_thumbnail_number = 2
 plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600),
-                 cmap='viridis_r', color_bar=True,
-                 label_text=['Grad1', 'Grad2'], embed_nb=True,
-                 interactive=False)
+                 cmap='viridis', color_bar=True, label_text=['Grad1', 'Grad2'])
 
 
 ###############################################################################

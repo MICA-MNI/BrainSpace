@@ -174,6 +174,79 @@ def load_conte69(as_sphere=False, with_normals=True, join=False):
     return surfs[0], surfs[1]
 
 
+def load_fsa5(with_normals=True, join=False):
+    """ Load fsaverage5 surfaces.
+
+    Parameters
+    ----------
+    with_normals : bool, optional
+        Whether to compute surface normals. Default is True.
+    join : bool, optional
+        If False, return one surface for left and right hemispheres. Otherwise,
+        return a single surface as a combination of both left and right
+        surfaces. Default is False.
+
+    Returns
+    -------
+    surf : tuple of BSPolyData or BSPolyData
+        Surfaces for left and right hemispheres. If ``join == True``, one
+        surface with both hemispheres.
+    """
+
+    root_pth = os.path.dirname(__file__)
+    fname = 'fsa5.pial.{}.gii'
+
+    ipth = os.path.join(root_pth, 'surfaces', fname)
+    surfs = [None] * 2
+    for i, side in enumerate(['lh', 'rh']):
+        surfs[i] = read_surface(ipth.format(side))
+        if with_normals:
+            nf = wrap_vtk(vtkPolyDataNormals, splitting=False,
+                          featureAngle=0.1)
+            surfs[i] = serial_connect(surfs[i], nf)
+
+    if join:
+        return combine_surfaces(*surfs)
+    return surfs[0], surfs[1]
+
+
+def load_confounds_preprocessing():
+    """Load counfounds for preprocessing tutorial.
+
+    Returns
+    -------
+    confounds : ndarray
+
+    """
+
+    root_pth = os.path.dirname(__file__)
+    fname = 'sub-010188_ses-02_task-rest_acq-AP_run-01_confounds.txt'
+    ipth = os.path.join(root_pth, 'preprocessing', fname)
+    return np.loadtxt(ipth)
+
+
+def fetch_timeseries_preprocessing():
+    """Fetch timeseries to deconfound for preprocessing tutorial.
+
+    Returns
+    -------
+    timeseries : list
+        Timeseries for left and right hemispheres.
+
+    """
+
+    import nibabel as nib
+
+    root_pth = os.path.dirname(__file__)
+    fname = 'sub-010188_ses-02_task-rest_acq-AP_run-01.fsa5.{}.mgz'
+    ipth = os.path.join(root_pth, 'preprocessing', fname)
+
+    ts = [None] * 2
+    for i, h in enumerate(['lh', 'rh']):
+        ts[i] = nib.load(ipth.format(h)).get_fdata().squeeze()
+    return ts
+
+
 def _load_feat(feat_name, parcellation=None, mask=None):
     root_pth = os.path.dirname(__file__)
     ipth = os.path.join(root_pth, 'matrices', 'main_group',

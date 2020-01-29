@@ -42,7 +42,6 @@ Tutorials
 
  .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial1_thumb.png
 
-
      :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial1.py`
 
 .. raw:: html
