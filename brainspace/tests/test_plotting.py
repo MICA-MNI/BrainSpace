@@ -100,14 +100,17 @@ def test_plotter_numpy():
 
 
 def test_plotter_screenshot():
+    import os
+    root_pth = os.path.dirname(__file__)
+
     p = plotter_single_renderer()
-    pth = p.screenshot('./_test_single_renderer_screenshot.png')
+    pth = p.screenshot(os.path.join(root_pth, '_test_single_screenshot.png'))
     assert pth.exists()
     pth.unlink()
     p.close()
 
     p = plotter_multiple_renderers()
-    pth = p.screenshot('./_test_multiple_renderers_screenshot.png')
+    pth = p.screenshot(os.path.join(root_pth, '_test_multiple_screenshot.png'))
     assert pth.exists()
     pth.unlink()
     p.close()
