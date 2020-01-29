@@ -21,7 +21,8 @@ INSTALL_REQUIRES = ['numpy>=1.11.0',
                     'matplotlib>=2.0.0',
                     'vtk>=8.1.0',
                     'nibabel',
-                    'pillow']
+                    'pillow',
+                    'pandas']
 
 
 here = path.abspath(path.dirname(__file__))
