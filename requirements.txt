@@ -4,5 +4,4 @@ scikit-learn>=0.20.0
 matplotlib>=2.0.0
 vtk>=8.1.0
 nibabel
-pillow
 pandas
