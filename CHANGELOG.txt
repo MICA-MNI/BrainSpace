@@ -4,6 +4,7 @@ MATLAB:
     - split_surfaces.m 
     - fusion.m
     - surface_to_graph.m
+    - load_group_mpc.m
 - Bug fixes:
     - Fixed a bug where the example data loaders failed when the BrainSpace
       directory was not named "BrainSpace".
