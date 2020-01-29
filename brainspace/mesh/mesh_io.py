@@ -6,16 +6,11 @@ High-level read/write functions for several formats.
 # License: BSD 3 clause
 
 
-# from vtkmodules.vtkIOPLYPython import vtkPLYReader, vtkPLYWriter
-# from vtkmodules.vtkIOXMLPython import vtkXMLPolyDataReader, vtkXMLPolyDataWriter
-# from vtkmodules.vtkIOLegacyPython import vtkPolyDataReader, vtkPolyDataWriter
-# from vtkmodules.vtkIOGeometryPython import vtkOBJReader, vtkOBJWriter
-
 from vtk import (vtkPLYReader, vtkPLYWriter, vtkXMLPolyDataReader,
                  vtkXMLPolyDataWriter, vtkPolyDataReader, vtkPolyDataWriter)
 
-from .io_support import (vtkFSReader, vtkFSWriter, vtkGIFTIReader,
-                         vtkGIFTIWriter)
+from ..vtk_interface.io_support import (vtkFSReader, vtkFSWriter,
+                                        vtkGIFTIReader, vtkGIFTIWriter)
 from ..vtk_interface.pipeline import serial_connect, get_output
 from ..vtk_interface.decorators import wrap_output
 
@@ -74,7 +69,7 @@ def read_surface(ipth, itype=None, return_data=True, update=True):
     ----------
     ipth : str
         Input filename.
-    itype : {'ply', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
+    itype : {'ply', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
         Input file type. If None, it is deduced from `ipth`. Default is None.
     return_data : bool, optional
         Whether to return data instead of filter. Default is False
@@ -121,7 +116,7 @@ def write_surface(ifilter, opth, oformat=None, otype=None):
     oformat : {'ascii', 'binary'}, optional
         File format. Defaults to writer's default format.
         Only used when writer accepts format. Default is None.
-    otype : {'ply', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
+    otype : {'ply', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
         File type. If None, type is deduced from `opth`. Default is None.
 
     Notes

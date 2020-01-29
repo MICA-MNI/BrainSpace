@@ -11,7 +11,7 @@ import numpy as np
 from sklearn.base import BaseEstimator
 
 
-def procrustes(source, target):
+def procrustes(source, target, center=False, scale=False):
     """Align `source` to `target` using procrustes analysis.
 
     Parameters
@@ -20,6 +20,10 @@ def procrustes(source, target):
         Source dataset.
     target : 2D ndarray, shape = (n_samples, n_feat)
         Target dataset.
+    center : bool, optional
+        Center data before alignment. Default is False.
+    scale : bool, optional
+        Remove scale before alignment. Default is False.
 
     Returns
     -------
@@ -28,26 +32,31 @@ def procrustes(source, target):
     """
 
     # Translate to origin
-    ms = source.mean(axis=0)
-    mt = target.mean(axis=0)
+    if center:
+        ms = source.mean(axis=0)
+        mt = target.mean(axis=0)
 
-    source = source - ms
-    target = target - mt
+        source = source - ms
+        target = target - mt
 
     # Remove scale
-    ns = np.linalg.norm(source)
-    nt = np.linalg.norm(target)
-    source /= ns
-    target /= nt
+    if scale:
+        ns = np.linalg.norm(source)
+        nt = np.linalg.norm(target)
+        source /= ns
+        target /= nt
 
     # orthogonal transformation: rotation + reflection
     u, w, vt = np.linalg.svd(target.T.dot(source).T)
     t = u.dot(vt)
 
     # Recover target scale
-    t *= w.sum() * nt
+    if scale:
+        t *= w.sum() * nt
 
-    aligned = source.dot(t) + mt
+    aligned = source.dot(t)
+    if center:
+        aligned += mt
     return aligned
 
 
@@ -58,7 +67,7 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
 
     Parameters
     ----------
-    data :  list of ndarrays, shape = (n_samples, n_feat)
+    data :  list of ndarray, shape = (n_samples, n_feat)
         List of datasets to align.
     reference : ndarray, shape = (n_samples, n_feat), optional
         Dataset to use as reference in the first iteration. If None, the first
@@ -102,9 +111,7 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
         new_reference = np.mean(aligned, axis=0)
 
         # Compute distance
-        reference -= new_reference
-        reference **= 2
-        new_dist = reference.sum()
+        new_dist = np.square(reference - new_reference).sum()
 
         # Update reference
         reference = new_reference
@@ -117,7 +124,7 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
 
         dist = new_dist
 
-    return aligned, reference if return_reference else aligned
+    return (aligned, reference) if return_reference else aligned
 
 
 class ProcrustesAlignment(BaseEstimator):

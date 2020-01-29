@@ -12,7 +12,7 @@ function [embedding,lambda] = diffusion_mapping(data, n_components, alpha, diffu
 %   diffusion_time) also returns the eigenvalues lambda. 
 %
 %   For complete documentation please consult our <a
-%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/diffusion_embedding.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/support_functions/diffusion_embedding.html">ReadTheDocs</a>.
 
 if exist('random_state','var')
     rng(random_state);

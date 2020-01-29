@@ -6,13 +6,11 @@ VTK read/write filters for Gifti (.surf.gii).
 # License: BSD 3 clause
 
 
-# from vtkmodules.vtkCommonDataModelPython import vtkPolyData
-# from vtkmodules.util.vtkAlgorithm import VTKPythonAlgorithmBase
 from vtk import vtkPolyData
 from vtk.util.vtkAlgorithm import VTKPythonAlgorithmBase
 
-from ...vtk_interface.decorators import wrap_input
-from ..mesh_creation import build_polydata
+from ..decorators import wrap_input
+from ...mesh.mesh_creation import build_polydata
 
 
 try:
@@ -37,7 +35,6 @@ def _read_gifti(ipth):
         if a1.intent not in [INTENT_POINTS, INTENT_CELLS]:
             # random array names
             s.append_array(a1.data, name=None, at='p')
-
     return s.VTKObject
 
 
@@ -50,7 +47,7 @@ def _write_gifti(pd, opth):
         raise ValueError('GIFTI writer only accepts triangles.')
 
     points = GiftiDataArray(data=pd.Points, intent=INTENT_POINTS)
-    cells = GiftiDataArray(data=pd.get_cells2D(), intent=INTENT_CELLS)
+    cells = GiftiDataArray(data=pd.GetCells2D(), intent=INTENT_CELLS)
     # if data is not None:
     #     data_array = GiftiDataArray(data=data, intent=INTENT_POINTDATA)
     #     gii = nb.gifti.GiftiImage(darrays=[points, cells, data_array])
@@ -73,7 +70,6 @@ class vtkGIFTIReader(VTKPythonAlgorithmBase):
         super().__init__(nInputPorts=0, nOutputPorts=1,
                          outputType='vtkPolyData')
         self.__FileName = ''
-        self.__is_ascii = False
 
     def RequestData(self, request, inInfo, outInfo):
         opt = vtkPolyData.GetData(outInfo, 0)
@@ -103,7 +99,6 @@ class vtkGIFTIWriter(VTKPythonAlgorithmBase):
             raise AssertionError('vtkGIFTIWriter requires nibabel.')
         super().__init__(nInputPorts=1, inputType='vtkPolyData', nOutputPorts=0)
         self.__FileName = ''
-        self.__is_ascii = False
 
     def RequestData(self, request, inInfo, outInfo):
         _write_gifti(vtkPolyData.GetData(inInfo[0], 0), self.__FileName)

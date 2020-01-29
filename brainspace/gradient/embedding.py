@@ -13,13 +13,17 @@ import numpy as np
 from scipy import sparse as ssp
 from scipy.sparse.linalg import eigsh
 from scipy.sparse.csgraph import laplacian
+from scipy.sparse.csgraph import connected_components
 
 from sklearn.utils import check_random_state
-from sklearn.manifold.spectral_embedding_ import _graph_is_connected
 from sklearn.base import BaseEstimator
 from sklearn.decomposition import PCA
 
 from .utils import is_symmetric, make_symmetric
+
+
+def _graph_is_connected(graph):
+    return connected_components(graph)[0] == 1
 
 
 def diffusion_mapping(adj, n_components=10, alpha=0.5, diffusion_time=0,

@@ -7,16 +7,22 @@ Basic functions on surface meshes.
 
 
 import warnings
+from itertools import combinations
+
+from scipy.spatial.distance import cdist
+from scipy.sparse import csgraph as csg
 import numpy as np
 
 from vtk import (vtkDataObject, vtkThreshold, vtkGeometryFilter,
                  vtkAppendPolyData)
 
+from .mesh_creation import build_polydata
+from .mesh_elements import get_immediate_adjacency
 from .array_operations import get_connected_components
 from ..vtk_interface import wrap_vtk, serial_connect, get_output
 from ..vtk_interface.pipeline import connect
 from ..vtk_interface.decorators import wrap_input
-
+from ..utils.parcellation import relabel_consecutive
 
 ASSOC_CELLS = vtkDataObject.FIELD_ASSOCIATION_CELLS
 ASSOC_POINTS = vtkDataObject.FIELD_ASSOCIATION_POINTS
@@ -390,3 +396,79 @@ def split_surface(surf, labeling=None):
 
     ulab = np.unique(labeling)
     return {l: mask_points(surf, labeling == l) for l in ulab}
+
+
+@wrap_input(0)
+def downsample_with_parcellation(surf, labeling, name='parcel',
+                                 check_connected=True):
+    """ Downsample surface according to the labeling.
+
+    Such that, each parcel centroid is used as a point in the new donwsampled
+    surface. Connectivity is based on neighboring parcels.
+
+    Parameters
+    ----------
+    surf : vtkPolyData or BSPolyData
+        Input surface.
+    labeling : str or 1D ndarray
+        Array of labels used to perform the downsampling. If str, it must be an
+        array in the PointData attributes of `surf`.
+    name : str, optional
+        Name of the downsampled parcellation appended to the PointData of the
+        new surface. Default is 'parcel'.
+    check_connected : bool, optional
+        Whether to check if the points in each parcel are connected.
+        Downsampling may produce inconsistent results if some parcels have more
+        than one connected component. Default is True.
+
+    Returns
+    -------
+    res : BSPolyData
+        Downsampled surface.
+
+    """
+
+    if isinstance(labeling, str):
+        labeling = surf.get_array(labeling, at='p')
+
+    labeling_small = np.unique(labeling)
+    nlabs = labeling_small.size
+
+    labeling_con = relabel_consecutive(labeling)
+
+    adj = get_immediate_adjacency(surf)
+    adj_neigh = adj.multiply(labeling_con).tocsr()
+
+    adj_small = np.zeros((nlabs, nlabs), dtype=np.bool)
+    for i in range(nlabs):
+        arow = adj_neigh[labeling_con == i]
+        for j in range(i + 1, nlabs):
+            adj_small[j, i] = adj_small[i, j] = np.any(arow.data == j)
+
+    points = np.empty((nlabs, 3))
+    cells = []
+    for i in range(nlabs):
+        m = labeling_con == i
+
+        if check_connected and csg.connected_components(adj[m][:, m])[0] > 1:
+            warnings.warn("Parcel %d is not fully connected. Downsampling may "
+                          "produce inconsistent results." % labeling_small[i])
+
+        neigh = np.unique(adj_neigh[m].data)
+        neigh = neigh[neigh != i]
+        if neigh.size < 2:
+            continue
+
+        edges = np.array(list(combinations(neigh, 2)))
+        edges = edges[adj_small[edges[:, 0], edges[:, 1]]]
+        c = np.hstack([np.full(edges.shape[0], i)[:, None], edges])
+        cells.append(c)
+
+        p = surf.Points[m]
+        d = cdist(p, p.mean(0, keepdims=True))[:, 0]
+        points[i] = p[np.argmin(d)]
+
+    cells = np.unique(np.sort(np.vstack(cells), axis=1), axis=0)
+    surf_small = build_polydata(points, cells=cells)
+    surf_small.append_array(labeling_small, name=name, at='p')
+    return surf_small

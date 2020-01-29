@@ -37,6 +37,38 @@ def load_group_fc(parcellation, scale=400, group='main'):
     return np.loadtxt(ipth, dtype=np.float, delimiter=',')
 
 
+def load_group_mpc(parcellation, scale=400):
+    """ Load group level connectivity matrix for a given parcellation.
+
+    Connectivity is derived from a subset of HCP data.
+
+    Parameters
+    ----------
+    parcellation : {'schaefer', 'vosdewael'}
+        Parcellation name, either 'schaefer' for Schaefer (functional)
+        parcellations or 'vosdewael' for a subparcellation of aparc.
+    scale : {100, 200, 300, 400}, optional
+        Number of parcels. Default is 400.
+
+    Returns
+    -------
+    conn : 2D ndarray, shape = (scale, scale)
+        Connectivity matrix.
+    """
+
+    if parcellation != 'vosdewael':
+        raise ValueError("Only 'vosdewael' parcellation is accepted at the "
+                         "moment.")
+
+    if scale != 200:
+        raise ValueError("Only a scale of 200 is accepted at the moment.")
+
+    root_pth = os.path.dirname(__file__)
+    fname = '{0}_{1}_mpc_matrix.csv'.format(parcellation, scale)
+    ipth = os.path.join(root_pth, 'matrices/fusion_tutorial', fname)
+    return np.loadtxt(ipth, dtype=np.float, delimiter=',')
+
+
 def load_parcellation(name, scale=400, join=False):
     """ Load parcellation for conte69.
 

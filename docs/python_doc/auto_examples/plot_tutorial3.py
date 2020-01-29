@@ -31,9 +31,6 @@ randomization.
 # cortical thickness data, and a template functional gradient.
 
 
-import warnings
-warnings.simplefilter('ignore')
-
 import numpy as np
 from brainspace.datasets import load_gradient, load_marker, load_conte69
 

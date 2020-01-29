@@ -14,7 +14,7 @@ Usage
 ----------
 ::
 
-	aligned = procrustes_alignment(gradients,varargin)
+    aligned = procrustes_alignment(gradients,varargin)
 
 - *gradients*: cell array of gradients
 - *varargin*: Name-value pairs (see below).

@@ -11,8 +11,6 @@ organization of the gradients looks like.
 # We’ll first start by loading some sample data. Note that we’re using
 # parcellated data for computational efficiency.
 
-import warnings
-warnings.simplefilter('ignore')
 
 from brainspace.datasets import load_group_fc, load_parcellation, load_conte69
 

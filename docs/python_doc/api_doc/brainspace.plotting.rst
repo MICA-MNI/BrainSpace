@@ -20,7 +20,7 @@ Plotting of brain surfaces
 
    plot_hemispheres
    plot_surf
-
+   build_plotter
 
 .. _pymod-plotting-generic:
 
@@ -32,6 +32,5 @@ Generic plotting
 .. autosummary::
    :toctree: ../../generated/
 
-   BasePlotter
    Plotter
    GridPlotter

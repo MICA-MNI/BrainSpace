@@ -30,7 +30,7 @@ classdef GradientMaps
 %
 % For complete documentation, including descriptions of this object's
 % properties and methods please consult our <a
-% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
 %
 % See also: GRADIENTMAPS.FIT
     
@@ -182,6 +182,11 @@ classdef GradientMaps
                 return
             end
             
+            % Check zero vectors in input data.
+            if any(all(data==0))
+                error('Input data contains a zero vector. Gradients cannot be computed for these vectors.')
+            end
+            
             % Sparsify input data. 
             disp(['Running with sparsity parameter: ' num2str(p.Results.sparsity)]);
             sparse_data = data;
@@ -209,7 +214,7 @@ classdef GradientMaps
                 otherwise
                     error('Unknown kernel method');
             end
-            
+                        
             % Check for negative numbers.
             if any(kernel_data(:) < 0)
                 disp('Found negative numbers in the kernel matrix. These will be set to zero.');

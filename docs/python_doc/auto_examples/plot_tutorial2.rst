@@ -15,15 +15,14 @@ customization of gradient computation with different kernels and dimensionality
 reductions, as well as aligning gradients from different datasets. This
 tutorial will only show you how to apply these techniques.
 
+Customizing gradient computation
++++++++++++++++++++++++++++++++++
 As before, we’ll start by loading the sample data.
 
 
 .. code-block:: default
 
 
-
-    import warnings
-    warnings.simplefilter('ignore')
 
     from brainspace.datasets import load_group_fc, load_parcellation, load_conte69
 
@@ -35,6 +34,7 @@ As before, we’ll start by loading the sample data.
 
     # and load the conte69 hemisphere surfaces
     surf_lh, surf_rh = load_conte69()
+
 
 
 
@@ -79,6 +79,16 @@ reduction techniques. Let’s have a look at three different kernels.
     :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+    /media/oualid/hd500/oualid/BrainSpace/brainspace/gradient/kernels.py:79: UserWarning: The affinity matrix contains negative values and will be zeroed-out.
+      warnings.warn('The affinity matrix contains negative values and will '
+
+
 
 
 It seems the gradients provided by these kernels are quite similar although
@@ -118,6 +128,10 @@ reduction techniques.
 
 
 
+
+Gradient alignment
++++++++++++++++++++
+
 A more principled way of increasing comparability across gradients are
 alignment techniques. BrainSpace provides two alignment techniques:
 Procrustes analysis, and joint alignment. For this example we will load
@@ -139,6 +153,16 @@ first group.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    GradientMaps(alignment='joint', approach='dm', kernel='normalized_angle',
+                 n_components=10, random_state=None)
 
 
 
@@ -171,6 +195,7 @@ organized.
 
 
 
+
 .. code-block:: default
 
 
@@ -195,6 +220,7 @@ organized.
 
 
 
+
 .. code-block:: default
 
 
@@ -214,6 +240,7 @@ organized.
 
 .. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial2_005.png
     :class: sphx-glr-single-img
+
 
 
 
@@ -247,10 +274,138 @@ reference.
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    GradientMaps(alignment='procrustes', approach='le', kernel='normalized_angle',
+                 n_components=10, random_state=None)
+
 
 
 The gradients in `galign.aligned_` are now aligned to the reference
 gradients.
+
+Gradient fusion
++++++++++++++++++++
+We can also fuse data across multiple modalities and build mutli-modal
+gradients. In this case we only look at one set of output gradients,
+rather than one per modality.
+
+First, let's load the example data of microstructural profile covariance
+(Paquola et al., 2019) and functional connectivity.
+
+
+.. code-block:: default
+
+
+    from brainspace.datasets import load_group_mpc
+
+    # First load mean connectivity matrix and parcellation
+    fc = load_group_fc('vosdewael', scale=200)
+    mpc = load_group_mpc('vosdewael', scale=200)
+
+    labeling = load_parcellation('vosdewael', scale=200, join=True)
+    mask = labeling != 0
+
+    seeds = [None] * 2
+    seeds[0] = map_to_labels(fc[0], labeling, mask=mask, fill=np.nan)
+    seeds[1] = map_to_labels(mpc[0], labeling, mask=mask, fill=np.nan)
+
+    # visualise the features from a seed region (seed 0)
+    plot_hemispheres(surf_lh, surf_rh, array_name=seeds, label_text=['FC', 'MPC'],
+                     size=(1200, 500), color_bar=True, cmap='viridis')
+
+
+
+
+
+.. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial2_006.png
+    :class: sphx-glr-single-img
+
+
+
+
+
+In order to fuse the matrices, we simply pass the matrices to the fusion
+command which will rescale and horizontally concatenate the matrices.
+
+
+.. code-block:: default
+
+
+    # Negative numbers are not allowed in fusion.
+    fc[fc < 0] = 0
+
+
+    def fusion(*args):
+        from scipy.stats import rankdata
+        from sklearn.preprocessing import minmax_scale
+
+        max_rk = [None] * len(args)
+        masks = [None] * len(args)
+        for j, a in enumerate(args):
+            m = masks[j] = a != 0
+            a[m] = rankdata(a[m])
+            max_rk[j] = a[m].max()
+
+        max_rk = min(max_rk)
+        for j, a in enumerate(args):
+            m = masks[j]
+            a[m] = minmax_scale(a[m], feature_range=(1, max_rk))
+
+        return np.hstack(args)
+
+
+    # fuse the matrices
+    fused_matrix = fusion(fc, mpc)
+
+
+
+
+
+
+
+
+We then use this output in the fit function. This will convert the long
+horizontal array into a square affinity matrix, and then perform embedding.
+
+
+.. code-block:: default
+
+
+    gm = GradientMaps(n_components=2, kernel='normalized_angle')
+    gm.fit(fused_matrix)
+
+
+    gradients_fused = [None] * 2
+    for i in range(2):
+        gradients_fused[i] = map_to_labels(gm.gradients_[:, i], labeling, mask=mask,
+                                           fill=np.nan)
+
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_fused,
+                     label_text=['Gradient 1', 'Gradient 2'], size=(1200, 500),
+                     color_bar=True, cmap='viridis')
+
+
+
+
+
+.. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial2_007.png
+    :class: sphx-glr-single-img
+
+
+
+
+
+.. note::
+  The mpc matrix presented here matches the subject cohort of
+  (Paquola et al., 2019). Other matrices in this package match the subject
+  groups used by (Vos de Wael et al., 2018). We make direct comparisons in
+  our tutorial for didactic purposes only.
 
 That concludes the second tutorial. In the third tutorial we will consider
 null hypothesis testing of comparisons between gradients and other markers.
@@ -258,7 +413,7 @@ null hypothesis testing of comparisons between gradients and other markers.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.399 seconds)
+   **Total running time of the script:** ( 0 minutes  3.095 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial2.py:

@@ -78,6 +78,22 @@ napoleon_use_param = True
 napoleon_use_ivar = True
 napoleon_use_rtype = False
 
+napoleon_include_private_with_doc = False
+# napoleon_include_special_with_doc = False
+
+autodoc_default_options = {
+    'members': True,
+    'member_order': 'bysource',
+    'inherited-members': True,
+    'no-special-members': True,
+    'exclude-members': 'get_params,set_params',
+    'undoc-members': True,
+}
+
+autoclass_content = 'class'
+# autodoc_default_flags = ['members']
+
+
 add_function_parentheses = False
 
 autosummary_generate = True
