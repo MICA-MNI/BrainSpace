@@ -104,6 +104,8 @@ Operations on meshes
    mask_points
    select_points
 
+    downsample_with_parcellation
+
 
 .. _pysec-mesh-array_operations:
 
