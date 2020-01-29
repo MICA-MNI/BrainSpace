@@ -16,11 +16,32 @@ Tutorials
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Preprocessing ------------- Begin with an MRI dataset that is organized in `BIDS &lt;https://bids....">
+
+.. only:: html
+
+ .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial0_thumb.png
+
+     :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial0.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /python_doc/auto_examples/plot_tutorial0
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 1: Building your first gradient">
 
 .. only:: html
 
  .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial1_thumb.png
+
 
      :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial1.py`
 
