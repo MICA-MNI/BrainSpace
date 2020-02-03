@@ -6,10 +6,11 @@ to prepare it for subsequent gradient analysis in the next tutorials.
 
 Requirements
 ------------
-For this tutorial, you will need to install the Python packages: `nilearn <https://nilearn.github.io>`_ and `load_confounds <https://github.com/SIMEXP/fmriprep_load_confounds>`_.  
+For this tutorial, you will need to install the Python packages: `nibabel <https://nipy.org/nibabel/>`_, `nilearn <https://nilearn.github.io>`_ and `load_confounds <https://github.com/SIMEXP/fmriprep_load_confounds>`_.
+  
+All these packages can be installed using ``pip``::  
 
-Both can be installed using `pip`::  
-
+    pip install nibabel
     pip install nilearn  
     pip install load_confounds  
 
