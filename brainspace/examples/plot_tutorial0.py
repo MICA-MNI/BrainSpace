@@ -38,33 +38,62 @@ using docker from the command line::
 """
 
 ###############################################################################
+# Import the dataset as timeseries
+# ++++++++++++++++++++++++
+# The timeseries should be a numpy array with the dimensions: nodes x timepoints  
+# 
+# Following is an example for reading in data::  
+# 
+#    import nibabel as nib
+#    import numpy as np
+#     
+#    filename = 'filename.{}.mgz' # where {} will be replaced with 'lh' and 'rh'
+#    timeseries = [None] * 2
+#    for i, h in enumerate(['lh', 'rh']):
+#        timeseries[i] = nib.load(filename.format(h)).get_fdata().squeeze()
+#    timeseries = np.vstack(timeseries)
+
+
+###############################################################################
+# As a **working example**, simply fetch timeseries:
+from brainspace.datasets import fetch_timeseries_preprocessing
+timeseries = fetch_timeseries_preprocessing()
+
+
+###############################################################################
 # Confound regression
 # ++++++++++++++++++++++++
 # To remove confound regressors from the output of the fmriprep pipeline, first
 # extract the confound columns. For example::
 #
-#    from brainspace.utils.confound_loader import load_confounds
+#    import load_confounds
 #    confounds_out = load_confounds("path to confound file",
 #                               strategy='minimal',
 #                               n_components=0.95,
 #                               motion_model='6params')
 
-###############################################################################
-# Otherwise, simply read in:
-from brainspace.datasets import load_confounds_preprocessing
 
+###############################################################################
+# As a **working example**, simply read in confounds
+from brainspace.datasets import load_confounds_preprocessing
 confounds_out = load_confounds_preprocessing()
 
 
 ###############################################################################
-# Then regress these confounds from the preprocessed data using `nilearn
-# <https://nilearn.github.io/auto_examples/03_connectivity/
-# plot_signal_extraction.html#extract-signals-on-a-parcellation-
-# defined-by-labels/>`_
+# Do the confound regression
+
+from nilearn import signal
+clean_ts = signal.clean(timeseries.T, confounds=confounds_out).T
+
+
+###############################################################################
+# And extract the cleaned timeseries onto a set of labels
 
 import numpy as np
 from nilearn import datasets
+from brainspace.utils.parcellation import reduce_by_labels
 
+# Fetch surface atlas
 atlas = datasets.fetch_atlas_surf_destrieux()
 
 # Remove non-cortex regions
@@ -82,28 +111,14 @@ mask = ~np.isin(labeling, masked_labels)
 lab_lh = atlas['map_left']
 labeling[lab_lh.size:] += lab_lh.max() + 1
 
-
-###############################################################################
-# Do the confound regression
-
-from brainspace.datasets import fetch_timeseries_preprocessing
-from brainspace.utils.parcellation import reduce_by_labels
-from nilearn import signal
-
-# Fetch timeseries
-timeseries = fetch_timeseries_preprocessing()
-
-# Remove confounds
-clean_ts = [None] * 2
-for i, ts in enumerate(timeseries):
-    clean_ts[i] = signal.clean(ts.T, confounds=confounds_out).T
-
-seed_ts = np.vstack(clean_ts)
-seed_ts = reduce_by_labels(seed_ts[mask], labeling[mask], axis=1, red_op='mean')
+# extract mean timeseries for each label
+seed_ts = reduce_by_labels(clean_ts[mask], labeling[mask], axis=1, red_op='mean')
 
 
 ###############################################################################
-# Calculate the functional connectivity matrix using
+# Calculate functional connectivity matrix
+# ++++++++++++++++++++++++ 
+# The following example uses
 # `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_
 # signal_extraction.html#compute-and-display-a-correlation-matrix/>`_:
 
