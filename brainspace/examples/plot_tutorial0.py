@@ -4,6 +4,15 @@ Tutorial 0: Preparing your data for gradient analysis
 In this example, we will introduce how to preprocess raw MRI data and how
 to prepare it for subsequent gradient analysis in the next tutorials.
 
+Requirements
+------------
+For this tutorial, you will need to install the Python packages: `nilearn <https://nilearn.github.io>`_ and `load_confounds <https://github.com/SIMEXP/fmriprep_load_confounds>`_.  
+
+Both can be installed using `pip`::  
+
+    pip install nilearn  
+    pip install load_confounds  
+
 Preprocessing
 -------------
 Begin with an MRI dataset that is organized in `BIDS
