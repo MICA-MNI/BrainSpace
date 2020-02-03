@@ -230,7 +230,7 @@ def fetch_timeseries_preprocessing():
 
     Returns
     -------
-    timeseries : list
+    timeseries : 2D ndarray, shape = (nodes (lh, rh), timepoints)
         Timeseries for left and right hemispheres.
 
     """
@@ -244,6 +244,7 @@ def fetch_timeseries_preprocessing():
     ts = [None] * 2
     for i, h in enumerate(['lh', 'rh']):
         ts[i] = nib.load(ipth.format(h)).get_fdata().squeeze()
+    ts = np.vstack(ts)
     return ts
 
 
@@ -315,4 +316,3 @@ def load_gradient(name, idx=0, join=False):
     if join:
         return x
     return x[:x.size//2], x[x.size//2:]
-
