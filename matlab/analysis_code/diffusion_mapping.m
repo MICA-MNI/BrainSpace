@@ -1,6 +1,6 @@
 function [embedding,lambda] = diffusion_mapping(data, n_components, alpha, diffusion_time, random_state)
-% DIFFUSION_EMBEDDING   Diffusion embbedding decomposition of input matrix.
-%   embedding = DIFFUSION_EMBEDDING(data,n_components,alpha,diffusion_time)
+% DIFFUSION_MAPPING   Diffusion embbedding decomposition of input matrix.
+%   embedding = DIFFUSION_MAPPING(data,n_components,alpha,diffusion_time)
 %   computes the first n_components diffusion components of matrix data
 %   using parameters alpha and diffusion_time. Variable data must be an
 %   n-by-n symmetric matrix containing only real non-negative values,
@@ -8,7 +8,7 @@ function [embedding,lambda] = diffusion_mapping(data, n_components, alpha, diffu
 %   diffusion_time is a positive scalar. diffusion_time may also be set to
 %   0 for automatic diffusion time estimation.
 %
-%   [embedding,lambda] = DIFFUSION_EMBEDDING(data,n_components,alpha, ...
+%   [embedding,lambda] = DIFFUSION_MAPPING(data,n_components,alpha, ...
 %   diffusion_time) also returns the eigenvalues lambda. 
 %
 %   For complete documentation please consult our <a
