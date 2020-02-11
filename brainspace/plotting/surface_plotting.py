@@ -11,14 +11,11 @@ from itertools import product as iter_prod
 import matplotlib.pyplot as plt
 import numpy as np
 
-import vtk
-
 from .base import Plotter
 from .colormaps import colormaps
 from . import defaults_plotting as dp
 from .utils import _broadcast, _expand_arg, _grep_args, _gen_grid, _get_ranges
 
-from ..vtk_interface import wrap_vtk
 from ..vtk_interface.decorators import wrap_input
 
 
@@ -264,7 +261,8 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
             ren.AddActor(**actor, mapper=mapper)
 
         ren.ResetCamera()
-        ren.GetActiveCamera().Zoom(zoom[i, j])
+        ren.activeCamera.parallelProjection = True
+        ren.activeCamera.Zoom(zoom[i, j])
 
     # Plot renderers for color bar, text
     for e in entries:
@@ -495,7 +493,6 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     if isinstance(cmap, list):
         cmap = np.asarray(cmap)[:, None]
 
-    zoom = [1.22, 1.16, 1.16, 1.22]
     return plot_surf(surfs, layout, array_name=array_name, view=view,
                      color_bar=color_bar, color_range=color_range, share='r',
                      label_text=label_text, cmap=cmap, nan_color=nan_color,
