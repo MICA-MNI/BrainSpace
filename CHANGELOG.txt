@@ -18,7 +18,7 @@ MATLAB:
     - Improved several warning/error messages.
     - All MATLAB ReadTheDocs hyperlinks now refer to the stable version of 
       ReadTheDocs, rather than the latest. 
-
+    - Moved execution of custom kernels to after the sparsification.
 Python:
 - gradient:
     - Fix bug in alignment (remove centering and scaling)
