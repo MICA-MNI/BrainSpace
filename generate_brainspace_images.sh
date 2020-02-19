@@ -52,7 +52,7 @@ generate_docker() {
             --run-bash 'apt-get update' \
             --install git libsm6 libxext6 libgl1-mesa-dev libvtk6.3 xvfb\
             --user=root \
-            --run-bash "curl https://raw.githubusercontent.com/PeerHerholz/BrainSpace/master/requirements.txt > requirements.txt && chmod 777 requirements.txt"\
+            --run-bash "curl https://raw.githubusercontent.com/PeerHerholz/BrainSpace/initial_draft_virtualization/requirements.txt > requirements.txt && chmod 777 requirements.txt"\
             --user=brainspace \
             --miniconda \
                conda_install="python=3.7 panel pyqt pyvista notebook ipython" \
@@ -73,7 +73,7 @@ generate_singularity() {
               --run-bash 'apt-get update' \
               --install  git libsm6 libxext6 libgl1-mesa-dev libvtk6.3 xvfb\
               --user=root \
-              --run-bash "curl https://raw.githubusercontent.com/PeerHerholz/BrainSpace/master/requirements.txt > requirements.txt && chmod 777 requirements.txt"\
+              --run-bash "curl https://raw.githubusercontent.com/PeerHerholz/BrainSpace/initial_draft_virtualization/requirements.txt > requirements.txt && chmod 777 requirements.txt"\
               --user=brainspace \
               --miniconda \
                  conda_install="python=3.7 panel pyqt pyvista notebook ipython" \
