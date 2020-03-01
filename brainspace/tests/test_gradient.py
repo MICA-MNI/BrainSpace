@@ -17,9 +17,8 @@ def test_kernels():
     x = rs.randn(10, 15)
     a = np.corrcoef(x)
 
-    with pytest.warns(UserWarning):
-        a2 = compute_affinity(a, sparsity=None)
-
+    # with pytest.warns(UserWarning):
+    a2 = compute_affinity(a, sparsity=None)
     assert np.count_nonzero(a2 < 0) == 0
 
     a2 = compute_affinity(a, sparsity=.7)
