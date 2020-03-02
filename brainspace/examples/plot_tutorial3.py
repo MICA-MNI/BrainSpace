@@ -52,8 +52,6 @@ embedding = load_gradient('fc', idx=0, join=True)
 ###############################################################################
 # Let’s first generate some null data using spintest.
 
-import numpy as np
-
 from brainspace.null_models import SpinPermutations
 from brainspace.plotting import plot_hemispheres
 
@@ -107,15 +105,15 @@ rotated = {'t1wt2w': t1wt2w_rotated, 'thickness': thickness_rotated}
 r_spin = np.empty(n_permutations)
 mask = ~np.isnan(thickness)
 for fn, feat in feats.items():
-    r_orig, pv_orig = spearmanr(feat[mask], embedding[mask])
+    r_obs, pv_obs = spearmanr(feat[mask], embedding[mask])
 
     for i, perm in enumerate(rotated[fn]):
-        mask_rot = mask & ~np.isnan(perm)  # Remove non-cortex
+        mask_rot = mask & ~np.isnan(perm)  # Remove midline
         r_spin[i] = spearmanr(perm[mask_rot], embedding[mask_rot])[0]
-    pv_spin = np.mean(np.abs(r_spin) > np.abs(r_orig))
+    pv_spin = np.mean(np.abs(r_spin) > np.abs(r_obs))
 
     print('{0}:\n Obs : {1:.5e}\n Spin: {2:.5e}\n'.
-          format(fn.capitalize(), pv_orig, pv_spin))
+          format(fn.capitalize(), pv_obs, pv_spin))
 
 ###############################################################################
 # It is interesting to see that both p-values increase when taking into
