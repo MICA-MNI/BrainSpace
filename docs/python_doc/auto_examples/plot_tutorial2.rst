@@ -68,8 +68,8 @@ reduction techniques. Let’s have a look at three different kernels.
 
 
     label_text = ['Pearson', 'Spearman', 'Normalized\nAngle']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_kernel, size=(1200, 800),
-                     cmap='viridis_r', color_bar=True, label_text=label_text)
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_kernel, size=(1200, 600),
+                     cmap='viridis_r', color_bar=True, label_text=label_text, zoom=1.45)
 
 
 
@@ -78,15 +78,6 @@ reduction techniques. Let’s have a look at three different kernels.
 .. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial2_001.png
     :class: sphx-glr-single-img
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /media/oualid/hd500/oualid/BrainSpace/brainspace/gradient/kernels.py:79: UserWarning: The affinity matrix contains negative values and will be zeroed-out.
-      warnings.warn('The affinity matrix contains negative values and will '
 
 
 
@@ -115,8 +106,8 @@ reduction techniques.
 
     # sphinx_gallery_thumbnail_number = 2
     label_text = ['PCA', 'LE', 'DM']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_embedding, size=(1200, 800),
-                     cmap='viridis_r', color_bar=True, label_text=label_text)
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_embedding, size=(1200, 600),
+                     cmap='viridis_r', color_bar=True, label_text=label_text, zoom=1.45)
 
 
 
@@ -180,9 +171,9 @@ organized.
         gradients_unaligned[i] = map_to_labels(gp.gradients_[i][:, 0], labeling,
                                                mask=mask, fill=np.nan)
 
-    label_text = ['Unaligned Group 1', 'Unaligned Group 2']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_unaligned, size=(1200, 500),
-                     cmap='viridis_r', color_bar=True, label_text=label_text)
+    label_text = ['Unaligned\nGroup 1', 'Unaligned\nGroup 2']
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_unaligned, size=(1200, 400),
+                     cmap='viridis_r', color_bar=True, label_text=label_text, zoom=1.5)
 
 
 
@@ -205,9 +196,9 @@ organized.
         gradients_procrustes[i] = map_to_labels(gp.aligned_[i][:, 0], labeling, mask=mask,
                                                 fill=np.nan)
 
-    label_text = ['Procrustes Group 1', 'Procrustes Group 2']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_procrustes, size=(1200, 500),
-                     cmap='viridis_r', color_bar=True, label_text=label_text)
+    label_text = ['Procrustes\nGroup 1', 'Procrustes\nGroup 2']
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_procrustes, size=(1200, 400),
+                     cmap='viridis_r', color_bar=True, label_text=label_text, zoom=1.5)
 
 
 
@@ -230,9 +221,9 @@ organized.
         gradients_joint[i] = map_to_labels(gj.aligned_[i][:, 0], labeling, mask=mask,
                                            fill=np.nan)
 
-    label_text = ['Joint Group 1', 'Joint Group 2']
-    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_joint, size=(1200, 500),
-                     cmap='viridis_r', color_bar=True, label_text=label_text)
+    label_text = ['Joint\nGroup 1', 'Joint\nGroup 2']
+    plot_hemispheres(surf_lh, surf_rh, array_name=gradients_joint, size=(1200, 400),
+                     cmap='viridis_r', color_bar=True, label_text=label_text, zoom=1.5)
 
 
 
@@ -296,7 +287,8 @@ gradients. In this case we only look at one set of output gradients,
 rather than one per modality.
 
 First, let's load the example data of microstructural profile covariance
-(Paquola et al., 2019) and functional connectivity.
+`(Paquola et al., 2019) <https://journals.plos.org/plosbiology/article?
+id=10.1371/journal.pbio.3000284>`_ and functional connectivity.
 
 
 .. code-block:: default
@@ -317,7 +309,7 @@ First, let's load the example data of microstructural profile covariance
 
     # visualise the features from a seed region (seed 0)
     plot_hemispheres(surf_lh, surf_rh, array_name=seeds, label_text=['FC', 'MPC'],
-                     size=(1200, 500), color_bar=True, cmap='viridis')
+                     size=(1200, 400), color_bar=True, cmap='viridis', zoom=1.45)
 
 
 
@@ -387,8 +379,8 @@ horizontal array into a square affinity matrix, and then perform embedding.
                                            fill=np.nan)
 
     plot_hemispheres(surf_lh, surf_rh, array_name=gradients_fused,
-                     label_text=['Gradient 1', 'Gradient 2'], size=(1200, 500),
-                     color_bar=True, cmap='viridis')
+                     label_text=['Gradient 1', 'Gradient 2'], size=(1200, 400),
+                     color_bar=True, cmap='viridis', zoom=1.45)
 
 
 
@@ -402,10 +394,12 @@ horizontal array into a square affinity matrix, and then perform embedding.
 
 
 .. note::
-  The mpc matrix presented here matches the subject cohort of
-  (Paquola et al., 2019). Other matrices in this package match the subject
-  groups used by (Vos de Wael et al., 2018). We make direct comparisons in
-  our tutorial for didactic purposes only.
+  The mpc matrix presented here matches the subject cohort of `(Paquola et
+  al., 2019) <https://journals.plos.org/plosbiology/article?id=10.1371/
+  journal.pbio.3000284>`_. Other matrices in this package match the subject
+  groups used by `(Vos de Wael et al., 2018) <https://www.pnas.org/content/
+  115/40/10154.short>`_. We make direct comparisons in our tutorial for
+  didactic purposes only.
 
 That concludes the second tutorial. In the third tutorial we will consider
 null hypothesis testing of comparisons between gradients and other markers.
@@ -413,7 +407,7 @@ null hypothesis testing of comparisons between gradients and other markers.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.095 seconds)
+   **Total running time of the script:** ( 0 minutes  8.340 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial2.py:
