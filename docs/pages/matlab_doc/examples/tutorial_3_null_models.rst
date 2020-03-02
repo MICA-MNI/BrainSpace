@@ -228,11 +228,7 @@ correlation. Alternatively, one could also test the one-tailed hypothesis
 whether the percentile rank is lower or higher than the 5th/95th percentile,
 respectively.
 
-In exception cases, MSR can produce random distributions wherein correlations
-between the real and random data follow a trimodal distribution `(Burt et al.,
-2020) <https://www.biorxiv.org/content/10.1101/2020.02.18.955054v1>`_. Whilst
-the source of this is still unknown, it is relatively simple to check whether
-this occurs in our data by visualizing the histograms. 
+There are some scenarios where MSR results do not follow a normal distribution. It is relatively simple to check whether this occurs in our data by visualizing the null distributions. Check this interesting paper for more information `(Burt et al.,2020) <https://www.biorxiv.org/content/10.1101/2020.02.18.955054v1>`_.
 
 .. code-block:: matlab
 
