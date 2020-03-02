@@ -9,7 +9,7 @@ Misc wrappers for some VTK classes.
 from vtk.util.vtkConstants import VTK_ID_TYPE
 
 from .base import BSVTKObjectWrapper
-from ..decorators import unwrap_input
+from ..decorators import unwrap_input, wrap_output
 
 
 class BSCollection(BSVTKObjectWrapper):
@@ -19,17 +19,18 @@ class BSCollection(BSVTKObjectWrapper):
 
     @property
     def n_items(self):
-        return self.VTKObjet.GetNumberOfItems()
+        return self.VTKObject.GetNumberOfItems()
 
+    @wrap_output
     def __getitem__(self, i):
         if i < 0:
             i += self.n_items
-        return self.VTKObjet.GetItemAsObject(i)
+        return self.VTKObject.GetItemAsObject(i)
 
     def __setitem__(self, i, obj):
         if i < 0:
             i += self.n_items
-        self.VTKObjet.ReplaceItem(i, obj)
+        self.VTKObject.ReplaceItem(i, obj)
 
 
 class BSPropCollection(BSCollection):
