@@ -19,29 +19,54 @@ from .utils import _broadcast, _expand_arg, _grep_args, _gen_grid, _get_ranges
 from ..vtk_interface.decorators import wrap_input
 
 
-orientations = {'lateral': (0, -90, -90),
-                'medial': (0, 90, 90),
+orientations = {'medial': (0, -90, -90),
+                'lateral': (0, 90, 90),
                 'ventral': (0, 180, 0),
                 'dorsal': (0, 0, 0)}
 
 
-def _add_colorbar(ren, lut, location):
+def _add_colorbar(ren, lut, location, **cb_kwds):
 
-    orientation = 'horizontal'
-    if location in ['left', 'right']:
-        orientation = 'vertical'
+    kwds = dp.scalarBarActor_kwds.copy()
+    kwds = {k.lower(): v for k, v in kwds.items()}
 
-    text_pos = 'succeedScalarBar'
-    if location in ['left', 'bottom']:
-        text_pos = 'precedeScalarBar'
+    orientation = 'vertical'
+    if location in {'top', 'bottom'}:
+        orientation = 'horizontal'
+        kwds['width'], kwds['height'] = kwds['height'], kwds['width']
 
-    kwbs = dp.scalarBarActor_kwds.copy()
-    kwbs.update({'lookuptable': lut, 'orientation': orientation,
+    if lut.GetIndexedLookup():
+        if location == 'left':
+            kwds['position'] = (.32, 0.25)
+        elif location == 'right':
+            kwds['position'] = (-.32, 0.25)
+        elif location == 'bottom':
+            kwds['position'] = (0.25, 0.73)
+        else:
+            kwds['position'] = (0.25, -.43)
+    elif location in {'top', 'bottom'}:
+        kwds['position'] = kwds['position'][::-1]
+
+    text_pos = 'precedeScalarBar'
+    if lut.GetIndexedLookup():
+        if location in {'left', 'bottom'}:
+            text_pos = 'succeedScalarBar'
+    elif location in {'right', 'top'}:
+        text_pos = 'succeedScalarBar'
+
+    for k, v in cb_kwds.items():
+        if isinstance(kwds.get(k, None), dict):
+            kwds[k].update(v)
+        else:
+            kwds[k] = v
+
+    kwds.update({'lookuptable': lut, 'orientation': orientation,
                  'textPosition': text_pos})
-    return ren.AddScalarBarActor(**kwbs)
+
+    return ren.AddScalarBarActor(**kwds)
 
 
-def _add_text(ren, text, location):
+def _add_text(ren, text, location, **lt_kwds):
     orientation = 0
     if location == 'left':
         orientation = 90
@@ -49,6 +74,13 @@ def _add_text(ren, text, location):
         orientation = -90
 
     kwds = dp.textActor_kwds.copy()
+    kwds = {k.lower(): v for k, v in kwds.items()}
+    for k, v in lt_kwds.items():
+        if isinstance(kwds.get(k, None), dict):
+            kwds[k].update(v)
+        else:
+            kwds[k] = v
+
     kwds.update({'input': text, 'orientation': orientation})
     return ren.AddTextActor(**kwds)
 
@@ -99,12 +131,14 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
     size : tuple, optional
         Window size. Default is (400, 400).
     kwargs : keyword-valued args
-        Additional arguments passed to the renderers, actors, mapper or
-        plotter. Keywords starting with:
+        Additional arguments passed to the renderers, actors, mapper, color_bar
+        or plotter. Keywords starting with:
 
         - 'renderer__' are passed to the renderers.
         - 'actor__' are passed to the actors.
         - 'mapper__' are passed to the mappers.
+        - 'cb__' are passed to color bar actors.
+        - 'text__' are passed to color text actors.
 
         The rest of keywords are passed to the plotter.
 
@@ -172,9 +206,12 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
     cmap = _expand_arg(cmap, 'cmap', shape, ref=array_name)
     color_range = _expand_arg(color_range, 'cbar_range', shape, ref=array_name)
 
-    ren_kwds = _grep_args('renderer', shape, kwargs)
-    actor_kwds = _grep_args('actor', shape, kwargs, ref=array_name)
-    mapper_kwds = _grep_args('mapper', shape, kwargs, ref=array_name)
+    ren_kwds = _grep_args('renderer', kwargs, shape=shape)
+    actor_kwds = _grep_args('actor', kwargs, shape=shape, ref=array_name)
+    mapper_kwds = _grep_args('mapper', kwargs, shape=shape, ref=array_name)
+    cb_kwds = _grep_args('cb', kwargs)
+    text_kwds = _grep_args('text', kwargs)
+    # lut_kwds = _grep_args('lut', kwargs)
 
     # Label text
     if label_text is None:
@@ -252,10 +289,13 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
             if nan_color:
                 lut['nanColor'] = nan_color
 
-            if sp['disc']:
-                lut['IndexedLookup'] = True
-                color_idx = sp['val']
-                lut['annotations'] = (color_idx, color_idx.astype(str))
+            # Do not support indexed lut for now
+            # if sp['disc']:
+                # lut['IndexedLookup'] = True
+                # color_idx = sp['val']
+                # lut['annotations'] = (color_idx, color_idx.astype(str))
+                # cb_kwds['labelFormat'] = '%-4.0f'
+
             mapper['lookuptable'] = lut
 
             ren.AddActor(**actor, mapper=mapper)
@@ -270,11 +310,11 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
         kwds.update({'row': e.row, 'col': e.col, 'background': background})
         ren1 = p.AddRenderer(**kwds)
         if isinstance(e.label, str):
-            _add_text(ren1, e.label, e.loc)
+            _add_text(ren1, e.label, e.loc, **text_kwds)
         else:  # color bar
             ren_lut = p.renderers[p.populated[e.label]][-1]
             lut = ren_lut.actors.lastActor.mapper.lookupTable
-            _add_colorbar(ren1, lut.VTKObject, e.loc)
+            _add_colorbar(ren1, lut.VTKObject, e.loc, **cb_kwds)
 
     return p
 
@@ -464,12 +504,12 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
 
     """
 
-    if color_bar:
+    if color_bar is True:
         color_bar = 'right'
 
     surfs = {'lh': surf_lh, 'rh': surf_rh}
     layout = ['lh', 'lh', 'rh', 'rh']
-    view = ['medial', 'lateral', 'medial', 'lateral']
+    view = ['lateral', 'medial', 'lateral', 'medial']
 
     if isinstance(array_name, np.ndarray):
         if array_name.ndim == 2:
@@ -493,10 +533,11 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     if isinstance(cmap, list):
         cmap = np.asarray(cmap)[:, None]
 
-    return plot_surf(surfs, layout, array_name=array_name, view=view,
-                     color_bar=color_bar, color_range=color_range, share='r',
-                     label_text=label_text, cmap=cmap, nan_color=nan_color,
-                     zoom=zoom, background=background, size=size,
-                     interactive=interactive, embed_nb=embed_nb,
+    kwds = {'view': view, 'share': 'r'}
+    kwds.update(kwargs)
+    return plot_surf(surfs, layout, array_name=array_name, color_bar=color_bar,
+                     color_range=color_range, label_text=label_text, cmap=cmap,
+                     nan_color=nan_color, zoom=zoom, background=background,
+                     size=size, interactive=interactive, embed_nb=embed_nb,
                      screenshot=screenshot, filename=filename, scale=scale,
-                     transparent_bg=transparent_bg, **kwargs)
+                     transparent_bg=transparent_bg, **kwds)

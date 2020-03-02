@@ -20,16 +20,23 @@ mapper_kwds = {
 scalarBarActor_kwds = {
     'numberOfLabels': 2, 'height': .5, 'position': (.08, .25), 'width': .8,
     'barRatio': .27, 'unconstrainedFontSize': True,
+    'annotationLeaderPadding': 2, 'annotationTextScaling': False,
+    'FixedAnnotationLeaderLineColor': True,
+    'textPad': 2,
     'labelTextProperty': {
         'color': (0, 0, 0), 'italic': False, 'shadow': False, 'bold': True,
         'fontFamily': 'Arial', 'fontSize': 16
+    },
+    'annotationTextProperty': {
+        'color': (0, 0, 0), 'italic': False, 'shadow': False, 'bold': True,
+        'fontFamily': 'Arial', 'fontSize': 16
     }
-
 }
 
 
 textActor_kwds = {
-    'textScaleMode': 'viewport', 'position': (0.5, 0.5),
+    'textScaleMode': 'viewport',
+    'position': (0.5, 0.5),
     'positionCoordinate': {'coordinateSystem': 'normalizedViewport'},
     'textProperty': {
         'color': (0, 0, 0), 'italic': False, 'shadow': False, 'bold': True,

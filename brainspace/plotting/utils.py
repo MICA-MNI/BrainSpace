@@ -117,17 +117,18 @@ def _expand_arg(arg, name, shape, ref=None):
     return arg
 
 
-def _grep_args(name, shape, kwds, ref=None):
+def _grep_args(name, kwds, shape=None, ref=None):
     """Broadcast/expand each value in `kwds` if its key starts with `name__`.
 
     Parameters
     ----------
     name : str
         Key prefix.
-    shape : tuple
-        The shape of the desired arrays.
     kwds : dict
         Dictionary.
+    shape : tuple, default
+        The shape of the desired arrays. Default is None.
+        If None, no broadcasting.
     ref : array of tuples, optional
         Reference array of tuples. If None, only broadcast is used.
 
@@ -144,7 +145,9 @@ def _grep_args(name, shape, kwds, ref=None):
     d = {k.split('__')[1].lower(): k for k in kwds
          if k.lower().startswith(name + '__')}
     for k, korg in d.items():
-        if ref is None:
+        if shape is None:
+            d[k] = kwds.pop(korg)
+        elif ref is None:
             d[k] = _broadcast(kwds.pop(korg), korg, shape)
         else:
             d[k] = _expand_arg(kwds.pop(korg), korg, shape, ref=ref)
