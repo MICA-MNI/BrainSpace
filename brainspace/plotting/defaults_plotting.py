@@ -38,9 +38,13 @@ textActor_kwds = {
     'textScaleMode': 'viewport',
     'position': (0.5, 0.5),
     'positionCoordinate': {'coordinateSystem': 'normalizedViewport'},
+    'position2Coordinate': {'coordinateSystem': 'normalizedViewport'},
     'textProperty': {
         'color': (0, 0, 0), 'italic': False, 'shadow': False, 'bold': True,
-        'fontFamily': 'Arial', 'fontSize': 40, 'justification': 'centered',
+        'fontFamily': 'Arial',
+        # 'fontSize': 40,
+        'fontSize': 50,
+        'justification': 'centered',
         'verticalJustification': 'centered'
     }
 }

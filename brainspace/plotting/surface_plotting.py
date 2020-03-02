@@ -323,7 +323,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
               color_range=None, share=False, label_text=None, cmap='viridis',
               nan_color=(0, 0, 0, 1), zoom=1, background=(1, 1, 1),
               size=(400, 400), embed_nb=False, interactive=True, scale=(1, 1),
-              transparent_bg=True, screenshot=False, filename=None, **kwargs):
+              transparent_bg=True, screenshot=False, filename=None,
+              return_plotter=False, **kwargs):
 
     """Plot surfaces arranged according to the `layout`.
 
@@ -426,7 +427,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
                       share=share, label_text=label_text, cmap=cmap,
                       nan_color=nan_color, zoom=zoom, background=background,
                       size=size, **kwargs)
-
+    if return_plotter:
+        return p
     if screenshot:
         return p.screenshot(filename, transparent_bg=transparent_bg,
                             scale=scale)

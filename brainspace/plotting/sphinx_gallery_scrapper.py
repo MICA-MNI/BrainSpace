@@ -6,6 +6,7 @@ Scrapper for sphinx-gallery to capture vtk figures.
 # This is shamelessly copied from PyVista
 
 from .base import Plotter
+from ..vtk_interface.wrappers import BSScalarBarActor
 
 
 def _get_sg_image_scraper():
@@ -27,7 +28,17 @@ class Scraper(object):
         image_path_iterator = block_vars["image_path_iterator"]
         for k, p in Plotter.DICT_PLOTTERS.items():
             fname = next(image_path_iterator)
-            p.screenshot(fname)
+
+            for _, lren in p.renderers.items():
+                for r in lren:
+                    for i in range(r.actors2D.n_items):
+                        a = r.actors2D[i]
+                        if not isinstance(a, BSScalarBarActor):
+                            continue
+                        a.labelTextProperty.fontsize = a.labelTextProperty.fontsize * 3
+
+            p.screenshot(fname, scale=3)
+            # p.screenshot(fname)
             image_names.append(fname)
 
         Plotter.close_all()  # close and clear all plotters
