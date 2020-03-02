@@ -82,13 +82,13 @@ def compute_affinity(x, kernel=None, sparsity=.9, pre_sparsify=True,
     if sp.issparse(x):
         x = x.toarray()
 
-    if not pre_sparsify:
+    if not pre_sparsify and kernel is not None:
         x = _build_kernel(x, kernel, gamma=gamma)
 
     if sparsity is not None and sparsity > 0:
         x = dominant_set(x, k=1-sparsity, is_thresh=False, as_sparse=False)
 
-    if pre_sparsify:
+    if pre_sparsify and kernel is not None:
         x = _build_kernel(x, kernel, gamma=gamma)
 
     if non_negative:
