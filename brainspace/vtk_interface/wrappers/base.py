@@ -420,7 +420,14 @@ def _numpy_to_variant(a):
     return av
 
 
+def _idlist_to_numpy(a):
+    n = a.GetNumberOfIds()
+    return np.array([a.GetId(i) for i in range(n)])
+
+
 def wrap_vtk_array(a):
+    if isinstance(a, vtk.vtkIdList):
+        return _idlist_to_numpy(a)
     if isinstance(a, (vtk.vtkStringArray, vtk.vtkUnicodeStringArray)):
         return _string_to_numpy(a)
     if isinstance(a, vtk.vtkVariantArray):
@@ -460,7 +467,7 @@ def wrap_vtk(obj, **kwargs):
     if len(kwargs) > 0:
         wobj.setVTK(**kwargs)
 
-    if isinstance(obj, vtk.vtkAbstractArray):
+    if isinstance(obj, (vtk.vtkAbstractArray, vtk.vtkIdList)):
         try:
             return wrap_vtk_array(obj)
         except:

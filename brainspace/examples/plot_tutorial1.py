@@ -18,7 +18,7 @@ from brainspace.datasets import load_group_fc, load_parcellation, load_conte69
 conn_matrix = load_group_fc('schaefer', scale=400)
 labeling = load_parcellation('schaefer', scale=400, join=True)
 
-# and load the conte69 hemisphere surfaces
+# and load the conte69 surfaces
 surf_lh, surf_rh = load_conte69()
 
 
@@ -27,7 +27,8 @@ surf_lh, surf_rh = load_conte69()
 
 from brainspace.plotting import plot_hemispheres
 
-plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(1200, 300), cmap='tab20')
+plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(1200, 200),
+                 cmap='tab20', zoom=1.85)
 
 
 ###############################################################################
@@ -57,8 +58,8 @@ for i in range(2):
     # map the gradient to the parcels
     grad[i] = map_to_labels(gm.gradients_[:, i], labeling, mask=mask, fill=np.nan)
 
-plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600), cmap='viridis_r',
-                 color_bar=True, label_text=['Grad1', 'Grad2'])
+plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 400), cmap='viridis_r',
+                 color_bar=True, label_text=['Grad1', 'Grad2'], zoom=1.55)
 
 
 ###############################################################################
@@ -71,9 +72,12 @@ plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600), cmap='viri
 
 import matplotlib.pyplot as plt
 
-plt.scatter(range(gm.lambdas_.size), gm.lambdas_)
+fig, ax = plt.subplots(1, figsize=(5, 4))
+ax.scatter(range(gm.lambdas_.size), gm.lambdas_)
+ax.set_xlabel('Component Nb')
+ax.set_ylabel('Eigenvalue')
 
-
+plt.show()
 ###############################################################################
 # This concludes the first tutorial. In the next tutorial we will have a look
 # at how to customize the methods of gradient estimation, as well as gradient

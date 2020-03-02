@@ -6,7 +6,9 @@ to prepare it for subsequent gradient analysis in the next tutorials.
 
 Requirements
 ------------
-For this tutorial, you will need to install the Python packages: `nilearn <https://nilearn.github.io>`_ and `load_confounds <https://github.com/SIMEXP/fmriprep_load_confounds>`_.
+For this tutorial, you will need to install the Python packages: `nilearn
+<https://nilearn.github.io>`_ and `load_confounds <https://github.com/
+SIMEXP/fmriprep_load_confounds>`_.
   
 Both these packages can be installed using ``pip``::  
 
@@ -173,8 +175,8 @@ for i, g in enumerate(gm.gradients_.T):
 surf_lh, surf_rh = load_fsa5()
 
 # sphinx_gallery_thumbnail_number = 2
-plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600),
-                 cmap='viridis_r', color_bar=True, label_text=['Grad1', 'Grad2'])
+plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 400), cmap='viridis_r',
+                 color_bar=True, label_text=['Grad1', 'Grad2'], zoom=1.5)
 
 
 ###############################################################################

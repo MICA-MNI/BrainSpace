@@ -24,17 +24,29 @@ except:
     has_nibabel = False
 
 
-def _read_gifti(ipth):
+def _read_gifti(ipth, ipths_pointdata):
     g = nb.load(ipth)
 
     points = g.get_arrays_from_intent(INTENT_POINTS)[0].data
     cells = g.get_arrays_from_intent(INTENT_CELLS)[0].data
     s = build_polydata(points, cells=cells)
 
-    for a1 in g.darrays:
-        if a1.intent not in [INTENT_POINTS, INTENT_CELLS]:
-            # random array names
-            s.append_array(a1.data, name=None, at='p')
+    # for pth_data, keys in ipths_pointdata.items():
+    #     d = nb.load(pth_data)
+    #     if len(d.darrays) != len(keys):
+    #         raise ValueError("Number of arrays in '%s' does not coincide with "
+    #                          "the number of keys %s" % pth_data, keys)
+    #     for i, d1 in enumerate(d.darrays):
+    #         if d1.intent in [INTENT_POINTS, INTENT_CELLS]:
+    #             raise ValueError("File '%s' contains coord/top data" %
+    #                              pth_data, keys)
+    #
+    #         s.append_array(d1.data, name=keys[i], at='p')
+
+    # for a1 in g.darrays:
+    #     if a1.intent not in [INTENT_POINTS, INTENT_CELLS]:
+    #         # random array names
+    #         s.append_array(a1.data, name=None, at='p')
     return s.VTKObject
 
 
@@ -69,21 +81,28 @@ class vtkGIFTIReader(VTKPythonAlgorithmBase):
             raise AssertionError('vtkGIFTIReader requires nibabel.')
         super().__init__(nInputPorts=0, nOutputPorts=1,
                          outputType='vtkPolyData')
-        self.__FileName = ''
+        self._FileName = ''
+        self._fnames_pointdata = {}
 
     def RequestData(self, request, inInfo, outInfo):
         opt = vtkPolyData.GetData(outInfo, 0)
-        s = _read_gifti(self.__FileName)
+        s = _read_gifti(self._FileName, self._fnames_pointdata)
         opt.ShallowCopy(s)
         return 1
 
     def SetFileName(self, fname):
-        if fname != self.__FileName:
-            self.__FileName = fname
+        if fname != self._FileName:
+            self._FileName = fname
             self.Modified()
 
+    # def AddFileNamePointData(self, fname, key):
+    #     if fname not in self._filenames_pointdata:
+    #         key = key if isinstance(key, list) else [key]
+    #         self._fnames_pointdata[fname] = key
+    #         self.Modified()
+
     def GetFileName(self):
-        return self.__FileName
+        return self._FileName
 
     def GetOutput(self, p_int=0):
         return self.GetOutputDataObject(p_int)

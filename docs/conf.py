@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import warnings
 sys.path.insert(0, os.path.abspath('..'))
 
 
@@ -238,4 +239,9 @@ import numpy as np
 np.random.seed(1234)\
 """
 
-
+# Remove matplotlib agg warnings from generated doc when using plt.show
+warnings.filterwarnings("ignore", category=UserWarning,
+                        message='Matplotlib is currently using agg, which is a'
+                                ' non-GUI backend, so cannot show the figure.')
+warnings.filterwarnings("ignore", category=UserWarning,
+                        message='Affinity is not symmetric. Making symmetric.')
