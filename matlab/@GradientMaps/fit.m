@@ -17,7 +17,7 @@ function obj = fit(obj,connectivity_matrix,varargin)
 %       - alpha (default: 0.5)
 %           - Numeric in the range [0 1].
 %   - Alignment arguments
-%       - niterations (default: 100)
+%       - niterations (default: 10)
 %           - Any integer
 %       - reference (default: nan)
 %           A matrix with equivalent size to that of the gradient matrix.
