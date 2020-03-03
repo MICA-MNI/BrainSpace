@@ -89,10 +89,10 @@ and let’s construct our gradients.
 
 
 
-Note that the default parameters are normalized angle kernel, diffusion
-embedding approach, 10 components. Once you have your gradients, a good first
-step is to simply inspect what they look like. Let’s have a look at the first
-two gradients.
+Note that the default parameters are diffusion embedding approach, 10
+components, and no kernel (use raw data). Once you have your gradients, a
+good first step is to simply inspect what they look like. Let’s have a look
+at the first two gradients.
 
 
 .. code-block:: default
@@ -159,7 +159,7 @@ alignments.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.195 seconds)
+   **Total running time of the script:** ( 0 minutes  3.136 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial1.py:
