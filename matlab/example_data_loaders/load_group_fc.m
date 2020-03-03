@@ -13,7 +13,7 @@ function conn_matrices = load_group_fc(name,parcel_number,group)
 %   connectivity matrices. 
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/data_loaders/load_group_fc.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/data_loaders/load_group_fc.html">ReadTheDocs</a>.
 
 if nargin < 3
     group = 'main';

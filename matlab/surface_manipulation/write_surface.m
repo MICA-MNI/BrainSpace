@@ -6,6 +6,6 @@ function write_surface(surface,file)
 %   in one of those extensions will be encoded as a Freesurfer file.
 %
 %   For complete documentation, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/write_surface.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/write_surface.html">ReadTheDocs</a>.
 
 convert_surface(surface,'path',file); 

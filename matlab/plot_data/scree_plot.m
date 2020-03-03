@@ -6,7 +6,7 @@ function h = scree_plot(lambdas)
 %   created are stored in structure array h. 
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/visualization/scree_plot.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/visualization/scree_plot.html">ReadTheDocs</a>.
 
 
 h.figure = figure('Color','White');

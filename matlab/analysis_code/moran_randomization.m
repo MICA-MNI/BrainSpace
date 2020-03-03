@@ -22,7 +22,7 @@ function Y_rand = moran_randomization(Y,MEM,n_rep,varargin)
 %   See also: COMPUTE_MEM
 %
 %   For more information, please consult our <a
-% href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/moran_randomization.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/moran_randomization.html">ReadTheDocs</a>.
 
 
 %% Deal with the input.  

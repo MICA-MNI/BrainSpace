@@ -7,7 +7,7 @@ function parcel_data = full2parcel(data,parcellation)
 %   vector, these are returned as NaN columns.
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/full2parcel.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/full2parcel.html">ReadTheDocs</a>.
 
 parcel_data = labelmean(data,parcellation,'ignorewarning')';
 end
