@@ -39,9 +39,6 @@ cortical thickness data, and a template functional gradient.
 
 
 
-    import warnings
-    warnings.simplefilter('ignore')
-
     import numpy as np
     from brainspace.datasets import load_gradient, load_marker, load_conte69
 
@@ -66,25 +63,25 @@ cortical thickness data, and a template functional gradient.
 
 
 
+
 Let’s first generate some null data using spintest.
 
 
 .. code-block:: default
 
 
-    import numpy as np
-
     from brainspace.null_models import SpinPermutations
     from brainspace.plotting import plot_hemispheres
 
     # Let's create some rotations
-    n_permutations = 1000
+    n_rand = 1000
 
-    sp = SpinPermutations(n_rep=n_permutations, random_state=0)
+    sp = SpinPermutations(n_rep=n_rand, random_state=0)
     sp.fit(sphere_lh, points_rh=sphere_rh)
 
     t1wt2w_rotated = np.hstack(sp.randomize(t1wt2w_lh, t1wt2w_rh))
     thickness_rotated = np.hstack(sp.randomize(thickness_lh, thickness_rh))
+
 
 
 
@@ -100,8 +97,8 @@ As an illustration of the rotation, let’s plot the original t1w/t2w data
 
 
     # Plot original data
-    plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w, size=(1200, 300), cmap='viridis',
-                     nan_color=(0.5, 0.5, 0.5, 1), color_bar=True)
+    plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w, size=(1200, 200), cmap='viridis',
+                     nan_color=(0.5, 0.5, 0.5, 1), color_bar=True, zoom=1.65)
 
 
 
@@ -109,6 +106,7 @@ As an illustration of the rotation, let’s plot the original t1w/t2w data
 
 .. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial3_001.png
     :class: sphx-glr-single-img
+
 
 
 
@@ -121,9 +119,9 @@ as well as a few rotated versions.
 
     # sphinx_gallery_thumbnail_number = 2
     # Plot some rotations
-    plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3], size=(1200, 800),
+    plot_hemispheres(surf_lh, surf_rh, array_name=t1wt2w_rotated[:3], size=(1200, 600),
                      cmap='viridis', nan_color=(0.5, 0.5, 0.5, 1), color_bar=True,
-                     label_text=['Rot0', 'Rot1', 'Rot2'])
+                     zoom=1.55, label_text=['Rot0', 'Rot1', 'Rot2'])
 
 
 
@@ -131,6 +129,7 @@ as well as a few rotated versions.
 
 .. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial3_002.png
     :class: sphx-glr-single-img
+
 
 
 
@@ -151,26 +150,43 @@ original data, as well as all rotated data.
 .. code-block:: default
 
 
+    from matplotlib import pyplot as plt
     from scipy.stats import spearmanr
+
+    fig, axs = plt.subplots(1, 2, figsize=(9, 3.5))
 
     feats = {'t1wt2w': t1wt2w, 'thickness': thickness}
     rotated = {'t1wt2w': t1wt2w_rotated, 'thickness': thickness_rotated}
 
-    r_spin = np.empty(n_permutations)
+    r_spin = np.empty(n_rand)
     mask = ~np.isnan(thickness)
-    for fn, feat in feats.items():
-        r_orig, pv_orig = spearmanr(feat[mask], embedding[mask])
+    for k, (fn, feat) in enumerate(feats.items()):
+        r_obs, pv_obs = spearmanr(feat[mask], embedding[mask])
 
+        # Compute perm pval
         for i, perm in enumerate(rotated[fn]):
-            mask_rot = mask & ~np.isnan(perm)  # Remove non-cortex
+            mask_rot = mask & ~np.isnan(perm)  # Remove midline
             r_spin[i] = spearmanr(perm[mask_rot], embedding[mask_rot])[0]
-        pv_spin = np.mean(np.abs(r_spin) > np.abs(r_orig))
+        pv_spin = np.mean(np.abs(r_spin) >= np.abs(r_obs))
 
-        print('{0}:\n Obs : {1:.5e}\n Spin: {2:.5e}\n'.
-              format(fn.capitalize(), pv_orig, pv_spin))
+        # Plot null dist
+        axs[k].hist(r_spin, bins=25, density=True, alpha=0.5, color=(0.8, 0.8, 0.8))
+        axs[k].axvline(r_obs, lw=2, ls='--', color='k')
+        axs[k].set_xlabel('Correlation with {}'.format(fn))
+        if k == 0:
+            axs[k].set_ylabel('Density')
+
+        print('{}:\n Obs : {:.5e}\n Spin: {:.5e}\n'.
+              format(fn.capitalize(), pv_obs, pv_spin))
+
+    fig.tight_layout()
+    plt.show()
 
 
 
+
+.. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial3_003.png
+    :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -186,6 +202,7 @@ original data, as well as all rotated data.
     Thickness:
      Obs : 0.00000e+00
      Spin: 1.37000e-01
+
 
 
 
@@ -219,7 +236,6 @@ thickness data, and a template functional gradient
 
 
     from brainspace.datasets import load_mask
-    from brainspace.mesh import mesh_elements as me
 
     n_pts_lh = surf_lh.n_points
     mask_tl, _ = load_mask(name='temporal')
@@ -228,6 +244,7 @@ thickness data, and a template functional gradient
     embedding_tl = embedding[:n_pts_lh][mask_tl]
     t1wt2w_tl = t1wt2w_lh[mask_tl]
     curv_tl = load_marker('curvature')[0][mask_tl]
+
 
 
 
@@ -245,12 +262,12 @@ providing a cortical surface. Here we’ll use a cortical surface.
 
 
     from brainspace.null_models import MoranRandomization
+    from brainspace.mesh import mesh_elements as me
 
     # compute spatial weight matrix
     w = me.get_ring_distance(surf_lh, n_ring=1, mask=mask_tl)
     w.data **= -1
 
-    n_rand = 1000
 
     msr = MoranRandomization(n_rep=n_rand, procedure='singleton', tol=1e-6,
                              random_state=0)
@@ -260,6 +277,16 @@ providing a cortical surface. Here we’ll use a cortical surface.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    MoranRandomization(joint=False, n_rep=1000, n_ring=1, procedure='singleton',
+                       random_state=0, spectrum='nonzero', tol=1e-06)
 
 
 
@@ -279,6 +306,7 @@ Using the Moran eigenvectors we can now compute the randomized data.
 
 
 
+
 Now that we have the randomized data, we can compute correlations between
 the gradient and the real/randomised data and generate the non-parametric
 p-values.
@@ -287,20 +315,37 @@ p-values.
 .. code-block:: default
 
 
+    fig, axs = plt.subplots(1, 2, figsize=(9, 3.5))
+
     feats = {'t1wt2w': t1wt2w_tl, 'curvature': curv_tl}
     rand = {'t1wt2w': t1wt2w_rand, 'curvature': curv_rand}
 
-    for fn, data in rand.items():
+    for k, (fn, data) in enumerate(rand.items()):
         r_obs, pv_obs = spearmanr(feats[fn], embedding_tl, nan_policy='omit')
 
+        # Compute perm pval
         r_rand = np.asarray([spearmanr(embedding_tl, d)[0] for d in data])
         pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
 
-        print('{0}:\n Obs  : {1:.5e}\n Moran: {2:.5e}\n'.
+        # Plot null dist
+        axs[k].hist(r_rand, bins=25, density=True, alpha=0.5, color=(0.8, 0.8, 0.8))
+        axs[k].axvline(r_obs, lw=2, ls='--', color='k')
+        axs[k].set_xlabel('Correlation with {}'.format(fn))
+        if k == 0:
+            axs[k].set_ylabel('Density')
+
+        print('{}:\n Obs  : {:.5e}\n Moran: {:.5e}\n'.
               format(fn.capitalize(), pv_obs, pv_rand))
 
+    fig.tight_layout()
+    plt.show()
 
 
+
+
+
+.. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial3_004.png
+    :class: sphx-glr-single-img
 
 
 .. rst-class:: sphx-glr-script-out
@@ -321,9 +366,16 @@ p-values.
 
 
 
+There are some scenarios where MSR results do not follow a normal
+distribution. It is relatively simple to check whether this occurs in our
+data by visualizing the null distributions. Check this interesting paper
+for more information `(Burt et al., 2020) <https://www.biorxiv.org/content/
+10.1101/2020.02.18.955054v1>`_.
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 2 minutes  23.000 seconds)
+   **Total running time of the script:** ( 3 minutes  22.475 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial3.py:

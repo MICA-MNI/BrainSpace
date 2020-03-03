@@ -20,8 +20,6 @@ parcellated data for computational efficiency.
 .. code-block:: default
 
 
-    import warnings
-    warnings.simplefilter('ignore')
 
     from brainspace.datasets import load_group_fc, load_parcellation, load_conte69
 
@@ -29,8 +27,9 @@ parcellated data for computational efficiency.
     conn_matrix = load_group_fc('schaefer', scale=400)
     labeling = load_parcellation('schaefer', scale=400, join=True)
 
-    # and load the conte69 hemisphere surfaces
+    # and load the conte69 surfaces
     surf_lh, surf_rh = load_conte69()
+
 
 
 
@@ -47,7 +46,8 @@ Let’s first look at the parcellation scheme we’re using.
 
     from brainspace.plotting import plot_hemispheres
 
-    plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(1200, 300), cmap='tab20')
+    plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(1200, 200),
+                     cmap='tab20', zoom=1.85)
 
 
 
@@ -55,6 +55,7 @@ Let’s first look at the parcellation scheme we’re using.
 
 .. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial1_001.png
     :class: sphx-glr-single-img
+
 
 
 
@@ -75,6 +76,16 @@ and let’s construct our gradients.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ Out:
+
+ .. code-block:: none
+
+
+    GradientMaps(alignment=None, approach='dm', kernel=None, n_components=10,
+                 random_state=0)
 
 
 
@@ -98,8 +109,8 @@ two gradients.
         # map the gradient to the parcels
         grad[i] = map_to_labels(gm.gradients_[:, i], labeling, mask=mask, fill=np.nan)
 
-    plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600), cmap='viridis_r',
-                     color_bar=True, label_text=['Grad1', 'Grad2'])
+    plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 400), cmap='viridis_r',
+                     color_bar=True, label_text=['Grad1', 'Grad2'], zoom=1.55)
 
 
 
@@ -107,6 +118,7 @@ two gradients.
 
 .. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial1_002.png
     :class: sphx-glr-single-img
+
 
 
 
@@ -124,14 +136,18 @@ on a scree plot.
 
     import matplotlib.pyplot as plt
 
-    plt.scatter(range(gm.lambdas_.size), gm.lambdas_)
+    fig, ax = plt.subplots(1, figsize=(5, 4))
+    ax.scatter(range(gm.lambdas_.size), gm.lambdas_)
+    ax.set_xlabel('Component Nb')
+    ax.set_ylabel('Eigenvalue')
 
-
+    plt.show()
 
 
 
 .. image:: /python_doc/auto_examples/images/sphx_glr_plot_tutorial1_003.png
     :class: sphx-glr-single-img
+
 
 
 
@@ -143,7 +159,7 @@ alignments.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.687 seconds)
+   **Total running time of the script:** ( 0 minutes  2.195 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial1.py:

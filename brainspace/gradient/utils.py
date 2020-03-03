@@ -109,10 +109,9 @@ def _dominant_set_sparse(s, k, is_thresh=False, norm=False):
         s = ssp.coo_matrix((data, (row, col)), shape=s.shape)
 
     if norm:
-        d = s.sum(axis=1).A1
-        s.data /= d[s.row]
+        s.data /= s.sum(axis=1).A1[s.row]
 
-    return s
+    return s.tocsr(copy=False)
 
 
 def _dominant_set_dense(s, k, is_thresh=False, norm=False, copy=True):

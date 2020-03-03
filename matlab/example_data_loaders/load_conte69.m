@@ -13,7 +13,7 @@ if ~exist('name','var')
 end
 
 P = mfilename('fullpath');
-brainspace_path = regexp(P,'.*BrainSpace','match','once');
+brainspace_path = fileparts(fileparts(fileparts(P)));
 surface_path = [brainspace_path filesep 'shared' filesep 'surfaces' filesep]; 
 
 if strcmpi(name,'spheres')

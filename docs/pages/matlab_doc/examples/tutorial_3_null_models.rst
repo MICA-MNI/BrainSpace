@@ -228,6 +228,39 @@ correlation. Alternatively, one could also test the one-tailed hypothesis
 whether the percentile rank is lower or higher than the 5th/95th percentile,
 respectively.
 
-This concludes the third and last tutorial. You should now be familliar with all
-the functionality of the BrainSpace toolbox. For more details on any specific
-function, please see :ref:`matlab_package`.
+There are some scenarios where MSR results do not follow a normal distribution. It is relatively simple to check whether this occurs in our data by visualizing the null distributions. Check this interesting paper for more information `(Burt et al.,2020) <https://www.biorxiv.org/content/10.1101/2020.02.18.955054v1>`_.
+
+.. code-block:: matlab
+
+    % Compute the correlations between real and random data.
+    upper_triangle = triu(ones(size(curv_rand,2),'logical'),1);
+    r_real_rand_curv = corr(curv_tl,curv_rand);
+    r_real_rand_t1wt2w = corr(t1wt2w_tl,t1wt2w_rand);
+    r_rand_rand_curv = corr(curv_rand);
+    r_rand_rand_t1wt2w = corr(t1wt2w_rand); 
+    r_rand_rand_curv = r_rand_rand_curv(upper_triangle);
+    r_rand_rand_t1wt2w = r_rand_rand_t1wt2w(upper_triangle);
+
+    % Plot histograms
+    figure('Color','w');
+    subplot(2,2,1);
+    hist(r_real_rand_curv,100); 
+    title('Correlation curvature real and random');
+    subplot(2,2,2);
+    hist(r_real_rand_t1wt2w,100);
+    title('Correlation t1w/t2w real and random');
+    subplot(2,2,3);
+    hist(r_rand_rand_curv,100);
+    title('Correlation curvature random and random');
+    subplot(2,2,4);
+    hist(r_rand_rand_t1wt2w,100);
+    title('Correlation curvature random and random');
+
+.. image:: ./example_figs/msr_correlations.png
+   :scale: 50%
+   :align: center
+
+Indeed, our histograms appear to be normally distributed. This concludes the
+third and last tutorial. You should now be familliar with all the functionality
+of the BrainSpace toolbox. For more details on any specific function, please see
+:ref:`matlab_package`.

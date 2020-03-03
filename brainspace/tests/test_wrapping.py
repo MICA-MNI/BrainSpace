@@ -5,15 +5,14 @@ import pytest
 import numpy as np
 
 import vtk
-# from vtkmodules.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
 from vtk.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
 
-from brainspace.vtk_interface import checks, wrap_vtk
-from brainspace.vtk_interface.base import BSVTKObjectWrapper
+from brainspace.vtk_interface import checks, wrap_vtk, is_wrapper, is_vtk
 from brainspace.vtk_interface.pipeline import serial_connect
-from brainspace.vtk_interface.wrappers import (BSAlgorithm, BSDataSet,
-                                               BSPolyData, BSPolyDataMapper,
-                                               BSActor, is_wrapper, is_vtk)
+from brainspace.vtk_interface.wrappers import (BSVTKObjectWrapper, BSPolyData,
+                                               BSPolyDataMapper, BSActor)
+from brainspace.vtk_interface.wrappers.algorithm import BSAlgorithm
+from brainspace.vtk_interface.wrappers.data_object import BSDataSet
 from brainspace.mesh import mesh_creation as mc
 
 

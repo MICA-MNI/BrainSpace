@@ -24,7 +24,7 @@ if ~iscell(name) && ~isstring(name)
 end    
 
 P = mfilename('fullpath');
-brainspace_path = regexp(P,'.*BrainSpace','match','once');
+brainspace_path = fileparts(fileparts(fileparts(P)));
 data_path = [brainspace_path filesep 'shared' filesep 'data' filesep group '_group']; 
 
 for ii = 1:numel(name)

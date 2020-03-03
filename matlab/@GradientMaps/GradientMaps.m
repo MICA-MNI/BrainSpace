@@ -176,16 +176,21 @@ classdef GradientMaps
             parse(p, varargin{:});
             kernel = obj.method.kernel;
             
-            % If a custom function, just run the custom function.
-            if isa(kernel,'function_handle')
-                kernel_data = kernel(data);
-                return
+            % Check zero vectors in input data.
+            if any(all(data==0))
+                error('Input data contains a zero vector. Gradients cannot be computed for these vectors.')
             end
             
             % Sparsify input data. 
             disp(['Running with sparsity parameter: ' num2str(p.Results.sparsity)]);
             sparse_data = data;
-            sparse_data(data <= prctile(data,p.Results.sparsity)) = 0; 
+            sparse_data(data < prctile(data,p.Results.sparsity)) = 0; 
+            
+            % If a custom function, just run the custom function.
+            if isa(kernel,'function_handle')
+                kernel_data = kernel(data);
+                return
+            end
             
             switch kernel
                 case 'None'
@@ -209,7 +214,7 @@ classdef GradientMaps
                 otherwise
                     error('Unknown kernel method');
             end
-            
+                        
             % Check for negative numbers.
             if any(kernel_data(:) < 0)
                 disp('Found negative numbers in the kernel matrix. These will be set to zero.');

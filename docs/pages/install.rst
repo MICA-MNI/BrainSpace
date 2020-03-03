@@ -24,6 +24,7 @@ To use BrainSpace, the following Python packages are required:
 * `vtk <https://vtk.org/>`_
 * `matplotlib <https://matplotlib.org/>`_
 * `nibabel <https://nipy.org/nibabel/index.html>`_
+* `nilearn <https://nilearn.github.io/>`_
 
 Nibabel is required for reading/writing Gifti surfaces. Matplotlib is only
 used for colormaps and we may remove this dependency in future releases.
@@ -62,10 +63,11 @@ MATLAB installation
 
 This toolbox has been tested with MATLAB versions R2018b, although we expect it
 to work with versions R2017a and newer. It will definitely throw errors with
-versions R2016b and older. 
+versions R2016b and older. Operating systems used during testing were OSX Mojave (10.14.6)
+and Linux Xenial Xerus (16.04.6).
 
 To install the MATLAB toolbox simply `download
-<https://github.com/MICA-MNI/BrainSpace>`_ and unzip the GitHub toolbox and run
+<https://github.com/MICA-MNI/BrainSpace/releases>`_ and unzip the GitHub toolbox and run
 the following in MATLAB: ::
 
     addpath('/path/to/BrainSpace/matlab/')

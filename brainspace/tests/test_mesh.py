@@ -1,19 +1,15 @@
-""" Test gradient maps """
+""" Test mesh operations """
 
 import pytest
 
 import os
-
 import numpy as np
 
 import vtk
-# from vtkmodules.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
 from vtk.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
-
 
 from brainspace.vtk_interface import wrap_vtk
 from brainspace.vtk_interface.wrappers import BSPolyData
-
 from brainspace.mesh import mesh_io as mio
 from brainspace.mesh import mesh_elements as me
 from brainspace.mesh import mesh_creation as mc
@@ -48,7 +44,7 @@ def test_io(ext):
     s2 = mio.read_surface(io_pth)
 
     assert np.allclose(s.Points, s2.Points)
-    assert np.all(s.get_cells2D() == s2.get_cells2D())
+    assert np.all(s.GetCells2D() == s2.GetCells2D())
 
     os.remove(io_pth)
 
@@ -63,7 +59,7 @@ def test_io_nb():
     s2 = mio.read_surface(io_pth)
 
     assert np.allclose(s.Points, s2.Points)
-    assert np.all(s.get_cells2D() == s2.get_cells2D())
+    assert np.all(s.GetCells2D() == s2.GetCells2D())
 
     os.remove(io_pth)
 
@@ -74,7 +70,7 @@ def test_mesh_creation():
     sv = mc.to_vertex(st)
 
     # build polydata with points and triangle cells
-    pd = mc.build_polydata(st.Points, cells=st.get_cells2D())
+    pd = mc.build_polydata(st.Points, cells=st.GetCells2D())
     assert pd.n_points == st.n_points
     assert pd.n_cells == st.n_cells
     assert np.all(pd.cell_types == np.array([VTK_TRIANGLE]))
@@ -88,14 +84,14 @@ def test_mesh_creation():
     assert isinstance(pd, BSPolyData)
 
     # build polydata with points vertices
-    pd = mc.build_polydata(st.Points, cells=sv.get_cells2D())
+    pd = mc.build_polydata(st.Points, cells=sv.GetCells2D())
     assert pd.n_points == st.n_points
     assert pd.n_cells == st.n_points
     assert np.all(pd.cell_types == np.array([VTK_VERTEX]))
     assert isinstance(pd, BSPolyData)
 
     # build polydata with lines
-    pd = mc.build_polydata(st.Points, cells=sl.get_cells2D())
+    pd = mc.build_polydata(st.Points, cells=sl.GetCells2D())
     assert pd.n_points == sl.n_points
     assert pd.n_cells == sl.n_cells
     assert np.all(pd.cell_types == np.array([VTK_LINE]))
@@ -195,7 +191,7 @@ def test_mesh_elements():
     n_edges = ee.n_cells
 
     assert np.all(me.get_points(s) == s.Points)
-    assert np.all(me.get_cells(s) == s.get_cells2D())
+    assert np.all(me.get_cells(s) == s.GetCells2D())
     assert me.get_extent(s).shape == (3,)
 
     pc = me.get_point2cell_connectivity(s)
@@ -373,11 +369,11 @@ def test_array_operations():
     assert np.allclose(s2.PointData['PointArea2'], area)
 
     # Connected components
-    cc = aop.get_connected_components(s)
+    cc = mop.get_connected_components(s)
     assert cc.shape == (s.n_points, )
     assert np.unique(cc).size == 1
 
-    s2 = aop.get_connected_components(s, append=True, key='components')
+    s2 = mop.get_connected_components(s, append=True, key='components')
     assert s is s2
     assert np.all(cc == s2.PointData['components'])
 
@@ -432,5 +428,5 @@ def test_array_operations():
     rd = aop.resample_pointdata(s, s2, 'NAdjCells')
     assert rd.shape == (s2.n_points,)
 
-    rd2 = aop.resample_pointdata(s, s2, 'NAdjCells', ops='mean')
+    rd2 = aop.resample_pointdata(s, s2, 'NAdjCells', red_func='mean')
     assert np.all(rd == rd2)

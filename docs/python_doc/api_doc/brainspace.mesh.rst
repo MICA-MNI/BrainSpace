@@ -104,6 +104,9 @@ Operations on meshes
    mask_points
    select_points
 
+   get_connected_components
+   downsample_with_parcellation
+
 
 .. _pysec-mesh-array_operations:
 
@@ -123,7 +126,6 @@ Operations on mesh data
    map_celldata_to_pointdata
    map_pointdata_to_celldata
    compute_point_area
-   get_connected_components
    get_labeling_border
    get_parcellation_centroids
    propagate_labeling

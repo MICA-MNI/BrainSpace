@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse as sp
 
 from sklearn.base import BaseEstimator
 
@@ -42,9 +43,6 @@ def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
         Gradients (i.e., eigenvectors).
     """
 
-    if callable(kernel):
-        x = kernel(x)
-        kernel = None
     a = compute_affinity(x, kernel=kernel, sparsity=sparsity, gamma=gamma)
 
     kwds_emb = {'n_components': n_components, 'random_state': random_state}
@@ -148,7 +146,14 @@ class GradientMaps(BaseEstimator):
             Returns self.
         """
 
-        if isinstance(x, np.ndarray):
+        align_single = False
+        if self.alignment is not None and self.alignment != 'joint' and \
+                not isinstance(x, list) and reference is not None:
+            x = [x]
+            n_iter = 1
+            align_single = True
+
+        if isinstance(x, np.ndarray):  # or sp.issparse(x):
             self.lambdas_, self.gradients_ = \
                 _fit_one(x, self.approach, self.kernel, self.n_components,
                          self.random_state, gamma=gamma, sparsity=sparsity,
@@ -161,6 +166,8 @@ class GradientMaps(BaseEstimator):
         n = len(x)
         lam, grad = [None] * n, [None] * n
         if self.alignment == 'joint':
+            if n < 2:
+                raise ValueError('Joint alignment requires >=2 datasets.')
             self.fit(np.vstack(x), gamma=gamma, sparsity=sparsity, **kwargs)
 
             s = np.cumsum([0] + [x1.shape[0] for x1 in x])
@@ -183,11 +190,17 @@ class GradientMaps(BaseEstimator):
                 self.aligned_ = pa.aligned_
 
             elif isinstance(self.alignment, ProcrustesAlignment):
+                self.alignment.set_params(n_iter=n_iter)
                 self.alignment.fit(self.gradients_, reference=reference)
-                self.aligned_ = self.alignment.fit(self.gradients_).aligned_
+                self.aligned_ = self.alignment.aligned_
 
             else:
                 self.aligned_ = None
+
+        if align_single:
+            self.gradients_ = self.gradients_[0]
+            self.lambdas_ = self.lambdas_[0]
+            self.aligned_ = self.aligned_[0]
 
         return self
 

@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import warnings
 sys.path.insert(0, os.path.abspath('..'))
 
 
@@ -78,10 +79,25 @@ napoleon_use_param = True
 napoleon_use_ivar = True
 napoleon_use_rtype = False
 
+napoleon_include_private_with_doc = False
+# napoleon_include_special_with_doc = False
+
+autodoc_default_options = {
+    'members': True,
+    'member_order': 'bysource',
+    'inherited-members': True,
+    'no-special-members': True,
+    'exclude-members': 'get_params,set_params',
+    'undoc-members': True,
+}
+
+autoclass_content = 'class'
+# autodoc_default_flags = ['members']
+
+
 add_function_parentheses = False
 
 autosummary_generate = True
-
 
 from sphinx_gallery.sorting import FileNameSortKey
 
@@ -116,6 +132,7 @@ source_suffix = '.rst'
 # The master toctree document.
 master_doc = 'index'
 
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
@@ -124,6 +141,9 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
+
+# If true, keep warnings as "system message" paragraphs in the built documents.
+# keep_warnings = False
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
@@ -219,4 +239,9 @@ import numpy as np
 np.random.seed(1234)\
 """
 
-
+# Remove matplotlib agg warnings from generated doc when using plt.show
+warnings.filterwarnings("ignore", category=UserWarning,
+                        message='Matplotlib is currently using agg, which is a'
+                                ' non-GUI backend, so cannot show the figure.')
+warnings.filterwarnings("ignore", category=UserWarning,
+                        message='Affinity is not symmetric. Making symmetric.')

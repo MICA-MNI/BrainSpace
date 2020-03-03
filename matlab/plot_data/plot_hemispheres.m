@@ -32,6 +32,11 @@ for ii = 1:2:numel(varargin)
     end
 end
 
+% Check if data is float.
+if ~isfloat(data)
+    data = double(data);
+end
+
 % If parcellated data is provided, bring it to the full mesh.
 if exist('parcellation','var')
     data = parcel2full(data,parcellation);

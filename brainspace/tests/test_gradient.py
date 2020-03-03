@@ -17,9 +17,8 @@ def test_kernels():
     x = rs.randn(10, 15)
     a = np.corrcoef(x)
 
-    with pytest.warns(UserWarning):
-        a2 = compute_affinity(a, sparsity=None)
-
+    # with pytest.warns(UserWarning):
+    a2 = compute_affinity(a, sparsity=None)
     assert np.count_nonzero(a2 < 0) == 0
 
     a2 = compute_affinity(a, sparsity=.7)
@@ -118,3 +117,19 @@ def test_embedding_gradient():
         elif align == 'joint':
             for i in range(2):
                 assert np.all(gm_dm.aligned_[i] == gm_dm.gradients_[i])
+
+    # test alignment with single matrix
+    gm_ref = GradientMaps(approach='dm', kernel='gaussian',
+                          alignment='procrustes', random_state=0)
+    ref = gm_ref.fit(x, sparsity=0.7).gradients_
+
+    gm_single = GradientMaps(approach='dm', kernel='gaussian',
+                             alignment='procrustes', random_state=0)
+    gm_single.fit(x2, sparsity=0.7, reference=ref)
+
+    gm_list = GradientMaps(approach='dm', kernel='gaussian',
+                           alignment='procrustes', random_state=0)
+    gm_list.fit([x2], sparsity=0.7, reference=ref)
+
+    assert gm_single.aligned_ is not None
+    assert np.allclose(gm_single.aligned_, gm_list.aligned_[0])
