@@ -24,6 +24,7 @@ To use BrainSpace, the following Python packages are required:
 * `vtk <https://vtk.org/>`_
 * `matplotlib <https://matplotlib.org/>`_
 * `nibabel <https://nipy.org/nibabel/index.html>`_
+* `nilearn <https://nilearn.github.io/>`_
 
 Nibabel is required for reading/writing Gifti surfaces. Matplotlib is only
 used for colormaps and we may remove this dependency in future releases.

@@ -14,14 +14,12 @@ to prepare it for subsequent gradient analysis in the next tutorials.
 
 Requirements
 ------------
-For this tutorial, you will need to install the Python packages: `nilearn
-<https://nilearn.github.io>`_ and `load_confounds <https://github.com/
-SIMEXP/fmriprep_load_confounds>`_.
-  
-Both these packages can be installed using ``pip``::  
+For this tutorial, you will need to install the Python package
+`load_confounds <https://github.com/SIMEXP/fmriprep_load_confounds>`_. You can
+do it using ``pip``::
 
-    pip install nilearn  
-    pip install load_confounds  
+    pip install load_confounds
+  
 
 Preprocessing
 -------------
@@ -45,7 +43,7 @@ using docker from the command line::
     template space.
 
 Import the dataset as timeseries
-++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++
 The timeseries should be a numpy array with the dimensions: nodes x timepoints  
 
 Following is an example for reading in data::  
@@ -159,7 +157,7 @@ And extract the cleaned timeseries onto a set of labels
 
 
 Calculate functional connectivity matrix
-++++++++++++++++++++++++ 
+++++++++++++++++++++++++++++++++++++++++
 The following example uses
 `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_
 signal_extraction.html#compute-and-display-a-correlation-matrix/>`_:
@@ -213,7 +211,7 @@ Plot the correlation matrix:
 
 
 Run gradient analysis and visualize
------------------------------------
++++++++++++++++++++++++++++++++++++
 
 Run gradient analysis
 
@@ -282,7 +280,7 @@ either the output generated here or the example data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  6.613 seconds)
+   **Total running time of the script:** ( 0 minutes  4.417 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial0.py:

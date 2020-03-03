@@ -6,14 +6,12 @@ to prepare it for subsequent gradient analysis in the next tutorials.
 
 Requirements
 ------------
-For this tutorial, you will need to install the Python packages: `nilearn
-<https://nilearn.github.io>`_ and `load_confounds <https://github.com/
-SIMEXP/fmriprep_load_confounds>`_.
-  
-Both these packages can be installed using ``pip``::  
+For this tutorial, you will need to install the Python package
+`load_confounds <https://github.com/SIMEXP/fmriprep_load_confounds>`_. You can
+do it using ``pip``::
 
-    pip install nilearn  
-    pip install load_confounds  
+    pip install load_confounds
+  
 
 Preprocessing
 -------------
@@ -40,7 +38,7 @@ using docker from the command line::
 
 ###############################################################################
 # Import the dataset as timeseries
-# ++++++++++++++++++++++++
+# ++++++++++++++++++++++++++++++++
 # The timeseries should be a numpy array with the dimensions: nodes x timepoints  
 # 
 # Following is an example for reading in data::  
@@ -118,7 +116,7 @@ seed_ts = reduce_by_labels(clean_ts[mask], labeling[mask], axis=1, red_op='mean'
 
 ###############################################################################
 # Calculate functional connectivity matrix
-# ++++++++++++++++++++++++ 
+# ++++++++++++++++++++++++++++++++++++++++
 # The following example uses
 # `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_
 # signal_extraction.html#compute-and-display-a-correlation-matrix/>`_:
@@ -149,7 +147,7 @@ corr_plot = plotting.plot_matrix(c, figure=(15, 15), labels=masked_regions,
 
 ###############################################################################
 # Run gradient analysis and visualize
-# -----------------------------------
+# +++++++++++++++++++++++++++++++++++
 #
 # Run gradient analysis
 

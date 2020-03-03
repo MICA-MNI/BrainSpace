@@ -16,7 +16,7 @@ Tutorials
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Requirements ------------ For this tutorial, you will need to install the Python packages: `nil...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Requirements ------------ For this tutorial, you will need to install the Python package `load_...">
 
 .. only:: html
 
