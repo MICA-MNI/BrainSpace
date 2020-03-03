@@ -17,7 +17,7 @@ function G = surface_to_graph(S,distance,mask,removeDegreeZero)
 %   from the graph (including masked vertices). Default is false.
 %
 %   For more information, pleasse consult our <a
-% href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/support_functions/surface_to_graph.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/surface_to_graph.html">ReadTheDocs</a>.
 
 % Make sure the surface in a matlab format. 
 S = convert_surface(S,'format','matlab'); 

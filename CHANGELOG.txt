@@ -16,8 +16,6 @@ MATLAB:
     - Optimized the spin_permutation code. It should now run substantially 
       faster, especially with a large number of permutations.
     - Improved several warning/error messages.
-    - All MATLAB ReadTheDocs hyperlinks now refer to the stable version of 
-      ReadTheDocs, rather than the latest. 
     - Moved execution of custom kernels to after the sparsification.
 Python:
 - gradient:

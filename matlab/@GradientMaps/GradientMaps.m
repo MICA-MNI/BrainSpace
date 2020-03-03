@@ -30,7 +30,7 @@ classdef GradientMaps
 %
 % For complete documentation, including descriptions of this object's
 % properties and methods please consult our <a
-% href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
 %
 % See also: GRADIENTMAPS.FIT
     

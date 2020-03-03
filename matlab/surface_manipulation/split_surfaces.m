@@ -12,7 +12,7 @@ function varargout = split_surfaces(S)
 %       [surface_left,surface_right] = SPLIT_SURFACES(S);
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/split_surfaces.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/split_surfaces.html">ReadTheDocs</a>.
 
 % Convert surface to graph.
 G = surface_to_graph(S,'mesh'); 
