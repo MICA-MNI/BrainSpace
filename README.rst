@@ -6,6 +6,9 @@ BrainSpace
 .. image:: https://img.shields.io/travis/MICA-MNI/BrainSpace/master?style=flat&logo=travis
    :target: https://travis-ci.org/MICA-MNI/BrainSpace
 
+.. image:: https://img.shields.io/appveyor/build/OualidBenkarim/brainspace/master?logo=appveyor
+   :alt: AppVeyor branch
+
 .. image:: https://img.shields.io/pypi/v/brainspace
    :target:  https://pypi.python.org/pypi/brainspace
 
