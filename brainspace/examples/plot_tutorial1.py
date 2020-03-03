@@ -42,10 +42,10 @@ gm.fit(conn_matrix)
 
 
 ###############################################################################
-# Note that the default parameters are normalized angle kernel, diffusion
-# embedding approach, 10 components. Once you have your gradients, a good first
-# step is to simply inspect what they look like. Let’s have a look at the first
-# two gradients.
+# Note that the default parameters are diffusion embedding approach, 10
+# components, and no kernel (use raw data). Once you have your gradients, a
+# good first step is to simply inspect what they look like. Let’s have a look
+# at the first two gradients.
 
 import numpy as np
 

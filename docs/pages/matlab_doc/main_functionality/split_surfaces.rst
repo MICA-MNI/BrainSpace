@@ -27,6 +27,6 @@ Description
 ------------------
 
 If you have a variable containing multiple disconnected surfaces, this function
-will split them up and return one surface per output file. Accepts all surfaces
+will split them up and return each in a separate output variable. Accepts all surfaces
 readable by :ref:`convert_surface_matlab`. 
 
