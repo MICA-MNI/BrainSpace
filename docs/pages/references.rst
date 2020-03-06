@@ -5,19 +5,14 @@ References
 
 When using BrainSpace, please cite the following manuscript:
 
-* `Vos de Wael R, Benkarim O, Paquola C, Larivière S, Royer J, Tavakol S,
-  Hong S, Xu T, Valk SL, Milham MP, Margulies DS, Smallwood J, Bernhardt BC
-  (2019) BrainSpace: a toolbox for the analysis of macroscale gradients in
-  neuroimaging and connectomics datasets. Preprint: https://www.biorxiv.org/content/10.1101/761460v1.
-  <https://www.biorxiv.org/content/10.1101/761460v1>`_
-
+* `Vos de Wael R, Benkarim O, Paquola, C Lariviere S, Royer S, Tavakol S, Xu T, Hong S, Langs G, Valk S, Misic B, Milham M, Margulies D, Smallwood J, Bernhardt B (2020). BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and connectomics datasets. Commun Biol 3, 103. <https://www.nature.com/articles/s42003-020-0794-7>`_
 
 The following references used methodology similar, or identical, to those
 described here: 
 
 Functional gradients of the adult connectome. 
 
-* `Margulies D, Ghosh SS, Gpulas A, Falkiewicz M, Juntenburg JM, Langs G, Bezgin G, Eickhoff S, 
+* `Margulies D, Ghosh SS, Goulas A, Falkiewicz M, Huntenburg JM, Langs G, Bezgin G, Eickhoff S, 
   Castellanos FX, Petrides M, Jefferies E, Smallwood J (2016) Situating the default-mode network
   along a principal gradient of macroscale cortical organization. PNAS <https://www.pnas.org/content/113/44/12574>`_
 

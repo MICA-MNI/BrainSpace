@@ -48,9 +48,8 @@ you can post to the Issues section of our `repository <https://github.com/MICA-M
 Paper
 -----------
 
-If you consider using BrainSpace, please cite our current preprint: 
-Vos de Wael R, Benkarim O, Paquola C, Lariviere S, Royer S, Tavakol S, Xu T, Hong S, Langs G, Valk SL, 
-Misic B, Milham MP, Margulies DS, Smallwood J, Bernhardt BC (2019) BrainSpace:  a toolbox for the analysis of macroscalegradients in neuroimaging and connectomics datasets. Biorxiv. 
+If you consider using BrainSpace, please cite our manuscript: 
+Vos de Wael R, Benkarim O, Paquola, C Lariviere S, Royer S, Tavakol S, Xu T, Hong S, Langs G, Valk S, Misic B, Milham M, Margulies D, Smallwood J, Bernhardt B (2020). BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and connectomics datasets. Commun Biol 3, 103.
 
 Core development team
 -----------------------
