@@ -17,7 +17,7 @@ function [h,C] = gradient_in_euclidean(gradients,surface,parcellation)
 %   where m is the number of vertices in surface.
 %
 %   For more information, please consult our <a
-% href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/visualization/gradient_in_euclidean.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/visualization/gradient_in_euclidean.html">ReadTheDocs</a>.
 
 if size(gradients,2) ~= 3 && size(gradients,2) ~= 2
     error('Input matrix must be numeric with two or three columns.');

@@ -10,7 +10,7 @@ function full_data = parcel2full(parcellated_data,parcellation)
 %   Any 0s or NaNs in the parcellation are set to NaN in the full_data. 
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/parcel2full.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/parcel2full.html">ReadTheDocs</a>.
 
 
 if iscell(parcellated_data)

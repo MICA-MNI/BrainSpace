@@ -34,6 +34,7 @@ Surface Handling
     main_functionality/read_surface
     main_functionality/write_surface
     main_functionality/combine_surfaces
+    main_functionality/split_surfaces
     main_functionality/full2parcel
     main_functionality/parcel2full
 

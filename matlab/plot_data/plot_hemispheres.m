@@ -15,7 +15,7 @@ function h = plot_hemispheres(data,surface,varargin)
 %       scheme, with identical numbers denoting same parcel.
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/visualization/plot_hemispheres.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/visualization/plot_hemispheres.html">ReadTheDocs</a>.
 
 for ii = 1:2:numel(varargin)
     switch lower(varargin{ii})

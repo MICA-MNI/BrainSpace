@@ -13,7 +13,7 @@ function out = labelmean(D,L,varargin)
 %       warning. 
 %
 %   For complete documentation please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/support_functions/labelmean.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/labelmean.html">ReadTheDocs</a>.
 
 
 

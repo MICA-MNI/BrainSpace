@@ -310,7 +310,7 @@ class Plotter(object):
             self._check_closed()
 
             if self.offscreen:
-                self._check_offscreen()
+                # self._check_offscreen()
                 # raise ValueError('Only offscreen rendering is available. '
                 #                  'Please use offscreen=False.')
                 return None

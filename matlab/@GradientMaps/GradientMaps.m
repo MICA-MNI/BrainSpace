@@ -30,7 +30,7 @@ classdef GradientMaps
 %
 % For complete documentation, including descriptions of this object's
 % properties and methods please consult our <a
-% href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
 %
 % See also: GRADIENTMAPS.FIT
     
@@ -176,12 +176,6 @@ classdef GradientMaps
             parse(p, varargin{:});
             kernel = obj.method.kernel;
             
-            % If a custom function, just run the custom function.
-            if isa(kernel,'function_handle')
-                kernel_data = kernel(data);
-                return
-            end
-            
             % Check zero vectors in input data.
             if any(all(data==0))
                 error('Input data contains a zero vector. Gradients cannot be computed for these vectors.')
@@ -190,7 +184,13 @@ classdef GradientMaps
             % Sparsify input data. 
             disp(['Running with sparsity parameter: ' num2str(p.Results.sparsity)]);
             sparse_data = data;
-            sparse_data(data <= prctile(data,p.Results.sparsity)) = 0; 
+            sparse_data(data < prctile(data,p.Results.sparsity)) = 0; 
+            
+            % If a custom function, just run the custom function.
+            if isa(kernel,'function_handle')
+                kernel_data = kernel(data);
+                return
+            end
             
             switch kernel
                 case 'None'

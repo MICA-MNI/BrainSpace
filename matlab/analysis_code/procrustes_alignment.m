@@ -8,7 +8,7 @@ function aligned = procrustes_alignment(gradients,varargin)
 %   the gradients array). 
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/support_functions/procrustes_alignment.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/procrustes_alignment.html">ReadTheDocs</a>.
 
 % Parse input
 p = inputParser;

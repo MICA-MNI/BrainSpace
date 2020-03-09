@@ -369,11 +369,11 @@ def test_array_operations():
     assert np.allclose(s2.PointData['PointArea2'], area)
 
     # Connected components
-    cc = aop.get_connected_components(s)
+    cc = mop.get_connected_components(s)
     assert cc.shape == (s.n_points, )
     assert np.unique(cc).size == 1
 
-    s2 = aop.get_connected_components(s, append=True, key='components')
+    s2 = mop.get_connected_components(s, append=True, key='components')
     assert s is s2
     assert np.all(cc == s2.PointData['components'])
 
@@ -428,5 +428,5 @@ def test_array_operations():
     rd = aop.resample_pointdata(s, s2, 'NAdjCells')
     assert rd.shape == (s2.n_points,)
 
-    rd2 = aop.resample_pointdata(s, s2, 'NAdjCells', ops='mean')
+    rd2 = aop.resample_pointdata(s, s2, 'NAdjCells', red_func='mean')
     assert np.all(rd == rd2)

@@ -7,7 +7,7 @@ function surf_out = read_surface(file)
 %   multiple of the former.
 %
 %   For complete documentation, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/read_surface.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/read_surface.html">ReadTheDocs</a>.
 
 surf_out = convert_surface(file,'format','MATLAB');
 

@@ -16,7 +16,7 @@ Tutorials
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Preprocessing ------------- Begin with an MRI dataset that is organized in `BIDS &lt;https://bids....">
+    <div class="sphx-glr-thumbcontainer" tooltip="Requirements ------------ For this tutorial, you will need to install the Python package `load_...">
 
 .. only:: html
 

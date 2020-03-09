@@ -17,13 +17,13 @@ function obj = fit(obj,connectivity_matrix,varargin)
 %       - alpha (default: 0.5)
 %           - Numeric in the range [0 1].
 %   - Alignment arguments
-%       - niterations (default: 100)
+%       - niterations (default: 10)
 %           - Any integer
 %       - reference (default: nan)
 %           A matrix with equivalent size to that of the gradient matrix.
 %
 % For complete documentation please consult our <a
-% href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
+% href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/main_functionality/gradientmaps.html">ReadTheDocs</a>.
 
 % Deal with varargin
 kernel_arg = {};

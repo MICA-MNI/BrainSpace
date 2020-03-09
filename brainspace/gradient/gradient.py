@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse as sp
 
 from sklearn.base import BaseEstimator
 
@@ -149,9 +150,10 @@ class GradientMaps(BaseEstimator):
         if self.alignment is not None and self.alignment != 'joint' and \
                 not isinstance(x, list) and reference is not None:
             x = [x]
+            n_iter = 1
             align_single = True
 
-        if isinstance(x, np.ndarray):
+        if isinstance(x, np.ndarray):  # or sp.issparse(x):
             self.lambdas_, self.gradients_ = \
                 _fit_one(x, self.approach, self.kernel, self.n_components,
                          self.random_state, gamma=gamma, sparsity=sparsity,
@@ -165,8 +167,7 @@ class GradientMaps(BaseEstimator):
         lam, grad = [None] * n, [None] * n
         if self.alignment == 'joint':
             if n < 2:
-                raise ValueError('Joint alignment requires '
-                                 '2 or more datasets.')
+                raise ValueError('Joint alignment requires >=2 datasets.')
             self.fit(np.vstack(x), gamma=gamma, sparsity=sparsity, **kwargs)
 
             s = np.cumsum([0] + [x1.shape[0] for x1 in x])

@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import warnings
 sys.path.insert(0, os.path.abspath('..'))
 
 
@@ -82,12 +83,12 @@ napoleon_include_private_with_doc = False
 # napoleon_include_special_with_doc = False
 
 autodoc_default_options = {
-    'members': True,
+    'members': None,
     'member_order': 'bysource',
-    'inherited-members': True,
-    'no-special-members': True,
+    'inherited-members': None,
+    'no-special-members': None,
     'exclude-members': 'get_params,set_params',
-    'undoc-members': True,
+    'undoc-members': None,
 }
 
 autoclass_content = 'class'
@@ -238,4 +239,9 @@ import numpy as np
 np.random.seed(1234)\
 """
 
-
+# Remove matplotlib agg warnings from generated doc when using plt.show
+warnings.filterwarnings("ignore", category=UserWarning,
+                        message='Matplotlib is currently using agg, which is a'
+                                ' non-GUI backend, so cannot show the figure.')
+warnings.filterwarnings("ignore", category=UserWarning,
+                        message='Affinity is not symmetric. Making symmetric.')

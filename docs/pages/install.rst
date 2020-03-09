@@ -24,6 +24,7 @@ To use BrainSpace, the following Python packages are required:
 * `vtk <https://vtk.org/>`_
 * `matplotlib <https://matplotlib.org/>`_
 * `nibabel <https://nipy.org/nibabel/index.html>`_
+* `nilearn <https://nilearn.github.io/>`_
 
 Nibabel is required for reading/writing Gifti surfaces. Matplotlib is only
 used for colormaps and we may remove this dependency in future releases.
@@ -76,7 +77,7 @@ startup`` and append the above line to the end of this file.
 
 You can move the MATLAB directory to other locations. However, the example data
 loader functions used in our tutorials require the MATLAB and shared directories
-to both be in a parent directory called BrainSpace. 
+to both be in the same directory. 
     
 If you wish to open gifti files you will also need to install the `gifti library
 <https://www.artefact.tk/software/matlab/gifti/>`_.

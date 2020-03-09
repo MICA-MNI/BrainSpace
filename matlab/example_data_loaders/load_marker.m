@@ -7,7 +7,7 @@ function [metric_lh,metric_rh] = load_marker(name)
 %   stored in metric_lh, and right in metric_rh. 
 %
 %   For more information, please consult our <a
-%   href="https://brainspace.readthedocs.io/en/stable/pages/matlab_doc/data_loaders/load_metric.html">ReadTheDocs</a>.
+%   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/data_loaders/load_metric.html">ReadTheDocs</a>.
 
 P = mfilename('fullpath');
 brainspace_path = fileparts(fileparts(fileparts(P)));

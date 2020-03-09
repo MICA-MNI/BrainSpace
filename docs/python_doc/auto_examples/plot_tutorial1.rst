@@ -27,7 +27,7 @@ parcellated data for computational efficiency.
     conn_matrix = load_group_fc('schaefer', scale=400)
     labeling = load_parcellation('schaefer', scale=400, join=True)
 
-    # and load the conte69 hemisphere surfaces
+    # and load the conte69 surfaces
     surf_lh, surf_rh = load_conte69()
 
 
@@ -46,7 +46,8 @@ Let’s first look at the parcellation scheme we’re using.
 
     from brainspace.plotting import plot_hemispheres
 
-    plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(1200, 300), cmap='tab20')
+    plot_hemispheres(surf_lh, surf_rh, array_name=labeling, size=(1200, 200),
+                     cmap='tab20', zoom=1.85)
 
 
 
@@ -82,18 +83,16 @@ and let’s construct our gradients.
 
  .. code-block:: none
 
-    /media/oualid/hd500/oualid/BrainSpace/brainspace/gradient/embedding.py:70: UserWarning: Affinity is not symmetric. Making symmetric.
-      warnings.warn('Affinity is not symmetric. Making symmetric.')
 
     GradientMaps(alignment=None, approach='dm', kernel=None, n_components=10,
                  random_state=0)
 
 
 
-Note that the default parameters are normalized angle kernel, diffusion
-embedding approach, 10 components. Once you have your gradients, a good first
-step is to simply inspect what they look like. Let’s have a look at the first
-two gradients.
+Note that the default parameters are diffusion embedding approach, 10
+components, and no kernel (use raw data). Once you have your gradients, a
+good first step is to simply inspect what they look like. Let’s have a look
+at the first two gradients.
 
 
 .. code-block:: default
@@ -110,8 +109,8 @@ two gradients.
         # map the gradient to the parcels
         grad[i] = map_to_labels(gm.gradients_[:, i], labeling, mask=mask, fill=np.nan)
 
-    plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600), cmap='viridis_r',
-                     color_bar=True, label_text=['Grad1', 'Grad2'])
+    plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 400), cmap='viridis_r',
+                     color_bar=True, label_text=['Grad1', 'Grad2'], zoom=1.55)
 
 
 
@@ -137,9 +136,12 @@ on a scree plot.
 
     import matplotlib.pyplot as plt
 
-    plt.scatter(range(gm.lambdas_.size), gm.lambdas_)
+    fig, ax = plt.subplots(1, figsize=(5, 4))
+    ax.scatter(range(gm.lambdas_.size), gm.lambdas_)
+    ax.set_xlabel('Component Nb')
+    ax.set_ylabel('Eigenvalue')
 
-
+    plt.show()
 
 
 
@@ -147,14 +149,6 @@ on a scree plot.
     :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-
-    <matplotlib.collections.PathCollection object at 0x7fc8dde41c90>
 
 
 
@@ -165,7 +159,7 @@ alignments.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.924 seconds)
+   **Total running time of the script:** ( 0 minutes  3.136 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial1.py:

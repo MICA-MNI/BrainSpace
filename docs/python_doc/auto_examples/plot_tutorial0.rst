@@ -12,6 +12,15 @@ Tutorial 0: Preparing your data for gradient analysis
 In this example, we will introduce how to preprocess raw MRI data and how
 to prepare it for subsequent gradient analysis in the next tutorials.
 
+Requirements
+------------
+For this tutorial, you will need to install the Python package
+`load_confounds <https://github.com/SIMEXP/fmriprep_load_confounds>`_. You can
+do it using ``pip``::
+
+    pip install load_confounds
+  
+
 Preprocessing
 -------------
 Begin with an MRI dataset that is organized in `BIDS
@@ -33,24 +42,54 @@ using docker from the command line::
     For this tutorial, it is crucial to output the data onto a cortical surface
     template space.
 
+Import the dataset as timeseries
+++++++++++++++++++++++++++++++++
+The timeseries should be a numpy array with the dimensions: nodes x timepoints  
+
+Following is an example for reading in data::  
+
+   import nibabel as nib
+   import numpy as np
+
+   filename = 'filename.{}.mgz' # where {} will be replaced with 'lh' and 'rh'
+   timeseries = [None] * 2
+   for i, h in enumerate(['lh', 'rh']):
+       timeseries[i] = nib.load(filename.format(h)).get_fdata().squeeze()
+   timeseries = np.vstack(timeseries)
+
+As a **working example**, simply fetch timeseries:
+
+
+.. code-block:: default
+
+    from brainspace.datasets import fetch_timeseries_preprocessing
+    timeseries = fetch_timeseries_preprocessing()
+
+
+
+
+
+
+
+
+
 Confound regression
 ++++++++++++++++++++++++
 To remove confound regressors from the output of the fmriprep pipeline, first
 extract the confound columns. For example::
 
-   from brainspace.utils.confound_loader import load_confounds
+   import load_confounds
    confounds_out = load_confounds("path to confound file",
                               strategy='minimal',
                               n_components=0.95,
                               motion_model='6params')
 
-Otherwise, simply read in:
+As a **working example**, simply read in confounds
 
 
 .. code-block:: default
 
     from brainspace.datasets import load_confounds_preprocessing
-
     confounds_out = load_confounds_preprocessing()
 
 
@@ -61,10 +100,24 @@ Otherwise, simply read in:
 
 
 
-Then regress these confounds from the preprocessed data using `nilearn
-<https://nilearn.github.io/auto_examples/03_connectivity/
-plot_signal_extraction.html#extract-signals-on-a-parcellation-
-defined-by-labels/>`_
+Do the confound regression
+
+
+.. code-block:: default
+
+
+    from nilearn import signal
+    clean_ts = signal.clean(timeseries.T, confounds=confounds_out).T
+
+
+
+
+
+
+
+
+
+And extract the cleaned timeseries onto a set of labels
 
 
 .. code-block:: default
@@ -72,7 +125,9 @@ defined-by-labels/>`_
 
     import numpy as np
     from nilearn import datasets
+    from brainspace.utils.parcellation import reduce_by_labels
 
+    # Fetch surface atlas
     atlas = datasets.fetch_atlas_surf_destrieux()
 
     # Remove non-cortex regions
@@ -90,35 +145,8 @@ defined-by-labels/>`_
     lab_lh = atlas['map_left']
     labeling[lab_lh.size:] += lab_lh.max() + 1
 
-
-
-
-
-
-
-
-
-Do the confound regression
-
-
-.. code-block:: default
-
-
-    from brainspace.datasets import fetch_timeseries_preprocessing
-    from brainspace.utils.parcellation import reduce_by_labels
-    from nilearn import signal
-
-    # Fetch timeseries
-    timeseries = fetch_timeseries_preprocessing()
-
-
-    # Remove confounds
-    clean_ts = [None] * 2
-    for i, ts in enumerate(timeseries):
-        clean_ts[i] = signal.clean(ts.T, confounds=confounds_out).T
-
-    seed_ts = np.vstack(clean_ts)
-    seed_ts = reduce_by_labels(seed_ts[mask], labeling[mask], axis=1, red_op='mean')
+    # extract mean timeseries for each label
+    seed_ts = reduce_by_labels(clean_ts[mask], labeling[mask], axis=1, red_op='mean')
 
 
 
@@ -128,7 +156,9 @@ Do the confound regression
 
 
 
-Calculate the functional connectivity matrix using
+Calculate functional connectivity matrix
+++++++++++++++++++++++++++++++++++++++++
+The following example uses
 `nilearn <https://nilearn.github.io/auto_examples/03_connectivity/plot_
 signal_extraction.html#compute-and-display-a-correlation-matrix/>`_:
 
@@ -181,7 +211,7 @@ Plot the correlation matrix:
 
 
 Run gradient analysis and visualize
------------------------------------
++++++++++++++++++++++++++++++++++++
 
 Run gradient analysis
 
@@ -205,8 +235,6 @@ Run gradient analysis
 
  .. code-block:: none
 
-    /media/oualid/hd500/oualid/BrainSpace/brainspace/gradient/embedding.py:70: UserWarning: Affinity is not symmetric. Making symmetric.
-      warnings.warn('Affinity is not symmetric. Making symmetric.')
 
     GradientMaps(alignment=None, approach='dm', kernel=None, n_components=2,
                  random_state=0)
@@ -232,8 +260,8 @@ Visualize results
     surf_lh, surf_rh = load_fsa5()
 
     # sphinx_gallery_thumbnail_number = 2
-    plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 600),
-                     cmap='viridis_r', color_bar=True, label_text=['Grad1', 'Grad2'])
+    plot_hemispheres(surf_lh, surf_rh, array_name=grad, size=(1200, 400), cmap='viridis_r',
+                     color_bar=True, label_text=['Grad1', 'Grad2'], zoom=1.5)
 
 
 
@@ -252,7 +280,7 @@ either the output generated here or the example data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  4.067 seconds)
+   **Total running time of the script:** ( 0 minutes  4.417 seconds)
 
 
 .. _sphx_glr_download_python_doc_auto_examples_plot_tutorial0.py:
