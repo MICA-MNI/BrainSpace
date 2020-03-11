@@ -30,8 +30,7 @@ Properties
 
 The **method** property is a structure array which itself consists of four
 fields. Each of these is set at the initalization of the object (see below) and
-cannot be modifed afterwards. The fields are: "kernel", "approach", "alignment",
- "n_components", and "verbose". 
+cannot be modifed afterwards. The fields are: "kernel", "approach", "alignment", "n_components", and "verbose". 
 
 The **gradients** property is a cell array containing the (unaligned) gradients
 of each input matrix. Each cell is an n-by-m matrix where n is the number of
