@@ -1,3 +1,10 @@
+v0.1.2, XXXXX 2020 -- Let there be null models update
+MATLAB
+- New functionality
+    - Added a verbose flag to GradientMaps (default value: false).
+ReadTheDocs
+ - Updated documentation of GradientMaps with the verbose flag. 
+
 v0.1.1, March 2020 -- Quality of life update
 MATLAB:
 - New functionality:
