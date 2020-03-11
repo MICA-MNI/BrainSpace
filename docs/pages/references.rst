@@ -5,7 +5,7 @@ References
 
 When using BrainSpace, please cite the following manuscript:
 
-* `Vos de Wael R, Benkarim O, Paquola C, Lariviere S, Royer S, Tavakol S, Xu T, Hong S, Langs G, Valk S, Misic B, Milham M, Margulies D, Smallwood J, Bernhardt B (2020). BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and connectomics datasets. Commun Biol 3, 103. <https://www.nature.com/articles/s42003-020-0794-7>`_
+* `Vos de Wael R, Benkarim O, Paquola C, Lariviere S, Royer J, Tavakol S, Xu T, Hong S, Langs G, Valk S, Misic B, Milham M, Margulies D, Smallwood J, Bernhardt B (2020). BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and connectomics datasets. Commun Biol 3, 103. <https://www.nature.com/articles/s42003-020-0794-7>`_
 
 The following references used methodology similar, or identical, to those
 described here: 
