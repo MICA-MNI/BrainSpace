@@ -56,22 +56,24 @@ end
 for ii = 1:numel(connectivity_matrix)
     connectivity_matrix{ii} = connectivity_matrix{ii}';
 end
-    
-disp('Running gradient analysis...');
-if isa(obj.method.kernel,'char')
-    disp(['Kernel: ' obj.method.kernel]);
-else
-    disp(['Kernel: ' func2str(obj.method.kernel)]);
-end
-if isa(obj.method.approach,'char')
-    disp(['Approach: ' obj.method.approach]);
-else
-    disp(['Approach: ' func2str(obj.method.approach)]);
-end
-if isa(obj.method.alignment,'char')
-    disp(['Alignment: ' obj.method.alignment]);
-else
-    disp(['Alignment: ' func2str(obj.method.alignment)]);
+
+if obj.method.verbose
+    disp('Running gradient analysis...');
+    if isa(obj.method.kernel,'char')
+        disp(['Kernel: ' obj.method.kernel]);
+    else
+        disp(['Kernel: ' func2str(obj.method.kernel)]);
+    end
+    if isa(obj.method.approach,'char')
+        disp(['Approach: ' obj.method.approach]);
+    else
+        disp(['Approach: ' func2str(obj.method.approach)]);
+    end
+    if isa(obj.method.alignment,'char')
+        disp(['Alignment: ' obj.method.alignment]);
+    else
+        disp(['Alignment: ' func2str(obj.method.alignment)]);
+    end
 end
 
 % Concatenate matrices for joint alignment. 
@@ -107,13 +109,17 @@ for ii = 1:N
     else
         obj.gradients{ii} = obj.method.approach(kernel_data); 
     end
-    disp('Stored (unaligned) results in the gradients field.');
+    if obj.method.verbose
+        disp('Stored (unaligned) results in the gradients field.');
+    end
 end
 
 %Run the alignment
 if strcmp(obj.method.alignment,'Procrustes Analysis')
     obj.aligned = procrustes_alignment(obj.gradients,alignment_arg{:});
-    disp('Stored aligned results in the aligned field.');
+    if obj.method.verbose
+        disp('Stored aligned results in the aligned field.');
+    end
 elseif strcmp(obj.method.alignment,'Joint Alignment')
     for ii = 1:numel(size_connectivity)
         if ii == 1
