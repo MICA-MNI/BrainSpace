@@ -70,7 +70,7 @@ To install the MATLAB toolbox simply `download
 <https://github.com/MICA-MNI/BrainSpace/releases>`_ and unzip the GitHub toolbox and run
 the following in MATLAB: ::
 
-    addpath('/path/to/BrainSpace/matlab/')
+    addpath(genpath('/path/to/BrainSpace/matlab/'))
 
 If you want to load BrainSpace every time you start MATLAB, type ``edit
 startup`` and append the above line to the end of this file. 
