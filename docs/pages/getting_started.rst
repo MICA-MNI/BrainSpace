@@ -48,7 +48,7 @@ parcellations. Let's start by loading the conte69 surfaces:
 
    .. code-tab:: matlab
 
-        addpath('/path/to/micasoft/BrainSpace/matlab');
+        addpath(genpath('/path/to/micasoft/BrainSpace/matlab'));
 
         % Load left and right hemispheres
         [surf_lh, surf_rh] = load_conte69();
