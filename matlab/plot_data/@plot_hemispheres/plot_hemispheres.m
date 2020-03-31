@@ -91,8 +91,8 @@ classdef plot_hemispheres < handle
                 if parcellation ~= round(parcellation)
                     error('parcellation may only consist of zeros and positve integers.')
                 end
-                if ~isvector(parcellation) || size(parcellation,2) == size(obj.data,2)
-                    error('parcellation must be a vector or a matrix with as many columns as the data matrix.')
+                if ~isvector(parcellation) 
+                    error('parcellation must be a vector.')
                 end
                 parcellation = double(parcellation(:));
             end
@@ -139,10 +139,7 @@ classdef plot_hemispheres < handle
             if isempty(obj.parcellation)
                 plotted_data = obj.data;
             else
-                plotted_data = zeros(size(obj.parcellation));
-                for ii = size(obj.data,2)
-                    plotted_data(:,ii) = parcel2full(obj.data(:,ii),obj.parcellation(:,ii));
-                end
+                plotted_data = parcel2full(obj.data,obj.parcellation);
                 plotted_data(isnan(plotted_data)) = -Inf;
             end
         end
@@ -166,7 +163,7 @@ classdef plot_hemispheres < handle
         
         function check_surface(obj)
             N1 = sum(cellfun(@(x)size(x.coord,2),obj.surface));
-            N2 = size(obj.data,1);
+            N2 = size(obj.plotted_data,1);
             
             if N1 ~= N2
                 error('Number of vertices on the surface and number of data points do not match.');
