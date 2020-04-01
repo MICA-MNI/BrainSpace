@@ -2,8 +2,20 @@ v0.1.2, XXXXX 2020 -- Let there be null models update
 MATLAB
 - New functionality
     - Added a verbose flag to GradientMaps (default value: false).
+    - plot_hemispheres has several new functionalities:
+        - Now returns an object rather than the graphics handles.
+          Old graphics handles are stored in object.handles. 
+        - Added the following methods to the plot_hemispheres object for 
+        modifying figure properties:
+            - object.colorlimits: modifies color limits.
+            - object.colormaps: modifies colormaps. 
+            - object.labels: modifies labeltext properties. 
+            - Added a "views" name-value pair that enables anterior, 
+              posterior, superior, and inferior views. 
 ReadTheDocs
- - Updated documentation of GradientMaps with the verbose flag. 
+ - Updated MATLAB documentation of GradientMaps with the verbose flag.
+ - Updated MATLAB documentation of plot_hemispheres to reflect the new 
+   changes.  
 
 v0.1.1, March 2020 -- Quality of life update
 MATLAB:
