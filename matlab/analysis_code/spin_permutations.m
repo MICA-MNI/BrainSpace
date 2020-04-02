@@ -8,8 +8,6 @@ function Y_rand = spin_permutations(Y,spheres,n_rep,varargin)
 %   the aforementioned. n_rep denotes the number of spins to perform.
 %
 %   Name-Value pairs
-%       'parcellation': an n-by-1 vector containing parcellations on the
-%                       surface.
 %       'surface_algorithm': The program used to construct the surface; 'FreeSurfer'
 %               (default) and 'CIVET' are supported. 
 %
@@ -21,11 +19,9 @@ function Y_rand = spin_permutations(Y,spheres,n_rep,varargin)
 
 % Make sure input is in the correct format. 
 p = inputParser;
-addParameter(p, 'parcellation', []);
 addParameter(p, 'surface_algorithm', 'freesurfer', @ischar);
 addParameter(p, 'random_state', nan);
 parse(p, varargin{:});
-parcellation = p.Results.parcellation;
 type = lower(p.Results.surface_algorithm);
 
 if ~isnan(p.Results.random_state)
@@ -44,12 +40,6 @@ if numel(Y) ~= numel(spheres)
     error('Found a different number of data cells than sphere cells.');
 end
 
-if ~isempty(parcellation)
-    if ~iscell(parcellation)
-        parcellation = {parcellation};
-    end
-end
-
 if numel(spheres) > 2
     error('Does not support more than two surfaces.')
 end
@@ -63,19 +53,6 @@ end
 for ii = 1:numel(spheres)
     S{ii} = convert_surface(spheres{ii});
     vertices{ii} = S{ii}.coord';    
-
-    % If parcellated data on sphere, get centroids of vertices.
-    if ~isempty(parcellation)
-        % Get Euclidean mean of points within each parcel.
-        euclidean_mean = labelmean(vertices{ii}, parcellation{ii},'ignorewarning')';
-        
-        % parcellationmean adds nan-columns if the parcellations are not 1:N. 
-        euclidean_mean(any(isnan(euclidean_mean),2),:) = [];
-        
-        % Find the centroid i.e. closest point to the Euclidean mean. 
-        idx = knnsearch(vertices{ii},euclidean_mean);
-        vertices{ii} = vertices{ii}(idx,:);   
-    end
     
     % Check for correct data dimensions. 
     if size(Y{ii},1) ~= size(vertices{ii},1)
@@ -122,7 +99,6 @@ for j=1:n_rep
         end
         rotated_vertices = vertices{ii}*rotation;
         nearest_neighbour = knnsearch(tree{ii}, rotated_vertices); % added 2019-06-18 see home page
-        %Y_rand{ii}= cat(3,Y_rand{ii}, Y{ii}(nearest_neighbour,:));
         Y_rand{ii}(:,:,j) = Y{ii}(nearest_neighbour,:);
     end
 end
