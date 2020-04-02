@@ -9,6 +9,9 @@ function colormaps(obj,maps)
 
 % If a single map is provided, set the colormap for the entire figure. 
 if numel(maps) == 1 || isnumeric(maps)
+    if iscell(maps)
+        maps = maps{1};
+    end
     colormap(obj.handles.figure,maps);
     return
 end
