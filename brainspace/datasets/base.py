@@ -210,6 +210,42 @@ def load_fsa5(with_normals=True, join=False):
     return surfs[0], surfs[1]
 
 
+def load_subcortical(with_normals=False, join=False):
+    """ Load subcortical surfaces.
+
+    Parameters
+    ----------
+    with_normals : bool, optional
+        Whether to compute surface normals. Default is False.
+    join : bool, optional
+        If False, return one surface for left and right hemispheres. Otherwise,
+        return a single surface as a combination of both left and right
+        surfaces. Default is False.
+
+    Returns
+    -------
+    surf : tuple of BSPolyData or BSPolyData
+        Surfaces for left and right hemispheres. If ``join == True``, one
+        surface with both hemispheres.
+    """
+
+    root_pth = os.path.dirname(__file__)
+    fname = 'sctx_{}.gii'
+
+    ipth = os.path.join(root_pth, 'surfaces', fname)
+    surfs = [None] * 2
+    for i, side in enumerate(['lh', 'rh']):
+        surfs[i] = read_surface(ipth.format(side))
+        if with_normals:
+            nf = wrap_vtk(vtkPolyDataNormals, splitting=False,
+                          featureAngle=0.1)
+            surfs[i] = serial_connect(surfs[i], nf)
+
+    if join:
+        return combine_surfaces(*surfs)
+    return surfs[0], surfs[1]
+
+
 def load_confounds_preprocessing():
     """Load counfounds for preprocessing tutorial.
 

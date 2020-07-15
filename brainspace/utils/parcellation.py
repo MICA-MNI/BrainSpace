@@ -336,3 +336,27 @@ def reduce_by_labels(values, labels, weights=None, target_labels=None,
     if values.ndim == 1:
         return mapped[0]
     return mapped
+
+def subcorticalvertices(subcortical_values=None):
+    """
+    Transforms one value per subcortical area to vertices
+
+    Parameters
+    ----------
+    subcortical_values : 1D ndarray (16 values)
+                                order of subcortical structure is:
+                                    L_accumbens, L_amygdala, L_caudate, L_hippocampus, L_pallidun, L_putamen, L_thalamus,
+                                    L_ventricles, R_accumbens, R_amygdala, R_caudate, R_hippocampus, R_pallidun, R_putamen,
+                                    R_thalamus, R_ventricles
+    Returns
+    ----------
+    data : ndarray (51278 values)
+           serves as input (array_name) for plot_hemisphere
+    """
+    numvertices = [867, 1419, 3012, 3784, 1446, 4003, 3726, 7653, 838, 1457, 3208, 3742, 1373, 3871, 3699, 7180]
+    data = []
+    if isinstance(subcortical_values, np.ndarray):
+        for ii in range(16):
+            data.append(np.tile(subcortical_values[ii], (numvertices[ii], 1)))
+        data = np.vstack(data).flatten()
+    return data
