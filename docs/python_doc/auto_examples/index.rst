@@ -93,6 +93,27 @@ Tutorials
    :hidden:
 
    /python_doc/auto_examples/plot_tutorial3
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 4: Subcortical surface visualization">
+
+.. only:: html
+
+ .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial4_thumb.png
+
+     :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial4.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /python_doc/auto_examples/plot_tutorial4
+
 .. raw:: html
 
     <div class="sphx-glr-clear"></div>
