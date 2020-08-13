@@ -1,9 +1,14 @@
+
+.. _pymod-plotting:
+
 Plotting functionality
 ===========================
 
-- :ref:`Plotting of brain surfaces<Plotting of brain surfaces>`
-- :ref:`Generic plotting<Generic plotting>`
+- :ref:`pymod-plotting-brain`
+- :ref:`pymod-plotting-generic`
 
+
+.. _pymod-plotting-brain:
 
 Plotting of brain surfaces
 ---------------------------
@@ -15,7 +20,9 @@ Plotting of brain surfaces
 
    plot_hemispheres
    plot_surf
+   build_plotter
 
+.. _pymod-plotting-generic:
 
 Generic plotting
 ---------------------------
@@ -25,6 +32,5 @@ Generic plotting
 .. autosummary::
    :toctree: ../../generated/
 
-   BasePlotter
    Plotter
    GridPlotter

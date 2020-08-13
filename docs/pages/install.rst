@@ -8,8 +8,9 @@ BrainSpace is available in Python and MATLAB.
 
 Python installation
 -------------------
-BrainSpace works on Python 3.6+, and probably with older versions of Python 3,
-although it is not tested.
+
+BrainSpace works on Python 3.5+, and probably with older versions of Python 3,
+although it is not tested. 
 
 
 Dependencies
@@ -23,6 +24,7 @@ To use BrainSpace, the following Python packages are required:
 * `vtk <https://vtk.org/>`_
 * `matplotlib <https://matplotlib.org/>`_
 * `nibabel <https://nipy.org/nibabel/index.html>`_
+* `nilearn <https://nilearn.github.io/>`_
 
 Nibabel is required for reading/writing Gifti surfaces. Matplotlib is only
 used for colormaps and we may remove this dependency in future releases.
@@ -42,14 +44,17 @@ is still experimental.
 
 Installation
 ^^^^^^^^^^^^
-You can install the python Package using ``pip``: ::
 
-    pip install -U brainspace
+BrainSpace can be installed using ``pip``: ::
+
+    pip install brainspace
 
 
-To install with ``conda``: ::
+Alternatively, you can install the package from Github as follows: ::
 
-    conda install brainspace
+    git clone https://github.com/MICA-MNI/BrainSpace.git
+    cd BrainSpace
+    python setup.py install
 
 
 
@@ -58,20 +63,21 @@ MATLAB installation
 
 This toolbox has been tested with MATLAB versions R2018b, although we expect it
 to work with versions R2017a and newer. It will definitely throw errors with
-versions R2016 and older
+versions R2016b and older. Operating systems used during testing were OSX Mojave (10.14.6)
+and Linux Xenial Xerus (16.04.6).
 
 To install the MATLAB toolbox simply `download
-<https://github.com/MICA-MNI/BrainSpace>`_ and unzip the GitHub toolbox and run
+<https://github.com/MICA-MNI/BrainSpace/releases>`_ and unzip the GitHub toolbox and run
 the following in MATLAB: ::
 
-    addpath('/path/to/BrainSpace/matlab/')
+    addpath(genpath('/path/to/BrainSpace/matlab/'))
 
 If you want to load BrainSpace every time you start MATLAB, type ``edit
 startup`` and append the above line to the end of this file. 
 
 You can move the MATLAB directory to other locations. However, the example data
 loader functions used in our tutorials require the MATLAB and shared directories
-to both be in a parent directory called BrainSpace. 
+to both be in the same directory. 
     
 If you wish to open gifti files you will also need to install the `gifti library
 <https://www.artefact.tk/software/matlab/gifti/>`_.

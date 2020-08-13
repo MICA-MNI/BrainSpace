@@ -19,6 +19,50 @@ matrix:
       services: xvfb
       env: REPORT_COVERAGE=true
 
+    - name: "Python 3.7.1 setup.py install"
+      python: 3.7
+      services: xvfb
+      install:
+        - python setup.py install
+
+    - name: "Python 3.7.1 sdist"
+      python: 3.7
+      services: xvfb
+      install:
+        - python setup.py sdist;
+        - pip install dist/*.tar.gz;
+
+    - name: "Python 3.7.1 wheel"
+      python: 3.7
+      services: xvfb
+      install:
+        - python setup.py bdist_wheel;
+        - pip install dist/*.whl;
+
+    - name: "Python 3.7.1 conda"
+      python: 3.7
+      services: xvfb
+      before_install: []
+      install:
+        # Install Anaconda
+        - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+            wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+          else
+            wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+          fi
+        - bash miniconda.sh -b -p $HOME/miniconda
+        - export PATH="$HOME/miniconda/bin:$PATH"
+        - hash -r
+        - conda config --set always_yes yes --set changeps1 no
+        - conda update -q conda
+        # Useful for debugging any issues with conda
+        - conda info -a
+
+        - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION numpy>=1.11.0 scipy>=0.17.0 scikit-learn>=0.20.0 matplotlib>=2.0.0 vtk>=8.1.0 pillow pytest
+        - source activate test-environment
+        - pip install nibabel
+        - pip install --no-deps .
+
     # ======= OSX ========
     - name: "Python 3.6.5 on macOS 10.13"
       os: osx
@@ -55,7 +99,7 @@ script:
   - if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       python3 -m pytest;
     else
-      pytest;
+      py.test brainspace;
     fi
 
 

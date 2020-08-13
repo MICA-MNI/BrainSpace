@@ -1,3 +1,6 @@
+
+.. _pymod-mesh:
+
 Mesh
 =======================
 
@@ -5,14 +8,16 @@ BrainSpace provides basic functionality for working with surface meshes. This
 functionality is built on top of the
 `Visualization Toolkit (VTK) <https://vtk.org/>`_.
 
-- :ref:`Read/Write functionality<Read/Write functionality>`
-- :ref:`Surface creation<Surface creation>`
-- :ref:`Elements<Elements>`
-- :ref:`Connectivity<Connectivity>`
-- :ref:`Operations on meshes<Operations on meshes>`
-- :ref:`Operations on mesh data<Operations on mesh data>`
-- :ref:`Mesh clustering<Mesh clustering>`
+- :ref:`pysec-mesh-io`
+- :ref:`pysec-mesh-creation`
+- :ref:`pysec-mesh-elements`
+- :ref:`pysec-mesh-connectivity`
+- :ref:`pysec-mesh-mesh_operations`
+- :ref:`pysec-mesh-array_operations`
+- :ref:`pysec-mesh-mesh_clustering`
 
+
+.. _pysec-mesh-io:
 
 Read/Write functionality
 -------------------------
@@ -23,9 +28,11 @@ Read/Write functionality
    :toctree: ../../generated/
 
 
-   load_surface
-   save_surface
+   read_surface
+   write_surface
 
+
+.. _pysec-mesh-creation:
 
 Surface creation
 -------------------------
@@ -39,6 +46,8 @@ Surface creation
    to_lines
    to_vertex
 
+
+.. _pysec-mesh-elements:
 
 Elements
 ------------------------------
@@ -54,6 +63,8 @@ Elements
    get_edges
 
 
+.. _pysec-mesh-connectivity:
+
 Connectivity
 ------------------------------
 
@@ -65,8 +76,7 @@ Connectivity
    get_cell2point_connectivity
    get_point2cell_connectivity
 
-   get_cell_point_neighbors
-   get_cell_edge_neighbors
+   get_cell_neighbors
 
    get_immediate_adjacency
    get_ring_adjacency
@@ -74,6 +84,8 @@ Connectivity
    get_immediate_distance
    get_ring_distance
 
+
+.. _pysec-mesh-mesh_operations:
 
 Operations on meshes
 ---------------------
@@ -92,6 +104,11 @@ Operations on meshes
    mask_points
    select_points
 
+   get_connected_components
+   downsample_with_parcellation
+
+
+.. _pysec-mesh-array_operations:
 
 Operations on mesh data
 -----------------------
@@ -109,7 +126,6 @@ Operations on mesh data
    map_celldata_to_pointdata
    map_pointdata_to_celldata
    compute_point_area
-   get_connected_components
    get_labeling_border
    get_parcellation_centroids
    propagate_labeling
@@ -117,7 +133,7 @@ Operations on mesh data
 
 
 
-
+.. _pysec-mesh-mesh_clustering:
 
 Mesh clustering
 -----------------------
@@ -133,6 +149,5 @@ Clustering and sampling of surface vertices.
 
    cluster_points
    sample_points_clustering
-   sample_points_decimation
 
 

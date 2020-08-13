@@ -6,7 +6,7 @@ import numpy as np
 from scipy.sparse import coo_matrix
 
 from brainspace.gradient import compute_affinity
-from brainspace.gradient.alignment import (generalized_procrustes,
+from brainspace.gradient.alignment import (procrustes_alignment,
                                            ProcrustesAlignment)
 from brainspace.gradient import embedding as emb
 from brainspace.gradient import GradientMaps
@@ -17,9 +17,8 @@ def test_kernels():
     x = rs.randn(10, 15)
     a = np.corrcoef(x)
 
-    with pytest.warns(UserWarning):
-        a2 = compute_affinity(a, sparsity=None)
-
+    # with pytest.warns(UserWarning):
+    a2 = compute_affinity(a, sparsity=None)
     assert np.count_nonzero(a2 < 0) == 0
 
     a2 = compute_affinity(a, sparsity=.7)
@@ -41,7 +40,7 @@ def test_alignment():
     assert len(pa.aligned_) == len(list_data)
     assert pa.mean_.shape == list_data[0].shape
 
-    aligned2, ref2 = generalized_procrustes(list_data, return_reference=True)
+    aligned2, ref2 = procrustes_alignment(list_data, return_reference=True)
     assert np.allclose(ref2, pa.mean_)
     for i in range(3):
         assert np.allclose(aligned2[i], pa.aligned_[i])
@@ -52,8 +51,8 @@ def test_alignment():
     assert len(pa2.aligned_) == len(list_data)
     assert pa2.mean_.shape == list_data[0].shape
 
-    aligned2, ref2 = generalized_procrustes(list_data, reference=ref,
-                                            return_reference=True)
+    aligned2, ref2 = procrustes_alignment(list_data, reference=ref,
+                                          return_reference=True)
     assert np.allclose(ref2, pa2.mean_)
     for i in range(3):
         assert np.allclose(aligned2[i], pa2.aligned_[i])
@@ -118,3 +117,19 @@ def test_embedding_gradient():
         elif align == 'joint':
             for i in range(2):
                 assert np.all(gm_dm.aligned_[i] == gm_dm.gradients_[i])
+
+    # test alignment with single matrix
+    gm_ref = GradientMaps(approach='dm', kernel='gaussian',
+                          alignment='procrustes', random_state=0)
+    ref = gm_ref.fit(x, sparsity=0.7).gradients_
+
+    gm_single = GradientMaps(approach='dm', kernel='gaussian',
+                             alignment='procrustes', random_state=0)
+    gm_single.fit(x2, sparsity=0.7, reference=ref)
+
+    gm_list = GradientMaps(approach='dm', kernel='gaussian',
+                           alignment='procrustes', random_state=0)
+    gm_list.fit([x2], sparsity=0.7, reference=ref)
+
+    assert gm_single.aligned_ is not None
+    assert np.allclose(gm_single.aligned_, gm_list.aligned_[0])

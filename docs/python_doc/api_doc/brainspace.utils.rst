@@ -1,8 +1,13 @@
+
+.. _pymod-utils:
+
 Utils
 =====
 
-- :ref:`Parcellation<Parcellation>`
+- :ref:`pysec-utils-parcellation`
 
+
+.. _pysec-utils-parcellation:
 
 Parcellation
 ------------

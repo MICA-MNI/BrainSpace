@@ -21,7 +21,8 @@ INSTALL_REQUIRES = ['numpy>=1.11.0',
                     'matplotlib>=2.0.0',
                     'vtk>=8.1.0',
                     'nibabel',
-                    'pillow']
+                    'pillow',
+                    'pandas']
 
 
 here = path.abspath(path.dirname(__file__))
@@ -68,6 +69,7 @@ setup(
         'test': TEST_REQUIRES + INSTALL_REQUIRES,
     },
     include_package_data=True,
+    zip_safe=False,
     # package_data={  # Optional
     #     'mydata': ['brainspace_data/*'],
     # },
@@ -76,4 +78,6 @@ setup(
         'Bug Reports': 'https://github.com/MICA-MNI/BrainSpace/issues',
         'Source': 'https://github.com/MICA-MNI/BrainSpace',
     },
+    download_url='https://github.com/MICA-MNI/BrainSpace/archive/'
+                 '{ver}.tar.gz'.format(ver=__version__),
 )

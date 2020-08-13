@@ -8,10 +8,8 @@ VTK basic checks.
 
 import numpy as np
 
-# from vtkmodules.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
-# from vtkmodules.vtkCommonDataModelPython import vtkCellTypes
-
-from vtk.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
+from vtk.util.vtkConstants import (VTK_VERTEX, VTK_LINE, VTK_TRIANGLE,
+                                   VTK_QUAD)
 from vtk import vtkCellTypes
 
 
@@ -65,7 +63,7 @@ def has_unique_cell_type(surf):
     bool
         True if `surf` has a unique cell type. False, otherwise.
     """
-    return get_cell_types(surf).size == 1
+    return get_number_of_cell_types(surf) == 1
 
 
 def has_only_triangle(surf):
@@ -85,6 +83,25 @@ def has_only_triangle(surf):
     if ct.size != 1:
         return False
     return ct[0] == VTK_TRIANGLE
+
+
+def has_only_quad(surf):
+    """Check if `surf` has only quads.
+
+    Parameters
+    ----------
+    surf : BSDataSet
+        Input data.
+
+    Returns
+    -------
+    bool
+        True if `surf` has only quads. False, otherwise.
+    """
+    ct = get_cell_types(surf)
+    if ct.size != 1:
+        return False
+    return ct[0] == VTK_QUAD
 
 
 def has_only_line(surf):

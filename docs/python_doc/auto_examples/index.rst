@@ -6,8 +6,8 @@
 
 .. _examples_index:
 
-Examples
-========
+Tutorials
+=========
 
 .. contents:: **Contents**
     :local:
@@ -16,13 +16,33 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 1">
+    <div class="sphx-glr-thumbcontainer" tooltip="Requirements ------------ For this tutorial, you will need to install the Python package `load_...">
 
 .. only:: html
 
-    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial1_thumb.png
+ .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial0_thumb.png
 
-        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial1.py`
+     :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial0.py`
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /python_doc/auto_examples/plot_tutorial0
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 1: Building your first gradient">
+
+.. only:: html
+
+ .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial1_thumb.png
+
+     :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial1.py`
 
 .. raw:: html
 
@@ -36,13 +56,13 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 2">
+    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 2: Customizing and aligning gradients">
 
 .. only:: html
 
-    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial2_thumb.png
+ .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial2_thumb.png
 
-        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial2.py`
+     :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial2.py`
 
 .. raw:: html
 
@@ -56,13 +76,13 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 3">
+    <div class="sphx-glr-thumbcontainer" tooltip="Tutorial 3: Null models for gradient significance">
 
 .. only:: html
 
-    .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial3_thumb.png
+ .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial3_thumb.png
 
-        :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial3.py`
+     :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial3.py`
 
 .. raw:: html
 
@@ -75,25 +95,8 @@ Examples
    /python_doc/auto_examples/plot_tutorial3
 .. raw:: html
 
-    <div style='clear:both'></div>
+    <div class="sphx-glr-clear"></div>
 
-
-
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-gallery
-
-
-  .. container:: sphx-glr-download
-
-    :download:`Download all examples in Python source code: auto_examples_python.zip <//media/oualid/hd500/oualid/BrainSpace/docs/python_doc/auto_examples/auto_examples_python.zip>`
-
-
-
-  .. container:: sphx-glr-download
-
-    :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip <//media/oualid/hd500/oualid/BrainSpace/docs/python_doc/auto_examples/auto_examples_jupyter.zip>`
 
 
 .. only:: html

@@ -6,16 +6,11 @@ High-level read/write functions for several formats.
 # License: BSD 3 clause
 
 
-# from vtkmodules.vtkIOPLYPython import vtkPLYReader, vtkPLYWriter
-# from vtkmodules.vtkIOXMLPython import vtkXMLPolyDataReader, vtkXMLPolyDataWriter
-# from vtkmodules.vtkIOLegacyPython import vtkPolyDataReader, vtkPolyDataWriter
-# from vtkmodules.vtkIOGeometryPython import vtkOBJReader, vtkOBJWriter
-
 from vtk import (vtkPLYReader, vtkPLYWriter, vtkXMLPolyDataReader,
                  vtkXMLPolyDataWriter, vtkPolyDataReader, vtkPolyDataWriter)
 
-from .io_support import (vtkFSReader, vtkFSWriter, vtkGIFTIReader,
-                         vtkGIFTIWriter)
+from ..vtk_interface.io_support import (vtkFSReader, vtkFSWriter,
+                                        vtkGIFTIReader, vtkGIFTIWriter)
 from ..vtk_interface.pipeline import serial_connect, get_output
 from ..vtk_interface.decorators import wrap_output
 
@@ -65,7 +60,7 @@ def _select_writer(otype):
     return writer
 
 
-def load_surface(ipth, itype=None, return_data=True, update=True):
+def read_surface(ipth, itype=None, return_data=True, update=True):
     """Read surface data.
 
     See `itype` for supported file types.
@@ -74,7 +69,7 @@ def load_surface(ipth, itype=None, return_data=True, update=True):
     ----------
     ipth : str
         Input filename.
-    itype : {'ply', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
+    itype : {'ply', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
         Input file type. If None, it is deduced from `ipth`. Default is None.
     return_data : bool, optional
         Whether to return data instead of filter. Default is False
@@ -94,7 +89,7 @@ def load_surface(ipth, itype=None, return_data=True, update=True):
 
     See Also
     --------
-    :func:`save_surface`
+    :func:`write_surface`
 
     """
 
@@ -107,7 +102,7 @@ def load_surface(ipth, itype=None, return_data=True, update=True):
     return get_output(reader, update=update, as_data=return_data)
 
 
-def save_surface(ifilter, opth, oformat=None, otype=None):
+def write_surface(ifilter, opth, oformat=None, otype=None):
     """Write surface data.
 
     See `otype` for supported file types.
@@ -121,7 +116,7 @@ def save_surface(ifilter, opth, oformat=None, otype=None):
     oformat : {'ascii', 'binary'}, optional
         File format. Defaults to writer's default format.
         Only used when writer accepts format. Default is None.
-    otype : {'ply', 'obj', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
+    otype : {'ply', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
         File type. If None, type is deduced from `opth`. Default is None.
 
     Notes
@@ -131,7 +126,7 @@ def save_surface(ifilter, opth, oformat=None, otype=None):
 
     See Also
     --------
-    :func:`load_surface`
+    :func:`read_surface`
 
     """
     if otype is None:
@@ -168,5 +163,5 @@ def convert_surface(ipth, opth, itype=None, otype=None, oformat=None):
         Only used when writer accepts format. Default is None.
 
     """
-    reader = load_surface(ipth, itype=itype, return_data=False, update=False)
-    save_surface(reader, opth, oformat=oformat, otype=otype)
+    reader = read_surface(ipth, itype=itype, return_data=False, update=False)
+    write_surface(reader, opth, oformat=oformat, otype=otype)

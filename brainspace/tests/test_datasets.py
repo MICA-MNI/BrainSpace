@@ -39,7 +39,7 @@ def test_load_mask():
     surf_lh, surf_rh = load_conte69()
     total_n_pts = surf_lh.n_points + surf_rh.n_points
 
-    mask = load_mask()
+    mask = load_mask(join=True)
     assert mask.shape == (total_n_pts,)
     assert mask.dtype == np.bool
 
@@ -47,15 +47,15 @@ def test_load_mask():
 @parametrize('name', ['vosdewael', 'schaefer'])
 @parametrize('kwds', [{}] + [{'n_parcels': k} for k in [100, 200, 300, 400]])
 def test_load_parcellation(name, kwds):
-    mask = load_mask()
+    mask = load_mask(join=True)
     total_n_pts = mask.size
 
     if 'n_parcels' in kwds:
         n = kwds['n_parcels']
-        parc = load_parcellation(name, n_parcels=n)
+        parc = load_parcellation(name, scale=n, join=True)
     else:
         n = 400
-        parc = load_parcellation(name)
+        parc = load_parcellation(name, join=True)
 
     assert parc.shape == (total_n_pts,)
     assert np.unique(parc).size == n + 1
@@ -63,10 +63,10 @@ def test_load_parcellation(name, kwds):
 
 
 def test_load_thickness():
-    mask = load_mask()
+    mask = load_mask(join=True)
     total_n_pts = mask.size
 
-    thick = load_thickness(parcellation=None, mask=None)
+    thick = load_marker('thickness', join=True)
     assert thick.shape == (total_n_pts,)
     assert thick.dtype == np.float
     assert not np.isnan(thick[mask]).any()
@@ -74,10 +74,10 @@ def test_load_thickness():
 
 
 def test_load_myelin():
-    mask = load_mask()
+    mask = load_mask(join=True)
     total_n_pts = mask.size
 
-    myelin = load_t1t2(parcellation=None, mask=None)
+    myelin = load_marker('t1wt2w', join=True)
     assert myelin.shape == (total_n_pts,)
     assert myelin.dtype == np.float
     assert not np.isnan(myelin[mask]).any()
@@ -87,14 +87,14 @@ def test_load_myelin():
 @parametrize('name', ['fc', 'mpc'])
 @parametrize('kwds', [{}] + [{'idx': k} for k in [0, 1]])
 def test_load_gradient(name, kwds):
-    mask = load_mask()
+    mask = load_mask(join=True)
     total_n_pts = mask.size
 
     if 'idx' in kwds:
         idx = kwds['idx']
-        grad = load_gradient(name, idx=idx)
+        grad = load_gradient(name, idx=idx, join=True)
     else:
-        grad = load_gradient(name)
+        grad = load_gradient(name, join=True)
 
     assert grad.shape == (total_n_pts,)
     assert grad.dtype == np.float
@@ -108,10 +108,10 @@ def test_load_group(name, kwds):
 
     if 'n_parcels' in kwds:
         n = kwds['n_parcels']
-        cm = load_group_hcp(name, n_parcels=n)
+        cm = load_group_fc(name, scale=n)
     else:
         n = 400
-        cm = load_group_hcp(name)
+        cm = load_group_fc(name)
 
     assert cm.shape == (n, n)
     assert cm.dtype == np.float
@@ -124,10 +124,10 @@ def test_load_holdout(name, kwds):
 
     if 'n_parcels' in kwds:
         n = kwds['n_parcels']
-        cm = load_group_hcp(name, n_parcels=n)
+        cm = load_group_fc(name, scale=n, group='holdout')
     else:
         n = 400
-        cm = load_group_hcp(name)
+        cm = load_group_fc(name, group='holdout')
 
     assert cm.shape == (n, n)
     assert cm.dtype == np.float

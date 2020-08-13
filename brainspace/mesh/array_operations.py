@@ -6,27 +6,28 @@ Functions on PointData and CellData.
 # License: BSD 3 clause
 
 
+import warnings
+
 import numpy as np
 from scipy.stats import mode
 from scipy.spatial import cKDTree
-from scipy.sparse.csgraph import laplacian
+from scipy.sparse.csgraph import laplacian, connected_components
 
 from sklearn.utils.extmath import weighted_mode
 
-# from vtkmodules.vtkFiltersVerdictPython import vtkCellSizeFilter
-# from vtkmodules.vtkFiltersGeneralPython import vtkCellCenters
-# from vtkmodules.vtkFiltersCorePython import vtkPolyDataConnectivityFilter
-
-from vtk import vtkCellSizeFilter, vtkCellCenters, vtkPolyDataConnectivityFilter
+from vtk import (vtkCellSizeFilter, vtkCellCenters, vtkCellLocator,
+                 vtkPolyDataConnectivityFilter, vtkGenericCell,
+                 mutable as vtk_mutable)
 
 from . import mesh_elements as me
+from .mesh_operations import mask_points
 from ..utils.parcellation import map_to_mask, reduce_by_labels
-from ..vtk_interface.pipeline import serial_connect
+from ..vtk_interface import wrap_vtk, serial_connect
 from ..vtk_interface.decorators import append_vtk, wrap_input
 
 
 @append_vtk(to='cell')
-def compute_cell_area(surf, append=False, array_name='cell_area'):
+def compute_cell_area(surf, append=False, key='cell_area'):
     """Compute cell area.
 
     Parameters
@@ -36,7 +37,7 @@ def compute_cell_area(surf, append=False, array_name='cell_area'):
     append : bool, optional
         If True, append array to cell data attributes of input surface
         and return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's cell data attributes. Only used if
         ``append == True``. Default is 'cell_area'.
 
@@ -48,18 +49,14 @@ def compute_cell_area(surf, append=False, array_name='cell_area'):
 
     """
 
-    alg = vtkCellSizeFilter()
-    alg.SetComputeArea(True)
-    alg.SetAreaArrayName('cell_area')
-    alg.SetComputeVolume(False)
-    alg.SetComputeLength(False)
-    alg.SetComputeVertexCount(False)
-    alg.ComputeSumOff()
-    return serial_connect(surf, alg).CellData['cell_area']
+    alg = wrap_vtk(vtkCellSizeFilter, computeArea=True, areaArrayName=key,
+                   computeVolume=False, computeLength=False, computeSum=False,
+                   computeVertexCount=False)
+    return serial_connect(surf, alg).CellData[key]
 
 
 @append_vtk(to='cell')
-def compute_cell_center(surf, append=False, array_name='cell_center'):
+def compute_cell_center(surf, append=False, key='cell_center'):
     """Compute center of cells (parametric center).
 
     Parameters
@@ -69,7 +66,7 @@ def compute_cell_center(surf, append=False, array_name='cell_center'):
     append : bool, optional
         If True, append array to cell data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's cell data attributes. Only used if
         ``append == True``. Default is 'cell_center'.
 
@@ -85,7 +82,7 @@ def compute_cell_center(surf, append=False, array_name='cell_center'):
 
 
 @append_vtk(to='point')
-def get_n_adjacent_cells(surf, append=False, array_name='point_ncells'):
+def get_n_adjacent_cells(surf, append=False, key='point_ncells'):
     """Compute number of adjacent cells for each point.
 
     Parameters
@@ -95,7 +92,7 @@ def get_n_adjacent_cells(surf, append=False, array_name='point_ncells'):
     append : bool, optional
         If True, append array to cell data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's point data attributes. Only used if
         ``append == True``. Default is 'point_ncells'.
 
@@ -112,7 +109,7 @@ def get_n_adjacent_cells(surf, append=False, array_name='point_ncells'):
 
 @append_vtk(to='point')
 def map_celldata_to_pointdata(surf, cell_data, red_func='mean',
-                              dtype=None, append=False, array_name=None):
+                              dtype=None, append=False, key=None):
     """Map cell data to point data.
 
     Parameters
@@ -132,7 +129,7 @@ def map_celldata_to_pointdata(surf, cell_data, red_func='mean',
     append: bool, optional
         If True, append array to point data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's point data attributes. Only used if
         ``append == True``. Default is None.
 
@@ -193,7 +190,7 @@ def map_celldata_to_pointdata(surf, cell_data, red_func='mean',
 
 @append_vtk(to='cell')
 def map_pointdata_to_celldata(surf, point_data, red_func='mean',
-                              dtype=None, append=False, array_name=None):
+                              dtype=None, append=False, key=None):
     """Map point data to cell data.
 
     Parameters
@@ -212,7 +209,7 @@ def map_pointdata_to_celldata(surf, point_data, red_func='mean',
     append: bool, optional
         If True, append array to cell data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's cell data attributes. Only used if
         ``append == True``. Default is None.
 
@@ -269,7 +266,7 @@ def map_pointdata_to_celldata(surf, point_data, red_func='mean',
 
 @append_vtk(to='point')
 def compute_point_area(surf, cell_area=None, area_as='one_third',
-                       append=False, array_name='point_area'):
+                       append=False, key='point_area'):
     """Compute point area from its adjacent cells.
 
     Parameters
@@ -286,7 +283,7 @@ def compute_point_area(surf, cell_area=None, area_as='one_third',
     append : bool, optional
         If True, append array to point data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's point data attributes. Only used if
         ``append == True``. Default is 'point_area'.
 
@@ -307,38 +304,153 @@ def compute_point_area(surf, cell_area=None, area_as='one_third',
                                      dtype=cell_area.dtype)
 
 
+# @append_vtk(to='point')
+# def get_connected_components(surf, labeling=None, mask=None, fill=0,
+#                              append=False, key='components'):
+#     """Get connected components.
+#
+#     Connected components are based on connectivity (and same label if
+#     `labeling` is provided).
+#
+#     Parameters
+#     ----------
+#     surf : vtkPolyData or BSPolyData
+#         Input surface.
+#     labeling : str or 1D ndarray, optional
+#         Array with labels. If str, it must be in the point data
+#         attributes of `surf`. Default is None. If provided, connectivity is
+#         based on neighboring points with the same label.
+#     mask : str or 1D ndarray, optional
+#         Boolean mask. If str, it must be in the point data
+#         attributes of `surf`. Default is None. If specified, only consider
+#         points within the mask.
+#     fill : int or float, optional
+#         Value used for entries out of the mask. Only used if the
+#         `target_mask` is provided. Default is 0.
+#     append : bool, optional
+#         If True, append array to point data attributes of input surface and
+#         return surface. Otherwise, only return array. Default is False.
+#     key : str, optional
+#         Array name to append to surface's point data attributes. Only used if
+#         ``append == True``. Default is 'components'.
+#
+#     Returns
+#     -------
+#     output : vtkPolyData, BSPolyData or ndarray
+#         1D array with different labels for each connected component.
+#         Return ndarray if ``append == False``. Otherwise, return input surface
+#         with the new array.
+#
+#     Notes
+#     -----
+#     VTK point data does not accept boolean arrays. If the mask is provided as
+#     a string, the mask is built from the corresponding array such that any
+#     value larger than 0 is True.
+#
+#     """
+#
+#     if isinstance(mask, str):
+#         mask = surf.get_array(name=mask, at='p') > 0
+#
+#     if labeling is None:
+#         alg = wrap_vtk(vtkPolyDataConnectivityFilter, colorRegions=True,
+#                        extractionMode='AllRegions')
+#         cc = serial_connect(surf, alg).PointData['RegionId'] + 1
+#         if mask is not None:
+#             cc[~mask] = 0
+#
+#         return cc
+#
+#     if isinstance(labeling, str):
+#         labeling = surf.get_array(name=labeling, at='p')
+#
+#     mlab = labeling if mask is None else labeling[mask]
+#
+#     adj = me.get_immediate_adjacency(surf, mask=mask)
+#     adj = ssp.triu(adj, 1)  # Converts to coo
+#
+#     # Zero-out neighbors with different labels
+#     mask_remove = mlab[adj.row] != mlab[adj.col]
+#     adj.data[mask_remove] = 0
+#     adj.eliminate_zeros()
+#
+#     nc, cc = connected_components(adj, directed=True, connection='weak')
+#     cc += 1
+#     if mask is not None:
+#         cc = map_to_mask(cc, mask=mask, fill=fill)
+#
+#     return cc
+
+
+# @append_vtk(to='point')
+# def connected_components_parcellation(surf, labeling, size=None,
+#                                       kind='largest', new_label=None,
+#                                       append=False, key=None):
+#
+#     if isinstance(labeling, str):
+#         labeling = surf.get_array(name=labeling, at='p')
+#
+#     ulab = np.unique(labeling)
+#     if new_label is None:
+#         new_label = ulab[-1] + 1
+#     elif np.any(new_label == ulab):
+#         raise ValueError('New label %d is already present in the data. Please '
+#                          'choose another label.' % new_label)
+#
+#     adj = me.get_immediate_adjacency(surf)
+#
+#     new_labeling = labeling.copy()
+#     for lab in ulab:
+#         mask = labeling == lab
+#         nc, cc = connected_components(adj[mask][:, mask])
+#         if nc == 1 or (size is not None and size < 0 and nc <= -size):
+#             continue
+#
+#         cc += 1
+#         uc, ct = np.unique(cc, return_counts=True)
+#         cc_ext = map_to_mask(cc, mask, fill=0)
+#
+#         # If negative --> keep 'size' (n) largest/smallest cc
+#         if size is not None and size < 0:
+#             if kind == 'largest':
+#                 discard_labs = uc[np.argpartition(ct, size)[:size]]
+#             else:
+#                 discard_labs = uc[np.argpartition(ct, -size)[-size:]]
+#         else:
+#             sz = size
+#             if sz is None:
+#                 sz = np.max(ct) if kind == 'largest' else np.min(ct)
+#             discard_labs = uc[ct < sz] if kind == 'largest' else uc[ct > sz]
+#
+#         new_labeling[np.isin(cc_ext, discard_labs)] = new_label
+#
+#     return new_labeling
+#
+#
+# @append_vtk(to='point')
+# def dilate_labeling(surf, labeling, dilate_label, radius=1, background=0,
+#                     append=False, key=None):
+#
+#     if isinstance(labeling, str):
+#         labeling = surf.get_array(name=labeling, at='p')
+#
+#     ulab = np.unique(labeling)
+#     if np.all(background != ulab) or (dilate_label != ulab).all():
+#         return labeling
+#
+#     labeling = labeling.copy()
+#
+#     adj = me.get_ring_adjacency(surf, n_ring=radius, include_self=False)
+#     mask = labeling == dilate_label
+#     am = adj[mask].max(axis=0).A[0].astype(np.bool)
+#     am &= labeling == background
+#     labeling[am] = dilate_label
+#
+#     return labeling
+
+
 @append_vtk(to='point')
-def get_connected_components(surf, append=False, array_name='components'):
-    """Get connected components.
-
-    Parameters
-    ----------
-    surf : vtkPolyData or BSPolyData
-        Input surface.
-    append : bool, optional
-        If True, append array to point data attributes of input surface and
-        return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
-        Array name to append to surface's point data attributes. Only used if
-        ``append == True``. Default is 'components'.
-
-    Returns
-    -------
-    output : vtkPolyData, BSPolyData or ndarray
-        1D array with different labels for each connected component.
-        Return ndarray if ``append == False``. Otherwise, return input surface
-        with the new array.
-
-    """
-
-    ccf = vtkPolyDataConnectivityFilter()
-    ccf.SetExtractionModeToAllRegions()
-    ccf.ColorRegionsOn()
-    return serial_connect(surf, ccf).PointData['RegionId']
-
-
-@append_vtk(to='point')
-def get_labeling_border(surf, labeling, append=False, array_name='border'):
+def get_labeling_border(surf, labeling, append=False, key='border'):
     """Get labeling borders.
 
     Parameters
@@ -351,7 +463,7 @@ def get_labeling_border(surf, labeling, append=False, array_name='border'):
     append : bool, optional
         If True, append array to point data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's point data attributes. Only used if
         ``append == True``. Default is 'border'.
 
@@ -375,8 +487,8 @@ def get_labeling_border(surf, labeling, append=False, array_name='border'):
 
 
 @append_vtk(to='point')
-def get_parcellation_centroids(surf, labeling, non_centroid=0,
-                               mask=None, append=False, array_name='centroids'):
+def get_parcellation_centroids(surf, labeling, non_centroid=0, mask=None,
+                               append=False, key='centroids'):
     """Compute parcels centroids.
 
     Parameters
@@ -394,7 +506,7 @@ def get_parcellation_centroids(surf, labeling, non_centroid=0,
     append : bool, optional
         If True, append array to point data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's point data attributes. Only used if
         ``append == True``. Default is 'centroids'.
 
@@ -434,7 +546,8 @@ def get_parcellation_centroids(surf, labeling, non_centroid=0,
         centroid_labs[idx_centroid] = ulab[i]
 
     if mask is not None:
-        centroid_labs = map_to_mask(centroid_labs, mask=mask, fill=non_centroid)
+        centroid_labs = map_to_mask(centroid_labs, mask=mask,
+                                    fill=non_centroid)
 
     return centroid_labs
 
@@ -442,7 +555,7 @@ def get_parcellation_centroids(surf, labeling, non_centroid=0,
 @append_vtk(to='point')
 def propagate_labeling(surf, labeling, no_label=np.nan, mask=None, alpha=0.99,
                        n_iter=30, tol=0.001, n_ring=1, mode='connectivity',
-                       append=False, array_name='propagated'):
+                       append=False, key='propagated'):
     """Propagate labeling on surface points.
 
     Parameters
@@ -473,7 +586,7 @@ def propagate_labeling(surf, labeling, no_label=np.nan, mask=None, alpha=0.99,
     append : bool, optional
         If True, append array to point data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's point data attributes. Only used if
         ``append == True``. Default is 'propagated'.
 
@@ -552,21 +665,23 @@ def propagate_labeling(surf, labeling, no_label=np.nan, mask=None, alpha=0.99,
 
 @append_vtk(to='point')
 def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
-                 relax=0.2, sigma=None, append=False, array_name=None):
+                 relax=0.2, sigma=None, append=False, key=None):
     """Propagate labeling on surface points.
 
     Parameters
     ----------
     surf : vtkPolyData or BSPolyData
         Input surface.
-    point_data : str, 1D ndarray
+    point_data : str, ndarray
         Input array to smooth. If str, it must be in the point data
         attributes of `surf`. If ndarray, use this array.
     n_iter : int, optional
         Number of smoothing iterations. Default is 5.
-    mask : 1D ndarray, optional
+    mask : str or 1D ndarray, optional
         Binary mask. If specified, smoothing is only performed on points
-        within the mask. Default is None.
+        within the mask. If str, it must be in the point data
+        attributes of `surf`. In this case, the mask is composed of all nonzero
+        values. Default is None.
     kernel : {'uniform', 'gaussian', 'inverse_distance'}, optional
         Smoothing kernel. Default is 'gaussian'.
     relax : float, optional
@@ -578,7 +693,7 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
     append : bool, optional
         If True, append array to point data attributes of input surface and
         return surface. Otherwise, only return array. Default is False.
-    array_name : str, optional
+    key : str, optional
         Array name to append to surface's point data attributes. Only used if
         ``append == True``. Default is None.
 
@@ -589,6 +704,16 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
         ``append == False``. Otherwise, return input surface with the
         new array.
 
+    Raises
+    ------
+    ValueError
+        If input array is 2D and number of rows does not coincide with number
+        of points in `surf`.
+
+    Notes
+    -----
+    For 2D arrays, each array is smoothed separately.
+
     """
 
     if relax <= 0 or relax >= 1:
@@ -596,6 +721,21 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
 
     if isinstance(point_data, str):
         point_data = surf.get_array(name=point_data, at='p')
+
+    is_flat = False
+    if point_data.ndim == 1:
+        point_data = np.atleast_2d(point_data).T
+        is_flat = True
+
+    if surf.n_points != point_data.shape[0]:
+        raise ValueError('Array must have {} rows.'.format(surf.n_points))
+
+    if point_data.shape[1] > 1:
+        warnings.warn('Array with multiple components (columns). Each '
+                      'component will be smoothed separately.')
+
+    if isinstance(mask, str):
+        point_data = surf.get_array(name=mask, at='p') != 0
 
     if mask is not None:
         pd = point_data[mask]
@@ -622,7 +762,8 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
     ws = w.sum(axis=1).A1
     w.data *= relax/ws[w.row]
 
-    retain = np.ones(pd.shape)
+    # retain = np.ones(pd.shape)
+    retain = np.ones((pd.shape[0], 1))
     retain[ws > 0] -= relax
 
     if np.issubdtype(pd.dtype, np.floating):
@@ -636,32 +777,108 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
         spd += wp
 
     if mask is not None:
-        spd = map_to_mask(spd, mask=mask)
-        spd[mask] = point_data[mask]
+        spd = map_to_mask(spd, mask=mask, axis=1)
+        spd[~mask] = point_data[~mask]
 
-    return spd
+    return spd.squeeze() if is_flat else spd
+
+
+def _get_pids_sphere(source, target, source_mask=None, target_mask=None):
+    """Spheres `source` and `target` must be aligned."""
+
+    c = vtkGenericCell()
+    close_pt, pcoord = np.empty((2, 3))
+    cid, subcid, dist = [vtk_mutable(0) for _ in range(3)]
+
+    if source_mask is not None:
+        gids = np.arange(source.n_points)
+        name_ids = source.append_array(gids, at='p')
+        source_masked = mask_points(source, source_mask)
+        source.remove_array(name_ids)
+        source = source_masked
+
+        if source.n_points != np.count_nonzero(source_mask):
+            raise ValueError('Source mask is not fully connected.')
+
+    celoc = vtkCellLocator()
+    celoc.SetDataSet(source.VTKObject)
+    celoc.BuildLocator()
+
+    tp = me.get_points(target, mask=target_mask)
+    n_pts = tp.shape[0]
+    weights = np.empty((n_pts, 3))
+    pids = np.empty((n_pts, 3), dtype=np.int64)
+
+    for i, p in enumerate(tp):
+        celoc.FindClosestPoint(p, close_pt, c, cid, subcid, dist)
+        c.EvaluatePosition(close_pt, close_pt, subcid, pcoord, dist,
+                           weights[i])
+        pids[i] = [c.GetPointIds().GetId(k) for k in range(3)]
+
+    if source_mask is not None:
+        gids = source.get_array(name_ids, at='p')
+        pids = np.unique(gids, return_inverse=True)[1][pids]
+
+    return pids, weights
+
+
+def _get_pids_naive(source, target, k=1, source_mask=None, target_mask=None,
+                    return_weights=True, n_jobs=1):
+    """Resampling based on k nearest points."""
+
+    sp = me.get_points(source, mask=source_mask)
+    tp = me.get_points(target, mask=target_mask)
+
+    tree = cKDTree(sp, leafsize=20, compact_nodes=False, copy_data=False,
+                   balanced_tree=False)
+    dist, pids = tree.query(tp, k=k, eps=0, n_jobs=n_jobs)
+
+    if return_weights:
+        return pids, 1 / dist
+    return pids
 
 
 @wrap_input(0, 1)
-def resample_pointdata(source_surf, target_surf, source_name, ops='mean',
-                       append=False, array_name=None):
+def resample_pointdata(source, target, data, is_sphere=False, source_mask=None,
+                       target_mask=None, red_func='mean', k=3, fill=0,
+                       n_jobs=1, append=False, key=None):
     """Resample point data in source to target surface.
 
     Parameters
     ----------
-    source_surf : vtkPolyData or BSPolyData
+    source : vtkPolyData or BSPolyData
         Source surface.
-    target_surf : vtkPolyData or BSPolyData
+    target : vtkPolyData or BSPolyData
         Target surface.
-    source_name : str or list of str
+    data : str, 1D ndarray or list or str and ndarray
         Point data in source surface to resample.
-    ops : {'mean', 'weighted_mean', 'mode', 'weighted_mode'}, optional
-        How is data resampled. Default is 'mean'.
+    is_sphere : bool, optional
+        If True, assume source and target are provided as spheres that are
+        aligned. Default is False.
+    source_mask : str or 1D ndarray, optional
+        Boolean mask. If str, it must be in the point data attributes of
+        `source`. Default is None. If specified, only consider points within
+        the mask.
+    target_mask : str or 1D ndarray, optional
+        Boolean mask. If str, it must be in the point data attributes of
+        `target`. Default is None. If specified, only consider points within
+        the mask.
+    red_func : {'mean', 'weighted_mean', 'mode', 'weighted_mode'}, optional
+        Reduction function. Default is 'mean'.
+    k : int, optional
+        Number of closest points to consider during resampling.
+        Only used when ``is_sphere==False``. Default is 3.
+    fill : int or float, optional
+        Value used for entries out of the mask. Only used if the
+        `target_mask` is provided. Default is 0.
+    n_jobs : int, optional
+        Number of parallel jobs. Only used when ``is_sphere==False``.
+        Default is 1.
     append: bool, optional
         If True, append array to point data attributes of target surface and
         return surface. Otherwise, only return resampled arrays.
         Default is False.
-    array_name : str or list of str, optional
+    key : str or list of str, optional
         Array names to append to target's point data attributes. Only used if
         ``append == True``. If None, use names in `source_name`.
         Default is None.
@@ -680,55 +897,68 @@ def resample_pointdata(source_surf, target_surf, source_name, ops='mean',
     vtkResampleWithDataSet.
 
     """
+    opt = ['mean', 'mode', 'weighted_mean', 'weighted_mode']
 
-    if not isinstance(source_name, list):
-        source_name = [source_name]
+    is_list = True
+    if not isinstance(data, list):
+        data = [data]
         is_list = False
+
+    if isinstance(red_func, str):
+        red_func = [red_func] * len(data)
+
+    if isinstance(source_mask, str):
+        source_mask = source.PointData[source_mask]
+    if isinstance(target_mask, str):
+        target_mask = source.PointData[target_mask]
+
+    if not is_sphere:
+        use_weights = False
+        if k > 1 and np.isin(red_func, opt[2:]).any():
+            use_weights = True
+
+        pids = _get_pids_naive(source, target, k=k, source_mask=source_mask,
+                               target_mask=target_mask, n_jobs=n_jobs,
+                               return_weights=use_weights)
+        if use_weights:
+            pids, w = pids
     else:
-        is_list = True
+        pids, w = _get_pids_sphere(source, target, source_mask=source_mask,
+                                   target_mask=target_mask)
 
-    if not isinstance(ops, list):
-        ops = [ops] * len(source_name)
+        k = None
+        for i, rf in enumerate(red_func):
+            if rf in ['mean', 'mode']:
+                red_func[i] = 'weighted_%s' % rf
 
-    if array_name is None:
-        array_name = source_name
+    resampled = [None] * len(data)
+    for i, d in enumerate(data):
+        if isinstance(d, str):
+            d = source.PointData[d]
 
-    cell_centers = compute_cell_center(source_surf)
-    cells = me.get_cells(source_surf)
+        if source_mask is not None:
+            d = d[source_mask]
 
-    tree = cKDTree(cell_centers, leafsize=20, compact_nodes=False,
-                   copy_data=False, balanced_tree=False)
-    _, idx_cell = tree.query(target_surf.Points, k=1, eps=0, n_jobs=1)
-
-    closest_cells = cells[idx_cell]
-    if np.any([op1 in ['weighted_mean', 'weighted_mode'] for op1 in ops]):
-        dist_to_cell_points = np.sum((target_surf.Points[:, None] -
-                                      source_surf.Points[closest_cells])**2,
-                                     axis=-1)
-        dist_to_cell_points **= .5
-        dist_to_cell_points += np.finfo(np.float).eps
-        weights = 1 / dist_to_cell_points
-
-    resampled = [None] * len(source_name)
-    for i, fn in enumerate(source_name):
-        candidate_feat = source_surf.get_array(fn, at='p')[closest_cells]
-        if ops[i] == 'mean':
-            feat = np.mean(candidate_feat, axis=1)
-        elif ops[i] == 'weighted_mean':
-            feat = np.average(candidate_feat, weights=weights, axis=1)
-        elif ops[i] == 'mode':
-            feat = mode(candidate_feat, axis=1)[0].squeeze()
-            feat = feat.astype(candidate_feat.dtype)
-        elif ops[i] == 'weighted_mode':
-            feat = weighted_mode(candidate_feat, weights, axis=1)[0].squeeze()
-            feat = feat.astype(candidate_feat.dtype)
+        if k == 1:
+            feat = d[pids]
+        elif red_func[i] == 'mean':
+            feat = np.mean(d[pids], axis=1)
+        elif red_func[i] == 'weighted_mean':
+            feat = np.average(d[pids], weights=w, axis=1)
+        elif red_func[i] == 'mode':
+            feat = mode(d[pids], axis=1)[0].squeeze()
+        elif red_func[i] == 'weighted_mode':
+            feat = weighted_mode(d[pids], w, axis=1)[0].squeeze()
+            feat = feat.astype(d.dtype)
         else:
-            raise ValueError('Unknown op: {0}'.format(ops[i]))
+            raise ValueError('Unknown red_func: {0}'.format(red_func[i]))
 
+        if target_mask is not None:
+            feat = map_to_mask(feat, mask=target_mask, fill=fill)
         resampled[i] = feat
 
-    if append:
+    if append and key is not None:
         for i, feat in enumerate(resampled):
-            target_surf.append_array(feat, name=array_name[i], at='p')
-        return target_surf
+            target.append_array(feat, name=key[i], at='p')
+
     return resampled if is_list else resampled[0]

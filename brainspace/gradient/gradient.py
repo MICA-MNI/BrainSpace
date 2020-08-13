@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse as sp
 
 from sklearn.base import BaseEstimator
 
@@ -65,7 +66,7 @@ class GradientMaps(BaseEstimator):
 
     Parameters
     ----------
-    n_gradients : int, optional
+    n_components : int, optional
         Number of gradients. Default is 10.
     approach : {'dm', 'le', 'pca'} or object, optional
         Embedding approach. Default is 'dm'. It can be a string or instance:
@@ -75,9 +76,11 @@ class GradientMaps(BaseEstimator):
           eigenmaps.
         - 'pca' or :class:`.PCAMaps`: embedding using PCA.
 
-    kernel : str or None, optional
+    kernel : str, callable or None, optional
         Kernel function to build the affinity matrix. Possible options:
         {'pearson', 'spearman', 'cosine', 'normalized_angle', 'gaussian'}.
+        If callable, must receive a 2D array and return a 2D square array.
+        If None, use input matrix. Default is None.
     alignment : {'procrustes', 'joint'}, object or None
         Alignment approach. Only used when two or more datasets are provided.
         If None, no alignment is peformed. If `object`, it accepts an instance
@@ -94,18 +97,18 @@ class GradientMaps(BaseEstimator):
 
     Attributes
     ----------
-    lambdas_ : ndarray or list of arrays, shape = (n_gradients,)
+    lambdas_ : ndarray or list of arrays, shape = (n_components,)
         Eigenvalues for each datatset.
-    gradients_ : ndarray or list of arrays, shape = (n_samples, n_gradients)
+    gradients_ : ndarray or list of arrays, shape = (n_samples, n_components)
         Gradients (i.e., eigenvectors).
-    aligned_ : None or list of arrays, shape = (n_samples, n_gradients)
+    aligned_ : None or list of arrays, shape = (n_samples, n_components)
         Aligned gradients. None if ``alignment is None`` or only one dataset
         is used.
     """
 
-    def __init__(self, n_gradients=10, approach='dm', kernel=None,
+    def __init__(self, n_components=10, approach='dm', kernel=None,
                  alignment=None, random_state=None):
-        self.n_gradients = n_gradients
+        self.n_components = n_components
         self.approach = approach
         self.kernel = kernel
         self.alignment = alignment
@@ -143,9 +146,16 @@ class GradientMaps(BaseEstimator):
             Returns self.
         """
 
-        if isinstance(x, np.ndarray):
+        align_single = False
+        if self.alignment is not None and self.alignment != 'joint' and \
+                not isinstance(x, list) and reference is not None:
+            x = [x]
+            n_iter = 1
+            align_single = True
+
+        if isinstance(x, np.ndarray):  # or sp.issparse(x):
             self.lambdas_, self.gradients_ = \
-                _fit_one(x, self.approach, self.kernel, self.n_gradients,
+                _fit_one(x, self.approach, self.kernel, self.n_components,
                          self.random_state, gamma=gamma, sparsity=sparsity,
                          **kwargs)
             self.aligned_ = None
@@ -156,6 +166,8 @@ class GradientMaps(BaseEstimator):
         n = len(x)
         lam, grad = [None] * n, [None] * n
         if self.alignment == 'joint':
+            if n < 2:
+                raise ValueError('Joint alignment requires >=2 datasets.')
             self.fit(np.vstack(x), gamma=gamma, sparsity=sparsity, **kwargs)
 
             s = np.cumsum([0] + [x1.shape[0] for x1 in x])
@@ -178,11 +190,17 @@ class GradientMaps(BaseEstimator):
                 self.aligned_ = pa.aligned_
 
             elif isinstance(self.alignment, ProcrustesAlignment):
+                self.alignment.set_params(n_iter=n_iter)
                 self.alignment.fit(self.gradients_, reference=reference)
-                self.aligned_ = self.alignment.fit(self.gradients_).aligned_
+                self.aligned_ = self.alignment.aligned_
 
             else:
                 self.aligned_ = None
+
+        if align_single:
+            self.gradients_ = self.gradients_[0]
+            self.lambdas_ = self.lambdas_[0]
+            self.aligned_ = self.aligned_[0]
 
         return self
 

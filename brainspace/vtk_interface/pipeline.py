@@ -1,15 +1,14 @@
 """
-VTK pipeline wrapper.
+Pipeline for VTK filters.
 """
 
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
-# from vtkmodules.vtkCommonExecutionModelPython import vtkAlgorithm
-from vtk import vtkAlgorithm
 
-from .wrappers import BSDataObject, BSAlgorithm
 from .decorators import wrap_input
+from .wrappers.algorithm import BSAlgorithm
+from .wrappers.data_object import BSDataObject
 
 
 # From https://vtk.org/Wiki/VTK/Tutorials/New_Pipeline
@@ -51,45 +50,46 @@ def connect(ftr0, ftr1, port0=0, port1=0, add_conn=False):
 
     """
 
-    if isinstance(ftr0, BSAlgorithm):
-        if port0 >= ftr0.nop:
-            raise ValueError("'{0}' only has {1} output ports."
-                             .format(ftr0.__vtkname__, ftr0.nop))
+    if isinstance(ftr0, BSAlgorithm) and port0 >= ftr0.nop:
+        raise ValueError("'{0}' only has {1} output ports.".
+                         format(ftr0.__vtkname__, ftr0.nop))
 
     if port1 >= ftr1.nip:
         raise ValueError("'{0}' only accepts {1} input ports.".
                          format(ftr1.__vtkname__, ftr1.nip))
 
-    if type(add_conn) == bool and add_conn or type(add_conn) == int:
+    if add_conn is True or type(add_conn) == int:
         if ftr1.nip > 1:
             raise ValueError("No support yet for 'add_conn' when filter "
                              "has more than 1 input ports.")
 
         pinfo = ftr1.GetInputPortInformation(port1)
         if pinfo.Get(ftr1.INPUT_IS_REPEATABLE()) == 0:
-            raise ValueError("Input port {0} of '{1}' does not accept multiple "
-                             "connections.".format(ftr1.nip, ftr1.__vtkname__))
+            raise ValueError("Input port {0} of '{1}' does not "
+                             "accept multiple connections.".
+                             format(ftr1.nip, ftr1.__vtkname__))
 
         if type(add_conn) == int:
             if not hasattr(ftr1, 'GetUserManagedInputs') or \
                     ftr1.GetUserManagedInputs() == 0:
                 raise ValueError("Input port {0} of '{1}' does not accept "
-                                 "connection number.".format(ftr1.nip,
-                                                             ftr1.__vtkname__))
+                                 "connection number."
+                                 .format(ftr1.nip, ftr1.__vtkname__))
 
     if isinstance(ftr0, BSAlgorithm):
-        if type(add_conn) == bool and add_conn:
+        op = ftr0.GetOutputPort(port0)
+        if add_conn is True:
             # Connection for only 1 input port. Not tested.
-            ftr1.AddInputConnection(port1, ftr0.GetOutputPort(port0))
+            ftr1.AddInputConnection(port1, op)
         elif type(add_conn) == int:
             # Connection for only 1 input port. Not tested.
-            ftr1.SetInputConnectionByNumber(add_conn, ftr0.GetOutputPort(port0))
+            ftr1.SetInputConnectionByNumber(add_conn, op)
         else:
-            ftr1.SetInputConnection(port1, ftr0.GetOutputPort(port0))
+            ftr1.SetInputConnection(port1, op)
 
     elif isinstance(ftr0, BSDataObject):
         ftr0 = ftr0.VTKObject
-        if type(add_conn) == bool and add_conn:
+        if add_conn is True:
             ftr1.AddInputData(ftr0)
         elif type(add_conn) == int:
             ftr1.SetInputDataByNumber(add_conn, ftr0)
@@ -270,7 +270,7 @@ def serial_connect(*filters, as_data=True, update=True, port=0):
               input port `ip` of filter `fi`. Default is None.
             * `ip` (int, optional) - This is the input port of `fi`. Must be
               specified when `ic` is not None. Default is 0.
-            * `fi` (vtkAlgorithm or :class:`.BSAlgorithm`) - This is the filter.
+            * `fi` (vtkAlgorithm or :class:`.BSAlgorithm`) - This is a filter.
             * `op` (int, optional) - This is the output port of `fi`.
               Default is 0.
 

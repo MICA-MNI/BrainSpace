@@ -1,14 +1,14 @@
-.. _load_template_matlab:
+.. _load_gradient_matlab:
 
 =======================
-load_template
+load_gradient
 =======================
 
 ------------------
 Synopsis
 ------------------
 
-Loads template gradients (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/example_data_loaders/load_template.m>`_). 
+Loads template gradients (`source code <https://github.com/MICA-MNI/BrainSpace/blob/master/matlab/example_data_loaders/load_gradient.m>`_). 
 
 ------------------
 Usage
@@ -16,9 +16,17 @@ Usage
 
 ::
 
-    data = load_template(type,number)
+    data = load_gradient(name,number)
 
-- *type*: The type of gradient, either 'fc' for functional connectivity or 'mpc' for microstructural profile covariance. 
+- *name*: The type of gradient, either 'fc' for functional connectivity or 'mpc' for microstructural profile covariance. 
 - *number*: The rank of the gradient, either 1 or 2. 
 - *data*: Output data. 
 
+------------------
+Description
+------------------
+
+Loads normative functional connectivity and microstructural profile covariance
+gradients, both computed from the HCP dataset. Gradients were computed with a
+cosine similarity kernel and diffusion mapping on a downsampled 5K cortical
+mesh. Resulting gradients were upsampled to the 32K mesh. 

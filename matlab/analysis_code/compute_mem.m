@@ -23,11 +23,22 @@ function MEM = compute_mem(W,varargin)
 % Parse input
 p = inputParser;
 addParameter(p, 'n_ring', 1, @isnumeric);
+addParameter(p, 'distance_metric', 'mesh', @ischar); 
 addParameter(p, 'mask', [], @islogical);
-addParameter(p, 'eigenvectors', 'all', @ischar);
+addParameter(p, 'spectrum', 'all', @ischar);
 
 parse(p, varargin{:});
 R = p.Results;
+
+% Check correct spectrum input
+if ~ismember(lower(p.Results.spectrum),{'all','nonzero'})
+    error('Spectrum must be ''all'' or ''nonzero''.');
+end
+
+% Check correct distance metric input. 
+if ~ismember(lower(p.Results.distance_metric),{'mesh','geodesic'})
+    error('distance_metric must be ''mesh'' or ''geodesic''.');
+end
 
 % If input is cell array, combine surfaces.
 if iscell(W)
@@ -59,18 +70,32 @@ if isstruct(W) || ischar(W)
     edges = double(unique(sort([faces(:,[1 2]); faces(:,[1 3]); faces(:,[2 3])],2),'rows'));
     edges(any(ismember(edges,R.mask),2),:) = [];
     
-    % Compute nodes within n_ring - this can probably be much more efficient
-    G = graph(edges(:,1),edges(:,2));
-    G = rmnode(G,find(degree(G)==0));
-    D_all = distances(G);
-    D = (D_all > 0) & (D_all <= R.n_ring);
-    
     % Compute euclidean distances
     dist = double(sqrt(sum((W.vertices(edges(:,1),:) - W.vertices(edges(:,2),:)).^2,2)));
     Gw = graph(edges(:,1),edges(:,2),dist);
     Gw = rmnode(Gw,find(degree(Gw)==0));
+    % Check if graph is connected.
+    if numel(unique(conncomp(Gw)))>1
+        error('The graph is disconnected (after applying the mask). A path must exist between all vertices (excluding those in the mask).')
+    end    
     D_weighted = distances(Gw);
     D_weighted(isinf(D_weighted)) = 0; 
+    
+    % Compute nodes within n_ring - this can probably be much more efficient
+    if lower(R.distance_metric) == "mesh"
+        G = graph(edges(:,1),edges(:,2));
+        G = rmnode(G,find(degree(G)==0));
+
+        % Check if graph is connected.
+        if numel(unique(conncomp(G)))>1
+            error('The graph is disconnected (after applying the mask). A path must exist between all vertices (excluding those in the mask).')
+        end
+
+        D_all = distances(G);
+        D = (D_all > 0) & (D_all <= R.n_ring);
+    elseif lower(R.distance_metric) == "geodesic"
+        D = D_weighted <= R.n_ring; 
+    end
     
     % Compute weights.
     W = (D .* D_weighted).^-1;
@@ -91,7 +116,7 @@ end
 
 % Remove zero eigenvector
 idx = find(abs(lambda) < 1e-10); 
-if strcmp(R.eigenvectors,'all')
+if strcmp(R.spectrum,'all')
     if numel(idx) == 1
         MEM(:,idx) = [];
         lambda(idx) = []; 

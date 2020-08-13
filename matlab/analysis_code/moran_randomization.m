@@ -1,12 +1,15 @@
-function Y_rand = moran_randomization(Y,MEM,nRandomizations,procedure,joint)
+function Y_rand = moran_randomization(Y,MEM,n_rep,varargin)
 % MORAN_RANDOMIZATION   Null model for spatially auto-correlated data.
-%   y_rand = MICA_MORAN_RANDOMIZATION(y,MEM,nRandomizations,procedure,joint)
-%   computes random values x_rand with similar spatial properties as the
-%   input data x. x is a n-by-1 vector of observations, MEM are the Moran
-%   eigenvectors, nRandomizations is a scalar denoting the amount of
-%   randomized datasets in the output, procedure is the method used to
-%   compute randomized data, and joint determines whether columns of Y are
-%   randomized identically or separately.
+%   y_rand = MICA_MORAN_RANDOMIZATION(y,MEM,n_rep,varargin) computes
+%   random values x_rand with similar spatial properties as the input data
+%   x. x is a n-by-1 vector of observations, MEM are the Moran
+%   eigenvectors, n_rep is a scalar denoting the amount of randomized
+%   datasets in the output. 
+%
+%   Valid name-value pairs are:
+%       'procedure' : either 'singleton', or 'pair'.
+%       'joint' : either true or false.
+%       'random_state' : any argument accepted by rng() or nan. 
 %
 %   The procedure can be either 'singleton' or 'pair'. 
 %
@@ -23,6 +26,18 @@ function Y_rand = moran_randomization(Y,MEM,nRandomizations,procedure,joint)
 
 
 %% Deal with the input.  
+p = inputParser;
+addParameter(p, 'procedure', 'singleton');
+addParameter(p, 'joint', true, @islogical);
+addParameter(p, 'random_state', nan);
+parse(p, varargin{:});
+
+procedure = p.Results.procedure;
+joint = p.Results.joint;
+
+if ~isnan(p.Results.random_state)
+    rng(p.Results.random_state); 
+end
 
 procedure = lower(procedure);
 if ~any(procedure == ["singleton","pair"])
@@ -38,15 +53,15 @@ n = size(MEM,1);
 switch procedure
     case 'singleton'
         % Run singleton procedure.
-        a = singletonProcedure(r_xV,nRandomizations,joint);
+        a = singletonProcedure(r_xV,n_rep,joint);
     case 'pair'
         if size(Y,2) > 1
             error('Multivariate resampling has not been implemented for the pair procedure.');
         end
-        a = nan(size(n,nRandomizations));
+        a = nan(size(n,n_rep));
         rem = mod(n,2);
-        pairs = nan(2,(n-rem)/2,nRandomizations);
-        for loop = 1:nRandomizations
+        pairs = nan(2,(n-rem)/2,n_rep);
+        for loop = 1:n_rep
             % Make pairs and find the remainder. 
             shuffle = randperm(n);
             pairs(:,:,loop) = reshape(shuffle(1:end-rem),2,[]);
@@ -68,7 +83,7 @@ switch procedure
 end
 
 % Compute the simulated data, match the mean and standard deviation. 
-Y_rand = nan(size(Y,1),size(Y,2),nRandomizations);
+Y_rand = nan(size(Y,1),size(Y,2),n_rep);
 for ii = 1:size(a,2)
     Y_rand(:,ii,:) = mean(Y(:,ii)) + std(Y(:,ii)) .* ((n-1)^0.5*MEM*squeeze(a(:,ii,:)));
 end
