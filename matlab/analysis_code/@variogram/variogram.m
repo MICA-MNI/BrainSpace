@@ -16,7 +16,6 @@ classdef variogram
     
     properties(Hidden, Access = private)
         disort
-        u_prctile     
     end
 
     %% Public Methods
