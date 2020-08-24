@@ -1,6 +1,6 @@
 classdef variogram
-    
-    properties
+    %% Properties 
+    properties(SetAccess = private)
         D
         deltas
         kernel
@@ -9,25 +9,35 @@ classdef variogram
         resample
         b
         random_state
-        n
-        dense
+        ns
+        knn
+        verbose
     end
     
+    properties(Hidden, Access = private)
+        disort
+        u_prctile     
+    end
+
+    %% Public Methods
     methods
+        %%% Constructor %%%
         function obj = variogram(varargin)
             % Deal with input.
             is_square_numeric = @(x)size(x,1)==size(x,2) && isnumeric(x) && numel(size(x))==2;
             valid_kernel = @(x) ismember(lower(x),{'exp','gaussian','uniform','invdist'});
             p = inputParser;
             addRequired( p, 'D'                         , is_square_numeric);
-            addParameter(p, 'deltas'    , 0.1:0.1:0.9   , @(x) x>0 && x<=1);
+            addParameter(p, 'deltas'    , 0.1:0.1:0.9   , @(x) all(x>0 & x<=1));
             addParameter(p, 'kernel'    , 'exp'         , valid_kernel);
             addParameter(p, 'pv'        , 25            , @(x) x>0 && x<=100 && isscalar(x));
             addParameter(p, 'nh'        , 25            , @(x)isscalar(x) && isnumeric(x));
             addParameter(p, 'resample'  , false         , @islogical);
             addParameter(p, 'b'         , nan           , @(x)isscalar(x) && isnumeric(x));
             addParameter(p, 'random_state', nan);
-            addParameter(p, 'dense'     , true          , @islogical);
+            addParameter(p, 'ns'        , inf           , @(x)isscalar(x) && isnumeric(x));
+            addParameter(p, 'knn'       , 1000          , @(x)isscalar(x) && isnumeric(x));
+            addParameter(p, 'verbose'   , false         , @(x)islogical(x) && isscalar(x));
             
             % Assign input to object properties. 
             parse(p, varargin{:});
@@ -35,55 +45,78 @@ classdef variogram
             for ii = 1:numel(f)
                 obj.(f{ii}) = p.Results.(f{ii});
             end  
-            
-            % Check for unimplemented stuff
-            if ~obj.dense 
-                error('The sparse implementation has not been ported to MATLAB yet.')
-            end 
+
+            if obj.ns <= obj.knn
+                error('The number of samples must be higher than the number of nearest neighbors.');
+            end
         end
         
-        %% Fitting functions
+        %%% Fitting function %%%
         function surrs = fit(obj,x,n)
             % Set default n to 1000.
             if ~exist('n','var')
                 n = 1000;
             end
             
-            % Set random state
+            % Set random state.
             if ~isnan(obj.random_state)
                 rng(obj.random_state)
             end
-            
-            mask = ~isnan(x);
-            
-            % Initialize variables
+                        
+            % Initialize variables.
             alpha = zeros(numel(obj.deltas),1);
             beta = zeros(numel(obj.deltas),1);
             rsquared = zeros(numel(obj.deltas),1);
             surrs = zeros(size(x,1),n);
             
-            % Compute true variogram
-            v = obj.compute_variogram(x);
-            smvar = obj.smooth_variogram(v);
+            % Only compute the sorted distance matrix once because sorting
+            % large matrices takes a while.
+            [~,obj.disort] = sort(obj.D,2);
+            
+            % Compute true variogram (dense).
+            if isinf(obj.ns)
+                v = obj.compute_variogram(x);
+                [utrunc,uidx,h] = obj.prepare_smooth_variogram(); 
+                smvar = obj.smooth_variogram(utrunc,uidx,v,h);
+            end
             
             % Generate surrograte maps.
             for ii = 1:n
-                % Create a permuted map
-                [x_perm,~] = obj.permute_map(x,mask);
+                if obj.verbose
+                    if ii ~= 1 && ii ~=n
+                        fprintf(repmat('\b',1,s));
+                    end
+                    s = fprintf('Generating surrogate map %d of %d.\r',ii,n);
+                end
+                % Compute true variogram and permuted map (sampled).
+                if ~isinf(obj.ns)
+                    idx = randperm(size(x,1),obj.ns);
+                    v = obj.compute_variogram(x(idx));
+                    [utrunc,uidx,h] = obj.prepare_smooth_variogram(idx);
+                    smvar = obj.smooth_variogram(utrunc,uidx,v,h);                 
+                end
+                
+                % Compute permuted map.
+                [x_perm,~] = obj.permute_map(x,~isnan(x));
+                
                 for jj = 1:numel(obj.deltas)
                     % Smooth permuted map.
                     sm_x_perm = obj.smooth_map(x_perm,jj);
                     
                     % Calculate empirical variogram
-                    vperm = obj.compute_variogram(sm_x_perm);
-                    smvar_perm = obj.smooth_variogram(vperm);
+                    if ~isinf(obj.ns)
+                        vperm = obj.compute_variogram(sm_x_perm(idx));
+                    else
+                        vperm = obj.compute_variogram(sm_x_perm);
+                    end
+                    smvar_perm = obj.smooth_variogram(utrunc,uidx,vperm,h);
                     
                     % Fit linear regression between smoothed variograms
                     [alpha(jj),beta(jj),rsquared(jj)] = obj.local_regression(smvar_perm,smvar);
                 end
                 
                 % Select best-fit model and regression parameters.
-                [~,idx] = min(rsquared);
+                [~,idx] = max(rsquared);
                 %dopt = obj.deltas(idx);
                 aopt = alpha(idx);
                 bopt = beta(idx);
@@ -97,23 +130,20 @@ classdef variogram
             if obj.resample
                 sorted_map = sort(x);
                 for ii = 1:n
-                    [~,idx] = ismember(surrs(:,ii),sort(surrs(:,ii)));
-                    surrs(:,ii) = sorted_map(idx);
+                    [~,idx_resample] = ismember(surrs(:,ii),sort(surrs(:,ii)));
+                    surrs(:,ii) = sorted_map(idx_resample);
                 end
             end
         end
-        
-        function smvar = smooth_variogram(obj,v)            
-            % Truncate u and v. 
-            upper_triangle = triu(ones(size(obj.D),'logical'),1);
-            u = obj.D(upper_triangle);
-            uidx = u < prctile(u,obj.pv);
+    end
+    
+    %% Private methods
+    methods(Access = private)
+        function smvar = smooth_variogram(obj,utrunc,uidx,v,h)  
+            % Smooths the variograms. 
             
-            utrunc = u(uidx);
             vtrunc = v(uidx);
-            
-            h = linspace(min(utrunc(:)),max(utrunc(:)),obj.nh);
-            
+                        
             % Auto-estimate b if it's nan. 
             if isnan(obj.b)
                 b_valid = 3 * (h(end)-h(1)) / (numel(h)-1);
@@ -126,15 +156,33 @@ classdef variogram
             smvar = sum(w.*vtrunc) ./ sum(w);
         end
         
-        function sm_map = smooth_map(obj,x,deltaidx)
-            % Smooth x using delta proportion of nearest neighbors.
+        function [utrunc,uidx,h] = prepare_smooth_variogram(obj,idx)
+            % Originally part of smooth_variogram. 
+            % Set to a separate function as this only needs to run once
+            % per permutation. 
+            if nargin > 1
+                D_subsample = obj.D(idx,idx);
+            else
+                D_subsample = obj.D;
+            end
             
-            % Find indices of first kmax elements of each for of dist matrix
-            [~,disort] = sort(obj.D,2);
+            upper_triangle = triu(ones(size(D_subsample),'logical'),1);
+            u = D_subsample(upper_triangle);
+            uidx = u < prctile(u,obj.pv);
+            utrunc = u(uidx);
+            h = linspace(min(utrunc(:)),max(utrunc(:)),obj.nh);
+        end
+        
+        function sm_map = smooth_map(obj,x,idx_delta)
+            % Smooth x using delta proportion of nearest neighbors.     
             
             % Get distances and values of k nearest neighbours
-            k = floor(obj.deltas(deltaidx) * size(obj.D,1));
-            jkn = disort(:,2:k+1);
+            if isinf(obj.ns)
+                k = floor(obj.deltas(idx_delta) * size(obj.D,1));
+            else
+                k = floor(obj.deltas(idx_delta) * obj.knn);
+            end
+            jkn = obj.disort(:,2:k+1);
             jkn_idx = jkn + (0:size(obj.D,1):(size(jkn,1)-1)*size(obj.D,1))'; % Convert row indices to matrix indices. 
             dkn = obj.D(jkn_idx);            
             xkn = x(jkn);
@@ -145,7 +193,6 @@ classdef variogram
         end
     end
     
-    %% Static methods.
     methods(Static, Access = private)
         function [data_perm,mask_perm] = permute_map(data,mask)
             % Return randomly permuted brain map.
