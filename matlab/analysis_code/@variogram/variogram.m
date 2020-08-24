@@ -1,4 +1,47 @@
 classdef variogram
+% VARIOGRAM Generates brain maps with similar spatial autocorrelation.
+%
+%   obj = VARIOGRAM(D,varargin) initializes the variogram object based on
+%   symmetric distance matrix D. Valid name-value pairs are:
+%   deltas : 1-dimensional vector, default [0.1,0.2,...,0.9]
+%       Proportion of neighbors to include for smoothing, in (0, 1]
+%   kernel : character vector, default 'exp'
+%       Kernel with which to smooth permuted maps:
+%           'gaussian' : Gaussian function.
+%           'exp' : Exponential decay function.
+%           'invdist' : Inverse distance.
+%           'uniform' : Uniform weights (distance independent).
+%   pv : scalar (float), default 25
+%       Percentile of the pairwise distance distribution at which to
+%       truncate during variogram fitting.
+%   nh : scalar (integer), default 25
+%       Number of uniformly spaced distances at which to compute
+%       variograms.
+%   resample : logical, default false
+%       Resample surrogate maps' values from target brain map
+%   b : scalar (float) or nan, default nan
+%       Gaussian kernel bandwidth for variogram smoothing. If None, set to
+%       three times the spacing between variogram x-coordinates.
+%   random_state : any valid input for the rng() function. Set to nan for
+%       no random initialization.
+%   ns : scalar (integer) or inf, default inf. 
+%       Number of samples to use when subsampling the brainmap. Set to inf
+%       to use the entire brainmap. 
+%   knn : scalar (integer), default 1000
+%       Number of nearest neighbours to use when smoothing the map. knn
+%       must be smaller than ns. 
+%
+%   Public Methods: surrogates = obj.fit(x,n) generates n surrogate maps
+%   for brain map x. x must have the same length as D. n is set to 1000 by
+%   default. 
+%
+%   Example usage:
+%   x = rand(100,1);
+%   D = rand(100:
+%   D = D + D'; % make distance matrix symmetric.
+%   obj = variogram(D);
+%   surrogates = obj.fit(x); 
+
     %% Properties 
     properties(SetAccess = private)
         D
@@ -47,6 +90,9 @@ classdef variogram
 
             if obj.ns <= obj.knn
                 error('The number of samples must be higher than the number of nearest neighbors.');
+            end
+            if ~isinf(obj.ns) && obj.ns >= size(obj.D,1)
+                error('The number of samples must be smaller than the number of nodes or infinite.');
             end
         end
         
