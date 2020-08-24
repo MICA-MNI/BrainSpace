@@ -30,6 +30,12 @@ classdef variogram
 %   knn : scalar (integer), default 1000
 %       Number of nearest neighbours to use when smoothing the map. knn
 %       must be smaller than ns. 
+%   num_workers: number of workers in the parallel pool, default 0.
+%       Sets the number of workers in a parallel pool. Only available if
+%       the parallel processing toolbox is installed. Note that if another
+%       pool is running with a different number of workers, then this pool
+%       will be shut down. The parallel pool is not closed at the end of
+%       the script. 
 %
 %   Public Methods: surrogates = obj.fit(x,n) generates n surrogate maps
 %   for brain map x. x must have the same length as D. n is set to 1000 by
@@ -41,6 +47,10 @@ classdef variogram
 %   D = D + D'; % make distance matrix symmetric.
 %   obj = variogram(D);
 %   surrogates = obj.fit(x); 
+%
+%   
+%  
+%   ADD A READTHEDOCS LINK!
 
     %% Properties 
     properties(SetAccess = private)
@@ -55,6 +65,7 @@ classdef variogram
         ns
         knn
         verbose
+        num_workers
     end
     
     properties(Hidden, Access = private)
@@ -80,6 +91,7 @@ classdef variogram
             addParameter(p, 'ns'        , inf           , @(x)isscalar(x) && isnumeric(x));
             addParameter(p, 'knn'       , 1000          , @(x)isscalar(x) && isnumeric(x));
             addParameter(p, 'verbose'   , false         , @(x)islogical(x) && isscalar(x));
+            addParameter(p, 'num_workers', 0             , @(x)isscalar(x) && isnumeric(x));
             
             % Assign input to object properties. 
             parse(p, varargin{:});
@@ -87,17 +99,29 @@ classdef variogram
             for ii = 1:numel(f)
                 obj.(f{ii}) = p.Results.(f{ii});
             end  
-
-            if obj.ns <= obj.knn
-                error('The number of samples must be higher than the number of nearest neighbors.');
-            end
+            
             if ~isinf(obj.ns) && obj.ns >= size(obj.D,1)
                 error('The number of samples must be smaller than the number of nodes or infinite.');
+            end
+            
+            if obj.num_workers ~= 0 && ~isnan(obj.random_state)
+                warning('Due to the way that random number initialization works on parallel pools, the results of this script will not be identical on separate runs even with the random state defined.');
             end
         end
         
         %%% Fitting function %%%
         function surrs = fit(obj,x,n)
+            % Start the parallel pool.
+            if obj.num_workers ~= 0
+                p = gcp('nocreate');
+                if isempty(p)
+                    parpool(obj.num_workers);   
+                elseif p.NumWorkers ~= obj.num_workers
+                    delete(p);
+                    parpool(obj.num_workers);
+                end
+            end
+            
             % Set default n to 1000.
             if ~exist('n','var')
                 n = 1000;
@@ -109,36 +133,53 @@ classdef variogram
             end
                         
             % Initialize variables.
-            alpha = zeros(numel(obj.deltas),1);
-            beta = zeros(numel(obj.deltas),1);
-            rsquared = zeros(numel(obj.deltas),1);
             surrs = zeros(size(x,1),n);
             
             % Only compute the sorted distance matrix once because sorting
             % large matrices takes a while.
             [~,obj.disort] = sort(obj.D,2);
             
-            % Compute true variogram (dense).
+            % Compute true variogram (dense). 
+            % Put inside a temporary structure to deal with parfor issues;
+            % parfor doesn't accept variables by the same name being
+            % defined both inside and outside the loop, even if they are
+            % defined in mutually exclusive if statements. 
             if isinf(obj.ns)
-                v = obj.compute_variogram(x);
-                [utrunc,uidx,h] = obj.prepare_smooth_variogram(); 
-                smvar = obj.smooth_variogram(utrunc,uidx,v,h);
+                v_out = obj.compute_variogram(x);
+                [tmp.utrunc,tmp.uidx,tmp.h] = obj.prepare_smooth_variogram(); 
+                tmp.smvar = obj.smooth_variogram(tmp.utrunc,tmp.uidx,v_out,tmp.h);
+            else
+                % Par-for wants a variable called "tmp" even if its unused.
+                tmp = struct();
             end
-            
+           
             % Generate surrograte maps.
-            for ii = 1:n
-                if obj.verbose
+            parfor (ii = 1:n, obj.num_workers)
+                if obj.verbose %#ok<*PFBNS>
                     if ii ~= 1 && ii ~=n
                         fprintf(repmat('\b',1,s));
                     end
                     s = fprintf('Generating surrogate map %d of %d.\r',ii,n);
                 end
+                
+                % Initialize variables
+                aopt = nan;
+                bopt = nan;
+                rsquared_best = -inf; 
+                idxopt = nan;
+                
                 % Compute true variogram and permuted map (sampled).
                 if ~isinf(obj.ns)
-                    idx = randperm(size(x,1),obj.ns);
-                    v = obj.compute_variogram(x(idx));
-                    [utrunc,uidx,h] = obj.prepare_smooth_variogram(idx);
+                    perm = randperm(size(x,1),obj.ns);
+                    v = obj.compute_variogram(x(perm));
+                    [utrunc,uidx,h] = obj.prepare_smooth_variogram(perm);
                     smvar = obj.smooth_variogram(utrunc,uidx,v,h);                 
+                else
+                    perm = nan; % This line prevents MATLAB from throwing a par-for warning - the line itself doesn't do anything. 
+                    utrunc = tmp.utrunc;
+                    uidx = tmp.uidx;
+                    h = tmp.h;
+                    smvar = tmp.smvar;
                 end
                 
                 % Compute permuted map.
@@ -150,24 +191,24 @@ classdef variogram
                     
                     % Calculate empirical variogram
                     if ~isinf(obj.ns)
-                        vperm = obj.compute_variogram(sm_x_perm(idx));
+                        vperm = obj.compute_variogram(sm_x_perm(perm));
                     else
                         vperm = obj.compute_variogram(sm_x_perm);
                     end
                     smvar_perm = obj.smooth_variogram(utrunc,uidx,vperm,h);
                     
                     % Fit linear regression between smoothed variograms
-                    [alpha(jj),beta(jj),rsquared(jj)] = obj.local_regression(smvar_perm,smvar);
+                    [alpha,beta,rsquared] = obj.local_regression(smvar_perm,smvar);
+                    
+                    if rsquared > rsquared_best
+                        aopt = alpha; 
+                        bopt = beta;
+                        idxopt = jj;
+                    end      
                 end
                 
-                % Select best-fit model and regression parameters.
-                [~,idx] = max(rsquared);
-                %dopt = obj.deltas(idx);
-                aopt = alpha(idx);
-                bopt = beta(idx);
-                
                 % Transform and smooth permuted map using best-fit parameters.
-                sm_xperm_best = obj.smooth_map(x_perm,idx);
+                sm_xperm_best = obj.smooth_map(x_perm,idxopt);
                 surrs(:,ii) = sqrt(abs(bopt)) * sm_xperm_best + sqrt(abs(aopt)) * randn(numel(x),1);
             end
             
