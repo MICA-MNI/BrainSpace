@@ -62,8 +62,7 @@ MATLAB installation
 -------------------
 
 This toolbox has been tested with MATLAB versions R2018b, although we expect it
-to work with versions R2018a and newer. It will definitely throw errors with
-versions R2016b and older. Operating systems used during testing were OSX Mojave (10.14.6)
+to work with versions R2018a and newer. Operating systems used during testing were OSX Mojave (10.14.6)
 and Linux Xenial Xerus (16.04.6).
 
 To install the MATLAB toolbox simply `download
