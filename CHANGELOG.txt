@@ -12,10 +12,14 @@ MATLAB
             - object.labels: modifies labeltext properties. 
             - Added a "views" name-value pair that enables anterior, 
               posterior, superior, and inferior views. 
+    - Added a MATLAB implementation of BrainSMASH (i.e. variogram 
+    matching null model)
+
 ReadTheDocs
  - Updated MATLAB documentation of GradientMaps with the verbose flag.
  - Updated MATLAB documentation of plot_hemispheres to reflect the new 
    changes.  
+ - Added MATLAB documentation for the variogram function. 
 
 v0.1.1, March 2020 -- Quality of life update
 MATLAB:
