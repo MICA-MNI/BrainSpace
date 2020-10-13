@@ -4,8 +4,8 @@ function S2 = convert_surface(S,varargin)
 %
 %   S2 = CONVERT_SURFACE(S) converts surface S to SurfStat format. S can
 %   either be a file (.gii, .mat, .obj, Freesurfer), a loaded variable (in
-%   SurfStat or MATLAB format), or a cell array containing multiple of the
-%   former.
+%   SurfStat or MATLAB format), or a cell/string array containing multiple of 
+%   the former.
 %
 %   S2 = CONVERT_SURFACE(S,'format',F) allows for specifying the output
 %   format F, either 'SurfStat' or 'MATLAB'.
@@ -27,7 +27,7 @@ format = p.Results.format;
 path = p.Results.path;
 
 % If multiple surfaces provided in a cell, loop over all.
-if iscell(S)
+if iscell(S) || isstring(S)
     if ~isempty(path) && numel(S) > 1
         error('Multiple inputs are not supported for surface writing');
     end
