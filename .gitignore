@@ -1,3 +1,5 @@
+*.DS_Store
+
 docs/_build
 docs/generated
 test_python
