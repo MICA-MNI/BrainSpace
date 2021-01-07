@@ -6,8 +6,8 @@
 Welcome to BrainSpace's documentation!
 ======================================
 
-.. image:: https://img.shields.io/travis/MICA-MNI/BrainSpace/master?style=flat&logo=travis
-   :target: https://travis-ci.org/MICA-MNI/BrainSpace
+.. image:: https://github.com/MICA-LAB/brainspace/workflows/Python%20package/badge.svg
+    :target: https://github.com/MICA-LAB/brainspace/actions
 
 .. image:: https://img.shields.io/appveyor/build/OualidBenkarim/brainspace/master?logo=appveyor
    :alt: AppVeyor branch
