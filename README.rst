@@ -4,7 +4,10 @@ BrainSpace
 
 
 .. image:: https://github.com/MICA-LAB/brainspace/workflows/Python%20package/badge.svg
-    :target: https://github.com/MICA-LAB/brainspace/actions
+   :target: https://github.com/MICA-LAB/brainspace/actions
+
+.. image:: https://codecov.io/gh/mica-mni/brainspace/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/mica-mni/brainspace
 
 .. image:: https://img.shields.io/appveyor/build/OualidBenkarim/brainspace/master?logo=appveyor
    :alt: AppVeyor branch
