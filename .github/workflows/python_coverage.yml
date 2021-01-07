@@ -7,7 +7,7 @@ on:
 jobs:
   codecov:
     name: Codecov Workflow
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     
     steps:
       - uses: actions/checkout@v1
@@ -20,7 +20,7 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install pytest pytest-cov
           python3 -m pip install -r requirements.txt
-          pytest --cov=./ --cov-report=xml brainspace/tests/test_gradient.py
+          python3 -m pytest --cov=./ --cov-report=xml 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
