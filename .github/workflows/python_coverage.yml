@@ -18,7 +18,7 @@ jobs:
       - name: Generate coverage report
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install pytest
+          python3 -m pip install pytest pytest-cov
           python3 -m pip install -r requirements.txt
           pytest --cov=./ --cov-report=xml brainspace/tests/test_gradient.py
       - name: Upload coverage to Codecov
