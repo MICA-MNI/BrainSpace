@@ -26,7 +26,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install pytest
         python -m pip install -r requirements.txt
-        python -m pytest brainspace/tests/test_gradient.py
+        python -m pytest brainspace
     
     - name: Test Linux/macOS 
       if: matrix.os != 'windows-latest'
@@ -34,4 +34,4 @@ jobs:
         python3 -m pip install --upgrade pip
         python3 -m pip install pytest
         python3 -m pip install -r requirements.txt
-        python3 -m pytest brainspace/tests/test_gradient.py
+        python3 -m pytest brainspace
