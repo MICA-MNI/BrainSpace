@@ -1,3 +1,8 @@
+Hotfix, January 2021 -- MATLAB Joint Alignment
+MATLAB:
+- Fixed faulty dimensionality extraction in joint alignment of asymmetric
+matrices. 
+
 v0.1.1, March 2020 -- Quality of life update
 MATLAB:
 - New functionality:
