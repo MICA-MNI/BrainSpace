@@ -15,7 +15,9 @@ from brainspace.null_models.moran import (compute_mem, moran_randomization,
                                           MoranRandomization)
 from brainspace.null_models.spin import (_generate_spins, spin_permutations,
                                          SpinPermutations)
-from brainspace.null_models.variogram import (Base, Sampled, txt2memmap)
+# from brainspace.null_models.variogram import Base, Sampled,
+from brainspace.null_models.variogram import (txt2memmap, SurrogateMaps,
+                                              SampledSurrogateMaps)
 
 
 def test_moran():
@@ -166,12 +168,19 @@ def test_variogram_base():
     brainmap[0] = np.nan
 
     # Generate surrogates
-    gen = Base(brainmap, distmat)
-    surrs = gen(n=10)
+    vsur = SurrogateMaps(random_state=672436)
+    vsur.fit(distmat)
+    surrs = vsur.randomize(brainmap, n_rep=10)
+
+    # np.random.seed(672436)
+    # gen = Base(brainmap, distmat)
+    # surrs2 = gen(n=10)
+    #
+    # assert np.allclose(surrs, surrs2, equal_nan=True)
     assert surrs.shape == (10, npoints)
-    assert np.allclose(gen.D, distmat)
-    assert np.allclose(gen.x.data[1:], brainmap[1:])
-    assert np.isnan(gen.x.data[0])
+    assert np.allclose(vsur._dist, distmat)
+    # assert np.allclose(gen.x.data[1:], brainmap[1:])
+    # assert np.isnan(gen.x.data[0])
     assert not np.isnan(surrs).any()
 
 
@@ -209,10 +218,18 @@ def test_variogram_sampled():
     masked_map = brainmap[np.where(mask == 0)]
 
     # Generate surrogates
-    gen = Sampled(masked_map, files['distmat'], files['index'], knn=100, ns=100)
-    surrs = gen(n=5)
-    assert gen.D.shape == (npoints-3, 100)
+    vsur = SampledSurrogateMaps(knn=100, ns=100, random_state=43)
+    vsur.fit(files['distmat'], files['index'])
+    surrs = vsur.randomize(masked_map, n_rep=5)
+
+    # np.random.seed(43)
+    # gen = Sampled(masked_map, files['distmat'], files['index'],
+    #               knn=100, ns=100)
+    # surrs2 = gen(n=5)
+    #
+    # assert np.allclose(surrs, surrs2, equal_nan=True)
+    assert vsur._dist.shape == (npoints-3, 100)
     assert surrs.shape == (5, npoints-3)
-    assert np.allclose(gen.x.data[1:], masked_map[1:])
-    assert np.isnan(gen.x.data[0])
+    # assert np.allclose(gen.x.data[1:], masked_map[1:])
+    # assert np.isnan(gen.x.data[0])
     assert not np.isnan(surrs).any()
