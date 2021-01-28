@@ -15,6 +15,10 @@ MATLAB
     - Added a MATLAB implementation of BrainSMASH (i.e. variogram 
     matching null model)
 
+Python:
+  - New functionality
+    - brainspace.mesh.mesh_io.read_surface now supports gzipped files. 
+
 ReadTheDocs
  - Updated MATLAB documentation of GradientMaps with the verbose flag.
  - Updated MATLAB documentation of plot_hemispheres to reflect the new 
