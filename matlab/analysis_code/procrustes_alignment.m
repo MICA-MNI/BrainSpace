@@ -1,4 +1,4 @@
-function aligned = procrustes_alignment(gradients,varargin)
+function [aligned, xfms] = procrustes_alignment(gradients,varargin)
 % PROCRUSTES_ALIGNMENT   Performs a Procrustes alignment between gradients.
 %
 %   aligned = PROCRUSTES_ALIGNMENT(gradients,varargin) performs a singular
@@ -28,7 +28,7 @@ else
     first_target = p.Results.reference;
 end
 
-realigned = procrustes_analysis(embs, p.Results.nIterations, first_target);
+[realigned, xfms] = procrustes_analysis(embs, p.Results.nIterations, first_target);
 
 % Store aligned data in cell format. 
 for ii = 1:size(realigned,3)
