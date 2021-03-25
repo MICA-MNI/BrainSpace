@@ -439,7 +439,7 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
 
 @wrap_input(0, 1)
 def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
-                     color_range=None, label_text=None,
+                     color_range=None, label_text=None, layout_style='row',
                      cmap='viridis', nan_color=(0, 0, 0, 1), zoom=1,
                      background=(1, 1, 1), size=(400, 400), interactive=True,
                      embed_nb=False, screenshot=False, filename=None,
@@ -464,6 +464,11 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     label_text : dict[str, array-like], optional
         Label text for column/row. Possible keys are {'left', 'right',
         'top', 'bottom'}, which indicate the location. Default is None.
+    layout_style : str or None
+        Display style for hemispheres. If `row`, layout is a single row 
+        alternating lateral and medial views, from left to right. If `grid`, 
+        layout is a 2x2 grid, with lateral views in the top row, and medial 
+        views in the bottom row, and left and right columns. Default is `row` 
     nan_color : tuple
         Color for nan values. Default is (0, 0, 0, 1).
     zoom : float or sequence of float, optional
@@ -532,10 +537,18 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
                 array_name2.append(an)
         array_name = np.asarray(array_name2)[:, None]
 
+    if layout_style == 'grid':
+        array_name = np.full((2, 2), fill_value=array_name[0][0]) 
+        layout = np.array(layout).reshape(2, 2).T.tolist()
+        view = view = [['lateral', 'medial'], ['medial', 'lateral']]
+        share = 'both'
+    else:
+        share = 'r'
+        
     if isinstance(cmap, list):
         cmap = np.asarray(cmap)[:, None]
 
-    kwds = {'view': view, 'share': 'r'}
+    kwds = {'view': view, 'share': share}
     kwds.update(kwargs)
     return plot_surf(surfs, layout, array_name=array_name, color_bar=color_bar,
                      color_range=color_range, label_text=label_text, cmap=cmap,
