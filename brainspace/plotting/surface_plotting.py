@@ -464,11 +464,11 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     label_text : dict[str, array-like], optional
         Label text for column/row. Possible keys are {'left', 'right',
         'top', 'bottom'}, which indicate the location. Default is None.
-    layout_style : str or None
-        Display style for hemispheres. If `row`, layout is a single row 
-        alternating lateral and medial views, from left to right. If `grid`, 
-        layout is a 2x2 grid, with lateral views in the top row, and medial 
-        views in the bottom row, and left and right columns. Default is `row` 
+    layout_style : str
+        Layout style for hemispheres. If 'row', layout is a single row 
+        alternating lateral and medial views, from left to right. If 'grid', 
+        layout is a 2x2 grid, with lateral views in the top row, medial 
+        views in the bottom row, and left and right columns. Default is 'row'. 
     nan_color : tuple
         Color for nan values. Default is (0, 0, 0, 1).
     zoom : float or sequence of float, optional
