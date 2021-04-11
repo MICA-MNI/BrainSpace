@@ -468,7 +468,9 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
         Layout style for hemispheres. If 'row', layout is a single row 
         alternating lateral and medial views, from left to right. If 'grid', 
         layout is a 2x2 grid, with lateral views in the top row, medial 
-        views in the bottom row, and left and right columns. Default is 'row'. 
+        views in the bottom row, and left and right columns. Default is 'row'.
+        When using 'grid' style, only one `array_name` can be plotted. If  
+        array_name contains multiple entries, only use the first one. 
     nan_color : tuple
         Color for nan values. Default is (0, 0, 0, 1).
     zoom : float or sequence of float, optional
@@ -510,13 +512,11 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     :func:`plot_surf`
 
     """
-
     if color_bar is True:
         color_bar = 'right'
 
     surfs = {'lh': surf_lh, 'rh': surf_rh}
     layout = ['lh', 'lh', 'rh', 'rh']
-    view = ['lateral', 'medial', 'lateral', 'medial']
 
     if isinstance(array_name, np.ndarray):
         if array_name.ndim == 2:
@@ -540,11 +540,12 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     if layout_style == 'grid':
         array_name = np.full((2, 2), fill_value=array_name[0][0]) 
         layout = np.array(layout).reshape(2, 2).T.tolist()
-        view = view = [['lateral', 'medial'], ['medial', 'lateral']]
+        view = [['lateral', 'medial'], ['medial', 'lateral']]
         share = 'both'
     else:
+        view = ['lateral', 'medial', 'lateral', 'medial']
         share = 'r'
-        
+
     if isinstance(cmap, list):
         cmap = np.asarray(cmap)[:, None]
 
