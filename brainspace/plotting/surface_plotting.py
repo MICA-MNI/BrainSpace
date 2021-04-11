@@ -469,8 +469,6 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
         alternating lateral and medial views, from left to right. If 'grid', 
         layout is a 2x2 grid, with lateral views in the top row, medial 
         views in the bottom row, and left and right columns. Default is 'row'.
-        When using 'grid' style, only one `array_name` can be plotted. If  
-        array_name contains multiple entries, only use the first one. 
     nan_color : tuple
         Color for nan values. Default is (0, 0, 0, 1).
     zoom : float or sequence of float, optional
@@ -538,9 +536,17 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
         array_name = np.asarray(array_name2)[:, None]
 
     if layout_style == 'grid':
-        array_name = np.full((2, 2), fill_value=array_name[0][0]) 
-        layout = np.array(layout).reshape(2, 2).T.tolist()
-        view = [['lateral', 'medial'], ['medial', 'lateral']]
+        
+        # create 2x2 grid for each array_name and stack altogether
+        n_arrays = len(array_name)
+        array_names, layouts = [], []
+        for a, l in zip(array_name, layout):
+            array_names.append(np.full((2, 2), fill_value=a[0]))
+            layouts.append(np.array(l).reshape(2, 2).T.tolist())
+        array_name = np.vstack(array_names)
+        layout = np.vstack(layouts)
+        
+        view = [['lateral', 'medial'], ['medial', 'lateral']] * n_arrays
         share = 'both'
     else:
         view = ['lateral', 'medial', 'lateral', 'medial']
