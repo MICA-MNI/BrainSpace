@@ -97,14 +97,12 @@ def read_surface(ipth, itype=None, return_data=True, update=True):
 
     if itype is None:
         itype = ipth.split('.')[-1]
-    elif itype.endswith('.gz'):
-        itype = 'gz'
 
     if itype == 'gz':
         extension = ipth.split('.')[-2]
         with tempfile.NamedTemporaryFile(suffix='.' + extension) as f_tmp:
             _uncompress(ipth, f_tmp.name)
-            return read_surface(f_tmp.name)
+            return read_surface(f_tmp.name, extension, return_data=return_data, update=update)
 
     reader = _select_reader(itype)
     reader.filename = ipth
