@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - 'master'
-      - 'github_actions' 
+
 jobs:
   codecov:
     name: Codecov Workflow
