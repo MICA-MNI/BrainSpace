@@ -89,7 +89,7 @@ def test_plotter_ipython():
 
 def test_plotter_numpy():
     p = plotter_single_renderer()
-#     img = p.to_numpy()
+    img = p.to_numpy()
 #     assert isinstance(img, np.ndarray)
     p.close()
 
