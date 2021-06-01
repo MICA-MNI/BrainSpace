@@ -90,7 +90,7 @@ def test_plotter_ipython():
 def test_plotter_numpy():
     s = to_data(vtk.vtkSphereSource())
 
-#     p = Plotter(offscreen=True)
+    p = Plotter(offscreen=True)
 #     ren0 = p.AddRenderer(row=0, col=0)
 #     ac0 = ren0.AddActor()
 #     ac0.SetMapper(inputdata=s)
