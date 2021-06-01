@@ -35,6 +35,7 @@ jobs:
     - name: Install headless display
       if: matrix.os != 'windows-latest'
       run: |
+        chmod +x .github/setup_headless_display.sh
         .github/setup_headless_display.sh
         
     - name: Test Linux/macOS 
