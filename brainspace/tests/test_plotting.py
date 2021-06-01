@@ -18,6 +18,9 @@ except ImportError:
     ipy = None
 
 
+import brainspace
+brainspace.OFF_SCREEN = True
+
 from brainspace.vtk_interface.pipeline import to_data
 from brainspace.plotting.base import Plotter
 from brainspace.plotting import build_plotter, plot_surf, plot_hemispheres
