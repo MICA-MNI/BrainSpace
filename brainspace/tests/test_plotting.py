@@ -90,53 +90,53 @@ def test_plotter_ipython():
 def test_plotter_numpy():
     p = plotter_single_renderer()
     img = p.to_numpy()
-#     assert isinstance(img, np.ndarray)
+    assert isinstance(img, np.ndarray)
     p.close()
 
-#     p = plotter_multiple_renderers()
-#     img = p.to_numpy()
-#     assert isinstance(img, np.ndarray)
-#     p.close()
+    p = plotter_multiple_renderers()
+    img = p.to_numpy()
+    assert isinstance(img, np.ndarray)
+    p.close()
 
 
-# def test_plotter_screenshot():
-#     import os
-#     root_pth = os.path.dirname(__file__)
+def test_plotter_screenshot():
+    import os
+    root_pth = os.path.dirname(__file__)
 
-#     p = plotter_single_renderer()
-#     pth = p.screenshot(os.path.join(root_pth, '_test_single_screenshot.png'))
-#     assert os.path.exists(pth)
-#     os.remove(pth)
-#     p.close()
+    p = plotter_single_renderer()
+    pth = p.screenshot(os.path.join(root_pth, '_test_single_screenshot.png'))
+    assert os.path.exists(pth)
+    os.remove(pth)
+    p.close()
 
-#     p = plotter_multiple_renderers()
-#     pth = p.screenshot(os.path.join(root_pth, '_test_multiple_screenshot.png'))
-#     assert os.path.exists(pth)
-#     os.remove(pth)
-#     p.close()
-
-
-# def test_build_plotter():
-#     s1 = to_data(vtk.vtkSphereSource())
-#     s2 = to_data(vtk.vtkSphereSource())
-
-#     surfs = {'s1': s1, 's2': s2}
-#     layout = np.array([['s1', 's2'], ['s2', 's2']])
-#     p = build_plotter(surfs, layout, offscreen=True)
-#     assert isinstance(p, Plotter)
+    p = plotter_multiple_renderers()
+    pth = p.screenshot(os.path.join(root_pth, '_test_multiple_screenshot.png'))
+    assert os.path.exists(pth)
+    os.remove(pth)
+    p.close()
 
 
-# def test_plot_surf():
-#     s1 = to_data(vtk.vtkSphereSource())
-#     s2 = to_data(vtk.vtkSphereSource())
+def test_build_plotter():
+    s1 = to_data(vtk.vtkSphereSource())
+    s2 = to_data(vtk.vtkSphereSource())
 
-#     surfs = {'s1': s1, 's2': s2}
-#     layout = np.array([['s1', 's2'], ['s2', 's2']])
-#     plot_surf(surfs, layout, offscreen=True)
+    surfs = {'s1': s1, 's2': s2}
+    layout = np.array([['s1', 's2'], ['s2', 's2']])
+    p = build_plotter(surfs, layout, offscreen=True)
+    assert isinstance(p, Plotter)
 
 
-# def test_plot_hemispheres():
-#     s1 = to_data(vtk.vtkSphereSource())
-#     s2 = to_data(vtk.vtkSphereSource())
+def test_plot_surf():
+    s1 = to_data(vtk.vtkSphereSource())
+    s2 = to_data(vtk.vtkSphereSource())
 
-#     plot_hemispheres(s1, s2, offscreen=True)
+    surfs = {'s1': s1, 's2': s2}
+    layout = np.array([['s1', 's2'], ['s2', 's2']])
+    plot_surf(surfs, layout, offscreen=True)
+
+
+def test_plot_hemispheres():
+    s1 = to_data(vtk.vtkSphereSource())
+    s2 = to_data(vtk.vtkSphereSource())
+
+    plot_hemispheres(s1, s2, offscreen=True)
