@@ -32,12 +32,15 @@ jobs:
         python -m pip install -r requirements.txt
         python -m pytest brainspace
     
-    - name: Test Linux/macOS 
-      uses: GabrielBB/xvfb-action@v1.5
+    - name: Install headless display
       if: matrix.os != 'windows-latest'
-      with:
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install pytest
-          python3 -m pip install -r requirements.txt
-          python3 -m pytest brainspace
+      run: |
+        .github/setup_headless_display.sh
+        
+    - name: Test Linux/macOS 
+      if: matrix.os != 'windows-latest'
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install pytest
+        python3 -m pip install -r requirements.txt
+        python3 -m pytest brainspace
