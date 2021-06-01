@@ -47,25 +47,25 @@ def plotter_multiple_renderers():
     return p
 
 
-# @pytest.mark.skipif(ipy is None and pn is None, reason="Requires panel")
-# def test_plotter_panel():
-#     p = plotter_single_renderer()
-#     img = p.to_panel()
-#     assert isinstance(img, pn.pane.VTK)
+@pytest.mark.skipif(ipy is None and pn is None, reason="Requires panel")
+def test_plotter_panel():
+    p = plotter_single_renderer()
+    img = p.to_panel()
+    assert isinstance(img, pn.pane.VTK)
 
-#     img = p.show(embed_nb=True, interactive=True)
-#     assert isinstance(img, pn.pane.VTK)
-#     p.close()
+    img = p.show(embed_nb=True, interactive=True)
+    assert isinstance(img, pn.pane.VTK)
+    p.close()
 
-#     p = plotter_multiple_renderers()
-#     with pytest.warns(UserWarning, match=r"Support for interactive \w+"):
-#         img = p.to_panel()
-#         assert isinstance(img, ipy.display.Image)
+    p = plotter_multiple_renderers()
+    with pytest.warns(UserWarning, match=r"Support for interactive \w+"):
+        img = p.to_panel()
+        assert isinstance(img, ipy.display.Image)
 
-#     with pytest.warns(UserWarning, match=r"Support for interactive \w+"):
-#         img = p.show(embed_nb=True, interactive=True)
-#         assert isinstance(img, ipy.display.Image)
-#     p.close()
+    with pytest.warns(UserWarning, match=r"Support for interactive \w+"):
+        img = p.show(embed_nb=True, interactive=True)
+        assert isinstance(img, ipy.display.Image)
+    p.close()
 
 
 # @pytest.mark.skipif(ipy is None, reason="Requires IPython")
