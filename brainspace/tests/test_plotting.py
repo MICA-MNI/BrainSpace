@@ -68,26 +68,33 @@ def test_plotter_panel():
     p.close()
 
 
-# @pytest.mark.skipif(ipy is None, reason="Requires IPython")
-# def test_plotter_ipython():
-#     p = plotter_single_renderer()
-#     img = p.show(embed_nb=True, interactive=False)
-#     assert isinstance(img, ipy.display.Image)
+@pytest.mark.skipif(ipy is None, reason="Requires IPython")
+def test_plotter_ipython():
+    p = plotter_single_renderer()
+    img = p.show(embed_nb=True, interactive=False)
+    assert isinstance(img, ipy.display.Image)
 
-#     img = p.to_notebook()
-#     assert isinstance(img, ipy.display.Image)
-#     p.close()
+    img = p.to_notebook()
+    assert isinstance(img, ipy.display.Image)
+    p.close()
 
-#     p = plotter_multiple_renderers()
-#     img = p.show(embed_nb=True, interactive=False)
-#     assert isinstance(img, ipy.display.Image)
+    p = plotter_multiple_renderers()
+    img = p.show(embed_nb=True, interactive=False)
+    assert isinstance(img, ipy.display.Image)
 
-#     img = p.to_notebook()
-#     assert isinstance(img, ipy.display.Image)
-#     p.close()
+    img = p.to_notebook()
+    assert isinstance(img, ipy.display.Image)
+    p.close()
 
 
-# def test_plotter_numpy():
+def test_plotter_numpy():
+    s = to_data(vtk.vtkSphereSource())
+
+#     p = Plotter(offscreen=True)
+#     ren0 = p.AddRenderer(row=0, col=0)
+#     ac0 = ren0.AddActor()
+#     ac0.SetMapper(inputdata=s)
+    
 #     p = plotter_single_renderer()
 #     img = p.to_numpy()
 #     assert isinstance(img, np.ndarray)
