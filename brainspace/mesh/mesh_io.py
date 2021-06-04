@@ -7,6 +7,7 @@ High-level read/write functions for several formats.
 
 import tempfile
 import gzip
+import os
 from vtk import (vtkPLYReader, vtkPLYWriter, vtkXMLPolyDataReader,
                  vtkXMLPolyDataWriter, vtkPolyDataReader, vtkPolyDataWriter)
 
@@ -101,9 +102,13 @@ def read_surface(ipth, itype=None, return_data=True, update=True):
     if itype == 'gz':
         extension = ipth.split('.')[-2]
         tmp = tempfile.NamedTemporaryFile(suffix='.' + extension)
+        #tmp_name = tmp.name
+        #tmp.close() # Close and reopen because windows throws permission errors when both reading and writing. 
+        #import pdb
+        #pdb.set_trace()
         _uncompress(ipth, tmp.name)
-        with open(tmp.name, 'r') as tmp_r: 
-            return read_surface(tmp_r.name, extension, return_data=return_data, update=update)
+        return read_surface(tmp.name, extension, return_data=return_data, update=update)
+
 
     reader = _select_reader(itype)
     reader.filename = ipth
