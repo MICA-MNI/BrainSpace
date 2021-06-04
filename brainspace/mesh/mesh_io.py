@@ -101,14 +101,13 @@ def read_surface(ipth, itype=None, return_data=True, update=True):
 
     if itype == 'gz':
         extension = ipth.split('.')[-2]
-        tmp = tempfile.NamedTemporaryFile(suffix='.' + extension)
-        #tmp_name = tmp.name
-        #tmp.close() # Close and reopen because windows throws permission errors when both reading and writing. 
-        #import pdb
-        #pdb.set_trace()
-        _uncompress(ipth, tmp.name)
-        return read_surface(tmp.name, extension, return_data=return_data, update=update)
-
+        tmp = tempfile.NamedTemporaryFile(suffix='.' + extension, delete = False)
+        tmp_name = tmp.name
+        tmp.close() # Close and reopen because windows throws permission errors when both reading and writing.
+        _uncompress(ipth, tmp_name)
+        result = read_surface(tmp_name, extension, return_data=return_data, update=update)
+        os.unlink(tmp_name)
+        return result
 
     reader = _select_reader(itype)
     reader.filename = ipth
