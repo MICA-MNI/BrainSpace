@@ -1,4 +1,4 @@
-v0.1.2, XXXXX 2020 -- Let there be null models update
+v0.1.2, XXXXX 2021 -- Let there be null models update
 MATLAB
 - New functionality
     - Added a verbose flag to GradientMaps (default value: false).
@@ -17,11 +17,20 @@ MATLAB
     - procrustes_alignment now outputs the rotation matrices as a second
     output variable. 
 
+Python:
+  - New functionality
+    - brainspace.mesh.mesh_io.read_surface now supports gzipped files. 
+
 ReadTheDocs
  - Updated MATLAB documentation of GradientMaps with the verbose flag.
  - Updated MATLAB documentation of plot_hemispheres to reflect the new 
    changes.  
  - Added MATLAB documentation for the variogram function. 
+
+Hotfix, January 2021 -- MATLAB Joint Alignment
+MATLAB:
+- Fixed faulty dimensionality extraction in joint alignment of asymmetric
+matrices. 
 
 v0.1.1, March 2020 -- Quality of life update
 MATLAB:
