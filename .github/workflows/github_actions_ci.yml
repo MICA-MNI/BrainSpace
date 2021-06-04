@@ -1,0 +1,55 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: [3.6, 3.7, 3.8]
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Test Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest
+        python -m pip install -r requirements.txt
+        python -m pytest brainspace --ignore brainspace/tests/test_plotting.py
+    
+#     - name: Install headless display
+#       if: matrix.os == 'ubuntu-latest'
+#       run: |
+#         chmod +x .github/setup_headless_display.sh
+#         .github/setup_headless_display.sh
+        
+    - name: Test Linux 
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install pytest
+        python3 -m pip install -r requirements.txt
+        python3 -m pytest brainspace --ignore brainspace/tests/test_plotting.py
+
+    - name: Test macOS 
+      if: matrix.os == 'macos-latest'
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install pytest
+        python3 -m pip install -r requirements.txt
+        python3 -m pytest brainspace
