@@ -65,8 +65,11 @@ This toolbox has been tested with MATLAB versions R2018b, although we expect it
 to work with versions R2018a and newer. Operating systems used during testing were OSX Mojave (10.14.6)
 and Linux Xenial Xerus (16.04.6).
 
-To install the MATLAB toolbox simply `download
-<https://github.com/MICA-MNI/BrainSpace/releases>`_ and unzip the GitHub toolbox and run
+The recommended installation approach is to download the code as a toolbox from FileExchange or Github,
+and open this toolbox with MATLAB. 
+
+If you prefer installing BrainSpace by simply adding it to a path, you can also `download
+<https://github.com/MICA-MNI/BrainSpace/releases>`_ and unzip the code from Github and run
 the following in MATLAB: ::
 
     addpath(genpath('/path/to/BrainSpace/matlab/'))
