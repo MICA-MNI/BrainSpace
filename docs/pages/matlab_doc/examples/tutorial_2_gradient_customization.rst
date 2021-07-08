@@ -14,8 +14,6 @@ Customizing Gradient Computation
 As before, we'll start by loading the sample data.
 
 .. code-block:: matlab    
-
-    addpath(genpath('/path/to/BrainSpace/matlab'));
     
     % First load mean connectivity matrix and Schaefer parcellation
     conn_matrix = load_group_fc('schaefer',400);
@@ -113,7 +111,9 @@ angle kernel and laplacian eigenmap approach.
 
 Here, ``Gp`` contains the Procrustes aligned data and ``Gj`` contains the joint
 aligned data. Let's plot them, but in separate figures to keep things organized.
-
+Note that the gradients in the first element of the gradients/aligned property
+correspond to the first data matrix provided in fit() and the gradients in the
+second element correspond to the second data matrix. 
 
 .. code-block:: matlab    
     
@@ -179,8 +179,6 @@ modality.
 First, let's load the example data of microstructural profile covariance and functional connectivity. 
 
 .. code-block:: matlab
-
-    addpath(genpath('/path/to/BrainSpace/matlab'));
 
     % First load mean connectivity matrix and parcellation
     mpc = load_group_mpc('vosdewael',200);

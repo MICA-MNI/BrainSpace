@@ -43,13 +43,11 @@ classdef variogram
 %
 %   Example usage:
 %   x = rand(100,1);
-%   D = rand(100:
+%   D = rand(100);
 %   D = D + D'; % make distance matrix symmetric.
 %   obj = variogram(D);
 %   surrogates = obj.fit(x); 
 %
-%   
-%  
 %   ADD A READTHEDOCS LINK!
 
     %% Properties 
@@ -64,7 +62,6 @@ classdef variogram
         random_state
         ns
         knn
-        verbose
         num_workers
     end
     
@@ -78,11 +75,10 @@ classdef variogram
         function obj = variogram(varargin)
             % Deal with input.
             is_square_numeric = @(x)size(x,1)==size(x,2) && isnumeric(x) && numel(size(x))==2;
-            valid_kernel = @(x) ismember(lower(x),{'exp','gaussian','uniform','invdist'});
             p = inputParser;
             addRequired( p, 'D'                         , is_square_numeric);
             addParameter(p, 'deltas'    , 0.1:0.1:0.9   , @(x) all(x>0 & x<=1));
-            addParameter(p, 'kernel'    , 'exp'         , valid_kernel);
+            addParameter(p, 'kernel'    , 'exp'         , @valid_kernel);
             addParameter(p, 'pv'        , 25            , @(x) x>0 && x<=100 && isscalar(x));
             addParameter(p, 'nh'        , 25            , @(x)isscalar(x) && isnumeric(x));
             addParameter(p, 'resample'  , false         , @islogical);
@@ -90,7 +86,6 @@ classdef variogram
             addParameter(p, 'random_state', nan);
             addParameter(p, 'ns'        , inf           , @(x)isscalar(x) && isnumeric(x));
             addParameter(p, 'knn'       , 1000          , @(x)isscalar(x) && isnumeric(x));
-            addParameter(p, 'verbose'   , false         , @(x)islogical(x) && isscalar(x));
             addParameter(p, 'num_workers', 0             , @(x)isscalar(x) && isnumeric(x));
             
             % Assign input to object properties. 
@@ -113,12 +108,16 @@ classdef variogram
         function surrs = fit(obj,x,n)
             % Start the parallel pool.
             if obj.num_workers ~= 0
-                p = gcp('nocreate');
-                if isempty(p)
-                    parpool(obj.num_workers);   
-                elseif p.NumWorkers ~= obj.num_workers
-                    delete(p);
-                    parpool(obj.num_workers);
+                if exist('parpool.m', 'file')  
+                    p = gcp('nocreate');
+                        if isempty(p)
+                            parpool(obj.num_workers);   
+                        elseif p.NumWorkers ~= obj.num_workers
+                            delete(p);
+                            parpool(obj.num_workers);
+                        end
+                else
+                    warning('Could not find the parallel processing toolbox. Continuing without parallel processing.')
                 end
             end
             
@@ -155,13 +154,7 @@ classdef variogram
            
             % Generate surrograte maps.
             parfor (ii = 1:n, obj.num_workers)
-                if obj.verbose %#ok<*PFBNS>
-                    if ii ~= 1 && ii ~=n
-                        fprintf(repmat('\b',1,s));
-                    end
-                    s = fprintf('Generating surrogate map %d of %d.\r',ii,n);
-                end
-                
+            %for ii = 1:n
                 % Initialize variables
                 aopt = nan;
                 bopt = nan;
@@ -169,14 +162,14 @@ classdef variogram
                 idxopt = nan;
                 
                 % Compute true variogram and permuted map (sampled).
-                if ~isinf(obj.ns)
+                if ~isinf(obj.ns) %#ok<PFBNS>
                     perm = randperm(size(x,1),obj.ns);
                     v = obj.compute_variogram(x(perm));
                     [utrunc,uidx,h] = obj.prepare_smooth_variogram(perm);
                     smvar = obj.smooth_variogram(utrunc,uidx,v,h);                 
                 else
                     perm = nan; % This line prevents MATLAB from throwing a par-for warning - the line itself doesn't do anything. 
-                    utrunc = tmp.utrunc;
+                    utrunc = tmp.utrunc; %#ok<PFBNS>
                     uidx = tmp.uidx;
                     h = tmp.h;
                     smvar = tmp.smvar;
@@ -298,17 +291,21 @@ classdef variogram
         
         function smooth_d = smoothing_kernel(type,d)
             % Applies a smoothing kernel to distance matrix d.
-            switch lower(type)
-                case 'exp'
-                    smooth_d = exp(-d ./ max(d,[],2));
-                case 'gaussian'
-                    smooth_d = exp(-1.25 * (d ./ max(d,[],2)));
-                case 'invdist'
-                    smooth_d = d.^-1;
-                case 'uniform'
-                    smooth_d = ones(size(d)) / size(d,1);
-                otherwise
-                    error('Unknown kernel type')
+            if isa(type, 'function_handle')
+                smooth_d = type(d); 
+            else
+                switch lower(type)
+                    case 'exp'
+                        smooth_d = exp(-d ./ max(d,[],2));
+                    case 'gaussian'
+                        smooth_d = exp(-1.25 * (d ./ max(d,[],2)));
+                    case 'invdist'
+                        smooth_d = d.^-1;
+                    case 'uniform'
+                        smooth_d = ones(size(d)) / size(d,1);
+                    otherwise
+                        error('Unknown kernel type')
+                end
             end
         end
         
@@ -331,5 +328,12 @@ classdef variogram
             % Compute R^2
             rsquared = 1 - sum((y - (intercept + slope * x(:,2))).^2) / sum((y-mean(y)).^2); 
         end
+    end
+end
+
+function is_valid = valid_kernel(x)
+    is_valid = isa(x, 'function_handle');
+    if ~is_valid
+        is_valid = ismember(lower(x), {'exp','gaussian','uniform','invdist'});
     end
 end
