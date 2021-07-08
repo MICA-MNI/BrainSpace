@@ -1,0 +1,162 @@
+<deployment-project plugin="plugin.toolbox" plugin-version="1.0">
+  <configuration file="/Users/reinder/GitHub/BrainSpace/BrainSpace.prj" location="/Users/reinder/GitHub/BrainSpace" name="BrainSpace" target="target.toolbox" target-name="Package Toolbox">
+    <param.appname>BrainSpace</param.appname>
+    <param.authnamewatermark>MICA Lab</param.authnamewatermark>
+    <param.email>reinder.vosdewael@gmail.com</param.email>
+    <param.company>McGill University</param.company>
+    <param.summary>BrainSpace is a lightweight cross-platform toolbox primarily intended for macroscale gradient mapping and analysis.</param.summary>
+    <param.description>BrainSpace is a lightweight cross-platform toolbox primarily intended for macroscale gradient mapping and analysis of neuroimaging and connectome level data. The current version of BrainSpace is available in Python and MATLAB, programming languages widely used by the neuroimaging and network neuroscience communities. The toolbox also contains several maps that allow for exploratory analysis of gradient correspondence with other brain-derived features, together with tools to generate spatial null models.
+
+If you consider using BrainSpace, please cite our manuscript: Vos de Wael R, Benkarim O, Paquola C, Lariviere S, Royer J, Tavakol S, Xu T, Hong S, Langs G, Valk S, Misic B, Milham M, Margulies D, Smallwood J, Bernhardt B (2020). BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and connectomics datasets. Commun Biol 3, 103.</param.description>
+    <param.screenshot>/Users/reinder/Desktop/1612370158.png</param.screenshot>
+    <param.version>0.1.2</param.version>
+    <param.output>${PROJECT_ROOT}/BrainSpace.mltbx</param.output>
+    <param.products.name>
+      <item>MATLAB</item>
+    </param.products.name>
+    <param.products.id>
+      <item>1</item>
+    </param.products.id>
+    <param.products.version>
+      <item>9.10</item>
+    </param.products.version>
+    <param.platforms />
+    <param.guid>cc685c6b-b946-4d79-b3d0-762743da5f8e</param.guid>
+    <param.exclude.filters />
+    <param.exclude.pcodedmfiles>true</param.exclude.pcodedmfiles>
+    <param.examples />
+    <param.demosxml />
+    <param.apps />
+    <param.registered.apps />
+    <param.docs />
+    <param.getting.started.guide />
+    <param.matlabpath.excludes />
+    <param.javaclasspath.excludes />
+    <param.exported.on.package>false</param.exported.on.package>
+    <param.required.addons />
+    <param.matlab.project.id />
+    <param.matlab.project.name />
+    <param.release.start>R2018b</param.release.start>
+    <param.release.end>latest</param.release.end>
+    <param.release.current.only>false</param.release.current.only>
+    <param.compatiblity.windows>true</param.compatiblity.windows>
+    <param.compatiblity.macos>true</param.compatiblity.macos>
+    <param.compatiblity.linux>true</param.compatiblity.linux>
+    <param.compatiblity.matlabonline>true</param.compatiblity.matlabonline>
+    <param.installation.map />
+    <param.additional.sw.names />
+    <param.additional.sw.licenses />
+    <param.additional.sw.win.url />
+    <param.additional.sw.mac.url />
+    <param.additional.sw.linux.url />
+    <unset>
+      <param.output />
+      <param.platforms />
+      <param.exclude.filters />
+      <param.exclude.pcodedmfiles />
+      <param.examples />
+      <param.demosxml />
+      <param.apps />
+      <param.registered.apps />
+      <param.docs />
+      <param.getting.started.guide />
+      <param.matlabpath.excludes />
+      <param.javaclasspath.excludes />
+      <param.exported.on.package />
+      <param.required.addons />
+      <param.matlab.project.id />
+      <param.matlab.project.name />
+      <param.release.current.only />
+      <param.compatiblity.windows />
+      <param.compatiblity.macos />
+      <param.compatiblity.linux />
+      <param.compatiblity.matlabonline />
+      <param.installation.map />
+      <param.additional.sw.names />
+      <param.additional.sw.licenses />
+      <param.additional.sw.win.url />
+      <param.additional.sw.mac.url />
+      <param.additional.sw.linux.url />
+    </unset>
+    <fileset.rootdir>
+      <file>${PROJECT_ROOT}/matlab</file>
+    </fileset.rootdir>
+    <fileset.rootfiles>
+      <file>${PROJECT_ROOT}/matlab/@GradientMaps</file>
+      <file>${PROJECT_ROOT}/matlab/analysis_code</file>
+      <file>${PROJECT_ROOT}/matlab/example_data_loaders</file>
+      <file>${PROJECT_ROOT}/matlab/plot_data</file>
+      <file>${PROJECT_ROOT}/matlab/surface_manipulation</file>
+    </fileset.rootfiles>
+    <fileset.depfun.included />
+    <fileset.depfun.excluded>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/Contents.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/display.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/export.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/fieldnames.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/gifti.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/isfield.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/plot.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/private/base64decode.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/private/base64encode.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/private/getdict.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/private/isintent.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/private/mvtk_write.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/private/read_freesurfer_file.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/private/read_gifti_file_standalone.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/private/xml_parser.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/private/zstream.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/save.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/saveas.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/struct.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/subsasgn.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@gifti/subsref.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/@variogram/variogram.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/Contents.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/display.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/export.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/fieldnames.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/gifti.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/isfield.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/plot.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/private/base64decode.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/private/base64encode.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/private/getdict.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/private/isintent.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/private/mvtk_write.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/private/read_freesurfer_file.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/private/read_gifti_file_standalone.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/private/xml_parser.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/private/zstream.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/save.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/saveas.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/struct.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/subsasgn.m</file>
+      <file>/Users/reinder/OneDrive/Academics/MATLAB/packages/cifti-matlab/@gifti/subsref.m</file>
+    </fileset.depfun.excluded>
+    <fileset.package />
+    <build-deliverables>
+      <file location="${PROJECT_ROOT}" name="BrainSpace.mltbx" optional="false">/Users/reinder/GitHub/BrainSpace/BrainSpace.mltbx</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>/Applications/MATLAB_R2021a.app</root>
+      <toolboxes />
+    </matlab>
+    <platform>
+      <unix>true</unix>
+      <mac>true</mac>
+      <windows>false</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.14.6</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>maci64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>

@@ -20,7 +20,6 @@ Usage
     surrogates = obj.fit(x,n);
 
 - *D*: A symmetric distance matrix.
-- *x*: Moran eigenvectors as returned by :ref:`compute_mem_matlab`.
 - *n*: Number of surrogate datasets to generate (default: 1000).
 - *varargin*: See name-value pairs below. 
 - *obj*: The variogram object.
@@ -41,7 +40,7 @@ Name-Value Pairs
 -----------------------
 
 - *deltas*: Proportion of neighbours to include for smoothing (default: 0.1:0.1:0.9).
-- *kernel*: Kernel with which to smooth permuted maps. Valid options are 'gaussian', 'exp' (default), 'invdist', and 'uniform'.
+- *kernel*: Kernel with which to smooth permuted maps. Valid options are 'gaussian', 'exp' (default), 'invdist', 'uniform', and a function handle.
 - *pv*: Percentile of pairwise distance distribution at which to truncate during variogram fitting (default: 25).
 - *nh*: Number of uniformly spaced distances at which to compute variograms (default: 25).
 - *resample*: Resample surrogate maps' values from target brain map (default: false).

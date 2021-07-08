@@ -10,8 +10,6 @@ data for computational efficiency.
 
 .. code-block:: matlab
 
-    addpath(genpath('/path/to/BrainSpace/matlab'));
-
     % First load mean connectivity matrix and Schaefer parcellation
     conn_matrix = load_group_fc('schaefer',400);
     labeling = load_parcellation('schaefer',400);

@@ -9,7 +9,7 @@ bias the test statistic. In this tutorial we will show two approaches for null
 hypothesis testing: spin permutations and Moran spectral randomization. 
 
 .. note:: 
-    When using either approach to compare gradients to non-gradient markers, we
+    When using these approaches to compare gradients to non-gradient markers, we
     recommend randomizing the non-gradient markers as these randomizations need not
     maintain the statistical independence between gradients.
 
@@ -25,8 +25,6 @@ their corresponding spheres, midline mask, and t1w/t2w intensity as well as
 cortical thickness data, and a template functional gradient.
 
 .. code-block:: matlab
-
-    addpath(genpath('/path/to/BrainSpace/matlab')); 
 
     % load the conte69 hemisphere surfaces and spheres
     [surf_lh, surf_rh] = load_conte69;
@@ -142,8 +140,6 @@ intensity as well as cortical thickness data, and a template functional
 gradient. 
 
 .. code-block:: matlab
-
-    addpath(genpath('/path/to/BrainSpace/matlab')); 
 
     % load the conte69 hemisphere surfaces and spheres
     [surf_lh, surf_rh] = load_conte69();
@@ -264,3 +260,80 @@ Indeed, our histograms appear to be normally distributed. This concludes the
 third and last tutorial. You should now be familliar with all the functionality
 of the BrainSpace toolbox. For more details on any specific function, please see
 :ref:`matlab_package`.
+
+
+Variogram Matching
+------------------
+Here, we use the variogram matching presented in `(Burt et al., 2020)
+<https://www.sciencedirect.com/science/article/pii/S1053811920305243>`_, which
+generates novel brainmaps with similar spatial autocorrelation to the input
+data. We will start by loading the conte69 surfaces for left and right
+hemispheres, a left temporal lobe mask, t1w/t2w intensity as well as cortical
+thickness data. 
+
+.. code-block:: matlab
+
+    % load the conte69 hemisphere surfaces and spheres
+    [surf_lh, surf_rh] = load_conte69();
+
+    % Load the data 
+    t1wt2w_lh = load_marker('t1wt2w');
+    curv_lh = load_marker('curvature');
+
+    % Load mask
+    temporal_mask_tmp = load_mask('temporal');
+
+    % There's a one vertex overlap between the HCP midline mask (i.e. nans) and
+    % our temporal mask.
+    temporal_mask_lh = temporal_mask_tmp & ~isnan(t1wt2w_lh);
+
+    % Load the embedding
+    embedding = load_gradient('fc',1);
+    embedding_lh = embedding(1:end/2);
+
+    % Keep only the temporal lobe. 
+    t1wt2w_tl = t1wt2w_lh(temporal_mask_lh);
+    curv_tl = curv_lh(temporal_mask_lh);
+
+Next, we will need a distance matrix that tells us what the spatial distance
+between our datapoints is. For this example, we will use geodesic distance. 
+
+.. code-block :: matlab
+
+    G = surface_to_graph(surf_lh, 'geodesic', ~temporal_mask_lh);
+    geodesic_distance = distances(G);
+
+Now we've got everything we need to generate our surrogate datasets. By default,
+BrainSpace will use all available data to generate surrogate maps. However, this
+process is extremely computationally and memory intensive. When using this method with more
+than a few hundred regions, we recommend subsampling the data. This can be done using
+the 'ns' and 'knn' name-value pairs. 'ns' determines how many data points to sample
+for the generation of the variogram; 'knn' determines how many neighbors to use
+in the smoothing step. 
+
+.. code-block :: matlab
+
+    random_initialization = 0; 
+    n_surrogate_datasets = 10;
+
+    % Note: num_samples must be greater than num_neighbors
+    num_samples = 200;
+    num_neighbors = 100;
+
+    obj_subsample = variogram(geodesic_distance, 'ns', num_samples, ...
+        'knn', num_neighbors, 'random_state', random_initialization);
+    surrogates_subsample = obj_subsample.fit(t1wt2w_lh, n_surrogate_datasets);
+
+.. note:: 
+    The variogram class also supports parallel processing with the 'num_workers'
+    Name-Value pair. This functionality requires the Parallel Computing Toolbox.
+
+The correlation between the real data, surrogate data, and the marker of interest 
+can then be compared as follows. Note that, for this example, we only generated 
+10 surogate datasets. For any practical usage we recommend generating at least 1000.
+
+.. code-block :: matlab
+
+    r_real = corr(t1wt2w_tl, curv_tl);
+    r_surrogate = corr(surrogates_subsample, curv_tl);
+    prctile_rank = mean(r_real > r_surrogate); 
