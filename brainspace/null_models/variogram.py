@@ -1644,7 +1644,7 @@ class SampledSurrogateMaps(BaseEstimator):
         Default is 25.
     knn : int, optional
         Number of nearest regions to keep in the neighborhood of each region.
-        Defaulr is 1000.
+        Default is 1000.
     b : float or None, default None
         Gaussian kernel bandwidth for variogram smoothing. if None,
         three times the distance interval spacing is used.

@@ -5,9 +5,10 @@ In this tutorial we assess the significance of correlations between the first
 canonical gradient and data from other modalities (curvature, cortical
 thickness and T1w/T2w image intensity). A normal test of the significance of
 the correlation cannot be used, because the spatial auto-correlation in MRI
-data may bias the test statistic. In this tutorial we will show two approaches
-for null hypothesis testing: spin permutations and Moran spectral
-randomization.
+data may bias the test statistic. In this tutorial we will show three
+approaches for null hypothesis testing: spin permutations, Moran spectral
+randomization, and autocorrelation-preserving surrogates based on variogram
+matching.
 
 .. note::
     When using either approach to compare gradients to non-gradient markers,
@@ -117,14 +118,13 @@ for k, (fn, feat) in enumerate(feats.items()):
     pv_spin = np.mean(np.abs(r_spin) >= np.abs(r_obs))
 
     # Plot null dist
-    axs[k].hist(r_spin, bins=25, density=True, alpha=0.5, color=(0.8, 0.8, 0.8))
+    axs[k].hist(r_spin, bins=25, density=True, alpha=0.5, color=(.8, .8, .8))
     axs[k].axvline(r_obs, lw=2, ls='--', color='k')
-    axs[k].set_xlabel('Correlation with {}'.format(fn))
+    axs[k].set_xlabel(f'Correlation with {fn}')
     if k == 0:
         axs[k].set_ylabel('Density')
 
-    print('{}:\n Obs : {:.5e}\n Spin: {:.5e}\n'.
-          format(fn.capitalize(), pv_obs, pv_spin))
+    print(f'{fn.capitalize()}:\n Obs : {pv_obs:.5e}\n Spin: {pv_spin:.5e}\n')
 
 fig.tight_layout()
 plt.show()
@@ -208,22 +208,97 @@ for k, (fn, data) in enumerate(rand.items()):
     pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
 
     # Plot null dist
-    axs[k].hist(r_rand, bins=25, density=True, alpha=0.5, color=(0.8, 0.8, 0.8))
+    axs[k].hist(r_rand, bins=25, density=True, alpha=0.5, color=(.8, .8, .8))
     axs[k].axvline(r_obs, lw=2, ls='--', color='k')
-    axs[k].set_xlabel('Correlation with {}'.format(fn))
+    axs[k].set_xlabel(f'Correlation with {fn}')
     if k == 0:
         axs[k].set_ylabel('Density')
 
-    print('{}:\n Obs  : {:.5e}\n Moran: {:.5e}\n'.
-          format(fn.capitalize(), pv_obs, pv_rand))
+    print(f'{fn.capitalize()}:\n Obs  : {pv_obs:.5e}\n Moran: {pv_rand:.5e}\n')
 
 fig.tight_layout()
 plt.show()
 
 
 ###############################################################################
-# There are some scenarios where MSR results do not follow a normal
-# distribution. It is relatively simple to check whether this occurs in our
-# data by visualizing the null distributions. Check this interesting paper
-# for more information `(Burt et al., 2020) <https://www.biorxiv.org/content/
-# 10.1101/2020.02.18.955054v1>`_.
+#
+#
+#
+#
+# Variogram Matching
+# ------------------
+#
+# Here, we will repeat the same analysis using the variogram matching approach
+# presented in `(Burt et al., 2020)
+# <https://www.sciencedirect.com/science/article/pii/S1053811920305243>`_,
+# which generates novel brainmaps with similar spatial autocorrelation to the
+# input data.
+#
+#
+# We will need a distance matrix that tells us what the spatial distance
+# between our datapoints is. For this example, we will use geodesic distance.
+
+
+from brainspace.mesh.mesh_elements import get_immediate_distance
+from scipy.sparse.csgraph import dijkstra
+
+# Compute geodesic distance
+gd = get_immediate_distance(surf_lh, mask=mask_tl)
+gd = dijkstra(gd, directed=False)
+
+idx_sorted = np.argsort(gd, axis=1)
+
+
+###############################################################################
+# Now we've got everything we need to generate our surrogate datasets. By
+# default, BrainSpace will use all available data to generate surrogate maps.
+# However, this process is extremely computationally and memory intensive. When
+# using this method with more than a few hundred regions, we recommend
+# subsampling the data. This can be done using SampledSurrogateMaps instead of
+# the SurrogateMaps.
+
+from brainspace.null_models import SampledSurrogateMaps
+
+
+n_surrogate_datasets = 1000
+
+# Note: number samples must be greater than number neighbors
+num_samples = 100
+num_neighbors = 50
+
+ssm = SampledSurrogateMaps(ns=num_samples, knn=num_neighbors, random_state=0)
+ssm.fit(gd, idx_sorted)
+
+t1wt2w_surrogates = ssm.randomize(t1wt2w_tl, n_rep=n_surrogate_datasets)
+curv_surrogates = ssm.randomize(curv_tl, n_rep=n_surrogate_datasets)
+
+
+###############################################################################
+# Similar to the previous case, we can now plot the results:
+
+import matplotlib.pyplot as plt
+from scipy.stats import spearmanr
+fig, axs = plt.subplots(1, 2, figsize=(9, 3.5))
+
+feats = {'t1wt2w': t1wt2w_tl, 'curvature': curv_tl}
+rand = {'t1wt2w': t1wt2w_surrogates, 'curvature': curv_surrogates}
+
+for k, (fn, data) in enumerate(rand.items()):
+    r_obs, pv_obs = spearmanr(feats[fn], embedding_tl, nan_policy='omit')
+
+    # Compute perm pval
+    r_rand = np.asarray([spearmanr(embedding_tl, d)[0] for d in data])
+    pv_rand = np.mean(np.abs(r_rand) >= np.abs(r_obs))
+
+    # Plot null dist
+    axs[k].hist(r_rand, bins=25, density=True, alpha=0.5, color=(.8, .8, .8))
+    axs[k].axvline(r_obs, lw=2, ls='--', color='k')
+    axs[k].set_xlabel(f'Correlation with {fn}')
+    if k == 0:
+        axs[k].set_ylabel('Density')
+
+    print(f'{fn.capitalize()}:\n Obs      : {pv_obs:.5e}\n '
+          f'Variogram: {pv_rand:.5e}\n')
+
+fig.tight_layout()
+plt.show()
