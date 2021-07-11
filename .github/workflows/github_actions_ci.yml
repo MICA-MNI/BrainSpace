@@ -31,13 +31,6 @@ jobs:
         python -m pip install pytest
         python -m pip install -r requirements.txt
         python -m pytest brainspace --ignore brainspace/tests/test_plotting.py
-    
-#     - name: Install headless display
-#       if: matrix.os == 'ubuntu-latest'
-#       run: |
-#         chmod +x .github/setup_headless_display.sh
-#         .github/setup_headless_display.sh
-
 
 
     - name: Prepare Linux
@@ -54,14 +47,6 @@ jobs:
         options: -screen 0 1600x1200x24
         run: python3 -m pytest brainspace
 
-
-#     - name: Test Linux 
-#       if: matrix.os == 'ubuntu-latest'
-#       run: |
-#         python3 -m pip install --upgrade pip
-#         python3 -m pip install pytest
-#         python3 -m pip install -r requirements.txt
-#         python3 -m pytest brainspace
 
     - name: Test macOS 
       if: matrix.os == 'macos-latest'
