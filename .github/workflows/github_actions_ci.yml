@@ -41,14 +41,21 @@ jobs:
     - name: Add xvfb
       if: matrix.os == 'ubuntu-latest'
       uses: GabrielBB/xvfb-action@v1.4
+      with:
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pytest
+          python3 -m pip install -r requirements.txt
+          python3 -m pytest brainspace
 
-    - name: Test Linux 
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install pytest
-        python3 -m pip install -r requirements.txt
-        python3 -m pytest brainspace --ignore brainspace/tests/test_plotting.py
+
+#     - name: Test Linux 
+#       if: matrix.os == 'ubuntu-latest'
+#       run: |
+#         python3 -m pip install --upgrade pip
+#         python3 -m pip install pytest
+#         python3 -m pip install -r requirements.txt
+#         python3 -m pytest brainspace --ignore brainspace/tests/test_plotting.py
 
     - name: Test macOS 
       if: matrix.os == 'macos-latest'
