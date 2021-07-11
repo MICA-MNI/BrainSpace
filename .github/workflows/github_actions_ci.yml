@@ -43,8 +43,7 @@ jobs:
       uses: GabrielBB/xvfb-action@v1
       with:
         options: -screen 0 1600x1200x24
-        
-        run: python3 -m pip install --upgrade pip
+        run: pwd
 
     - name: Add xvfb
       if: matrix.os == 'ubuntu-latest'
