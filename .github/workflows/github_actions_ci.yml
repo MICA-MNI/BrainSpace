@@ -37,7 +37,11 @@ jobs:
 #       run: |
 #         chmod +x .github/setup_headless_display.sh
 #         .github/setup_headless_display.sh
-        
+
+    - name: Add xvfb
+      if: matrix.os == 'ubuntu-latest'
+      uses: GabrielBB/xvfb-action@v1.4
+
     - name: Test Linux 
       if: matrix.os == 'ubuntu-latest'
       run: |
