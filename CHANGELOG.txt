@@ -1,4 +1,4 @@
-v0.1.2, XXXXX 2021 -- Let there be null models update
+v0.1.2, July 2022
 MATLAB
 - New functionality
     - Added a verbose flag to GradientMaps (default value: false).
@@ -16,6 +16,7 @@ MATLAB
     matching null model)
     - procrustes_alignment now outputs the rotation matrices as a second
     output variable. 
+    - Added an installation as a toolbox.
 
 Python:
   - New functionality
@@ -25,7 +26,7 @@ ReadTheDocs
  - Updated MATLAB documentation of GradientMaps with the verbose flag.
  - Updated MATLAB documentation of plot_hemispheres to reflect the new 
    changes.  
- - Added MATLAB documentation for the variogram function. 
+ - Added MATLAB/Python documentation/tutorial for the variogram function. 
 
 Hotfix, January 2021 -- MATLAB Joint Alignment
 MATLAB:
