@@ -27,6 +27,8 @@ classdef GradientMaps
 %   - random_state (default: nan)
 %       - Any valid input for MATLAB's "rng" function or nan for no
 %           initialization.
+%   - verbose (default: false)
+%       - Determines wheter non-warning/error messages will be displayed.
 %
 % For complete documentation, including descriptions of this object's
 % properties and methods please consult our <a
@@ -38,7 +40,7 @@ classdef GradientMaps
         method
         gradients
         aligned
-        lambda        
+        lambda
     end
     
     properties (Access = private)
@@ -47,10 +49,7 @@ classdef GradientMaps
     
     methods
         %% Constructor
-        function obj = GradientMaps(varargin)
-            disp('Launching BrainSpace, the gradient connectivity toolbox.');
-            disp('');
-            
+        function obj = GradientMaps(varargin)           
             % Parse input
             in_fun = @(x) isa(x,'char') || isa(x,'function_handle');
             p = inputParser;
@@ -59,17 +58,23 @@ classdef GradientMaps
             addParameter(p, 'alignment', 'none', in_fun);
             addParameter(p, 'n_components', 10, @isnumeric);
             addParameter(p, 'random_state', nan);
+            addParameter(p, 'verbose', false, @islogical); 
             
             parse(p, varargin{:});
             R = p.Results;
             
             % Set the properties
+            if R.verbose
+                disp('Launching BrainSpace, the gradient connectivity toolbox.');
+                disp('');
+            end
             obj = obj.set( ...
                 'kernel',       R.kernel, ...
                 'approach',     R.approach, ...
                 'alignment',    R.alignment, ...
                 'random_state', R.random_state, ...
-                'n_components', R.n_components);
+                'n_components', R.n_components, ...
+                'verbose',      R.verbose);
         end
     end
     methods(Access = private)
@@ -152,15 +157,21 @@ classdef GradientMaps
                     case 'n_components'
                         obj.method.n_components = varargin{ii+1};
                         change_string{end+1} = ['Set the number of requested components to: ' num2str(varargin{ii+1}) '.'];
+                    
+                    case 'verbose'
+                        obj.method.verbose = varargin{ii+1};
+                        change_string{end+1} = ['Verbose display was set to: ' mat2str(obj.method.verbose) '.'];
                         
                     otherwise
                         error('Unknown property. Valid properties are: ''connectivitymatrix'', ''kernel'', ''approach'', and ''nullmodel''.');
                 end
             end
-            for ii = 1:numel(change_string)
-                disp(change_string{ii})
+            if obj.method.verbose
+                for ii = 1:numel(change_string)
+                    disp(change_string{ii})
+                end
+                disp(' ')
             end
-            disp(' ')
         end
         % -------------------------------------
         % -------------------------------------
@@ -182,7 +193,9 @@ classdef GradientMaps
             end
             
             % Sparsify input data. 
-            disp(['Running with sparsity parameter: ' num2str(p.Results.sparsity)]);
+            if obj.method.verbose
+                disp(['Running with sparsity parameter: ' num2str(p.Results.sparsity)]);
+            end
             sparse_data = data;
             sparse_data(data < prctile(data,p.Results.sparsity)) = 0; 
             
@@ -201,7 +214,9 @@ classdef GradientMaps
                 case {'Pearson','Spearman'}
                     kernel_data = corr(sparse_data,'type',kernel);
                 case 'Gaussian'
-                    disp(['Running with gamma parameter: ' num2str(p.Results.gamma) '.']);
+                    if obj.method.verbose
+                        disp(['Running with gamma parameter: ' num2str(p.Results.gamma) '.']);
+                    end
                     kernel_data = exp(-p.Results.gamma .* squareform(pdist(sparse_data').^2));
                 case {'Cosine Similarity','Normalized Angle'}
                     cosine_similarity = 1-squareform(pdist(sparse_data','cosine'));
@@ -217,7 +232,9 @@ classdef GradientMaps
                         
             % Check for negative numbers.
             if any(kernel_data(:) < 0)
-                disp('Found negative numbers in the kernel matrix. These will be set to zero.');
+                if obj.method.verbose
+                    disp('Found negative numbers in the kernel matrix. These will be set to zero.');
+                end
                 kernel_data(kernel_data < 0) = 0; 
             end
             
@@ -288,11 +305,12 @@ classdef GradientMaps
                     [~, embedding, ~, ~, lambda] = pca(data);
                     embedding = embedding(:,1:obj.method.n_components);
                 case 'Laplacian Eigenmap'
-                    disp(['Requested ' num2str(obj.method.n_components) ' components.']);
                     [embedding, lambda] = laplacian_eigenmaps(data, obj.method.n_components);
                 case 'Diffusion Embedding'
-                    disp(['Running with alpha parameter: ' num2str(in.alpha)]);
-                    disp(['Running with diffusion time: ' num2str(in.diffusion_time)]);
+                    if obj.method.verbose
+                        disp(['Running with alpha parameter: ' num2str(in.alpha)]);
+                        disp(['Running with diffusion time: ' num2str(in.diffusion_time)]);
+                    end
                     [embedding, lambda] = diffusion_mapping(data, obj.method.n_components, in.alpha, in.diffusion_time);
                 otherwise
                     error('Unknown manifold technique.');

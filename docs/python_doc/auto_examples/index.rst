@@ -21,6 +21,7 @@ Tutorials
 .. only:: html
 
  .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial0_thumb.png
+     :alt: Tutorial 0: Preparing your data for gradient analysis
 
      :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial0.py`
 
@@ -41,6 +42,7 @@ Tutorials
 .. only:: html
 
  .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial1_thumb.png
+     :alt: Tutorial 1: Building your first gradient
 
      :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial1.py`
 
@@ -61,6 +63,7 @@ Tutorials
 .. only:: html
 
  .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial2_thumb.png
+     :alt: Tutorial 2: Customizing and aligning gradients
 
      :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial2.py`
 
@@ -81,6 +84,7 @@ Tutorials
 .. only:: html
 
  .. figure:: /python_doc/auto_examples/images/thumb/sphx_glr_plot_tutorial3_thumb.png
+     :alt: Tutorial 3: Null models for gradient significance
 
      :ref:`sphx_glr_python_doc_auto_examples_plot_tutorial3.py`
 

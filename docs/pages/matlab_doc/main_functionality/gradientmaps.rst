@@ -30,8 +30,7 @@ Properties
 
 The **method** property is a structure array which itself consists of four
 fields. Each of these is set at the initalization of the object (see below) and
-cannot be modifed afterwards. The fields are: "kernel", "approach", "alignment",
-and "n_components". 
+cannot be modifed afterwards. The fields are: "kernel", "approach", "alignment", "n_components", and "verbose". 
 
 The **gradients** property is a cell array containing the (unaligned) gradients
 of each input matrix. Each cell is an n-by-m matrix where n is the number of
@@ -76,9 +75,11 @@ be provided to alter its behavior.
    - Any input accepted by MATLAB's ``rng`` function, or nan to use the current random state. (default: nan)
 'n_components'
    - Any natural number in double format. (default: 10)
+'verbose'
+   - Determines whether non-warning/error messages are diplayed (default: false).
 
 Putting it all together, an example initialization could be: ``gm =
-GradientMaps('kernel','g','approach','pca','alignment','','random_state',10);``
+GradientMaps('kernel','g','approach','pca','alignment','','random_state',10,'verbose',true);``
 
 Public Methods
 ---------------

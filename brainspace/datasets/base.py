@@ -12,7 +12,8 @@ from ..vtk_interface import wrap_vtk, serial_connect
 def load_group_fc(parcellation, scale=400, group='main'):
     """ Load group level connectivity matrix for a given parcellation.
 
-    Connectivity is derived from a subset of HCP data.
+    Connectivity is derived from a the discovery (main) and validation (holdout) 
+    datasets of (Vos de Wael et al., 2018, PNAS).
 
     Parameters
     ----------
@@ -40,7 +41,7 @@ def load_group_fc(parcellation, scale=400, group='main'):
 def load_group_mpc(parcellation, scale=400):
     """ Load group level connectivity matrix for a given parcellation.
 
-    Connectivity is derived from a subset of HCP data.
+    MPC is derived from the dataset used by (Paquola et al., 2019, PLoS biology).
 
     Parameters
     ----------
@@ -265,6 +266,9 @@ def _load_feat(feat_name, parcellation=None, mask=None):
 
 def load_marker(name, join=False):
     """ Load cortical data for conte69.
+
+    Markers are derived from the discovery (main) datasets of (Vos de Wael et
+    al., 2018, PNAS).
 
     Parameters
     ----------

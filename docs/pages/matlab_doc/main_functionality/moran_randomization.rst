@@ -22,7 +22,7 @@ Usage
 
 - *Y*: An n-by-m data matrix to randomize where n is number of datapoints and m are different modalities. 
 - *MEM*: Moran eigenvectors as returned by :ref:`compute_mem_matlab`.
-- *n_rep*: Number of perutations
+- *n_rep*: Number of pertubations
 - *varargin*: See name-value pairs below. 
 - *Y_rand*: Randomized data. 
 

@@ -305,7 +305,7 @@ class DiffusionMaps(Embedding):
 
     """
 
-    def __init__(self, n_components=10, alpha=0.5, diffusion_time=1,
+    def __init__(self, n_components=10, alpha=0.5, diffusion_time=0,
                  random_state=None):
         super().__init__(n_components=n_components)
         self.alpha = alpha

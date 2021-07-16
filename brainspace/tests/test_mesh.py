@@ -4,6 +4,8 @@ import pytest
 
 import os
 import numpy as np
+import shutil
+import gzip
 
 import vtk
 from vtk.util.vtkConstants import VTK_TRIANGLE, VTK_LINE, VTK_VERTEX
@@ -43,10 +45,19 @@ def test_io(ext):
     mio.write_surface(s, io_pth)
     s2 = mio.read_surface(io_pth)
 
+    io_gz_pth = os.path.join(root_pth, 'test_sphere_io.{ext}.gz').format(ext=ext)
+    with open(io_pth, 'rb') as f1:
+        with gzip.open(io_gz_pth, 'wb') as f2:
+            shutil.copyfileobj(f1, f2)
+    s3 = mio.read_surface(io_gz_pth)
+
     assert np.allclose(s.Points, s2.Points)
     assert np.all(s.GetCells2D() == s2.GetCells2D())
-
+    assert np.allclose(s.Points, s3.Points)
+    assert np.all(s.GetCells2D() == s3.GetCells2D())
+    
     os.remove(io_pth)
+    os.remove(io_gz_pth)
 
 
 @pytest.mark.skipif(nb is None, reason="Requires nibabel")

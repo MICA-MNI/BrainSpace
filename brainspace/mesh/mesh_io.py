@@ -5,7 +5,9 @@ High-level read/write functions for several formats.
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
-
+import tempfile
+import gzip
+import os
 from vtk import (vtkPLYReader, vtkPLYWriter, vtkXMLPolyDataReader,
                  vtkXMLPolyDataWriter, vtkPolyDataReader, vtkPolyDataWriter)
 
@@ -70,7 +72,8 @@ def read_surface(ipth, itype=None, return_data=True, update=True):
     ipth : str
         Input filename.
     itype : {'ply', 'vtp', 'vtk', 'fs', 'asc', 'gii'}, optional
-        Input file type. If None, it is deduced from `ipth`. Default is None.
+        Input file type. If None, it is deduced from `ipth`. Files compressed
+        with gzip (.gz) are also supported. Default is None.
     return_data : bool, optional
         Whether to return data instead of filter. Default is False
     update : bool, optional
@@ -95,6 +98,16 @@ def read_surface(ipth, itype=None, return_data=True, update=True):
 
     if itype is None:
         itype = ipth.split('.')[-1]
+
+    if itype == 'gz':
+        extension = ipth.split('.')[-2]
+        tmp = tempfile.NamedTemporaryFile(suffix='.' + extension, delete = False)
+        tmp_name = tmp.name
+        tmp.close() # Close and reopen because windows throws permission errors when both reading and writing.
+        _uncompress(ipth, tmp_name)
+        result = read_surface(tmp_name, extension, return_data=return_data, update=update)
+        os.unlink(tmp_name)
+        return result
 
     reader = _select_reader(itype)
     reader.filename = ipth
@@ -165,3 +178,27 @@ def convert_surface(ipth, opth, itype=None, otype=None, oformat=None):
     """
     reader = read_surface(ipth, itype=itype, return_data=False, update=False)
     write_surface(reader, opth, oformat=oformat, otype=otype)
+
+def _uncompress(ipth, opth, block_size=65536):
+    """Uncompresses files. Currently only supports gzip.
+
+    Parameters
+    ----------
+    ipth : str
+        Input filename.
+    opth : str
+        Output filename.
+    block_size : int, optional
+        Size of blocks of the input that are read at a time, by default 65536
+    
+    """
+    if ipth.split('.')[-1] == 'gz':
+        with gzip.open(ipth, 'rb') as i_file, open(opth, 'wb') as o_file:
+            while True:
+                block = i_file.read(block_size)
+                if not block:
+                    break
+                else:
+                    o_file.write(block)
+    else:
+        ValueError('Unknown file format.')

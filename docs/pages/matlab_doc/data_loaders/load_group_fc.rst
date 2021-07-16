@@ -26,3 +26,8 @@ Usage
 .. _DK: https://surfer.nmr.mgh.harvard.edu/ftp/articles/desikan06-parcellation.pdf
 
 __ DK_
+
+
+.. note ::
+    Data matrices were drived from the discovery (main) and validation (holdout) groups of `(Vos de Wael et
+    al., 2018) <https://www.pnas.org/content/115/40/10154.short>`_. 
