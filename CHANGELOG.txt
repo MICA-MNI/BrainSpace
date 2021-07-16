@@ -1,32 +1,34 @@
 v0.1.2, July 2022
 MATLAB
-- New functionality
-    - Added a verbose flag to GradientMaps (default value: false).
-    - plot_hemispheres has several new functionalities:
-        - Now returns an object rather than the graphics handles.
-          Old graphics handles are stored in object.handles. 
-        - Added the following methods to the plot_hemispheres object for 
-        modifying figure properties:
-            - object.colorlimits: modifies color limits.
-            - object.colormaps: modifies colormaps. 
-            - object.labels: modifies labeltext properties. 
-            - Added a "views" name-value pair that enables anterior, 
-              posterior, superior, and inferior views. 
-    - Added a MATLAB implementation of BrainSMASH (i.e. variogram 
-    matching null model)
-    - procrustes_alignment now outputs the rotation matrices as a second
-    output variable. 
-    - Added an installation as a toolbox.
+  - Added a verbose flag to GradientMaps (default value: false).
+  - plot_hemispheres has several new functionalities:
+      - Now returns an object rather than the graphics handles.
+        Old graphics handles are stored in object.handles. 
+      - Added the following methods to the plot_hemispheres object for 
+      modifying figure properties:
+          - object.colorlimits: modifies color limits.
+          - object.colormaps: modifies colormaps. 
+          - object.labels: modifies labeltext properties. 
+          - Added a "views" name-value pair that enables anterior, 
+            posterior, superior, and inferior views. 
+  - Added a MATLAB implementation of BrainSMASH (i.e. variogram 
+  matching null model)
+  - procrustes_alignment now outputs the rotation matrices as a second
+  output variable. 
+  - Added an installation as a toolbox.
 
 Python:
-  - New functionality
-    - brainspace.mesh.mesh_io.read_surface now supports gzipped files. 
+  - brainspace.mesh.mesh_io.read_surface now supports gzipped files. 
+  - Added the variogram matching procedure.
+  - Added a new layout for plot_hemispheres.
+  - Default diffusion time now set to 0.
 
 ReadTheDocs
  - Updated MATLAB documentation of GradientMaps with the verbose flag.
  - Updated MATLAB documentation of plot_hemispheres to reflect the new 
    changes.  
  - Added MATLAB/Python documentation/tutorial for the variogram function. 
+ - Corrected the diffusion maps documentation.
 
 Hotfix, January 2021 -- MATLAB Joint Alignment
 MATLAB:
