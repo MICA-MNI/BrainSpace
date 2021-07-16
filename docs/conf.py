@@ -109,6 +109,8 @@ sphinx_gallery_conf = {
     'image_scrapers': ('matplotlib', _get_sg_image_scraper()),
     'within_subsection_order': FileNameSortKey,
     'download_all_examples': False,
+    'remove_config_comments': True,
+    # 'run_stale_examples': True,
 }
 
 

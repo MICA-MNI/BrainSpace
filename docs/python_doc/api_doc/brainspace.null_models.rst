@@ -6,6 +6,7 @@ Null models
 
 - :ref:`pysec-nullmodels-spin`
 - :ref:`pysec-nullmodels-moran`
+- :ref:`pysec-nullmodels-variogram`
 
 
 
@@ -39,3 +40,19 @@ Moran spectral randomization
    MoranRandomization
    compute_mem
    moran_randomization
+
+
+
+.. _pysec-nullmodels-variogram:
+
+Surrogate maps
+-----------------------------
+
+.. currentmodule:: brainspace.null_models.variogram
+
+.. autosummary::
+   :toctree: ../../generated/
+
+
+   SurrogateMaps
+   SampledSurrogateMaps
