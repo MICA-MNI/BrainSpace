@@ -1,3 +1,7 @@
+Hotfix, September 2021 -- MATLAB eigenvalues
+MATLAB
+- Fixed an inaccuracy in the computation of the eigenvalues in diffusion mapping.
+
 v0.1.2, July 2022
 MATLAB
   - Added a verbose flag to GradientMaps (default value: false).
