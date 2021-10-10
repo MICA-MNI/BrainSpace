@@ -1,4 +1,4 @@
-function [embedding,lambda] = diffusion_mapping(data, n_components, alpha, diffusion_time, random_state)
+function [embedding, scaled_eigval] = diffusion_mapping(data, n_components, alpha, diffusion_time, random_state)
 % DIFFUSION_MAPPING   Diffusion mapping decomposition of input matrix.
 %   embedding = DIFFUSION_MAPPING(data,n_components,alpha,diffusion_time)
 %   computes the first n_components diffusion components of matrix data
@@ -8,8 +8,8 @@ function [embedding,lambda] = diffusion_mapping(data, n_components, alpha, diffu
 %   diffusion_time is a positive scalar. diffusion_time may also be set to
 %   0 for automatic diffusion time estimation.
 %
-%   [embedding,lambda] = DIFFUSION_MAPPING(data,n_components,alpha, ...
-%   diffusion_time) also returns the eigenvalues lambda. 
+%   [embedding, scaled_eigval] = DIFFUSION_MAPPING(data,n_components,alpha, ...
+%   diffusion_time) also returns the eigenvalues scaled_eigval. 
 %
 %   For complete documentation please consult our <a
 %   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/diffusion_mapping.html">ReadTheDocs</a>.
