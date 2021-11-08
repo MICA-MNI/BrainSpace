@@ -35,6 +35,10 @@ Functional gradients in aging.
   Targeting age-related differences in brain and cognition with multimodal imaging and
   connectome topography profiling. Human Brain Mapping, in press. <https://onlinelibrary.wiley.com/doi/full/10.1002/hbm.24767>`_
 
+Functional gradients of the nonhuman primate connectome.
+
+* `Manea, A. M. G., Zilverstand, A., Ugurbil, K., Heilbronner, S. R., & Zimmermann, J. (2021). Intrinsic timescales as an organizational principle of neural processing across the whole rhesus macaque brain. bioRxiv, 2021.2010.2005.463277. doi:10.1101/2021.10.05.463277 <https://www.biorxiv.org/content/10.1101/2021.10.05.463277v1>`_
+
 Meta-analytic co-activation and functional gradients in the hippocampus.
 
 * `Vos de Wael R, Larivière S, Caldairou B, Hong S, Jefferies E, Margulies DS, Smallwood J, 
