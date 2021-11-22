@@ -3,8 +3,8 @@ BrainSpace
 ====================
 
 
-.. image:: https://github.com/MICA-LAB/brainspace/workflows/Python%20package/badge.svg
-   :target: https://github.com/MICA-LAB/brainspace/actions
+.. image:: https://github.com/MICA-MNI/brainspace/workflows/Python%20package/badge.svg
+   :target: https://github.com/MICA-MNI/brainspace/actions
 
 .. image:: https://codecov.io/gh/mica-mni/brainspace/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/mica-mni/brainspace
