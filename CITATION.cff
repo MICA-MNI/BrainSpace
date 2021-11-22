@@ -44,7 +44,7 @@ authors:
     given-names: "Jonathan"
     orcid: "https://orcid.org/0000-0002-7298-2459"
   - family-names: "Bernhardt"
-    given-names: "Boris"
+    given-names: "Boris Christian"
     orcid: "https://orcid.org/0000-0001-9256-6041"
 
 title: "BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and connectomics datasets"
@@ -93,7 +93,7 @@ preferred-citation:
     given-names: "Jonathan"
     orcid: "https://orcid.org/0000-0002-7298-2459"
   - family-names: "Bernhardt"
-    given-names: "Boris"
+    given-names: "Boris Chrstian"
     orcid: "https://orcid.org/0000-0001-9256-6041"
 
   title: "BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and connectomics datasets"
@@ -102,6 +102,7 @@ preferred-citation:
   url: "https://www.nature.com/articles/s42003-020-0794-7"
   journal: Communications Biology
   volume: 3
-  number: 1
-  pages: 1-10
+  issue: 1
+  start: 1
+  end: 10
   type: article
