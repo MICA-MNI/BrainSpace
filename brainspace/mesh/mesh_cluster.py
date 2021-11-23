@@ -5,6 +5,7 @@ Clustering and sampling of surface mesh points.
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
+from warnings import warn
 
 import numpy as np
 
@@ -88,9 +89,10 @@ def cluster_points(surf, n_clusters=100, is_size=False, mask=None,
 
     # Find clusters
     if approach == 'kmeans':
+        if n_jobs != 1:
+            warn("The n_jobs parameter is deprecated and will be removed in a future version", DeprecationWarning)
         _, cluster_labs, _ = k_means(evs, n_clusters=n_clusters,
-                                     random_state=random_state, n_jobs=n_jobs,
-                                     n_init=n_init)
+                                     random_state=random_state, n_init=n_init)
     else:
         conn = me.get_immediate_adjacency(surf, include_self=False)
         if mask is not None:
