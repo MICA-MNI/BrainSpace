@@ -29,7 +29,7 @@ For this tutorial, you will need to install the Python package
 `nilearn <https://nilearn.github.io/stable/index.html>`_ version 0.9.0 or above. You can
 do it using ``pip``::
 
-    pip install nilearn>=0.9.0
+    pip install "nilearn>=0.9.0"
   
 
 Preprocessing
