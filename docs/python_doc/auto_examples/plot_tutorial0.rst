@@ -97,8 +97,8 @@ To remove confound regressors from the output of the fmriprep pipeline, first
 extract the confound columns. For example::
 
    from nilearn.interfaces.fmriprep import load_confounds_strategy
-   confounds_out = load_confounds("path/to/fmriprep/output/sub-<subject>_task-<task>_space-<space>_desc-preproc_bold.nii.gz",
-                                  denoise_strategy='simple')
+   confounds_out = load_confounds_strategy("path/to/fmriprep/output/sub-<subject>_task-<task>_space-<space>_desc-preproc_bold.nii.gz",
+                                           denoise_strategy='simple')
 
 .. GENERATED FROM PYTHON SOURCE LINES 76-77
 
