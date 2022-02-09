@@ -26,10 +26,10 @@ to prepare it for subsequent gradient analysis in the next tutorials.
 Requirements
 ------------
 For this tutorial, you will need to install the Python package
-`load_confounds <https://github.com/SIMEXP/fmriprep_load_confounds>`_. You can
+`nilearn <https://nilearn.github.io/stable/index.html>`_ version 0.9.0 or above. You can
 do it using ``pip``::
 
-    pip install load_confounds
+    pip install nilearn>=0.9.0
   
 
 Preprocessing
@@ -96,11 +96,9 @@ Confound regression
 To remove confound regressors from the output of the fmriprep pipeline, first
 extract the confound columns. For example::
 
-   import load_confounds
-   confounds_out = load_confounds("path to confound file",
-                              strategy='minimal',
-                              n_components=0.95,
-                              motion_model='6params')
+   from nilearn.interfaces.fmriprep import load_confounds_strategy
+   confounds_out = load_confounds("path/to/fmriprep/output/sub-<subject>_task-<task>_space-<space>_desc-preproc_bold.nii.gz",
+                                  denoise_strategy='simple')
 
 .. GENERATED FROM PYTHON SOURCE LINES 76-77
 
