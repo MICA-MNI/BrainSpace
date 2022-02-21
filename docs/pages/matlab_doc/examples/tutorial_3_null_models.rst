@@ -271,7 +271,7 @@ data. We will start by loading the conte69 surfaces for left and right
 hemispheres, a left temporal lobe mask, t1w/t2w intensity as well as cortical
 thickness data. 
 
-.. code-block:: matlab
+.. code-block :: matlab
 
     % load the conte69 hemisphere surfaces and spheres
     [surf_lh, surf_rh] = load_conte69();
@@ -300,7 +300,7 @@ between our datapoints is. For this example, we will use geodesic distance.
 
 .. code-block :: matlab
 
-    G = surface_to_graph(surf_lh, 'geodesic', ~temporal_mask_lh);
+    G = surface_to_graph(surf_lh, 'geodesic', ~temporal_mask_lh, true);
     geodesic_distance = distances(G);
 
 Now we've got everything we need to generate our surrogate datasets. By default,
@@ -322,7 +322,7 @@ in the smoothing step.
 
     obj_subsample = variogram(geodesic_distance, 'ns', num_samples, ...
         'knn', num_neighbors, 'random_state', random_initialization);
-    surrogates_subsample = obj_subsample.fit(t1wt2w_lh, n_surrogate_datasets);
+    surrogates_subsample = obj_subsample.fit(t1wt2w_tl, n_surrogate_datasets);
 
 .. note:: 
     The variogram class also supports parallel processing with the 'num_workers'
