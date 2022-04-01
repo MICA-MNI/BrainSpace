@@ -1,5 +1,4 @@
 import numpy as np
-import scipy.sparse as sp
 
 from sklearn.base import BaseEstimator
 
@@ -44,6 +43,11 @@ def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
     """
 
     a = compute_affinity(x, kernel=kernel, sparsity=sparsity, gamma=gamma)
+
+    if np.isnan(a).any() or np.isinf(a).any():
+        raise ValueError(
+            "Affinity matrix contains NaN or Inf values. Common causes of this include NaNs/Infs or rows of zeros in the input matrix."
+        )
 
     kwds_emb = {'n_components': n_components, 'random_state': random_state}
     kwds_emb.update(kwargs)
