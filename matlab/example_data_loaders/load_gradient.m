@@ -10,8 +10,8 @@ function data = load_gradient(name,idx)
 %   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/data_loaders/load_template.html">ReadTheDocs</a>.
 
 P = mfilename('fullpath');
-brainspace_path = fileparts(fileparts(fileparts(P)));
-data_path = [brainspace_path filesep 'shared' filesep 'template_gradients'];
+brainspace_path = fileparts(fileparts(P));
+data_path = [brainspace_path filesep 'datasets' filesep 'template_gradients'];
 
 data = load([data_path filesep 'conte69_32k_' name '_gradient' num2str(idx) '.csv']);
 
