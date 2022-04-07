@@ -5,6 +5,8 @@ Surface plotting functions.
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
+import os
+import warnings
 
 from itertools import product as iter_prod
 
@@ -324,7 +326,7 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
               nan_color=(0, 0, 0, 1), zoom=1, background=(1, 1, 1),
               size=(400, 400), embed_nb=False, interactive=True, scale=(1, 1),
               transparent_bg=True, screenshot=False, filename=None,
-              return_plotter=False, **kwargs):
+              return_plotter=False, suppress_warnings=False, **kwargs):
 
     """Plot surfaces arranged according to the `layout`.
 
@@ -382,6 +384,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
     scale : tuple, optional
         Scale (magnification). Only used if ``screenshot==True``.
         Default is None.
+    suppress_warnings : bool, optional
+        Whether to suppress warnings. Default is False.
     kwargs : keyword-valued args
         Additional arguments passed to the renderers, actors, mapper or
         plotter. Keywords starting with:
@@ -415,6 +419,19 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
     the shape of `array_name`.
 
     """
+
+    if os.name != "nt":
+        # Windows doesn't have a DISPLAY variable... Not sure how to deal with that.
+        # So just skip this check for Windows for now.
+        if ("DISPLAY" not in os.environ or not os.environ["DISPLAY"]) and not suppress_warnings:
+            warnings.warn(
+                (
+                    "Running plot_hemispheres without a display may result in a crash. " +
+                    "For a workaround please consult https://github.com/MICA-MNI/BrainSpace/issues/66. " +
+                    "To suppress this warning set suppress_warnings=True."
+                ), 
+                RuntimeWarning
+            )
 
     if screenshot and filename is None:
         raise ValueError('Filename is required.')
