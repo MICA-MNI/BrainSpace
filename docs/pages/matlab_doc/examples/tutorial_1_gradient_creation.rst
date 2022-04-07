@@ -27,7 +27,7 @@ Let's first look at the parcellation scheme we're using.
 .. code-block:: matlab    
     
     h = plot_hemispheres(labeling, {surf_lh,surf_rh});
-    colormap(h.figure,lines(401))
+    colormap(h.handles.figure,lines(401))
 
 .. image:: ./example_figs/schaefer_400.png
     :scale: 70%

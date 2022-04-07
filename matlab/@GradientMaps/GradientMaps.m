@@ -286,11 +286,8 @@ classdef GradientMaps
                 end
             end
             
-            % Check if the graph is connected. Large matrices may remain
-            % floating point asymmetric despite the above check, so only
-            % use lower.
-            if ~all(conncomp(graph(abs(data),'lower')) == 1) 
-                error('Graph is not connected.')
+            if ~graph_is_connected(data)
+                error('Affinity matrix is not a connected graph.');
             end
             
             %% Embedding.

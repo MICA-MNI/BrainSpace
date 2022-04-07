@@ -1,9 +1,18 @@
+v0.1.4, April 2022 -- Bug Fixes
+MATLAB:
+  - Fixed a bug that caused the detection of connected affinity matrices to error.
+
+v0.1.3, January 2022 -- Fix dependency error
+Python:
+  - Fixed an issue caused by an update to scikit-learn's kmeans function.
+
+
 Hotfix, September 2021 -- MATLAB eigenvalues
-MATLAB
+MATLAB:
 - Fixed an inaccuracy in the computation of the eigenvalues in diffusion mapping.
 
 v0.1.2, July 2022
-MATLAB
+MATLAB:
   - Added a verbose flag to GradientMaps (default value: false).
   - plot_hemispheres has several new functionalities:
       - Now returns an object rather than the graphics handles.
