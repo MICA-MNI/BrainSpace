@@ -12,13 +12,21 @@ classdef utils_tests < matlab.unittest.TestCase
             test_graphs = {
                 magic(5) + magic(5)', ... % connected
                 eye(5), ... % Not connected
-                one_disconnected
+                one_disconnected, ...
+                graph(one_disconnected)
             };
 
             for G = test_graphs
+                if isa(G{1}, 'graph')
+                    mathworks_answer = all(conncomp(G{1})==1);
+                else
+                    mathworks_answer = all(conncomp(graph(G{1}))==1);
+                end
+                brainspace_answer = graph_is_connected(G{1});
+
                 testCase.assertEqual( ...
-                    all(conncomp(graph(G{1}))==1), ...
-                    graph_is_connected(G{1}) ...
+                    mathworks_answer, ...
+                    brainspace_answer ...
                 );
             end
         end

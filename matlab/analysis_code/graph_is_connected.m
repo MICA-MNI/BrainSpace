@@ -9,7 +9,6 @@ function is_connected = graph_is_connected(G)
 if isa(G, 'graph')
     G = adjacency(G);
 end
-G = logical(G);
 
 vertex = 1;
 visited = zeros(size(G, 1), 1, 'logical');
