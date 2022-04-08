@@ -8,8 +8,8 @@
     <param.description>BrainSpace is a lightweight cross-platform toolbox primarily intended for macroscale gradient mapping and analysis of neuroimaging and connectome level data. The current version of BrainSpace is available in Python and MATLAB, programming languages widely used by the neuroimaging and network neuroscience communities. The toolbox also contains several maps that allow for exploratory analysis of gradient correspondence with other brain-derived features, together with tools to generate spatial null models.
 
 If you consider using BrainSpace, please cite our manuscript: Vos de Wael R, Benkarim O, Paquola C, Lariviere S, Royer J, Tavakol S, Xu T, Hong S, Langs G, Valk S, Misic B, Milham M, Margulies D, Smallwood J, Bernhardt B (2020). BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and connectomics datasets. Commun Biol 3, 103.</param.description>
-    <param.screenshot>/Users/reinder/Desktop/1612370158.png</param.screenshot>
-    <param.version>0.1.2</param.version>
+    <param.screenshot />
+    <param.version>0.1.4</param.version>
     <param.output>${PROJECT_ROOT}/BrainSpace.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>
@@ -18,7 +18,7 @@ If you consider using BrainSpace, please cite our manuscript: Vos de Wael R, Ben
       <item>1</item>
     </param.products.id>
     <param.products.version>
-      <item>9.10</item>
+      <item>9.11</item>
     </param.products.version>
     <param.platforms />
     <param.guid>cc685c6b-b946-4d79-b3d0-762743da5f8e</param.guid>
@@ -50,6 +50,7 @@ If you consider using BrainSpace, please cite our manuscript: Vos de Wael R, Ben
     <param.additional.sw.mac.url />
     <param.additional.sw.linux.url />
     <unset>
+      <param.screenshot />
       <param.output />
       <param.platforms />
       <param.exclude.filters />
@@ -84,9 +85,11 @@ If you consider using BrainSpace, please cite our manuscript: Vos de Wael R, Ben
     <fileset.rootfiles>
       <file>${PROJECT_ROOT}/matlab/@GradientMaps</file>
       <file>${PROJECT_ROOT}/matlab/analysis_code</file>
+      <file>${PROJECT_ROOT}/matlab/datasets</file>
       <file>${PROJECT_ROOT}/matlab/example_data_loaders</file>
       <file>${PROJECT_ROOT}/matlab/plot_data</file>
       <file>${PROJECT_ROOT}/matlab/surface_manipulation</file>
+      <file>${PROJECT_ROOT}/matlab/tests</file>
     </fileset.rootfiles>
     <fileset.depfun.included />
     <fileset.depfun.excluded>
@@ -140,7 +143,7 @@ If you consider using BrainSpace, please cite our manuscript: Vos de Wael R, Ben
     </build-deliverables>
     <workflow />
     <matlab>
-      <root>/Applications/MATLAB_R2021a.app</root>
+      <root>/Applications/MATLAB_R2021b.app</root>
       <toolboxes />
     </matlab>
     <platform>
@@ -152,7 +155,7 @@ If you consider using BrainSpace, please cite our manuscript: Vos de Wael R, Ben
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>10.14.6</osver>
+      <osver>12.3.1</osver>
       <os32>false</os32>
       <os64>true</os64>
       <arch>maci64</arch>

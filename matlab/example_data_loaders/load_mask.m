@@ -13,8 +13,8 @@ if nargin < 1
 end
 
 P = mfilename('fullpath');
-brainspace_path = fileparts(fileparts(fileparts(P)));
-surface_path = [brainspace_path filesep 'shared' filesep 'surfaces' filesep]; 
+brainspace_path = fileparts(fileparts(P));
+surface_path = [brainspace_path filesep 'datasets' filesep 'surfaces' filesep]; 
 
 mask_lh = logical(load([surface_path filesep 'conte69_32k_lh_' name '_mask.csv']));
 mask_rh = logical(load([surface_path filesep 'conte69_32k_rh_' name '_mask.csv']));

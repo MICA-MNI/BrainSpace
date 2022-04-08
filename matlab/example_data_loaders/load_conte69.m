@@ -13,8 +13,8 @@ if ~exist('name','var')
 end
 
 P = mfilename('fullpath');
-brainspace_path = fileparts(fileparts(fileparts(P)));
-surface_path = [brainspace_path filesep 'shared' filesep 'surfaces' filesep]; 
+brainspace_path = fileparts(fileparts(P));
+surface_path = [brainspace_path filesep 'datasets' filesep 'surfaces' filesep]; 
 
 if strcmpi(name,'spheres')
     surf_lh = convert_surface([surface_path 'conte69_32k_left_sphere.gii']);

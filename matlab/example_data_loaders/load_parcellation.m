@@ -18,8 +18,8 @@ if ~iscell(name) && ~isstring(name)
 end    
 
 P = mfilename('fullpath');
-brainspace_path = fileparts(fileparts(fileparts(P)));
-parcellation_path = [brainspace_path filesep 'shared' filesep 'parcellations']; 
+brainspace_path = fileparts(fileparts(P));
+parcellation_path = [brainspace_path filesep 'datasets' filesep 'parcellations']; 
 
 for ii = 1:numel(name)
     for jj = 1:numel(parcel_number)

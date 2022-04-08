@@ -24,8 +24,8 @@ if ~iscell(name) && ~isstring(name)
 end    
 
 P = mfilename('fullpath');
-brainspace_path = fileparts(fileparts(fileparts(P)));
-data_path = [brainspace_path filesep 'shared' filesep 'data' filesep group '_group']; 
+brainspace_path = fileparts(fileparts(P));
+data_path = [brainspace_path filesep 'datasets' filesep 'data' filesep group '_group']; 
 
 for ii = 1:numel(name)
     for jj = 1:numel(parcel_number)

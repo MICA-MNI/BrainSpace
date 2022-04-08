@@ -10,8 +10,8 @@ function [metric_lh,metric_rh] = load_marker(name)
 %   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/data_loaders/load_metric.html">ReadTheDocs</a>.
 
 P = mfilename('fullpath');
-brainspace_path = fileparts(fileparts(fileparts(P)));
-data_path = [brainspace_path filesep 'shared' filesep 'data' filesep 'main_group'];
+brainspace_path = fileparts(fileparts(P));
+data_path = [brainspace_path filesep 'datasets' filesep 'data' filesep 'main_group'];
 
 metric = load([data_path filesep 'conte69_32k_' lower(name) '.csv']);
 metric_lh = metric(1:end/2);
