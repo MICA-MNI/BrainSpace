@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  python_unittests:
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -55,3 +55,20 @@ jobs:
         python3 -m pip install pytest
         python3 -m pip install -r requirements.txt
         python3 -m pytest brainspace
+
+  matlab_unittests: 
+    strategy:
+      fail-fast: false
+      matrix:
+        matlab-version: [R018b, latest]
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install MATLAB
+      uses: matlab-actions/setup-matlab@v0
+    - name: Run tests 
+      uses: matlab-actions/run-tests@v0
+      with:
+        source-folder: matlab
