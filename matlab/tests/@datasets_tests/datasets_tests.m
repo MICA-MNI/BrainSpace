@@ -3,8 +3,17 @@ classdef datasets_tests < matlab.unittest.TestCase
 
     methods(Test)
         function test_conte69(testCase)
-            [surf_lh, surf_rh] = load_conte69();
-            [sphere_lh, sphere_rh] = load_conte69('sPhErEs');
+            try
+                [surf_lh, surf_rh] = load_conte69();
+                [sphere_lh, sphere_rh] = load_conte69('sPhErEs');
+            catch err
+                if strcmp(err.identifier, 'MATLAB:UndefinedFunction') && ...
+                        contains(err.message, '''gifti''')
+                    testCase.assumeTrue(true, 'Gifti toolbox not found');
+                else
+                    rethrow(err)
+                end
+            end     
 
             for surface = {surf_lh, surf_rh, sphere_lh, sphere_rh}
                 testCase.verifyEqual(fieldnames(surface{1}), {'tri'; 'coord'});
