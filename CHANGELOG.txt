@@ -1,6 +1,10 @@
 v0.1.4, April 2022 -- Bug Fixes
 MATLAB:
   - Fixed a bug that caused the detection of connected affinity matrices to error.
+  
+Python:
+  - GradientMaps.fit() now returns an error when the affinity matrix contains NaN or Inf.
+  - Added a warning when plot_hemispheres() is run without a display. 
 
 v0.1.3, January 2022 -- Fix dependency error
 Python:
