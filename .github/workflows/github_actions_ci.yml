@@ -57,13 +57,7 @@ jobs:
         python3 -m pytest brainspace
 
   matlab_unittests: 
-    strategy:
-      fail-fast: false
-      matrix:
-        matlab-version: [R018b, latest]
-
-    runs-on: ubuntu-latest
-    
+    runs-on: ubuntu-latest    
     steps:
     - uses: actions/checkout@v2
     - name: Install MATLAB
