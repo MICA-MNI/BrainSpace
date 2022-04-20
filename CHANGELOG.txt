@@ -1,5 +1,6 @@
 v0.1.4, April 2022 -- Bug Fixes
 MATLAB:
+  - Fixed the uploading of tutorial data to FileExchange.
   - Fixed a bug that caused the detection of connected affinity matrices to error.
   
 Python:
