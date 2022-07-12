@@ -12,7 +12,14 @@ from collections import defaultdict
 
 import numpy as np
 
-from vtk.util.vtkConstants import VTK_BIT, VTK_STRING, VTK_UNICODE_STRING
+from vtk.util.vtkConstants import VTK_BIT, VTK_STRING
+
+# VTK_UNICODE_STRING has been removed since VTK 9.2.
+# See: https://gitlab.kitware.com/vtk/vtk/-/blob/master/Documentation/release/9.2.md
+try:
+    from vtk.util.vtkConstants import VTK_UNICODE_STRING
+except ImportError:
+    VTK_UNICODE_STRING = VTK_STRING
 
 
 re_state = 'Set(?P<state>(?P<root>[A-Z0-9].*)To(?P<value>[A-Z0-9].*))'
