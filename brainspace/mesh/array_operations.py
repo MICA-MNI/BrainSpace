@@ -839,7 +839,7 @@ def _get_pids_naive(source, target, k=1, source_mask=None, target_mask=None,
     sp = me.get_points(source, mask=source_mask)
     tp = me.get_points(target, mask=target_mask)
 
-    tree = KDTree(sp, leafsize=20, copy_data=False, balanced_tree=False)
+    tree = KDTree(sp, leafsize=20, balanced_tree=False)
     dist, pids = tree.query(tp, k=k, eps=0)
 
     if return_weights:
