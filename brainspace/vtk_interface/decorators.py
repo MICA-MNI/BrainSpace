@@ -23,7 +23,7 @@ def wrap_input(*xargs, skip=False):
     ----------
     xargs : sequence of int and str
         Positional indices (integers) and keys as strings (for keyword
-        args) to wrap. If no specified, try to wrap all args.
+        args) to wrap. If none specified, try to wrap all args.
     skip : bool, optional
         Wrap all arguments except those in `xargs`. Default is False.
 
@@ -252,19 +252,19 @@ def append_vtk(to='point'):
 
     Parameters
     ----------
-    to : {'point', 'cell', 'field'}, optional
+    to: {'point', 'cell', 'field'}, optional
         Append data to PointData, CellData or FieldData. Default is 'point'.
 
     Returns
     -------
-    wrapped_func : callable
+    wrapped_func: callable
         Wrapped function.
 
     Notes
     -----
     All functions using this decorator must:
 
-    - Return an ndarray. The size of the array must be consistent with
+    - Return a ndarray. The size of the array must be consistent with
       the data it will be appended to (e.g., number of points if
       ``to == 'point'``), except for FieldData.
 
