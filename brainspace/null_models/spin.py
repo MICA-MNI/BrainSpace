@@ -9,7 +9,7 @@ Implementation of Spin permutations.
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist
-from scipy.spatial import cKDTree
+from scipy.spatial import KDTree
 
 from sklearn.utils import check_random_state
 from sklearn.base import BaseEstimator
@@ -80,7 +80,8 @@ def _generate_spins(points_lh, points_rh=None, unique=False, n_rep=100,
     spin = {k: np.empty((n_rep, p.shape[0]), dtype=int)
             for k, p in pts.items()}
     if not unique:
-        tree = {k: cKDTree(p, leafsize=20) for k, p in pts.items()}
+        # tree = {k: cKDTree(p, leafsize=20) for k, p in pts.items()}
+        tree = {k: KDTree(p, leafsize=20) for k, p in pts.items()}
 
     rs = check_random_state(random_state)
 
@@ -105,7 +106,7 @@ def _generate_spins(points_lh, points_rh=None, unique=False, n_rep=100,
                 row, col = linear_sum_assignment(dist)
                 spin[k][i, idx[k]] = idx[k][col]
             else:
-                _, spin[k][i] = tree[k].query(p @ rot[k], k=1, n_jobs=1)
+                _, spin[k][i] = tree[k].query(p @ rot[k], k=1)
 
     return spin
 
