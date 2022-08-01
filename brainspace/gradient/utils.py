@@ -38,8 +38,8 @@ def is_symmetric(x, tol=1E-10):
     if ssp.issparse(x):
         if x.format not in ['csr', 'csc', 'coo']:
             x = x.tocoo(copy=False)
-        dif1 = x - x.T
-        return np.all(np.abs(dif1.data) < tol)
+        dif = x - x.T
+        return np.all(np.abs(dif.data) < tol)
 
     return np.allclose(x, x.T, atol=tol)
 
@@ -141,7 +141,7 @@ def _dominant_set_dense(s, k, is_thresh=False, norm=False, copy=True):
 
 
 def dominant_set(s, k, is_thresh=False, norm=False, copy=True, as_sparse=True):
-    """Keep largest elements for each row. Zero-out the rest.
+    """Keep the largest elements for each row. Zero-out the rest.
 
     Parameters
     ----------
@@ -183,3 +183,94 @@ def dominant_set(s, k, is_thresh=False, norm=False, copy=True, as_sparse=True):
         return _dominant_set_sparse(s, k, is_thresh=is_thresh, norm=norm)
 
     return _dominant_set_dense(s, k, is_thresh=is_thresh, norm=norm, copy=copy)
+
+
+def ravel_symmetric(x, with_diagonal=False):
+    """Return the flattened upper triangular part of a symmetric matrix.
+
+    Parameters
+    ----------
+    x : 2D ndarray or sparse matrix, shape=(n, n)
+        Input array.
+    with_diagonal : bool, optional
+        If True, also return diagonal elements. Default is False.
+
+    Returns
+    -------
+    output : 1D ndarray, shape (n_feat,)
+        The flattened upper triangular part of `x`. If with_diagonal
+        is True, ``n_feat = n * (n + 1) / 2`` and
+        ``n_feat = n * (n - 1) / 2`` otherwise.
+
+    """
+
+    n = x.shape[0]
+    k = 0 if with_diagonal else -1
+    mask_lt = np.tri(n, k=k, dtype=np.bool)
+
+    if ssp.issparse(x) and not ssp.isspmatrix_csc(x):
+        x = x.tocsc(copy=False)
+
+    return x[mask_lt.T]
+
+
+def unravel_symmetric(x, size, as_sparse=False, part='both', fmt='csr'):
+    """Build symmetric matrix from array with upper triangular elements.
+
+    Parameters
+    ----------
+    x : 1D ndarray
+        Input data with elements to go in the upper triangular part.
+    size : int
+        Number of rows/columns of matrix.
+    as_sparse : bool, optional
+        Return a sparse matrix. Default is False.
+    part: {'both', 'upper', 'lower'}, optional
+        Build matrix with elements if both or just on triangular part.
+        Default is both.
+    fmt: str, optional
+        Format of sparse matrix. Only used if ``as_sparse=True``.
+        Default is 'csr'.
+
+    Returns
+    -------
+    sym : 2D ndarray or sparse matrix, shape = (size, size)
+        Array with the lower/upper or both (symmetric) triangular parts
+        built from `x`.
+
+    """
+
+    k = 1
+    if (size * (size + 1) // 2) == x.size:
+        k = 0
+    elif (size * (size - 1) // 2) != x.size:
+        raise ValueError('Cannot unravel data. Wrong size.')
+
+    shape = (size, size)
+    if as_sparse:
+        mask = x != 0
+        x = x[mask]
+
+        idx = np.triu_indices(size, k=k)
+        idx = [idx1[mask] for idx1 in idx]
+        if part == 'lower':
+            idx = idx[::-1]
+        elif part == 'both':
+            idx = np.concatenate(idx), np.concatenate(idx[::-1])
+            x = np.tile(x, 2)
+
+        xs = ssp.coo_matrix((x, idx), shape=shape)
+        if fmt != 'coo':
+            xs = xs.asformat(fmt, copy=False)
+
+    else:
+        mask_lt = np.tri(size, k=-k, dtype=np.bool)
+        xs = np.zeros(shape, dtype=x.dtype)
+
+        xs[mask_lt.T] = x
+        if part == 'both':
+            xs.T[mask_lt.T] = x
+        elif part == 'lower':
+            xs = xs.T
+
+    return xs
