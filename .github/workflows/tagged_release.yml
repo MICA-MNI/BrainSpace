@@ -2,6 +2,8 @@ name: "tagged_release"
 
 on:
   push:
+    branches:
+      - master
     tags:
       - "v*"
 
@@ -36,15 +38,8 @@ jobs:
           LICENSE
           dist/*
 
-    - name: Publish distribution 📦 to Test PyPI
+    - name: Publish to PyPi.
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
-        verbose: true
-
-    - name: Publish to PyPi.
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
+        password: ${{ secrets.PYPI_TOKEN }}
         verbose: true
