@@ -90,7 +90,8 @@ def cluster_points(surf, n_clusters=100, is_size=False, mask=None,
     # Find clusters
     if approach == 'kmeans':
         if n_jobs != 1:
-            warn("The n_jobs parameter is deprecated and will be removed in a future version", DeprecationWarning)
+            warn('The n_jobs parameter is deprecated and will be removed '
+                 'in a future version', DeprecationWarning)
         _, cluster_labs, _ = k_means(evs, n_clusters=n_clusters,
                                      random_state=random_state, n_init=n_init)
     else:
