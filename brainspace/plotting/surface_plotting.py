@@ -102,9 +102,10 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
     array_name : array-like, optional
         Names of point data array to plot for each layout entry.
         Use a tuple with multiple array names to plot multiple arrays
-        (overlays) per layout entry. Default is None.
+        (overlays) per layout entry. If None, plot surfaces without any array
+        data. Default is None.
     view : array-like, optional
-        View for each each layout entry. Possible views are {'lateral',
+        View for each layout entry. Possible views are {'lateral',
         'medial', 'ventral', 'dorsal'}. If None, use default view.
         Default is None.
     color_bar : {'left', 'right', 'top', 'bottom'} or None, optional
@@ -252,7 +253,11 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
 
         s = surfs[layout[i, j]]
         for ia, name in enumerate(array_name[i, j]):
-            if name is False or name is None:
+            # change to: if None or True, plot surface without array data
+            # if false: do not plot anything
+
+            # if name is False or name is None:
+            if name is False:
                 continue
 
             sp = specs[ia, i, j]
@@ -339,9 +344,10 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
     array_name : array-like, optional
         Names of point data array to plot for each layout entry.
         Use a tuple with multiple array names to plot multiple arrays
-        (overlays) per layout entry. Default is None.
+        (overlays) per layout entry. If None, plot surfaces without any array
+        data. Default is None.
     view : array-like, optional
-        View for each each layout entry. Possible views are {'lateral',
+        View for each layout entry. Possible views are {'lateral',
         'medial', 'ventral', 'dorsal'}. If None, use default view.
         Default is None.
     color_bar : {'left', 'right', 'top', 'bottom'} or None, optional
@@ -384,6 +390,8 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
     scale : tuple, optional
         Scale (magnification). Only used if ``screenshot==True``.
         Default is None.
+    return_plotter: bool, optional
+        If True, return plotter instead of returning image or rendering.
     suppress_warnings : bool, optional
         Whether to suppress warnings. Default is False.
     kwargs : keyword-valued args
@@ -421,17 +429,17 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
     """
 
     if os.name != "nt":
-        # Windows doesn't have a DISPLAY variable... Not sure how to deal with that.
+        # Windows doesn't have a DISPLAY variable...
+        # Not sure how to deal with that.
         # So just skip this check for Windows for now.
-        if ("DISPLAY" not in os.environ or not os.environ["DISPLAY"]) and not suppress_warnings:
+        if ("DISPLAY" not in os.environ or not os.environ["DISPLAY"]) \
+                and not suppress_warnings:
             warnings.warn(
-                (
-                    "Running plot_hemispheres without a display may result in a crash. " +
-                    "For a workaround please consult https://github.com/MICA-MNI/BrainSpace/issues/66. " +
-                    "To suppress this warning set suppress_warnings=True."
-                ), 
-                RuntimeWarning
-            )
+                'Running plot_hemispheres without a display may result in a '
+                'crash. For a workaround please consult '
+                'https://github.com/MICA-MNI/BrainSpace/issues/66. '
+                'To suppress this warning set suppress_warnings=True.',
+                RuntimeWarning)
 
     if screenshot and filename is None:
         raise ValueError('Filename is required.')
@@ -472,7 +480,7 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     array_name : str, list of str, ndarray or list of ndarray, optional
         Name of point data array to plot. If ndarray, the array is split for
         the left and right hemispheres. If list, plot one row per array.
-        Default is None.
+        If None, plot surfaces without any array data. Default is None.
     color_bar : bool, optional
         Plot color bar for each array (row). Default is False.
     color_range : {'sym'}, tuple or sequence.
@@ -482,9 +490,9 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
         Label text for column/row. Possible keys are {'left', 'right',
         'top', 'bottom'}, which indicate the location. Default is None.
     layout_style : str
-        Layout style for hemispheres. If 'row', layout is a single row 
-        alternating lateral and medial views, from left to right. If 'grid', 
-        layout is a 2x2 grid, with lateral views in the top row, medial 
+        Layout style for hemispheres. If 'row', layout is a single row
+        alternating lateral and medial views, from left to right. If 'grid',
+        layout is a 2x2 grid, with lateral views in the top row, medial
         views in the bottom row, and left and right columns. Default is 'row'.
     nan_color : tuple
         Color for nan values. Default is (0, 0, 0, 1).
@@ -514,7 +522,6 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     kwargs : keyword-valued args
         Additional arguments passed to the plotter.
 
-
     Returns
     -------
     figure : Ipython Image or None
@@ -539,6 +546,7 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
         elif array_name.ndim == 1:
             array_name = [array_name]
 
+    to_remove = []
     if isinstance(array_name, list):
         layout = [layout] * len(array_name)
         array_name2 = []
@@ -548,12 +556,13 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
                 name = surf_lh.append_array(an[:n_pts_lh], at='p')
                 surf_rh.append_array(an[n_pts_lh:], name=name, at='p')
                 array_name2.append(name)
+                to_remove.append(name)
             else:
                 array_name2.append(an)
         array_name = np.asarray(array_name2)[:, None]
 
     if layout_style == 'grid':
-        
+
         # create 2x2 grid for each array_name and stack altogether
         n_arrays = len(array_name)
         array_names, layouts = [], []
@@ -562,7 +571,7 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
             layouts.append(np.array(l).reshape(2, 2).T.tolist())
         array_name = np.vstack(array_names)
         layout = np.vstack(layouts)
-        
+
         view = [['lateral', 'medial'], ['medial', 'lateral']] * n_arrays
         share = 'both'
     else:
@@ -572,11 +581,24 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     if isinstance(cmap, list):
         cmap = np.asarray(cmap)[:, None]
 
+    # when embed_nb=True, interactive (with panel) only supports one renderer,
+    # here we have at least 4
+    if embed_nb:
+        interactive = False
+
     kwds = {'view': view, 'share': share}
     kwds.update(kwargs)
-    return plot_surf(surfs, layout, array_name=array_name, color_bar=color_bar,
-                     color_range=color_range, label_text=label_text, cmap=cmap,
-                     nan_color=nan_color, zoom=zoom, background=background,
-                     size=size, interactive=interactive, embed_nb=embed_nb,
-                     screenshot=screenshot, filename=filename, scale=scale,
-                     transparent_bg=transparent_bg, **kwds)
+    res = plot_surf(surfs, layout, array_name=array_name, color_bar=color_bar,
+                    color_range=color_range, label_text=label_text, cmap=cmap,
+                    nan_color=nan_color, zoom=zoom, background=background,
+                    size=size, interactive=interactive, embed_nb=embed_nb,
+                    screenshot=screenshot, filename=filename, scale=scale,
+                    transparent_bg=transparent_bg, **kwds)
+
+    # remove arrays added to surfaces if any
+    # cannot do it if return_plotter=True
+    if not kwargs.get('return_plotter', False):
+        surf_lh.remove_array(name=to_remove, at='p')
+        surf_rh.remove_array(name=to_remove, at='p')
+
+    return res
