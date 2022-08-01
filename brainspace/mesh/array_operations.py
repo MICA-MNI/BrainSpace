@@ -10,7 +10,8 @@ import warnings
 
 import numpy as np
 from scipy.stats import mode
-from scipy.spatial import cKDTree
+# from scipy.spatial import cKDTree
+from scipy.spatial import KDTree
 from scipy.sparse.csgraph import laplacian, connected_components
 
 from sklearn.utils.extmath import weighted_mode
@@ -833,15 +834,15 @@ def _get_pids_sphere(source, target, source_mask=None, target_mask=None):
 
 
 def _get_pids_naive(source, target, k=1, source_mask=None, target_mask=None,
-                    return_weights=True, n_jobs=1):
-    """Resampling based on k nearest points."""
+                    return_weights=True):
+    """Resampling based on the k nearest points."""
 
     sp = me.get_points(source, mask=source_mask)
     tp = me.get_points(target, mask=target_mask)
 
-    tree = cKDTree(sp, leafsize=20, compact_nodes=False, copy_data=False,
-                   balanced_tree=False)
-    dist, pids = tree.query(tp, k=k, eps=0, n_jobs=n_jobs)
+    tree = KDTree(sp, leafsize=20, compact_nodes=False, copy_data=False,
+                  balanced_tree=False)
+    dist, pids = tree.query(tp, k=k, eps=0)
 
     if return_weights:
         return pids, 1 / dist
@@ -909,6 +910,9 @@ def resample_pointdata(source, target, data, is_sphere=False, source_mask=None,
     """
     opt = ['mean', 'mode', 'weighted_mean', 'weighted_mode']
 
+    if n_jobs != 1:
+        warnings.warn('The n_jobs parameter is deprecated and will be removed '
+                      'in a future version', DeprecationWarning)
     is_list = True
     if not isinstance(data, list):
         data = [data]
@@ -928,7 +932,7 @@ def resample_pointdata(source, target, data, is_sphere=False, source_mask=None,
             use_weights = True
 
         pids = _get_pids_naive(source, target, k=k, source_mask=source_mask,
-                               target_mask=target_mask, n_jobs=n_jobs,
+                               target_mask=target_mask,
                                return_weights=use_weights)
         if use_weights:
             pids, w = pids
