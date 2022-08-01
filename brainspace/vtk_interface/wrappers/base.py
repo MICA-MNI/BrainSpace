@@ -9,10 +9,18 @@ Base wrapper for VTK objects.
 import numpy as np
 
 import vtk
+from vtk import (vtkAbstractArray, vtkStringArray, vtkIdList, vtkVariantArray,
+                 vtkDataArray)
 from vtk.numpy_interface import dataset_adapter as dsa
 from vtk.util.vtkConstants import VTK_STRING
 
 from .utils import call_vtk, get_vtk_methods, is_numpy_string, is_vtk_string
+
+
+try:
+    from vtk import vtkUnicodeStringArray
+except ImportError:
+    vtkUnicodeStringArray = vtkStringArray
 
 
 class VTKMethodWrapper:
@@ -386,7 +394,8 @@ def BSWrapVTKObject(obj):
 
 def _string_to_numpy(a):
     dtype = np.string_
-    if isinstance(a, vtk.vtkUnicodeStringArray):
+    if isinstance(a, vtkUnicodeStringArray) \
+            and vtkUnicodeStringArray != vtkStringArray:
         dtype = np.unicode_
     shape = a.GetNumberOfTuples(), a.GetNumberOfComponents()
     an = [a.GetValue(i) for i in range(a.GetNumberOfValues())]
@@ -395,9 +404,9 @@ def _string_to_numpy(a):
 
 def _numpy_to_string(a, array_type=None):
     if np.issubdtype(a.dtype, np.string_) or array_type == VTK_STRING:
-        av = vtk.vtkStringArray()
+        av = vtkStringArray()
     else:
-        av = vtk.vtkUnicodeStringArray()
+        av = vtkUnicodeStringArray()
     av.SetNumberOfComponents(1 if a.ndim == 1 else a.shape[1])
     av.SetNumberOfValues(a.size)
     for i, s in enumerate(a.ravel()):
@@ -412,7 +421,7 @@ def _variant_to_numpy(a):
 
 
 def _numpy_to_variant(a):
-    av = vtk.vtkVariantArray()
+    av = vtkVariantArray()
     av.SetNumberOfComponents(1 if a.ndim == 1 else a.shape[1])
     av.SetNumberOfValues(a.size)
     for i, s in enumerate(a.ravel()):
@@ -426,13 +435,13 @@ def _idlist_to_numpy(a):
 
 
 def wrap_vtk_array(a):
-    if isinstance(a, vtk.vtkIdList):
+    if isinstance(a, vtkIdList):
         return _idlist_to_numpy(a)
-    if isinstance(a, (vtk.vtkStringArray, vtk.vtkUnicodeStringArray)):
+    if isinstance(a, (vtkStringArray, vtkUnicodeStringArray)):
         return _string_to_numpy(a)
-    if isinstance(a, vtk.vtkVariantArray):
+    if isinstance(a, vtkVariantArray):
         return _variant_to_numpy(a)
-    if isinstance(a, vtk.vtkDataArray):
+    if isinstance(a, vtkDataArray):
         return dsa.vtkDataArrayToVTKArray(a)
     raise ValueError('Unsupported array type: {0}'.format(type(a)))
 
@@ -459,7 +468,7 @@ def wrap_vtk(obj, **kwargs):
 
     Returns
     -------
-    wrapper : BSVTKObjectWrapper
+    wrapper: BSVTKObjectWrapper
         The wrapped object.
     """
 
@@ -467,7 +476,7 @@ def wrap_vtk(obj, **kwargs):
     if len(kwargs) > 0:
         wobj.setVTK(**kwargs)
 
-    if isinstance(obj, (vtk.vtkAbstractArray, vtk.vtkIdList)):
+    if isinstance(obj, (vtkAbstractArray, vtkIdList)):
         try:
             return wrap_vtk_array(obj)
         except:
