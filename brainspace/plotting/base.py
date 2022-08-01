@@ -345,6 +345,10 @@ class Plotter(object):
         del self.ren_win
         self.ren_win = None
         if self.iren:
+            try:
+                self.iren.SetDone(True)
+            except:
+                pass
             self.iren.TerminateApp()
             del self.iren
             self.iren = None
@@ -357,6 +361,10 @@ class Plotter(object):
         else:
             self.ren_win.Finalize()
             if self.iren:
+                try:
+                    self.iren.SetDone(True)
+                except:
+                    pass
                 self.iren.TerminateApp()
             if self.use_qt:
                 self.app_window.close()
