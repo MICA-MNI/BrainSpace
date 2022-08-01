@@ -29,7 +29,7 @@ def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
         Inverse kernel width. Only used if ``kernel`` == 'gaussian'.
         If None, ``gamma=1/n_feat``. Default is None.
     sparsity : float, optional
-        Proportion of smallest elements to zero-out for each row.
+        Proportion of the smallest elements to zero-out for each row.
         Default is 0.9.
     kwargs : kwds, optional
         Additional keyword parameters passed to the embedding approach.
@@ -45,9 +45,9 @@ def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
     a = compute_affinity(x, kernel=kernel, sparsity=sparsity, gamma=gamma)
 
     if np.isnan(a).any() or np.isinf(a).any():
-        raise ValueError(
-            "Affinity matrix contains NaN or Inf values. Common causes of this include NaNs/Infs or rows of zeros in the input matrix."
-        )
+        raise ValueError('Affinity matrix contains NaN or Inf values. Common '
+                         'causes of this include NaNs/Infs or rows of zeros '
+                         'in the input matrix.')
 
     kwds_emb = {'n_components': n_components, 'random_state': random_state}
     kwds_emb.update(kwargs)
@@ -87,7 +87,7 @@ class GradientMaps(BaseEstimator):
         If None, use input matrix. Default is None.
     alignment : {'procrustes', 'joint'}, object or None
         Alignment approach. Only used when two or more datasets are provided.
-        If None, no alignment is peformed. If `object`, it accepts an instance
+        If None, no alignment is performed. If `object`, it accepts an instance
         of :class:`.ProcrustesAlignment`. Default is None.
 
         - If 'procrustes', datasets are aligned using generalized procrustes
@@ -134,7 +134,7 @@ class GradientMaps(BaseEstimator):
             Inverse kernel width. Only used if ``kernel == 'gaussian'``.
             If None, ``gamma=1/n_feat``. Default is None.
         sparsity : float, optional
-            Proportion of smallest elements to zero-out for each row.
+            Proportion of the smallest elements to zero-out for each row.
             Default is 0.9.
         n_iter : int, optional
             Number of iterations for procrustes alignment. Default is 10.
