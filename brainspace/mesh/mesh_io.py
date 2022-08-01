@@ -8,6 +8,7 @@ High-level read/write functions for several formats.
 import tempfile
 import gzip
 import os
+
 from vtk import (vtkPLYReader, vtkPLYWriter, vtkXMLPolyDataReader,
                  vtkXMLPolyDataWriter, vtkPolyDataReader, vtkPolyDataWriter)
 
@@ -62,6 +63,31 @@ def _select_writer(otype):
     return writer
 
 
+def _uncompress(ipth, opth, block_size=65536):
+    """Uncompresses files. Currently only supports gzip.
+
+    Parameters
+    ----------
+    ipth : str
+        Input filename.
+    opth : str
+        Output filename.
+    block_size : int, optional
+        Size of blocks of the input that are read at a time, by default 65536
+
+    """
+    if ipth.split('.')[-1] == 'gz':
+        with gzip.open(ipth, 'rb') as i_file, open(opth, 'wb') as o_file:
+            while True:
+                block = i_file.read(block_size)
+                if not block:
+                    break
+                else:
+                    o_file.write(block)
+    else:
+        ValueError('Unknown file format.')
+
+
 def read_surface(ipth, itype=None, return_data=True, update=True):
     """Read surface data.
 
@@ -101,11 +127,14 @@ def read_surface(ipth, itype=None, return_data=True, update=True):
 
     if itype == 'gz':
         extension = ipth.split('.')[-2]
-        tmp = tempfile.NamedTemporaryFile(suffix='.' + extension, delete = False)
+        tmp = tempfile.NamedTemporaryFile(suffix='.' + extension, delete=False)
         tmp_name = tmp.name
-        tmp.close() # Close and reopen because windows throws permission errors when both reading and writing.
+        # Close and reopen because windows throws permission errors when both
+        # reading and writing.
+        tmp.close()
         _uncompress(ipth, tmp_name)
-        result = read_surface(tmp_name, extension, return_data=return_data, update=update)
+        result = read_surface(tmp_name, extension, return_data=return_data,
+                              update=update)
         os.unlink(tmp_name)
         return result
 
@@ -178,27 +207,3 @@ def convert_surface(ipth, opth, itype=None, otype=None, oformat=None):
     """
     reader = read_surface(ipth, itype=itype, return_data=False, update=False)
     write_surface(reader, opth, oformat=oformat, otype=otype)
-
-def _uncompress(ipth, opth, block_size=65536):
-    """Uncompresses files. Currently only supports gzip.
-
-    Parameters
-    ----------
-    ipth : str
-        Input filename.
-    opth : str
-        Output filename.
-    block_size : int, optional
-        Size of blocks of the input that are read at a time, by default 65536
-    
-    """
-    if ipth.split('.')[-1] == 'gz':
-        with gzip.open(ipth, 'rb') as i_file, open(opth, 'wb') as o_file:
-            while True:
-                block = i_file.read(block_size)
-                if not block:
-                    break
-                else:
-                    o_file.write(block)
-    else:
-        ValueError('Unknown file format.')
