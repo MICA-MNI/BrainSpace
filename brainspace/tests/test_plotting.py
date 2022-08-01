@@ -47,7 +47,7 @@ def plotter_multiple_renderers():
     return p
 
 
-@pytest.mark.skipif(ipy is None and pn is None, reason="Requires panel")
+@pytest.mark.skipif(ipy is None or pn is None, reason="Requires panel")
 def test_plotter_panel():
     p = plotter_single_renderer()
     img = p.to_panel()
