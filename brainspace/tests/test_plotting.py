@@ -49,12 +49,14 @@ def plotter_multiple_renderers():
 
 @pytest.mark.skipif(ipy is None or pn is None, reason="Requires panel")
 def test_plotter_panel():
+
+    cls = (pn.pane.VTK, pn.pane.vtk.vtk.VTKRenderWindowSynchronized)
     p = plotter_single_renderer()
     img = p.to_panel()
-    assert isinstance(img, pn.pane.VTK)
+    assert isinstance(img, cls)
 
     img = p.show(embed_nb=True, interactive=True)
-    assert isinstance(img, pn.pane.VTK)
+    assert isinstance(img, cls)
     p.close()
 
     p = plotter_multiple_renderers()
