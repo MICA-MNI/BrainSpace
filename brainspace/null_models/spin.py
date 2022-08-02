@@ -9,7 +9,7 @@ Implementation of Spin permutations.
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist
-from scipy.spatial import cKDTree
+from scipy.spatial import KDTree
 
 from sklearn.utils import check_random_state
 from sklearn.base import BaseEstimator
@@ -80,7 +80,8 @@ def _generate_spins(points_lh, points_rh=None, unique=False, n_rep=100,
     spin = {k: np.empty((n_rep, p.shape[0]), dtype=int)
             for k, p in pts.items()}
     if not unique:
-        tree = {k: cKDTree(p, leafsize=20) for k, p in pts.items()}
+        # tree = {k: cKDTree(p, leafsize=20) for k, p in pts.items()}
+        tree = {k: KDTree(p, leafsize=20) for k, p in pts.items()}
 
     rs = check_random_state(random_state)
 
@@ -105,7 +106,7 @@ def _generate_spins(points_lh, points_rh=None, unique=False, n_rep=100,
                 row, col = linear_sum_assignment(dist)
                 spin[k][i, idx[k]] = idx[k][col]
             else:
-                _, spin[k][i] = tree[k].query(p @ rot[k], k=1, n_jobs=1)
+                _, spin[k][i] = tree[k].query(p @ rot[k], k=1)
 
     return spin
 
@@ -289,10 +290,14 @@ class SpinPermutations(BaseEstimator):
         Returns
         -------
         rand_lh : ndarray, shape = (n_rep, n_lh, n_feat)
-            Permutations of `x_rh`. If ``n_feat == 1``, shape = (n_rep, n_lh).
+            Permutations of `x_lh`. If ``n_feat == 1``, shape = (n_rep, n_lh).
         rand_lh : ndarray, shape = (n_rep, n_rh, n_feat)
             Permutations of `x_rh`. If ``n_feat == 1``, shape = (n_rep, n_rh).
             None if `x_rh` is None. Only if `spin_rh_` is not None.
+
+        See Also
+        --------
+        :func:`.SpinPermutations.randomize_gen`
 
         """
 
@@ -305,3 +310,38 @@ class SpinPermutations(BaseEstimator):
             rand_rh = x_rh[self.spin_rh_]
 
         return rand_lh, rand_rh
+
+    def randomize_gen(self, x_lh, x_rh=None):
+        """ Generate random samples from `x_lh` and `x_rh`.
+
+        This is the generator version of :func:`.SpinPermutations.randomize`.
+
+        Parameters
+        ----------
+        x_lh : ndarray, shape = (n_lh,) or (n_lh, n_feat)
+            Array of variables arranged in columns, where `n_feat` is the
+            number of variables.
+        x_rh : ndarray, shape = (n_rh,) or (n_rh, n_feat), optional
+            Array of variables arranged in columns for the right hemisphere.
+            Default is None.
+
+        Yields
+        -------
+        rand_lh : ndarray, shape = (n_lh, n_feat)
+            Permutation of `x_lh`. If ``n_feat == 1``, shape = (n_lh,).
+        rand_lh : ndarray, shape = (n_rh, n_feat)
+            Permutation of `x_rh`. If ``n_feat == 1``, shape = (n_rh,).
+            None if `x_rh` is None. Only if `spin_rh_` is not None.
+
+        See Also
+        --------
+        :func:`.SpinPermutations.randomize`
+        """
+
+        for i in range(self.n_rep):
+            rand_lh = x_lh[self.spin_lh_[i]]
+            if self.spin_rh_ is not None and x_rh is not None:
+                rand_rh = x_rh[self.spin_rh_[i]]
+                yield rand_lh, rand_rh
+            else:
+                yield rand_lh

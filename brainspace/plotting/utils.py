@@ -364,8 +364,29 @@ def _get_ranges(layout, surfs, array_name, share, cbar_range, nvals=256):
         elif share == 'c':
             ax, idx = 1, iter_prod(idx, [slice(None)], range(ncol))
 
-        specs['min'][:] = np.nanmin(specs['min'], axis=ax, keepdims=True)
-        specs['max'][:] = np.nanmax(specs['max'], axis=ax, keepdims=True)
+        # avoid warning when all nan
+        def _nanmin(a):
+            if np.isnan(a).all():
+                return np.nan
+            return np.nanmin(a)
+
+        def _nanmax(a):
+            if np.isnan(a).all():
+                return np.nan
+            return np.nanmax(a)
+
+        if ax == (1, 2):
+            specs['min'][:] = np.atleast_3d(_nanmin(specs['min']))
+            specs['max'][:] = np.atleast_3d(_nanmax(specs['max']))
+        else:
+            min_val = np.apply_along_axis(_nanmin, ax, specs['min'])
+            max_val = np.apply_along_axis(_nanmax, ax, specs['max'])
+            if ax == 1:
+                specs['min'][:] = min_val[None]
+                specs['max'][:] = max_val[None]
+            else:
+                specs['min'][:] = np.atleast_3d(min_val)
+                specs['max'][:] = np.atleast_3d(max_val)
 
         for i in idx:
             if specs['disc'][i].all():

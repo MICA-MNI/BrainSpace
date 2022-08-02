@@ -10,7 +10,7 @@ import warnings
 
 import numpy as np
 from scipy.stats import mode
-from scipy.spatial import cKDTree
+from scipy.spatial import KDTree
 from scipy.sparse.csgraph import laplacian, connected_components
 
 from sklearn.utils.extmath import weighted_mode
@@ -624,31 +624,41 @@ def propagate_labeling(surf, labeling, no_label=np.nan, mask=None, alpha=0.99,
     # Graph matrix
     if mode == 'connectivity':
         adj = me.get_ring_adjacency(surf, n_ring=n_ring, include_self=False,
-                                    dtype=np.float)
+                                    dtype=np.float, mask=mask)
     else:
-        adj = me.get_ring_distance(surf, n_ring=n_ring, dtype=np.float)
+        adj = me.get_ring_distance(surf, n_ring=n_ring, dtype=np.float,
+                                   mask=mask)
         adj.data[:] = np.exp(-adj.data/n_ring**2)
 
     if mask is not None:
         adj = adj[mask][:, mask]
 
-    graph_matrix = -alpha * laplacian(adj, normed=True)
-    diag_mask = (graph_matrix.row == graph_matrix.col)
-    graph_matrix.data[diag_mask] = 0.0
+    # graph_matrix = -alpha * laplacian(adj, normed=True)
+    graph = laplacian(adj, normed=True)
+    graph.data *= -alpha
+    graph.data[graph.row == graph.col] = 0
+    graph.eliminate_zeros()
+    graph = graph.tocsr(copy=False)
+    # diag_mask = (graph_matrix.row == graph_matrix.col)
+    # graph_matrix.data[diag_mask] = 0.0
 
     # Label distributions and label static
     lab_dist = np.zeros((n_pts, n_labs))
     lab_dist[np.argwhere(labeled)[:, 0], idx_lab] = 1
 
-    lab_static = lab_dist.copy()
-    lab_static *= 1 - alpha
+    # lab_static = lab_dist.copy()
+    # lab_static *= 1 - alpha
+    lab_static = (1 - alpha) * lab_dist
 
     # propagation
     lab_dist_perv = lab_dist
     for i in range(n_iter):
-        lab_dist = graph_matrix.dot(lab_dist) + lab_static
+        lab_dist = graph.dot(lab_dist)
+        lab_dist += lab_static
+        # lab_dist = graph_matrix.dot(lab_dist) + lab_static
 
-        if np.linalg.norm(lab_dist - lab_dist_perv, 'fro') < tol:
+        lab_dist_perv -= lab_dist
+        if np.linalg.norm(lab_dist_perv, 'fro') < tol:
             break
 
         lab_dist_perv = lab_dist
@@ -823,15 +833,14 @@ def _get_pids_sphere(source, target, source_mask=None, target_mask=None):
 
 
 def _get_pids_naive(source, target, k=1, source_mask=None, target_mask=None,
-                    return_weights=True, n_jobs=1):
-    """Resampling based on k nearest points."""
+                    return_weights=True):
+    """Resampling based on the k nearest points."""
 
     sp = me.get_points(source, mask=source_mask)
     tp = me.get_points(target, mask=target_mask)
 
-    tree = cKDTree(sp, leafsize=20, compact_nodes=False, copy_data=False,
-                   balanced_tree=False)
-    dist, pids = tree.query(tp, k=k, eps=0, n_jobs=n_jobs)
+    tree = KDTree(sp, leafsize=20)
+    dist, pids = tree.query(tp, k=k, eps=0)
 
     if return_weights:
         return pids, 1 / dist
@@ -899,6 +908,9 @@ def resample_pointdata(source, target, data, is_sphere=False, source_mask=None,
     """
     opt = ['mean', 'mode', 'weighted_mean', 'weighted_mode']
 
+    if n_jobs != 1:
+        warnings.warn('The n_jobs parameter is deprecated and will be removed '
+                      'in a future version', DeprecationWarning)
     is_list = True
     if not isinstance(data, list):
         data = [data]
@@ -918,7 +930,7 @@ def resample_pointdata(source, target, data, is_sphere=False, source_mask=None,
             use_weights = True
 
         pids = _get_pids_naive(source, target, k=k, source_mask=source_mask,
-                               target_mask=target_mask, n_jobs=n_jobs,
+                               target_mask=target_mask,
                                return_weights=use_weights)
         if use_weights:
             pids, w = pids
@@ -942,7 +954,7 @@ def resample_pointdata(source, target, data, is_sphere=False, source_mask=None,
         if k == 1:
             feat = d[pids]
         elif red_func[i] == 'mean':
-            feat = np.mean(d[pids], axis=1)
+            feat = np.nanmean(d[pids], axis=1)
         elif red_func[i] == 'weighted_mean':
             feat = np.average(d[pids], weights=w, axis=1)
         elif red_func[i] == 'mode':
@@ -954,7 +966,7 @@ def resample_pointdata(source, target, data, is_sphere=False, source_mask=None,
             raise ValueError('Unknown red_func: {0}'.format(red_func[i]))
 
         if target_mask is not None:
-            feat = map_to_mask(feat, mask=target_mask, fill=fill)
+            feat = map_to_mask(feat, mask=target_mask, axis=1, fill=fill)
         resampled[i] = feat
 
     if append and key is not None:

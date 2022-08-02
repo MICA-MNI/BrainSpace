@@ -74,9 +74,9 @@ def find_label_correspondence(lab1, lab2):
 
     Parameters
     ----------
-    lab1 : ndarray, shape = (n_lab,)
+    lab1 : ndarray, shape = (n_labels,)
         First array of labels.
-    lab2 : ndarray, shape = (n_lab,)
+    lab2 : ndarray, shape = (n_labels,)
         Second array of labels.
 
     Returns
@@ -108,14 +108,14 @@ def relabel_by_overlap(lab, ref_lab):
 
     Parameters
     ----------
-    lab : ndarray, shape = (n_lab,)
+    lab : ndarray, shape = (n_labels,)
         Array of labels.
-    ref_lab : ndarray, shape = (n_lab,)
+    ref_lab : ndarray, shape = (n_labels,)
         Reference array of labels.
 
     Returns
     -------
-    new_lab : ndarray, shape = (n_lab,)
+    new_lab : ndarray, shape = (n_labels,)
         Array relabeled using the reference array.
 
     Notes
@@ -147,7 +147,7 @@ def map_to_mask(values, mask, fill=0, axis=0):
 
     Parameters
     ----------
-    values : ndarray, shape = (n_rows, n_cols) or (n_cols,)
+    values : ndarray, shape = (n_values,) or (n_samples, n_values)
         Source array of values.
     mask : ndarray, shape = (n_mask,)
         Mask of boolean values. Data is mapped to mask.
@@ -161,22 +161,23 @@ def map_to_mask(values, mask, fill=0, axis=0):
     -------
     output : ndarray
         Values mapped to mask. If `values` is 1D, shape (n_mask,).
-        When `values` is 2D, shape (n_rows, n_mask) if ``axis == 0`` and
-        (n_mask, n_cols) otherwise.
+        When `values` is 2D, shape (n_samples, n_mask) if ``axis == 0`` and
+        (n_mask, n_samples) otherwise.
 
     """
 
     if np.issubdtype(values.dtype, np.integer) and not np.isfinite(fill):
         raise ValueError("Cannot use non-finite 'fill' with integer arrays.")
 
-    if values.ndim == 1:
-        axis = 0
+    if axis == 1 and values.ndim > 1:
+        values = values.T
 
     values2d = np.atleast_2d(values)
-    n = values2d.shape[axis]
-    mapped = np.full((n, mask.size), fill, dtype=values.dtype)
-    mapped[:, mask] = values2d if axis == 0 else values2d.T
+    if values2d.shape[1] > np.count_nonzero(mask):
+        raise ValueError("Mask cannot allocate values.")
 
+    mapped = np.full((values2d.shape[0], mask.size), fill, dtype=values.dtype)
+    mapped[:, mask] = values2d
     if values.ndim == 1:
         return mapped[0]
     if axis == 1:
@@ -184,7 +185,8 @@ def map_to_mask(values, mask, fill=0, axis=0):
     return mapped
 
 
-def map_to_labels(source_val, target_lab, mask=None, fill=0, source_lab=None):
+def map_to_labels(source_val, target_lab, mask=None, fill=0, axis=0,
+                  source_lab=None):
     """Map data in source to target according to their labels.
 
     Target labels are sorted in ascending order, such that the smallest label
@@ -193,45 +195,67 @@ def map_to_labels(source_val, target_lab, mask=None, fill=0, source_lab=None):
 
     Parameters
     ----------
-    source_val : ndarray, shape = (n_val,)
+    source_val : ndarray, shape = (n_values,) or (n_samples, n_values)
         Source array of values.
-    target_lab : ndarray, shape = (n_lab,)
+    target_lab : ndarray, shape = (n_labels,)
         Target labels.
-    mask : ndarray, shape = (n_lab,), optional
+    mask : int or ndarray, shape = (n_labels,), optional
         If mask is not None, only consider target labels in mask.
+        If int, it indicates the label denoting label to discard.
         Default is None.
     fill : float, optional
         Value used to fill elements outside the mask. Only used if mask is not
         None. Default is 0.
-    source_lab : ndarray, shape = (n_val,), optional
+    axis : {0, 1}, optional
+        If ``axis == 0``, map rows. Otherwise, map columns. Default is 0.
+    source_lab : ndarray, shape = (n_values,), optional
         Source labels for source values. If None, use unique labels in
         `target_lab` in ascending order. Default is None.
 
     Returns
     -------
-    target_val : ndarray, shape = (n_lab,)
+    target_val : ndarray, shape = (n_labels,) or (n_samples, n_labels)
         Target array with corresponding source values.
 
     """
 
     if mask is not None:
-        target_lab2 = target_lab[mask]
-        labs2 = map_to_labels(source_val, target_lab2, source_lab=source_lab)
-        return map_to_mask(labs2, mask, fill=fill)
+        if not isinstance(mask, np.ndarray):
+            mask = target_lab != mask
 
-    if source_lab is None:
-        uq_tl, idx_tl = np.unique(target_lab, return_inverse=True)
-        return source_val[idx_tl]
+        target_lab = target_lab[mask]
+        mapped = map_to_labels(source_val, target_lab, axis=axis,
+                               source_lab=source_lab)
+        return map_to_mask(mapped, mask, fill=fill, axis=axis)
 
-    if source_lab.size != source_val.size:
-        raise ValueError('Source values and labels must have same size.')
+    if axis == 1 and source_val.ndim > 1:
+        source_val = source_val.T
 
-    uq_sl, idx_sl = np.unique(source_lab, return_inverse=True)
-    if source_lab.size != uq_sl.size:
-        raise ValueError('Source labels must have distinct labels.')
+    values2d = np.atleast_2d(source_val)
 
-    source_val = source_val[idx_sl]
-    return source_val[target_lab]
+    ulab, idx = np.unique(target_lab, return_inverse=True)
+    if ulab.size > values2d.shape[1]:
+        raise ValueError('There are more target labels than source values.')
+
+    if source_lab is not None:
+        if source_lab.size != values2d.shape[1]:
+            raise ValueError('Source values and labels must have same size.')
+
+        if not np.isin(ulab, source_lab).all():
+            raise ValueError('Cannot find target labels in source labels.')
+
+        uq_sl, idx_sl = np.unique(source_lab, return_inverse=True)
+        if source_lab.size != uq_sl.size:
+            raise ValueError('Source labels must have distinct labels.')
+
+        values2d = values2d[:, idx_sl]
+
+    mapped = values2d[:, idx]
+    if source_val.ndim == 1:
+        return mapped[0]
+    if axis == 1:
+        return mapped.T
+    return mapped
 
 
 def _get_redop(red_op, weights=None, axis=None):
@@ -259,7 +283,7 @@ def _get_redop(red_op, weights=None, axis=None):
 
 
 def reduce_by_labels(values, labels, weights=None, target_labels=None,
-                     red_op='mean', axis=0, dtype=np.float):
+                     red_op='mean', axis=0, dtype=None):
     """Summarize data in `values` according to `labels`.
 
     Parameters
@@ -282,7 +306,9 @@ def reduce_by_labels(values, labels, weights=None, target_labels=None,
         a 1D array of values, array of weights (or None) and return a scalar
         value. Default is 'mean'.
     dtype : dtype, optional
-        Data type of output array. Default is float.
+        Data type of output array. When None, if `red_op` in
+        {'min', 'max', 'sum', 'mode'}, output is same type as `values`,
+        otherwise output is float. Default is None.
     axis : {0, 1}, optional
         If ``axis == 0``, apply to each row (reduce number of columns per row).
         Otherwise, apply to each column (reduce number of rows per column).
@@ -315,17 +341,22 @@ def reduce_by_labels(values, labels, weights=None, target_labels=None,
     else:
         fred = red_op
 
+    if dtype is None:
+        dtype = np.float
+        if red_op in {'min', 'max', 'sum', 'mode'}:
+            dtype = values.dtype
+
     mapped = np.empty((v2d.shape[0], uq_tl.size), dtype=dtype)
-    for ilab, lab in enumerate(uq_tl):
+    for i, lab in enumerate(uq_tl):
         mask = labels == lab
         wm = None if weights is None else weights[:, mask]
 
         if isinstance(red_op, str):
-            mapped[:, ilab] = fred(v2d[:, mask], wm)
+            mapped[:, i] = fred(v2d[:, mask], wm)
 
         else:
             for idx in range(v2d.shape[0]):
-                mapped[idx, ilab] = fred(v2d[idx, mask], wm)
+                mapped[idx, i] = fred(v2d[idx, mask], wm)
 
     if idx_back is not None:
         mapped = mapped[:, idx_back]

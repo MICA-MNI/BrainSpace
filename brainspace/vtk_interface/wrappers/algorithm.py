@@ -69,7 +69,7 @@ class LUTMixin:
             Lookup table. If None, a LookupTable is created.
             Default is None.
         kwargs : optional keyword arguments
-            Arguments are use to set the lookup table.
+            Arguments are used to set the lookup table.
         """
 
         if obj is None:
@@ -88,7 +88,7 @@ class LUTMixin:
             Lookup table. If None, the lut is created.
             Default is None.
         kwargs : optional keyword arguments
-            Arguments are use to set the lookup table.
+            Arguments are used to set the lookup table.
         """
 
         obj = BSLookupTableWithEnabling(vtkobject=obj, **kwargs)
@@ -104,7 +104,7 @@ class LUTMixin:
             Lookup table. If None, the lut is created.
             Default is None.
         kwargs : optional keyword arguments
-            Arguments are use to set the lookup table.
+            Arguments are used to set the lookup table.
         """
 
         obj = BSWindowLevelLookupTable(vtkobject=obj, **kwargs)
@@ -120,7 +120,7 @@ class LUTMixin:
             Lookup table. If None, the color transfer function is created.
             Default is None.
         kwargs : optional keyword arguments
-            Arguments are use to set the lookup table.
+            Arguments are used to set the lookup table.
         """
 
         obj = BSColorTransferFunction(vtkobject=obj, **kwargs)
@@ -137,7 +137,7 @@ class LUTMixin:
             Lookup table. If None, the discretizable color transfer function
             is created. Default is None.
         kwargs : optional keyword arguments
-            Arguments are use to set the lookup table.
+            Arguments are used to set the lookup table.
         """
 
         obj = BSDiscretizableColorTransferFunction(vtkobject=obj, **kwargs)
@@ -219,7 +219,7 @@ class BSLabeledContourMapper(BSMapper):
             Label text property. If None, the property is created.
             Default is None.
         kwargs : optional keyword arguments
-            Arguments are use to set the property.
+            Arguments are used to set the property.
         """
 
         obj = BSTextProperty(vtkobject=obj, **kwargs)
@@ -272,7 +272,7 @@ class BSTextMapper2D(BSMapper2D):
             Label text property. If None, the property is created.
             Default is None.
         kwargs : optional keyword arguments
-            Arguments are use to set the property.
+            Arguments are used to set the property.
         """
 
         if obj is None:
