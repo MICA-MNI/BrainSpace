@@ -640,7 +640,7 @@ def get_boundary_cells(surf, with_edge=True):
 
 
 def get_immediate_distance(surf, metric='euclidean', mask=None,
-                           dtype=np.float):
+                           dtype=np.float64):
     """Get immediate distance matrix.
 
     Parameters
@@ -689,7 +689,7 @@ def get_immediate_distance(surf, metric='euclidean', mask=None,
 
 
 def get_ring_distance(surf, n_ring=1, metric='geodesic', mask=None,
-                      dtype=np.float):
+                      dtype=np.float64):
     """Get distance matrix in the neighborhood of each point.
 
     Parameters
@@ -704,7 +704,7 @@ def get_ring_distance(surf, n_ring=1, metric='geodesic', mask=None,
         Binary mask. If specified, only use points within the mask.
         Default is None.
     dtype : dtype, optional
-        Data type. Default is np.float.
+        Data type. Default is np.float64.
 
     Returns
     -------
