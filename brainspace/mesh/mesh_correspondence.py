@@ -25,7 +25,7 @@ def _find_correspondence(surf, ref_surf, eps=0, n_jobs=1, use_cell=False):
     tree = cKDTree(ref_points, leafsize=20, compact_nodes=False,
                    copy_data=False, balanced_tree=False)
     d, idx = tree.query(points, k=1, eps=0, n_jobs=n_jobs,
-                        distance_upper_bound=eps+np.finfo(np.float).eps)
+                        distance_upper_bound=eps+np.finfo(np.float64).eps)
 
     if np.isinf(d).any():
         raise ValueError('Cannot find correspondences. Try increasing '

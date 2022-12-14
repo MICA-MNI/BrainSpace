@@ -35,7 +35,7 @@ def load_group_fc(parcellation, scale=400, group='main'):
     root_pth = os.path.dirname(__file__)
     fname = '{0}_{1}_mean_connectivity_matrix.csv'.format(parcellation, scale)
     ipth = os.path.join(root_pth, 'matrices', '{0}_group', fname).format(group)
-    return np.loadtxt(ipth, dtype=np.float, delimiter=',')
+    return np.loadtxt(ipth, dtype=np.float64, delimiter=',')
 
 
 def load_group_mpc(parcellation, scale=400):
@@ -67,7 +67,7 @@ def load_group_mpc(parcellation, scale=400):
     root_pth = os.path.dirname(__file__)
     fname = '{0}_{1}_mpc_matrix.csv'.format(parcellation, scale)
     ipth = os.path.join(root_pth, 'matrices/fusion_tutorial', fname)
-    return np.loadtxt(ipth, dtype=np.float, delimiter=',')
+    return np.loadtxt(ipth, dtype=np.float64, delimiter=',')
 
 
 def load_parcellation(name, scale=400, join=False):
@@ -253,7 +253,7 @@ def _load_feat(feat_name, parcellation=None, mask=None):
     root_pth = os.path.dirname(__file__)
     ipth = os.path.join(root_pth, 'matrices', 'main_group',
                         '{0}.csv'.format(feat_name))
-    x = np.loadtxt(ipth, dtype=np.float)
+    x = np.loadtxt(ipth, dtype=np.float64)
     if mask is not None:
         x = x[mask]
 

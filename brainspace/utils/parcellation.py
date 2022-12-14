@@ -342,7 +342,7 @@ def reduce_by_labels(values, labels, weights=None, target_labels=None,
         fred = red_op
 
     if dtype is None:
-        dtype = np.float
+        dtype = np.float64
         if red_op in {'min', 'max', 'sum', 'mode'}:
             dtype = values.dtype
 

@@ -624,9 +624,9 @@ def propagate_labeling(surf, labeling, no_label=np.nan, mask=None, alpha=0.99,
     # Graph matrix
     if mode == 'connectivity':
         adj = me.get_ring_adjacency(surf, n_ring=n_ring, include_self=False,
-                                    dtype=np.float, mask=mask)
+                                    dtype=np.float64, mask=mask)
     else:
-        adj = me.get_ring_distance(surf, n_ring=n_ring, dtype=np.float,
+        adj = me.get_ring_distance(surf, n_ring=n_ring, dtype=np.float64,
                                    mask=mask)
         adj.data[:] = np.exp(-adj.data/n_ring**2)
 
@@ -754,7 +754,7 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
 
     if kernel == 'uniform':
         w = me.get_immediate_adjacency(surf, include_self=False, mask=mask,
-                                       dtype=np.float)
+                                       dtype=np.float64)
     elif kernel == 'gaussian':
         w = me.get_immediate_distance(surf, metric='sqeuclidean', mask=mask)
         if sigma is None:
@@ -779,7 +779,7 @@ def smooth_array(surf, point_data, n_iter=5, mask=None, kernel='gaussian',
     if np.issubdtype(pd.dtype, np.floating):
         spd = pd.copy()
     else:
-        spd = pd.astype(np.float)
+        spd = pd.astype(np.float64)
 
     for i in range(n_iter):
         wp = w.dot(spd)
