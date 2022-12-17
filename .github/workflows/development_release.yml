@@ -22,11 +22,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install --upgrade setuptools wheel
-    
 
     - name: Build binary wheel and tarball.
       run: |
         python setup.py sdist bdist_wheel
+
     - name: Publish to PyPi test.
       uses: pypa/gh-action-pypi-publish@release/v1
       with:
