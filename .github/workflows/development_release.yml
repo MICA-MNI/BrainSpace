@@ -1,48 +1,48 @@
-name: "development_release"
-
-on:
-  push:
-    branches:
-      - devb
-    tags:
-      - "v\*"
-
-jobs:
-  development-release:
-    name: "Development Release"
-    runs-on: "ubuntu-latest"
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python 3.8.
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python BrainSpace.
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install --upgrade setuptools wheel
-
-    - name: Build binary wheel and tarball.
-      run: |
-        python setup.py sdist bdist_wheel
-
-#    - name: Create Github release.
-#      uses: "marvinpinto/action-automatic-releases@latest"
+#name: "development_release"
+#
+#on:
+#  push:
+#    branches:
+#      - devb
+#    tags:
+#      - "v\*"
+#
+#jobs:
+#  development-release:
+#    name: "Development Release"
+#    runs-on: "ubuntu-latest"
+#
+#    steps:
+#    - uses: actions/checkout@v2
+#
+#    - name: Set up Python 3.8.
+#      uses: actions/setup-python@v2
 #      with:
-#        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-#        prerelease: false
-#        files: |
-#          LICENSE
-#          dist/*
-
-#    - name: Publish to PyPi test.
-#      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-#      uses: pypa/gh-action-pypi-publish@release/v1
-#      with:
-#        verbose: true
-#        skip_existing: true
-#        password: ${{ secrets.PYPI_TEST_API_TOKEN }}
-#        repository_url: https://test.pypi.org/legacy/
+#        python-version: 3.8
+#
+#    - name: Install Python BrainSpace.
+#      run: |
+#        python -m pip install --upgrade pip
+#        python -m pip install --upgrade setuptools wheel
+#
+#    - name: Build binary wheel and tarball.
+#      run: |
+#        python setup.py sdist bdist_wheel
+#
+##    - name: Create Github release.
+##      uses: "marvinpinto/action-automatic-releases@latest"
+##      with:
+##        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+##        prerelease: false
+##        files: |
+##          LICENSE
+##          dist/*
+#
+##    - name: Publish to PyPi test.
+##      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+##      uses: pypa/gh-action-pypi-publish@release/v1
+##      with:
+##        verbose: true
+##        skip_existing: true
+##        password: ${{ secrets.PYPI_TEST_API_TOKEN }}
+##        repository_url: https://test.pypi.org/legacy/
