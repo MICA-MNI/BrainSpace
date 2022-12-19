@@ -95,7 +95,7 @@ def load_parcellation(name, scale=400, join=False):
     root_pth = os.path.dirname(__file__)
     fname = '{name}_{np}_conte69.csv'.format(name=name, np=scale)
     ipth = os.path.join(root_pth, 'parcellations', fname)
-    x = np.loadtxt(ipth, dtype=np.int)
+    x = np.loadtxt(ipth, dtype=np.int64)
     if join:
         return x
     return x[:x.size//2], x[x.size//2:]
@@ -127,8 +127,8 @@ def load_mask(name='midline', join=False):
         name = ''
     else:
         name = '_' + name
-    mask_lh = np.loadtxt(ipth.format('lh', name), dtype=np.bool)
-    mask_rh = np.loadtxt(ipth.format('rh', name), dtype=np.bool)
+    mask_lh = np.loadtxt(ipth.format('lh', name), dtype=np.bool_)
+    mask_rh = np.loadtxt(ipth.format('rh', name), dtype=np.bool_)
     if join:
         return np.concatenate([mask_lh, mask_rh])
     return mask_lh, mask_rh

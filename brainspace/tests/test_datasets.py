@@ -41,7 +41,7 @@ def test_load_mask():
 
     mask = load_mask(join=True)
     assert mask.shape == (total_n_pts,)
-    assert mask.dtype == np.bool
+    assert mask.dtype == np.bool_
 
 
 @parametrize('name', ['vosdewael', 'schaefer'])
