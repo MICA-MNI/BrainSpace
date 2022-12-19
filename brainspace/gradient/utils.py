@@ -206,7 +206,7 @@ def ravel_symmetric(x, with_diagonal=False):
 
     n = x.shape[0]
     k = 0 if with_diagonal else -1
-    mask_lt = np.tri(n, k=k, dtype=np.bool)
+    mask_lt = np.tri(n, k=k, dtype=np.bool_)
 
     if ssp.issparse(x) and not ssp.isspmatrix_csc(x):
         x = x.tocsc(copy=False)
@@ -264,7 +264,7 @@ def unravel_symmetric(x, size, as_sparse=False, part='both', fmt='csr'):
             xs = xs.asformat(fmt, copy=False)
 
     else:
-        mask_lt = np.tri(size, k=-k, dtype=np.bool)
+        mask_lt = np.tri(size, k=-k, dtype=np.bool_)
         xs = np.zeros(shape, dtype=x.dtype)
 
         xs[mask_lt.T] = x

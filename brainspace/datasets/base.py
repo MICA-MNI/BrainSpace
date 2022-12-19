@@ -127,8 +127,8 @@ def load_mask(name='midline', join=False):
         name = ''
     else:
         name = '_' + name
-    mask_lh = np.loadtxt(ipth.format('lh', name), dtype=np.bool)
-    mask_rh = np.loadtxt(ipth.format('rh', name), dtype=np.bool)
+    mask_lh = np.loadtxt(ipth.format('lh', name), dtype=np.bool_)
+    mask_rh = np.loadtxt(ipth.format('rh', name), dtype=np.bool_)
     if join:
         return np.concatenate([mask_lh, mask_rh])
     return mask_lh, mask_rh

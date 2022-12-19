@@ -95,21 +95,21 @@ testdata_overlap = [
 testdata_map_mask = [
     # with default fill=0
     (np.array([1, 3, 3, 2], dtype=np.int64),
-     np.array([0, 0, 1, 1, 1, 1], dtype=np.bool),
+     np.array([0, 0, 1, 1, 1, 1], dtype=np.bool_),
      {},
      np.array([0, 0, 1, 3, 3, 2], dtype=np.int64),
      None),
 
     # raises ValueError is integer and fill=nan
     (np.array([1, 3, 3, 2], dtype=np.int64),
-     np.array([0, 0, 1, 1, 1, 1], dtype=np.bool),
+     np.array([0, 0, 1, 1, 1, 1], dtype=np.bool_),
      {'fill': np.nan},
      np.array([0, 0, 1, 3, 3, 2], dtype=np.int64),
      ValueError),
 
     # test default axis=0
     (np.array([[1, 3, 3, 2], [3, 4, 4, 0]], dtype=np.float64),
-     np.array([1, 0, 0, 1, 1, 1], dtype=np.bool),
+     np.array([1, 0, 0, 1, 1, 1], dtype=np.bool_),
      {'fill': np.nan},
      np.array([[1, np.nan, np.nan, 3, 3, 2],
                [3, np.nan, np.nan, 4, 4, 0]], dtype=np.float64),
@@ -117,7 +117,7 @@ testdata_map_mask = [
 
     # test axis=1
     (np.array([[1, 3, 3, 2], [3, 4, 4, 0]], dtype=np.float64),
-     np.array([1, 0, 1], dtype=np.bool),
+     np.array([1, 0, 1], dtype=np.bool_),
      {'fill': np.nan, 'axis': 1},
      np.array([[1, 3, 3, 2],
                [np.nan, np.nan, np.nan, np.nan],
@@ -144,21 +144,21 @@ testdata_map_labels = [
     # test default fill=0
     (np.array([2, 1, 3], dtype=np.float64),
      np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
-     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool)},
+     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool_)},
      np.array([1, 1, 3, 0, 0, 2], dtype=np.float64),
      None),
 
     # test default fill=np.nan with int
     (np.array([2, 1, 3], dtype=np.int64),
      np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
-     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool), 'fill': np.nan},
+     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool_), 'fill': np.nan},
      np.array([1, 1, 3, 0, 0, 2], dtype=np.int64),
      ValueError),
 
     # test source_lab
     (np.array([2, 1, 3], dtype=np.float64),
      np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
-     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool), 'fill': np.nan,
+     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool_), 'fill': np.nan,
       'source_lab': np.array([2, 1, 0])},
      np.array([1, 1, 2, np.nan, np.nan, 3], dtype=np.float64),
      None),
@@ -166,7 +166,7 @@ testdata_map_labels = [
     # test source_lab.size != source_val.size
     (np.array([2, 1, 3], dtype=np.float64),
      np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
-     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool), 'fill': np.nan,
+     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool_), 'fill': np.nan,
       'source_lab': np.array([2, 1])},
      np.array([1, 1, 2, np.nan, np.nan, 3], dtype=np.float64),
      ValueError),
@@ -174,7 +174,7 @@ testdata_map_labels = [
     # test (unique source_lab).size != source_val.size
     (np.array([2, 1, 3], dtype=np.float64),
      np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
-     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool), 'fill': np.nan,
+     {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool_), 'fill': np.nan,
       'source_lab': np.array([2, 1, 2])},
      np.array([1, 1, 2, np.nan, np.nan, 3], dtype=np.float64),
      ValueError),
@@ -182,7 +182,7 @@ testdata_map_labels = [
     # test (unique source_lab).size != source_val.size
     pytest.param(np.array([2, 1, 3], dtype=np.float64),
                  np.array([1, 1, 2, 2, 1, 0], dtype=np.int64),
-                 {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool),
+                 {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool_),
                   'fill': np.nan,
                   'source_lab': np.array([2, 1, 0])},
                  np.array([1, 1, 2, np.nan, np.nan, 1], dtype=np.float64),
