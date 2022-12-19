@@ -13,9 +13,9 @@ parametrize = pytest.mark.parametrize
 
 testdata_consecutive = [
     # default start_from = 0 and dtype
-    (np.array([1, 3, 3, 2, 2, 2], dtype=np.int),
+    (np.array([1, 3, 3, 2, 2, 2], dtype=np.int64),
      {},
-     np.array([0, 2, 2, 1, 1, 1], dtype=np.int)),
+     np.array([0, 2, 2, 1, 1, 1], dtype=np.int64)),
 
     # default start_from = 0 and dtype
     (np.array([1, 3, 3, 2, 2, 2], dtype=np.uint8),
@@ -30,9 +30,9 @@ testdata_consecutive = [
 
 testdata_relabel = [
     # default new_labels = None => consecutive
-    (np.array([1, 3, 3, 2, 2, 2], dtype=np.int),
+    (np.array([1, 3, 3, 2, 2, 2], dtype=np.int64),
      {},
-     np.array([0, 2, 2, 1, 1, 1], dtype=np.int)),
+     np.array([0, 2, 2, 1, 1, 1], dtype=np.int64)),
 
     # with new_labels as array
     (np.array([1, 3, 3, 2, 2, 2], dtype=np.uint8),
@@ -58,8 +58,8 @@ testdata_relabel = [
 
 testdata_correspondence = [
     # dict correspondence
-    (np.array([1, 3, 3, 2, 2, 2], dtype=np.int),
-     np.array([0, 2, 2, 1, 1, 1], dtype=np.int),
+    (np.array([1, 3, 3, 2, 2, 2], dtype=np.int64),
+     np.array([0, 2, 2, 1, 1, 1], dtype=np.int64),
      {1: 0, 3: 2, 2: 1}),
 
     # dict correspondence with more input labels
@@ -76,9 +76,9 @@ testdata_correspondence = [
 
 testdata_overlap = [
     # overlap
-    (np.array([1, 3, 3, 2, 2, 2], dtype=np.int),
-     np.array([0, 2, 2, 1, 1, 1], dtype=np.int),
-     np.array([0, 2, 2, 1, 1, 1], dtype=np.int)),
+    (np.array([1, 3, 3, 2, 2, 2], dtype=np.int64),
+     np.array([0, 2, 2, 1, 1, 1], dtype=np.int64),
+     np.array([0, 2, 2, 1, 1, 1], dtype=np.int64)),
 
     # overlap with more input labels -> remaining with consecutive
     (np.array([3, 1, 1, 2, 2, 2], dtype=np.uint8),
@@ -94,17 +94,17 @@ testdata_overlap = [
 
 testdata_map_mask = [
     # with default fill=0
-    (np.array([1, 3, 3, 2], dtype=np.int),
+    (np.array([1, 3, 3, 2], dtype=np.int64),
      np.array([0, 0, 1, 1, 1, 1], dtype=np.bool),
      {},
-     np.array([0, 0, 1, 3, 3, 2], dtype=np.int),
+     np.array([0, 0, 1, 3, 3, 2], dtype=np.int64),
      None),
 
     # raises ValueError is integer and fill=nan
-    (np.array([1, 3, 3, 2], dtype=np.int),
+    (np.array([1, 3, 3, 2], dtype=np.int64),
      np.array([0, 0, 1, 1, 1, 1], dtype=np.bool),
      {'fill': np.nan},
-     np.array([0, 0, 1, 3, 3, 2], dtype=np.int),
+     np.array([0, 0, 1, 3, 3, 2], dtype=np.int64),
      ValueError),
 
     # test default axis=0
@@ -129,35 +129,35 @@ testdata_map_mask = [
 testdata_map_labels = [
     # test defaults
     (np.array([1, 2, 3], dtype=np.float64),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {},
      np.array([2, 2, 3, 3, 1, 1], dtype=np.float64),
      None),
 
     # test defaults small labels
     (np.array([1, 2, 3], dtype=np.float64),
-     np.array([5, 6], dtype=np.int),
+     np.array([5, 6], dtype=np.int64),
      {},
      np.array([1, 2], dtype=np.float64),
      None),
 
     # test default fill=0
     (np.array([2, 1, 3], dtype=np.float64),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool)},
      np.array([1, 1, 3, 0, 0, 2], dtype=np.float64),
      None),
 
     # test default fill=np.nan with int
-    (np.array([2, 1, 3], dtype=np.int),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+    (np.array([2, 1, 3], dtype=np.int64),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool), 'fill': np.nan},
-     np.array([1, 1, 3, 0, 0, 2], dtype=np.int),
+     np.array([1, 1, 3, 0, 0, 2], dtype=np.int64),
      ValueError),
 
     # test source_lab
     (np.array([2, 1, 3], dtype=np.float64),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool), 'fill': np.nan,
       'source_lab': np.array([2, 1, 0])},
      np.array([1, 1, 2, np.nan, np.nan, 3], dtype=np.float64),
@@ -165,7 +165,7 @@ testdata_map_labels = [
 
     # test source_lab.size != source_val.size
     (np.array([2, 1, 3], dtype=np.float64),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool), 'fill': np.nan,
       'source_lab': np.array([2, 1])},
      np.array([1, 1, 2, np.nan, np.nan, 3], dtype=np.float64),
@@ -173,7 +173,7 @@ testdata_map_labels = [
 
     # test (unique source_lab).size != source_val.size
     (np.array([2, 1, 3], dtype=np.float64),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool), 'fill': np.nan,
       'source_lab': np.array([2, 1, 2])},
      np.array([1, 1, 2, np.nan, np.nan, 3], dtype=np.float64),
@@ -181,7 +181,7 @@ testdata_map_labels = [
 
     # test (unique source_lab).size != source_val.size
     pytest.param(np.array([2, 1, 3], dtype=np.float64),
-                 np.array([1, 1, 2, 2, 1, 0], dtype=np.int),
+                 np.array([1, 1, 2, 2, 1, 0], dtype=np.int64),
                  {'mask': np.array([1, 1, 1, 0, 0, 1], dtype=np.bool),
                   'fill': np.nan,
                   'source_lab': np.array([2, 1, 0])},
@@ -194,56 +194,56 @@ testdata_map_labels = [
 testdata_reduce = [
     # test defaults
     (np.array([1, 2, 3, 4, 5, 6], dtype=np.float64),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {},
      np.array([5.5, 1.5, 3.5], dtype=np.float64),
      None),
 
     # test weights
     (np.array([1, 2, 3, 4, 5, 6], dtype=np.float64),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {'weights': np.array([1, 1, 2, 1, 1, 2])},
      np.array([17/3, 1.5, 10/3], dtype=np.float64),
      None),
 
     # Test target labels
     (np.array([1, 2, 3, 4, 5, 6], dtype=np.float64),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {'target_labels': np.array([2, 1, 0])},
      np.array([3.5, 1.5, 5.5], dtype=np.float64),
      None),
 
     # Test target labels small
     (np.array([1, 2, 3, 4, 5, 6], dtype=np.float64),
-     np.array([1, 1, 2, 2, 0, 0], dtype=np.int),
+     np.array([1, 1, 2, 2, 0, 0], dtype=np.int64),
      {'target_labels': np.array([2, 1])},
      np.array([3.5, 1.5], dtype=np.float64),
      None),
 
     # Test red_op
-    (np.array([1, 2, 2, 5, 5, 6], dtype=np.int),
-     np.array([1, 1, 1, 0, 0, 0], dtype=np.int),
-     {'red_op': 'mode', 'dtype': np.int},
-     np.array([5, 2], dtype=np.int),
+    (np.array([1, 2, 2, 5, 5, 6], dtype=np.int64),
+     np.array([1, 1, 1, 0, 0, 0], dtype=np.int64),
+     {'red_op': 'mode', 'dtype': np.int64},
+     np.array([5, 2], dtype=np.int64),
      None),
 
     # Test default axis=0
-    (np.array([[1, 2, 2, 5], [6, 6, 7, 8]], dtype=np.int),
-     np.array([1, 1, 1, 0], dtype=np.int),
-     {'red_op': 'mode', 'dtype': np.int},
-     np.array([[5, 2], [8, 6]], dtype=np.int),
+    (np.array([[1, 2, 2, 5], [6, 6, 7, 8]], dtype=np.int64),
+     np.array([1, 1, 1, 0], dtype=np.int64),
+     {'red_op': 'mode', 'dtype': np.int64},
+     np.array([[5, 2], [8, 6]], dtype=np.int64),
      None),
 
     # Test default axis=1
-    (np.array([[1, 2, 2, 5], [6, 4, 7, 8], [6, 4, 7, 5]], dtype=np.int),
-     np.array([0, 0, 0], dtype=np.int),
-     {'red_op': 'mode', 'dtype': np.int, 'axis': 1},
-     np.array([[6, 4, 7, 5]], dtype=np.int),
+    (np.array([[1, 2, 2, 5], [6, 4, 7, 8], [6, 4, 7, 5]], dtype=np.int64),
+     np.array([0, 0, 0], dtype=np.int64),
+     {'red_op': 'mode', 'dtype': np.int64, 'axis': 1},
+     np.array([[6, 4, 7, 5]], dtype=np.int64),
      None),
 
     # Test red_op callable
-    (np.array([[1, 2, 2, 5], [6, 4, 7, 8], [6, 4, 7, 5]], dtype=np.int),
-     np.array([0, 0, 0], dtype=np.int),
+    (np.array([[1, 2, 2, 5], [6, 4, 7, 8], [6, 4, 7, 5]], dtype=np.int64),
+     np.array([0, 0, 0], dtype=np.int64),
      {'red_op': lambda x, w: np.mean(x), 'axis': 1},
      np.array([[13/3, 10/3, 16/3, 18/3]], dtype=np.float64),
      None),

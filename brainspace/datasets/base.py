@@ -95,7 +95,7 @@ def load_parcellation(name, scale=400, join=False):
     root_pth = os.path.dirname(__file__)
     fname = '{name}_{np}_conte69.csv'.format(name=name, np=scale)
     ipth = os.path.join(root_pth, 'parcellations', fname)
-    x = np.loadtxt(ipth, dtype=np.int)
+    x = np.loadtxt(ipth, dtype=np.int64)
     if join:
         return x
     return x[:x.size//2], x[x.size//2:]
