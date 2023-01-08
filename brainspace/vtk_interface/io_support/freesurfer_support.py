@@ -48,7 +48,7 @@ def _fread3_many(fobj, n):
     out : 1D array
         An array of 3 byte int
     """
-    b1, b2, b3 = np.fromfile(fobj, ">u1", 3 * n).reshape(-1, 3).astype(np.int).T
+    b1, b2, b3 = np.fromfile(fobj, ">u1", 3 * n).reshape(-1, 3).astype(np.int64).T
     return (b1 << 16) + (b2 << 8) + b3
 
 

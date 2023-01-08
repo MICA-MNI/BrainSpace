@@ -208,7 +208,7 @@ def get_cell_neighbors(surf, include_self=True, with_edge=True,
         ce.eliminate_zeros()
 
     else:
-        ce = get_cell2point_connectivity(surf, dtype=np.bool)
+        ce = get_cell2point_connectivity(surf, dtype=np.bool_)
         ce *= ce.T
         if not include_self:
             ce.setdiag(0)
@@ -251,7 +251,7 @@ def get_immediate_adjacency(surf, include_self=True, mask=None,
     share and edge with current point.
     """
 
-    adj = get_point2cell_connectivity(surf, mask=mask, dtype=np.bool)
+    adj = get_point2cell_connectivity(surf, mask=mask, dtype=np.bool_)
     adj *= adj.T
     if not include_self:
         adj.setdiag(0)
@@ -297,7 +297,7 @@ def get_ring_adjacency(surf, n_ring=1, include_self=True, mask=None,
                                        mask=mask, dtype=dtype)
 
     adj = get_immediate_adjacency(surf, include_self=True, mask=mask,
-                                  dtype=np.bool)
+                                  dtype=np.bool_)
     adj **= n_ring
     if not include_self:
         adj.setdiag(0)
@@ -331,7 +331,7 @@ def get_edges(surf, mask=None):
     """
 
     adj = get_immediate_adjacency(surf, include_self=False, mask=mask,
-                                  dtype=np.bool)
+                                  dtype=np.bool_)
     adj.sort_indices()
     adj_ud = ssp.triu(adj, k=1, format='coo')
     edges = np.column_stack([adj_ud.row, adj_ud.col])
@@ -640,7 +640,7 @@ def get_boundary_cells(surf, with_edge=True):
 
 
 def get_immediate_distance(surf, metric='euclidean', mask=None,
-                           dtype=np.float):
+                           dtype=np.float64):
     """Get immediate distance matrix.
 
     Parameters
@@ -689,7 +689,7 @@ def get_immediate_distance(surf, metric='euclidean', mask=None,
 
 
 def get_ring_distance(surf, n_ring=1, metric='geodesic', mask=None,
-                      dtype=np.float):
+                      dtype=np.float64):
     """Get distance matrix in the neighborhood of each point.
 
     Parameters
@@ -704,7 +704,7 @@ def get_ring_distance(surf, n_ring=1, metric='geodesic', mask=None,
         Binary mask. If specified, only use points within the mask.
         Default is None.
     dtype : dtype, optional
-        Data type. Default is np.float.
+        Data type. Default is np.float64.
 
     Returns
     -------

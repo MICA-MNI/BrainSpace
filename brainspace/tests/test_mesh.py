@@ -238,7 +238,7 @@ def test_mesh_elements():
 
     d = me.get_immediate_distance(s)
     assert d.shape == (s.n_points, s.n_points)
-    assert d.dtype == np.float
+    assert d.dtype == np.float64
     assert d.nnz == adj2.nnz
 
     d2 = me.get_immediate_distance(s, metric='sqeuclidean')
@@ -247,7 +247,7 @@ def test_mesh_elements():
     assert np.allclose(d_sq.A, d2.A)
 
     rd = me.get_ring_distance(s)
-    assert rd.dtype == np.float
+    assert rd.dtype == np.float64
     assert np.allclose(d.A, rd.A)
 
     rd2 = me.get_ring_distance(s, n_ring=2)

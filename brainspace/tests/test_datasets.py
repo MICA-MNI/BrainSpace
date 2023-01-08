@@ -41,7 +41,7 @@ def test_load_mask():
 
     mask = load_mask(join=True)
     assert mask.shape == (total_n_pts,)
-    assert mask.dtype == np.bool
+    assert mask.dtype == np.bool_
 
 
 @parametrize('name', ['vosdewael', 'schaefer'])
@@ -68,7 +68,7 @@ def test_load_thickness():
 
     thick = load_marker('thickness', join=True)
     assert thick.shape == (total_n_pts,)
-    assert thick.dtype == np.float
+    assert thick.dtype == np.float64
     assert not np.isnan(thick[mask]).any()
     assert np.isnan(thick[~mask]).all()
 
@@ -79,7 +79,7 @@ def test_load_myelin():
 
     myelin = load_marker('t1wt2w', join=True)
     assert myelin.shape == (total_n_pts,)
-    assert myelin.dtype == np.float
+    assert myelin.dtype == np.float64
     assert not np.isnan(myelin[mask]).any()
     assert np.isnan(myelin[~mask]).all()
 
@@ -97,7 +97,7 @@ def test_load_gradient(name, kwds):
         grad = load_gradient(name, join=True)
 
     assert grad.shape == (total_n_pts,)
-    assert grad.dtype == np.float
+    assert grad.dtype == np.float64
     assert not np.isnan(grad[mask]).any()
     assert np.isnan(grad[~mask]).all()
 
@@ -114,7 +114,7 @@ def test_load_group(name, kwds):
         cm = load_group_fc(name)
 
     assert cm.shape == (n, n)
-    assert cm.dtype == np.float
+    assert cm.dtype == np.float64
     assert np.allclose(cm, cm.T)
 
 
@@ -130,5 +130,5 @@ def test_load_holdout(name, kwds):
         cm = load_group_fc(name, group='holdout')
 
     assert cm.shape == (n, n)
-    assert cm.dtype == np.float
+    assert cm.dtype == np.float64
     assert np.allclose(cm, cm.T)
