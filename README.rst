@@ -2,25 +2,6 @@
 BrainSpace
 ====================
 
-
-.. image:: https://github.com/MICA-MNI/brainspace/workflows/Python%20package/badge.svg
-   :target: https://github.com/MICA-MNI/brainspace/actions
-
-.. image:: https://codecov.io/gh/mica-mni/brainspace/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/mica-mni/brainspace
-
-.. image:: https://img.shields.io/appveyor/build/OualidBenkarim/brainspace/master?logo=appveyor
-   :alt: AppVeyor branch
-
-.. image:: https://img.shields.io/pypi/v/brainspace
-   :target:  https://pypi.python.org/pypi/brainspace
-
-.. image:: https://img.shields.io/pypi/l/brainspace?label=License
-   :target: https://opensource.org/licenses/BSD-3-Clause
-
-.. image:: https://img.shields.io/pypi/pyversions/brainspace
-   :alt: PyPI - Python Version
-
 BrainSpace is a lightweight cross-platform toolbox primarily intended 
 for macroscale gradient mapping and analysis of 
 neuroimaging and connectome level data. The current version 
