@@ -10,7 +10,7 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.stats import rankdata
 from scipy.spatial.distance import pdist, squareform
-
+from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.metrics.pairwise import rbf_kernel
 
 from .utils import dominant_set
@@ -24,7 +24,7 @@ def _build_kernel(x, kernel, gamma=None):
         return np.corrcoef(x)
 
     if kernel in {'cosine', 'normalized_angle'}:
-        x = 1 - squareform(pdist(x, metric='cosine'))
+        x = cosine_similarity(x)
         if kernel == 'normalized_angle':
             x = 1 - np.arccos(x, x)/np.pi
         return x
