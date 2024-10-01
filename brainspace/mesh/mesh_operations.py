@@ -77,7 +77,11 @@ def _surface_selection(surf, array, low=-np.inf, upp=np.inf, use_cell=False):
         upp = array.max()
 
     tf = wrap_vtk(vtkThreshold, allScalars=True)
-    tf.ThresholdBetween(low, upp)
+    # tf.ThresholdBetween(low, upp) # deprecated
+    tf.SetThresholdFunction(vtkThreshold.THRESHOLD_BETWEEN)
+    tf.SetLowerThreshold(low)
+    tf.SetUpperThreshold(upp)
+
     if use_cell:
         tf.SetInputArrayToProcess(0, 0, 0, ASSOC_CELLS, array_name)
     else:
