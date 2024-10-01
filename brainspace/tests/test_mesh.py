@@ -244,11 +244,11 @@ def test_mesh_elements():
     d2 = me.get_immediate_distance(s, metric='sqeuclidean')
     d_sq = d.copy()
     d_sq.data **= 2
-    assert np.allclose(d_sq.A, d2.A)
+    assert np.allclose(d_sq.toarray(), d2.toarray())
 
     rd = me.get_ring_distance(s)
     assert rd.dtype == np.float64
-    assert np.allclose(d.A, rd.A)
+    assert np.allclose(d.toarray(), rd.toarray())
 
     rd2 = me.get_ring_distance(s, n_ring=2)
     assert (rd2 - d).nnz > 0
