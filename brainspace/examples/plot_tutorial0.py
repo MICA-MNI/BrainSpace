@@ -62,7 +62,7 @@ timeseries = fetch_timeseries_preprocessing()
 ###############################################################################
 # Confound regression
 # ++++++++++++++++++++++++
-# To remove confound regressors from the output of the fmriprep pipeline, first
+# To remove confound regressors from the output of the fmri prep pipeline, first
 # extract the confound columns. For example::
 #
 #    import load_confounds

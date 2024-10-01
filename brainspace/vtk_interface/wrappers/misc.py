@@ -7,6 +7,8 @@ Misc wrappers for some VTK classes.
 
 
 from vtk.util.vtkConstants import VTK_ID_TYPE
+from vtk.util.numpy_support import numpy_to_vtk
+
 
 from .base import BSVTKObjectWrapper
 from ..decorators import unwrap_input, wrap_output
@@ -94,6 +96,7 @@ class BSCellArray(BSVTKObjectWrapper):
 
     @unwrap_input(2, vtype={2: VTK_ID_TYPE})
     def SetCells(self, n_cells, cells):
+        cells = numpy_to_vtk(cells, deep=True, array_type=VTK_ID_TYPE)
         self.VTKObject.SetCells(n_cells, cells)
 
 

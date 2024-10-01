@@ -115,7 +115,7 @@ def test_basic_wrapping():
     assert s.VTKObject.GetArrayAccessMode() == 1
 
     # test change in access mode
-    s.arrayid = 3
+    s.SetArrayId(3)
     assert s.VTKObject.GetArrayId() == 3
     assert s.VTKObject.GetArrayAccessMode() == 0
 

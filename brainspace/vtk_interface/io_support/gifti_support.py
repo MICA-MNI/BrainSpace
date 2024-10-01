@@ -5,9 +5,10 @@ VTK read/write filters for Gifti (.surf.gii).
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
-
+import numpy as np
 from vtk import vtkPolyData
 from vtk.util.vtkAlgorithm import VTKPythonAlgorithmBase
+
 
 from ..decorators import wrap_input
 from ...mesh.mesh_creation import build_polydata
@@ -52,20 +53,37 @@ def _read_gifti(ipth, ipths_pointdata):
 
 @wrap_input(0)
 def _write_gifti(pd, opth):
-    # TODO: what about pointdata?
+    import numpy as np
     from nibabel.gifti.gifti import GiftiDataArray
+    from nibabel.nifti1 import data_type_codes
 
     if not pd.has_only_triangle:
         raise ValueError('GIFTI writer only accepts triangles.')
 
-    points = GiftiDataArray(data=pd.Points, intent=INTENT_POINTS)
-    cells = GiftiDataArray(data=pd.GetCells2D(), intent=INTENT_CELLS)
-    # if data is not None:
-    #     data_array = GiftiDataArray(data=data, intent=INTENT_POINTDATA)
-    #     gii = nb.gifti.GiftiImage(darrays=[points, cells, data_array])
-    # else:
+    # Cast Points to float32
+    points_data = pd.Points.astype(np.float32)
+    points_datatype = data_type_codes[points_data.dtype]
+    points = GiftiDataArray(
+        data=points_data,
+        intent=INTENT_POINTS,
+        datatype=points_datatype
+    )
+
+    # Cast Cells to int32
+    cells_data = pd.GetCells2D().astype(np.int32)
+    cells_datatype = data_type_codes[cells_data.dtype]
+    cells = GiftiDataArray(
+        data=cells_data,
+        intent=INTENT_CELLS,
+        datatype=cells_datatype
+    )
+
+    # Create the GIFTI image
     g = nb.gifti.GiftiImage(darrays=[points, cells])
+
+    # Save the GIFTI image
     nb.save(g, opth)
+
 
 
 ###############################################################################

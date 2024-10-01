@@ -33,8 +33,11 @@ def _fread3(fobj):
     n : int
         A 3 byte int
     """
-    b1, b2, b3 = np.fromfile(fobj, ">u1", 3)
-    return (b1 << 16) + (b2 << 8) + b3
+    b = np.fromfile(fobj, ">u1", 3)
+    if len(b) != 3:
+        raise IOError('Unexpected end of file when reading magic number.')
+    return (int(b[0]) << 16) + (int(b[1]) << 8) + int(b[2])
+
 
 
 def _fread3_many(fobj, n):
@@ -48,9 +51,11 @@ def _fread3_many(fobj, n):
     out : 1D array
         An array of 3 byte int
     """
-    b1, b2, b3 = np.fromfile(fobj, ">u1", 3 * n).reshape(-1, 3).astype(np.int64).T
-    return (b1 << 16) + (b2 << 8) + b3
-
+    b = np.fromfile(fobj, ">u1", 3 * n)
+    if len(b) != 3 * n:
+        raise IOError('Unexpected end of file when reading multiple 3-byte integers.')
+    b = b.reshape(-1, 3)
+    return (int(b[:, 0]) << 16) + (int(b[:, 1]) << 8) + int(b[:, 2])
 
 def _read_geometry_fs(ipth, is_ascii=False):
     """Adapted from nibabel. Add ascii support."""
@@ -60,7 +65,7 @@ def _read_geometry_fs(ipth, is_ascii=False):
             re_header = re.compile('^#!ascii version (.*)$')
             fname_header = re_header.match(fh.readline()).group(1)
 
-            re_npoints_cells = re.compile('[\s]*(\d+)[\s]*(\d+)[\s]*$')
+            re_npoints_cells = re.compile(r'[\s]*(\d+)[\s]*(\d+)[\s]*$')
             re_n = re_npoints_cells.match(fh.readline())
             n_points, n_cells = int(re_n.group(1)), int(re_n.group(2))
 
@@ -68,9 +73,9 @@ def _read_geometry_fs(ipth, is_ascii=False):
             for i in range(n_points):
                 x_points[i, :] = [float(v) for v in fh.readline().split()[:3]]
 
-            x_cells = np.zeros((n_cells, 3), dtype=np.uintp)
+            x_cells = np.zeros((n_cells, 3), dtype=np.int32)
             for i in range(n_cells):
-                x_cells[i] = [np.uintp(v) for v in fh.readline().split()[:3]]
+                x_cells[i] = [np.int32(v) for v in fh.readline().split()[:3]]
 
     else:
         with open(ipth, 'rb') as fh:
@@ -90,7 +95,7 @@ def _read_geometry_fs(ipth, is_ascii=False):
                 quads = _fread3_many(fh, n_quad * 4)
                 quads = quads.reshape(n_quad, 4)
                 n_cells = 2 * n_quad
-                x_cells = np.zeros((n_cells, 3), dtype=np.uintp)
+                x_cells = np.zeros((n_cells, 3), dtype=np.int32)
 
                 # Face splitting follows (Remove loop in nib) -> Not tested!
                 m0 = (quads[:, 0] % 2) == 0
@@ -107,7 +112,7 @@ def _read_geometry_fs(ipth, is_ascii=False):
                 x_points = np.fromfile(fh, '>f4', n_points * 3)
                 x_points = x_points.reshape(n_points, 3).astype(np.float64)
 
-                x_cells = np.zeros((n_cells, 3), dtype=np.uintp)
+                x_cells = np.zeros((n_cells, 3), dtype=np.int32)
                 x_cells.flat[:] = np.fromfile(fh, '>i4', n_cells * 3)
 
     return build_polydata(x_points, cells=x_cells).VTKObject
@@ -123,7 +128,7 @@ def _write_geometry_fs(pd, opth, fname_header=None, is_ascii=False):
     n_points, n_cells = pd.GetNumberOfPoints(), pd.GetNumberOfCells()
     x_points = np.zeros((n_points, 4), dtype=np.float32)
     x_points[:, :3] = pd.GetPoints()
-    x_cells = np.zeros((n_cells, 4), dtype=np.uintp)
+    x_cells = np.zeros((n_cells, 4), dtype=np.int32)
     x_cells[:, :3] = pd.GetPolygons().reshape(-1, 4)[:, 1:]
 
     if is_ascii:
@@ -146,7 +151,9 @@ def _write_geometry_fs(pd, opth, fname_header=None, is_ascii=False):
 
         with open(opth, 'wb') as fobj:
             magic_bytes.tofile(fobj)
-            fobj.write('{0}%s\n\n'.format(create_stamp).encode('utf-8'))
+            # fobj.write('{0}%s\n\n'.format(create_stamp).encode('utf-8'))
+            fobj.write((create_stamp + '\n').encode('utf-8'))
+            fobj.write(b'\n')
 
             np.array([n_points, n_cells], dtype='>i4').tofile(fobj)
 
