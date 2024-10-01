@@ -449,7 +449,7 @@ class BSPolyData(BSPointSet, dsa.PolyData):
         else:
             n_cells, n_points_cell = cells.shape
             vtk_cells = np.empty((n_cells, n_points_cell + 1),
-                                 dtype=np.uintp)
+                                 dtype=np.int32)
             vtk_cells[:, 0] = n_points_cell
             vtk_cells[:, 1:] = cells
             vtk_cells = vtk_cells.ravel()

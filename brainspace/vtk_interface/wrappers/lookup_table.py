@@ -5,8 +5,9 @@ Wrappers for VTK lookup tables.
 # Author: Oualid Benkarim <oualid.benkarim@mcgill.ca>
 # License: BSD 3 clause
 
-
+import vtk
 from vtk.util.vtkConstants import VTK_STRING, VTK_UNSIGNED_CHAR
+from vtk.util.numpy_support import numpy_to_vtk
 
 from .base import BSVTKObjectWrapper
 from ..decorators import unwrap_input
@@ -31,7 +32,10 @@ class BSLookupTable(BSScalarsToColors):
 
     @unwrap_input(1, vtype={1: VTK_UNSIGNED_CHAR})
     def SetTable(self, table):
-        self.VTKObject.SetTable(table)
+        # Convert NumPy array to vtkUnsignedCharArray
+        vtk_table = numpy_to_vtk(table, array_type=vtk.VTK_UNSIGNED_CHAR, deep=True)
+        # Now set the table using the vtkUnsignedCharArray
+        self.VTKObject.SetTable(vtk_table)
 
     def SetNumberOfColors(self, n):
         # SetNumberOfColors() has no effect after the table has been built
