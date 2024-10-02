@@ -3,6 +3,7 @@
 docs/_build
 docs/generated
 test_python
+bugs
 
 .pytest_cache
 .ipynb_checkpoints
