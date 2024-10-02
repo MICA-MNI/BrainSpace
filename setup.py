@@ -47,7 +47,7 @@ setup(
     long_description_content_type='text/x-rst',
     url='https://github.com/MICA-MNI/BrainSpace',
     author='BrainSpace developers',
-    author_email='oualid.benkarim@mcgill.ca',
+    author_email='enning.yang@mcgill.ca',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',

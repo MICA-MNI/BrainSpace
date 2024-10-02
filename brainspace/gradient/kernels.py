@@ -26,6 +26,7 @@ def _build_kernel(x, kernel, gamma=None):
     if kernel in {'cosine', 'normalized_angle'}:
         x = cosine_similarity(x)
         if kernel == 'normalized_angle':
+            x = np.clip(x, -1.0, 1.0)
             x = 1 - np.arccos(x, x)/np.pi
         return x
 
