@@ -1,3 +1,9 @@
+v0.1.5, October 2024 -- Fix dependency error
+Python:
+  - After python 3.9, the computation of sparse PCA is available.
+  - Fix bugs regarding dtype 
+  - Fix bugs about the inf or NaN value in computation of connection matrix 
+  
 v0.1.4, August 2022 -- Support for vtk 9.2
 MATLAB:
   - Fixed the uploading of tutorial data to FileExchange.
