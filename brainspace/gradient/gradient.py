@@ -84,7 +84,7 @@ class GradientMaps(BaseEstimator):
         Kernel function to build the affinity matrix. Possible options:
         {'pearson', 'spearman', 'cosine', 'normalized_angle', 'gaussian'}.
         If callable, must receive a 2D array and return a 2D square array.
-        If None, use input matrix. Default is None.
+        If None, use input matrix. Default is 'normalized_angle'.
     alignment : {'procrustes', 'joint'}, object or None
         Alignment approach. Only used when two or more datasets are provided.
         If None, no alignment is performed. If `object`, it accepts an instance
@@ -110,7 +110,7 @@ class GradientMaps(BaseEstimator):
         is used.
     """
 
-    def __init__(self, n_components=10, approach='dm', kernel=None,
+    def __init__(self, n_components=10, approach='dm', kernel='normalized_angle',
                  alignment=None, random_state=None):
         self.n_components = n_components
         self.approach = approach
