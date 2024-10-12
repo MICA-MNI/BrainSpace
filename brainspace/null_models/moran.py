@@ -99,9 +99,6 @@ def compute_mem(w, n_ring=1, spectrum='nonzero', tol=1e-10):
     mask_zero = ev_abs < tol
     n_zero = np.count_nonzero(mask_zero)
 
-    if n_zero == 0:
-        raise ValueError('Weight matrix has no zero eigenvalue.')
-
     # Multiple zero eigenvalues
     if spectrum == 'all':
         if n_zero > 1:
