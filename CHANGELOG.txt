@@ -1,4 +1,4 @@
-v0.1.15, October 2024 -- Fix dependency error
+v0.1.16, October 2024 -- Fix dependency error
 Python:
   - After python 3.9, the computation of sparse PCA is available.
   - Fix bugs regarding dtype 
