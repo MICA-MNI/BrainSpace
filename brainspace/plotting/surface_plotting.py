@@ -284,7 +284,7 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
 
             cm = cmap[i, j][ia]
             if cm is not None:
-                if cm in colormaps:
+                if isinstance(cm, str) and cm in colormaps:
                     table = colormaps[cm]
                 else:
                     cm = plt.get_cmap(cm)
