@@ -8,67 +8,63 @@ on:
 
 jobs:
   python_unittests:
-
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.8, 3.9, "3.10", "3.11"]
         exclude:
           - os: macos-latest
             python-version: 3.7
           - os: macos-latest
             python-version: 3.8
 
-
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Test Windows
-      if: matrix.os == 'windows-latest'
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install pytest
-        python -m pip install -r requirements.txt
-        python -m pytest brainspace --ignore brainspace/tests/test_plotting.py
+      - uses: actions/checkout@v2
 
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Prepare Linux
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install pytest
-        python3 -m pip install -r requirements.txt
-          
-    - name: Test Linux
-      if: matrix.os == 'ubuntu-latest'
-      uses: GabrielBB/xvfb-action@v1.5
-      with:
-        options: -screen 0 1600x1200x24
-        run: python3 -m pytest brainspace
+      - name: Test Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest
+          python -m pip install -r requirements.txt
+          python -m pytest brainspace --ignore brainspace/tests/test_plotting.py
 
+      - name: Prepare Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pytest
+          python3 -m pip install -r requirements.txt
 
-    - name: Test macOS 
-      if: matrix.os == 'macos-latest'
-      run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install pytest
-        python3 -m pip install -r requirements.txt
-        python3 -m pytest brainspace
+      - name: Test Linux
+        if: matrix.os == 'ubuntu-latest'
+        uses: GabrielBB/xvfb-action@v1.5
+        with:
+          options: -screen 0 1600x1200x24
+          run: python3 -m pytest brainspace
 
-  matlab_unittests: 
-    runs-on: ubuntu-latest    
+      - name: Test macOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pytest
+          python3 -m pip install -r requirements.txt
+          python3 -m pytest brainspace
+
+  matlab_unittests:
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install MATLAB
-      uses: matlab-actions/setup-matlab@v0
-    - name: Run tests 
-      uses: matlab-actions/run-tests@v0
-      with:
-        source-folder: matlab
+      - uses: actions/checkout@v2
+      - name: Install MATLAB
+        uses: matlab-actions/setup-matlab@v0
+      - name: Run tests
+        uses: matlab-actions/run-tests@v0
+        with:
+          source-folder: matlab
