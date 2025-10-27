@@ -14,7 +14,7 @@ from vtk import (vtkAbstractArray, vtkStringArray, vtkIdList, vtkVariantArray,
 from vtk.numpy_interface import dataset_adapter as dsa
 from vtk.util.vtkConstants import VTK_STRING
 
-from .utils import call_vtk, get_vtk_methods, is_numpy_string, is_vtk_string
+from .utils import call_vtk, get_vtk_methods, is_numpy_string, is_vtk_string, get_vtk_name
 
 
 try:
@@ -155,8 +155,9 @@ class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
 
         super().__init__(vtkobject)
 
-        if self.VTKObject.__vtkname__ not in self._vtk_map:
-            self._vtk_map[self.VTKObject.__vtkname__] = \
+        vtk_name = get_vtk_name(self.VTKObject)
+        if vtk_name not in self._vtk_map:
+            self._vtk_map[vtk_name] = \
                 get_vtk_methods(self.VTKObject)
 
         # Has to be postponed (see metaclass) cause we may forward some kwds
@@ -320,7 +321,7 @@ class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
     @property
     def vtk_map(self):
         """dict: Dictionary of vtk setter and getter methods."""
-        return self._vtk_map[self.VTKObject.__vtkname__]
+        return self._vtk_map[get_vtk_name(self.VTKObject)]
 
 
 def is_wrapper(obj):
@@ -379,14 +380,21 @@ def BSWrapVTKObject(obj):
         raise ValueError('Unknown object type: {0}'.format(type(obj)))
 
     # Is this really needed? is there a vtk class that doesn't start with vtk?
-    if not obj.__vtkname__.startswith('vtk'):
+    vtk_name = get_vtk_name(obj)
+    if not vtk_name.startswith('vtk'):
         raise ValueError('Unknown object type: {0}'.format(type(obj)))
 
     # Find wrapper for vtk class or one of its superclasses
-    for c in [sc.__vtkname__[3:] for sc in obj.__class__.mro()[:-3]]:
-        if c in BSVTKObjectWrapperMeta.entries:
-            bs_cls = BSVTKObjectWrapperMeta.entries[c]
-            return bs_cls(obj)
+    # VTK 9.4+ compatibility: safely get vtk name from each class in MRO
+    for sc in obj.__class__.mro()[:-3]:
+        try:
+            c = get_vtk_name(sc)[3:]  # Remove 'vtk' prefix
+            if c in BSVTKObjectWrapperMeta.entries:
+                bs_cls = BSVTKObjectWrapperMeta.entries[c]
+                return bs_cls(obj)
+        except (AttributeError, IndexError):
+            # Skip classes without proper VTK names
+            continue
 
     # Fall back to generic wrapper
     return BSVTKObjectWrapper(obj)

@@ -123,8 +123,8 @@ def test_basic_wrapping():
     s = wrap_vtk(vtk.vtkActor, opacity=0.5, interpolation='phong')
     assert isinstance(s, BSActor)
     assert s.VTKObject.GetProperty().GetOpacity() == 0.5
-    assert s.property.opacity == 0.5
-    assert s.opacity == 0.5
+    assert s.GetProperty().GetOpacity() == 0.5  # Use GetProperty().GetOpacity() for VTK 9.4+ compatibility
+    assert s.GetOpacity() == 0.5  # BSActor forwards property methods
 
     # test implemented wrapper
     s = wrap_vtk(vtk.vtkPolyData)
