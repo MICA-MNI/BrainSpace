@@ -16,6 +16,14 @@ from numpy.lib.stride_tricks import as_strided
 from vtk import vtkCommand
 import vtk.qt as vtk_qt
 
+# Fix for VTK 9.4+ headless rendering
+# Set the render window type to OSMesa for offscreen rendering
+import os as _os
+import vtk as _vtk
+_vtk_version = tuple(map(int, _vtk.vtkVersion.GetVTKVersion().split('.')[:2]))
+if _vtk_version >= (9, 4) and _os.environ.get('VTK_DEFAULT_RENDER_WINDOW_TYPE') is None:
+    _os.environ['VTK_DEFAULT_RENDER_WINDOW_TYPE'] = 'OSMesa'
+
 from brainspace import OFF_SCREEN
 from ..vtk_interface.pipeline import serial_connect, get_output
 from ..vtk_interface.wrappers import (BSWindowToImageFilter, BSPNGWriter,
@@ -416,7 +424,7 @@ class Plotter(object):
     def to_numpy(self, transparent_bg=True, scale=(1, 1)):
         wf = self._win2img(transparent_bg, scale)
         img = get_output(wf)
-        shape = img.dimensions[::-1][1:] + (-1,)
+        shape = img.VTKObject.GetDimensions()[::-1][1:] + (-1,)
         img = img.PointData['ImageScalars'].reshape(shape)[::-1]
         return img
 
