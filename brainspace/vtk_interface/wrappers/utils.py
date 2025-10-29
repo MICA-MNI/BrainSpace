@@ -207,3 +207,49 @@ def is_numpy_string(dtype):
 
 def is_vtk_string(vtype):
     return vtype in [VTK_STRING, VTK_UNICODE_STRING]
+
+
+def get_vtk_name(obj):
+    """Get the VTK class name from a VTK object or class.
+
+    This function provides compatibility with VTK 9.4+ where some classes
+    no longer have the __vtkname__ attribute.
+
+    Parameters
+    ----------
+    obj : type or object
+        VTK class or object.
+
+    Returns
+    -------
+    str
+        The VTK class name.
+
+    Notes
+    -----
+    In VTK 9.4.0, some classes like PointSet no longer have the __vtkname__
+    attribute. This function falls back to using __name__ when __vtkname__
+    is not available.
+
+    Examples
+    --------
+    >>> import vtk
+    >>> from brainspace.vtk_interface.wrappers.utils import get_vtk_name
+    >>> get_vtk_name(vtk.vtkPolyData())
+    'vtkPolyData'
+    >>> get_vtk_name(vtk.vtkPolyData)
+    'vtkPolyData'
+    """
+    # Handle both classes and instances
+    obj_class = obj if isinstance(obj, type) else type(obj)
+
+    # Try __vtkname__ first (older VTK versions)
+    if hasattr(obj_class, '__vtkname__'):
+        return obj_class.__vtkname__
+
+    # Fallback to __name__ (VTK 9.4+)
+    if hasattr(obj_class, '__name__'):
+        return obj_class.__name__
+
+    # Last resort - try to get from string representation
+    return str(obj_class).split("'")[1].split('.')[-1]

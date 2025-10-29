@@ -9,6 +9,7 @@ Pipeline for VTK filters.
 from .decorators import wrap_input
 from .wrappers.algorithm import BSAlgorithm
 from .wrappers.data_object import BSDataObject
+from .wrappers.utils import get_vtk_name
 
 
 # From https://vtk.org/Wiki/VTK/Tutorials/New_Pipeline
@@ -52,11 +53,11 @@ def connect(ftr0, ftr1, port0=0, port1=0, add_conn=False):
 
     if isinstance(ftr0, BSAlgorithm) and port0 >= ftr0.nop:
         raise ValueError("'{0}' only has {1} output ports.".
-                         format(ftr0.__vtkname__, ftr0.nop))
+                         format(get_vtk_name(ftr0.VTKObject), ftr0.nop))
 
     if port1 >= ftr1.nip:
         raise ValueError("'{0}' only accepts {1} input ports.".
-                         format(ftr1.__vtkname__, ftr1.nip))
+                         format(get_vtk_name(ftr1.VTKObject), ftr1.nip))
 
     if add_conn is True or type(add_conn) == int:
         if ftr1.nip > 1:
@@ -67,14 +68,14 @@ def connect(ftr0, ftr1, port0=0, port1=0, add_conn=False):
         if pinfo.Get(ftr1.INPUT_IS_REPEATABLE()) == 0:
             raise ValueError("Input port {0} of '{1}' does not "
                              "accept multiple connections.".
-                             format(ftr1.nip, ftr1.__vtkname__))
+                             format(ftr1.nip, get_vtk_name(ftr1.VTKObject)))
 
         if type(add_conn) == int:
             if not hasattr(ftr1, 'GetUserManagedInputs') or \
                     ftr1.GetUserManagedInputs() == 0:
                 raise ValueError("Input port {0} of '{1}' does not accept "
                                  "connection number."
-                                 .format(ftr1.nip, ftr1.__vtkname__))
+                                 .format(ftr1.nip, get_vtk_name(ftr1.VTKObject)))
 
     if isinstance(ftr0, BSAlgorithm):
         op = ftr0.GetOutputPort(port0)
