@@ -19,7 +19,8 @@ from ..vtk_interface.decorators import wrap_output
 
 
 # 'fs' type for FreeSurfer geometry data (also read FreeSurfer ascii as .asc)
-supported_types = ['ply', 'obj', 'vtp', 'vtk', 'asc', 'fs', 'gii']
+supported_types = ['ply', 'obj', 'vtp', 'vtk', 'asc', 'fs', 'gii', 'pial',
+                   'white', 'orig', 'sphere', 'inflated', 'smoothwm']
 supported_formats = ['binary', 'ascii']
 
 
@@ -33,7 +34,8 @@ def _select_reader(itype):
         reader = vtkXMLPolyDataReader()
     elif itype == 'vtk':
         reader = vtkPolyDataReader()
-    elif itype in ['asc', 'fs']:
+    elif itype in ['asc', 'fs', 'pial', 'white', 'orig', 'sphere', 'inflated',
+                   'smoothwm']:
         reader = vtkFSReader()
         if itype == 'asc':
             reader.SetFileTypeToASCII()
