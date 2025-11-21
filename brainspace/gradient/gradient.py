@@ -130,6 +130,8 @@ class GradientMaps(BaseEstimator):
         ----------
         x : ndarray or list of arrays, shape = (n_samples, n_feat)
             Input matrix or list of matrices.
+            If a single matrix is provided and ``reference`` is not None,
+            ``n_iter`` is set to 1 (fixed reference alignment).
         gamma : float or None, optional
             Inverse kernel width. Only used if ``kernel == 'gaussian'``.
             If None, ``gamma=1/n_feat``. Default is None.
@@ -141,6 +143,9 @@ class GradientMaps(BaseEstimator):
         reference : ndarray, shape = (n_samples, n_feat), optional
             Initial reference for procrustes alignments. Only used when
             ``alignment == 'procrustes'``. Default is None.
+            If provided, it is used as the reference for the first iteration.
+            If ``n_iter > 1``, the reference is updated at each iteration
+            (Generalized Procrustes Analysis).
         kwargs : kwds, optional
             Additional keyword parameters passed to the embedding approach.
 
