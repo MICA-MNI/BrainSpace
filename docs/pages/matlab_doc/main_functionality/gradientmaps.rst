@@ -43,7 +43,8 @@ gradients property. If an alignment was requested, then the aligned data are
 stored here. 
 
 The **lambda** property stores the variance explained (for PCA) or the
-eigenvalues (for LE and DM). Note that all computed lambdas are provided even if
+eigenvalues (for LE and DM). Note that for DM and LE, these eigenvalues do not
+represent variance explained. Note that all computed lambdas are provided even if
 this is more than the number of requested components. 
 
 Initialization

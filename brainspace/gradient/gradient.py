@@ -102,7 +102,12 @@ class GradientMaps(BaseEstimator):
     Attributes
     ----------
     lambdas_ : ndarray or list of arrays, shape = (n_components,)
-        Eigenvalues for each datatset.
+        Eigenvalues for each dataset. For PCA, this contains the explained
+        variance. For Diffusion Maps and Laplacian Eigenmaps, this contains
+        the eigenvalues of the affinity matrix (or related operator).
+        Note that for Diffusion Maps, these eigenvalues are related to the
+        geometric structure and diffusion distance, but do not represent
+        "variance explained" in the same sense as PCA.
     gradients_ : ndarray or list of arrays, shape = (n_samples, n_components)
         Gradients (i.e., eigenvectors).
     aligned_ : None or list of arrays, shape = (n_samples, n_components)

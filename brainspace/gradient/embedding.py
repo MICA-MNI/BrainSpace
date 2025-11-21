@@ -288,7 +288,8 @@ class DiffusionMaps(Embedding):
     Attributes
     ----------
     lambdas_ : 1D ndarray, shape (n_components,)
-        Eigenvalues of the affinity matrix in descending order.
+        Eigenvalues of the affinity matrix in descending order. Note that these
+        are not equivalent to "variance explained" as in PCA.
     maps_ : 2D ndarray, shape (n, n_components)
         Eigenvectors of the affinity matrix in same order. Where `n` is
         the number of rows of the affinity matrix.
@@ -353,7 +354,8 @@ class LaplacianEigenmaps(Embedding):
     Attributes
     ----------
     lambdas_ : ndarray, shape (n_components,)
-        Eigenvalues of the affinity matrix in ascending order.
+        Eigenvalues of the affinity matrix in ascending order. Note that these
+        are not equivalent to "variance explained" as in PCA.
     maps_ : ndarray, shape (n, n_components)
         Eigenvectors of the affinity matrix in same order. Where `n` is
         the number of rows of the affinity matrix.
