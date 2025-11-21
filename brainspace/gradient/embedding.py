@@ -74,7 +74,8 @@ def diffusion_mapping(adj, n_components=10, alpha=0.5, diffusion_time=0,
 
     # Check connected
     if not _graph_is_connected(adj):
-        warnings.warn('Graph is not fully connected.')
+        warnings.warn('Graph is not fully connected. The first few gradients '
+                      'will likely separate the disconnected components.')
 
     ###########################################################
     # Step 2
@@ -208,7 +209,8 @@ def laplacian_eigenmaps(adj, n_components=10, norm_laplacian=True,
 
     # Check connected
     if not _graph_is_connected(adj):
-        warnings.warn('Graph is not fully connected.')
+        warnings.warn('Graph is not fully connected. The first few gradients '
+                      'will likely separate the disconnected components.')
 
     lap, dd = laplacian(adj, normed=norm_laplacian, return_diag=True)
     if norm_laplacian:
