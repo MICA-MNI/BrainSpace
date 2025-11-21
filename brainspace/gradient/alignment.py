@@ -38,6 +38,9 @@ def procrustes(source, target, center=False, scale=False):
 
         source = source - ms
         target = target - mt
+    elif scale:
+        source = source.copy()
+        target = target.copy()
 
     # Remove scale
     if scale:
@@ -61,8 +64,9 @@ def procrustes(source, target, center=False, scale=False):
 
 
 # Generalized procrustes analysis
-def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
-                         return_reference=False, verbose=False):
+def procrustes_alignment(data, reference=None, center=False, scale=False,
+                         n_iter=10, tol=1e-5, return_reference=False,
+                         verbose=False):
     """Iterative alignment using generalized procrustes analysis.
 
     Parameters
@@ -72,6 +76,10 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
     reference : ndarray, shape = (n_samples, n_feat), optional
         Dataset to use as reference in the first iteration. If None, the first
         dataset in `data` is used as reference. Default is None.
+    center : bool, optional
+        Center data before alignment. Default is False.
+    scale : bool, optional
+        Remove scale before alignment. Default is False.
     n_iter : int, optional
         Number of iterations. Default is 10.
     tol : float, optional
@@ -96,7 +104,8 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
 
     if reference is None:
         # Use the first item to build the initial reference
-        aligned = [data[0]] + [procrustes(d, data[0]) for d in data[1:]]
+        aligned = [data[0]] + [procrustes(d, data[0], center=center,
+                                          scale=scale) for d in data[1:]]
         reference = np.mean(aligned, axis=0)
     else:
         aligned = [None] * len(data)
@@ -105,7 +114,8 @@ def procrustes_alignment(data, reference=None, n_iter=10, tol=1e-5,
     dist = np.inf
     for i in range(n_iter):
         # Align to reference
-        aligned = [procrustes(d, reference) for d in data]
+        aligned = [procrustes(d, reference, center=center, scale=scale)
+                   for d in data]
 
         # Compute new mean
         new_reference = np.mean(aligned, axis=0)
@@ -132,6 +142,10 @@ class ProcrustesAlignment(BaseEstimator):
 
     Parameters
     ----------
+    center : bool, optional
+        Center data before alignment. Default is False.
+    scale : bool, optional
+        Remove scale before alignment. Default is False.
     n_iter : int, optional
         Number of iterations. Default is 10.
     tol : float, optional
@@ -147,7 +161,10 @@ class ProcrustesAlignment(BaseEstimator):
         Reference dataset built in the last iteration.
     """
 
-    def __init__(self, n_iter=10, tol=1e-5, verbose=False):
+    def __init__(self, center=False, scale=False, n_iter=10, tol=1e-5,
+                 verbose=False):
+        self.center = center
+        self.scale = scale
         self.n_iter = n_iter
         self.tol = tol
         self.verbose = verbose
@@ -170,7 +187,8 @@ class ProcrustesAlignment(BaseEstimator):
         """
 
         self.aligned_, self.mean_ = \
-            procrustes_alignment(data, reference=reference, tol=self.tol,
+            procrustes_alignment(data, reference=reference, center=self.center,
+                                 scale=self.scale, tol=self.tol,
                                  n_iter=self.n_iter, return_reference=True,
                                  verbose=self.verbose)
         return self
