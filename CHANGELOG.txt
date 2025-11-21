@@ -1,3 +1,10 @@
+v0.1.21, November 2025
+Python:
+  - Added `center` and `scale` parameters to `procrustes_alignment` (Issue #135).
+  - Clarified documentation for `GradientMaps.fit` regarding alignment methods (Issue #134).
+  - Improved warning message for disconnected graphs in `GradientMaps` (Issue #132).
+  - Added support for FreeSurfer surface file extensions (`.pial`, `.white`, `.orig`, `.sphere`, `.inflated`, `.smoothwm`) in `read_surface` (Issue #133).
+
 v0.1.16, October 2024 -- Fix dependency error
 Python:
   - After python 3.9, the computation of sparse PCA is available.
