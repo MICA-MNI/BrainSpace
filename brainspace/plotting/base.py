@@ -203,6 +203,11 @@ class Plotter(object):
         self.use_qt = has_pyqt and try_qt and not self.offscreen
 
         self.ren_win = BSRenderWindow(**kwargs)
+        
+        # Disable multisampling in offscreen mode to avoid shader errors
+        if self.offscreen:
+            self.ren_win.SetMultiSamples(0)
+        
         if not self.offscreen:
             if self.use_qt:
                 self.iren = BSGenericRenderWindowInteractor()
