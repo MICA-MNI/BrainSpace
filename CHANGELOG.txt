@@ -1,3 +1,8 @@
+v0.1.22, December 2025
+Python:
+  - Fixed VTK wrapper to handle non-callable attributes correctly for VTK 9.4+ compatibility (Issue #107).
+  - Updated VTK requirement to allow versions >= 9.1.0 (removing upper limit for VTK 9.4+ support).
+
 v0.1.21, November 2025
 Python:
   - Added `center` and `scale` parameters to `procrustes_alignment` (Issue #135).

@@ -9,7 +9,7 @@
 
 If you consider using BrainSpace, please cite our manuscript: Vos de Wael R, Benkarim O, Paquola C, Lariviere S, Royer J, Tavakol S, Xu T, Hong S, Langs G, Valk S, Misic B, Milham M, Margulies D, Smallwood J, Bernhardt B (2020). BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and connectomics datasets. Commun Biol 3, 103.</param.description>
     <param.screenshot />
-    <param.version>0.1.21</param.version>
+    <param.version>0.1.22</param.version>
     <param.output>${PROJECT_ROOT}/BrainSpace.mltbx</param.output>
     <param.products.name>
       <item>MATLAB</item>
