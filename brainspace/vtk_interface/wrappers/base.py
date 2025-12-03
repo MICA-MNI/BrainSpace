@@ -35,11 +35,23 @@ class VTKMethodWrapper:
         return _wrap_output_data(self.name(*args, **kwargs))
     
     def __getattr__(self, attr):
-        """Forward attribute access to the wrapped callable's return value if it's actually data."""
-        # If someone accesses an attribute on a VTKMethodWrapper, it likely means
-        # the wrapper was incorrectly created for a non-callable (data property).
-        # Try to access the attribute on self.name directly.
-        if attr != 'name':
+        """Forward attribute access by calling the wrapped method and accessing the result.
+        
+        This handles cases where VTK properties are accessed in a chain, e.g.:
+        renderer.actors.lastActor.mapper.lookuptable
+        
+        If the VTKMethodWrapper was incorrectly created for a property access,
+        we call the underlying method (if callable) and then access the attribute on the result.
+        """
+        if attr == 'name':
+            raise AttributeError(f"'VTKMethodWrapper' object has no attribute '{attr}'")
+        
+        # Call the method to get the actual object, then access the attribute on it
+        if callable(self.name):
+            obj = self.name()
+            return _wrap_output_data(getattr(obj, attr))
+        else:
+            # self.name is not callable, access attribute directly
             return _wrap_output_data(getattr(self.name, attr))
 
 
@@ -218,7 +230,9 @@ class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
         # vtk name and forward again
         try:
             attr = super().__getattr__(name)
-            if callable(attr):
+            # Check if it's a method (not just callable, but an actual method/function)
+            # VTK objects themselves can be callable, but they're data, not methods
+            if callable(attr) and not is_vtk(attr):
                 return VTKMethodWrapper(attr)
             return _wrap_output_data(attr)
         except:
