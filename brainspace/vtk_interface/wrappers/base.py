@@ -209,7 +209,10 @@ class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
         # If it doesn't exist, look for it in vtk_map, find its corresponding
         # vtk name and forward again
         try:
-            return VTKMethodWrapper(super().__getattr__(name))
+            attr = super().__getattr__(name)
+            if callable(attr):
+                return VTKMethodWrapper(attr)
+            return _wrap_output_data(attr)
         except:
             return self._handle_call('get', name, None)
 
