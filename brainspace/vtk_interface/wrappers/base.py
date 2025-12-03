@@ -214,7 +214,7 @@ class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
                 return VTKMethodWrapper(attr)
             return _wrap_output_data(attr)
         except:
-            return self._handle_call('get', name, None)
+            return _wrap_output_data(self._handle_call('get', name, None))
 
     def __setattr__(self, name, value):
         """ Forwards unknown set requests to vtk object.
