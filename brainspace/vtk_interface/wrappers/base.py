@@ -33,6 +33,14 @@ class VTKMethodWrapper:
     def __call__(self, *args, **kwargs):
         args, kwargs = _unwrap_input_data(args, kwargs)
         return _wrap_output_data(self.name(*args, **kwargs))
+    
+    def __getattr__(self, attr):
+        """Forward attribute access to the wrapped callable's return value if it's actually data."""
+        # If someone accesses an attribute on a VTKMethodWrapper, it likely means
+        # the wrapper was incorrectly created for a non-callable (data property).
+        # Try to access the attribute on self.name directly.
+        if attr != 'name':
+            return _wrap_output_data(getattr(self.name, attr))
 
 
 class BSVTKObjectWrapperMeta(type):
