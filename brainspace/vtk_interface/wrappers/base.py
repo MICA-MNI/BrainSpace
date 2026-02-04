@@ -369,13 +369,13 @@ class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
         """
         # Create a new instance of the same VTK class
         new_vtk_obj = self.VTKObject.NewInstance()
-        
+
         # Copy data from self to the new instance
         if deep:
             new_vtk_obj.DeepCopy(self.VTKObject)
         else:
             new_vtk_obj.ShallowCopy(self.VTKObject)
-        
+
         # Wrap the new VTK object in the same wrapper type
         return BSWrapVTKObject(new_vtk_obj)
 
@@ -385,12 +385,12 @@ class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
 
     def __deepcopy__(self, memo):
         """Support for Python's copy.deepcopy() function.
-        
+
         Parameters
         ----------
         memo : dict
             Dictionary of objects already copied during the current copying pass.
-            
+
         Notes
         -----
         While VTK's DeepCopy handles internal structures, we register the new
