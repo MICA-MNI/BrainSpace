@@ -384,8 +384,24 @@ class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
         return self.copy(deep=False)
 
     def __deepcopy__(self, memo):
-        """Support for Python's copy.deepcopy() function."""
-        return self.copy(deep=True)
+        """Support for Python's copy.deepcopy() function.
+        
+        Parameters
+        ----------
+        memo : dict
+            Dictionary of objects already copied during the current copying pass.
+            
+        Notes
+        -----
+        While VTK's DeepCopy handles internal structures, we register the new
+        wrapper in memo to maintain proper Python deepcopy semantics and prevent
+        issues with circular references at the wrapper level.
+        """
+        # Create the deep copy
+        result = self.copy(deep=True)
+        # Register in memo to handle circular references properly
+        memo[id(self)] = result
+        return result
 
     @property
     def vtk_map(self):
