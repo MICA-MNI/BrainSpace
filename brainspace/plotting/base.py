@@ -91,7 +91,7 @@ def _get_qt_app():
     if in_ipython():
         from IPython import get_ipython
         ipython = get_ipython()
-        ipython.magic('gui qt')
+        ipython.run_line_magic('gui', 'qt')
 
         from IPython.external.qt_for_kernel import QtGui
         app = QtGui.QApplication.instance()
@@ -192,9 +192,9 @@ class Plotter(object):
     def __init__(self, nrow=1, ncol=1, offscreen=None, force_close=False,
                  try_qt=False, **kwargs):
 
-        if try_qt:
-            warnings.warn('Qt rendering is not supported for the moment.')
-            try_qt = False
+        # if try_qt:
+        #     warnings.warn('Qt rendering is not supported for the moment.')
+        #     try_qt = False
 
         self.grid = _create_grid(nrow, ncol)
         self.nrow, self.ncol = self.grid.shape[:2]
@@ -342,6 +342,7 @@ class Plotter(object):
             self.ren_win.Render()
             if self.use_qt:
                 self.app_window.show()
+                self.app.exec_()
             else:
                 self.iren.Start()
 
