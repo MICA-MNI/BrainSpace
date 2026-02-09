@@ -343,6 +343,66 @@ class BSVTKObjectWrapper(dsa.VTKObjectWrapper,
         vr = self.VTKObject.__repr__()[1:].split(')')[0]
         return '<{0} [Wrapping a {1}]>'.format(r, vr)
 
+    def copy(self, deep=False):
+        """Create a copy of this VTK object.
+
+        Parameters
+        ----------
+        deep : bool, optional
+            If True, create a deep copy. If False, create a shallow copy.
+            Default is False (shallow copy).
+
+        Returns
+        -------
+        copied : BSVTKObjectWrapper
+            A copy of this object, wrapped in the same wrapper type.
+
+        Examples
+        --------
+        >>> import vtk
+        >>> from brainspace.vtk_interface.wrappers import wrap_vtk
+        >>> pd = wrap_vtk(vtk.vtkPolyData())
+        >>> pd_copy = pd.copy()
+        >>> pd_copy is pd
+        False
+
+        """
+        # Create a new instance of the same VTK class
+        new_vtk_obj = self.VTKObject.NewInstance()
+
+        # Copy data from self to the new instance
+        if deep:
+            new_vtk_obj.DeepCopy(self.VTKObject)
+        else:
+            new_vtk_obj.ShallowCopy(self.VTKObject)
+
+        # Wrap the new VTK object in the same wrapper type
+        return BSWrapVTKObject(new_vtk_obj)
+
+    def __copy__(self):
+        """Support for Python's copy.copy() function."""
+        return self.copy(deep=False)
+
+    def __deepcopy__(self, memo):
+        """Support for Python's copy.deepcopy() function.
+
+        Parameters
+        ----------
+        memo : dict
+            Dictionary of objects already copied during the current copying pass.
+
+        Notes
+        -----
+        While VTK's DeepCopy handles internal structures, we register the new
+        wrapper in memo to maintain proper Python deepcopy semantics and prevent
+        issues with circular references at the wrapper level.
+        """
+        # Create the deep copy
+        result = self.copy(deep=True)
+        # Register in memo to handle circular references properly
+        memo[id(self)] = result
+        return result
+
     @property
     def vtk_map(self):
         """dict: Dictionary of vtk setter and getter methods."""
