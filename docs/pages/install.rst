@@ -9,8 +9,8 @@ BrainSpace is available in Python and MATLAB.
 Python installation
 -------------------
 
-BrainSpace works on Python 3.5+, and probably with older versions of Python 3,
-although it is not tested. 
+BrainSpace requires Python 3.9 or newer. It is tested on Python 3.9 through
+3.13 across Linux, macOS, and Windows.
 
 
 Dependencies
@@ -24,10 +24,11 @@ To use BrainSpace, the following Python packages are required:
 * `vtk <https://vtk.org/>`_
 * `matplotlib <https://matplotlib.org/>`_
 * `nibabel <https://nipy.org/nibabel/index.html>`_
-* `nilearn <https://nilearn.github.io/>`_
 
 Nibabel is required for reading/writing Gifti surfaces. Matplotlib is only
 used for colormaps and we may remove this dependency in future releases.
+``nilearn`` is only needed to run the tutorial notebooks; install it with
+``pip install brainspace[examples]``.
 
 
 Additional dependencies
