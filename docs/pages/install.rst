@@ -57,6 +57,34 @@ Alternatively, you can install the package from Github as follows: ::
     python setup.py install
 
 
+Plotting on a remote / headless server
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+VTK requires a rendering context. On a server with no attached display
+(SSH session, container, CI runner, JupyterHub) the default ``vtk`` wheel
+will fail to render and ``plot_hemispheres`` may hang or error. Install
+one of the offscreen-capable VTK builds instead:
+
+* OSMesa (software rendering, no GPU needed): ::
+
+    pip uninstall vtk
+    pip install vtk-osmesa
+
+* EGL (GPU-accelerated, requires an NVIDIA driver with EGL support): ::
+
+    pip uninstall vtk
+    pip install vtk-egl
+
+If you prefer ``conda``, equivalent OSMesa builds are published on
+``conda-forge``: ::
+
+    conda install -c conda-forge mesalib
+    conda install -c conda-forge "vtk=*=osmesa_*"
+
+After installing, set ``embed_nb=True`` (Jupyter) or pass
+``offscreen=True`` to the plotting functions.
+
+
 
 MATLAB installation
 -------------------
