@@ -74,6 +74,31 @@ def test_moran():
     assert np.allclose(r2, msr.randomize(feats))
 
 
+def test_compute_mem_no_zero_eigvals_nonzero_branch():
+    """spectrum='nonzero' must accept matrices with no zero eigenvalues (#112).
+
+    Surfaces with no medial wall (e.g. hippocampal subfields) produce weight
+    matrices with no kernel; the previous unconditional ValueError blocked
+    that legitimate use case.
+    """
+    rs = np.random.RandomState(0)
+    a = rs.randn(20, 20)
+    w = a @ a.T  # positive definite -> no zero eigenvalues
+    mem, ev = compute_mem(w, spectrum='nonzero', tol=1e-10)
+    assert mem.shape[0] == 20
+    assert ev.shape[0] == mem.shape[1]
+    assert np.all(np.abs(ev) > 1e-10)
+
+
+def test_compute_mem_no_zero_eigvals_all_branch_still_raises():
+    """spectrum='all' still requires a zero eigenvalue (#112)."""
+    rs = np.random.RandomState(1)
+    a = rs.randn(20, 20)
+    w = a @ a.T
+    with pytest.raises(ValueError, match="spectrum='all'"):
+        compute_mem(w, spectrum='all', tol=1e-10)
+
+
 def test_spin():
     # Create dummy spheres or left and right hemispheres
     sphere_lh = wrap_vtk(vtk.vtkSphereSource, radius=20, thetaResolution=10,
