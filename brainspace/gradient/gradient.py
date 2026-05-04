@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 
 from sklearn.base import BaseEstimator
@@ -7,14 +9,86 @@ from .kernels import compute_affinity
 from .embedding import PCAMaps, LaplacianEigenmaps, DiffusionMaps
 
 
+def _is_path_like(x):
+    """Return True if `x` looks like a filesystem path to a stored array."""
+    return isinstance(x, (str, bytes, os.PathLike))
+
+
+def _devectorize(v, discard_diagonal=False):
+    """Reconstruct a symmetric square matrix from its lower-triangular vector.
+
+    Mirrors the layout produced by :func:`nilearn.connectome.sym_matrix_to_vec`,
+    which is the format ``nilearn.connectome.ConnectivityMeasure(vectorize=True)``
+    returns.
+
+    Parameters
+    ----------
+    v : ndarray, shape (n*(n+1)/2,) or (n*(n-1)/2,)
+        Lower-triangular entries of a symmetric matrix, in row-major order.
+    discard_diagonal : bool, optional
+        Whether the diagonal was discarded when vectorizing. Default is False.
+
+    Returns
+    -------
+    m : ndarray, shape (n, n)
+        Reconstructed symmetric matrix. The diagonal is filled with zeros if
+        ``discard_diagonal`` is True.
+    """
+    v = np.asarray(v)
+    if v.ndim != 1:
+        raise ValueError('Vectorized input must be 1D; got shape {}.'
+                         .format(v.shape))
+
+    size = v.shape[0]
+    if discard_diagonal:
+        # size = n*(n-1)/2
+        n = int(round((1 + np.sqrt(1 + 8 * size)) / 2))
+        if n * (n - 1) // 2 != size:
+            raise ValueError('Vector length {} is not consistent with a '
+                             'lower-triangular matrix without diagonal.'
+                             .format(size))
+    else:
+        # size = n*(n+1)/2
+        n = int(round((-1 + np.sqrt(1 + 8 * size)) / 2))
+        if n * (n + 1) // 2 != size:
+            raise ValueError('Vector length {} is not consistent with a '
+                             'lower-triangular matrix with diagonal.'
+                             .format(size))
+
+    m = np.zeros((n, n), dtype=v.dtype)
+    rows, cols = np.tril_indices(n, k=-1 if discard_diagonal else 0)
+    m[rows, cols] = v
+    m[cols, rows] = v
+    return m
+
+
+def _load_matrix(x, vectorized=False, discard_diagonal=False):
+    """Load `x` if path-like; otherwise return as-is. Devectorize if requested."""
+    if _is_path_like(x):
+        x = np.load(os.fspath(x))
+    if vectorized:
+        x = _devectorize(x, discard_diagonal=discard_diagonal)
+    return x
+
+
 def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
-             sparsity=0.9, **kwargs):
+             sparsity=0.9, vectorized=False, discard_diagonal=False, **kwargs):
     """Compute gradients of `x`.
 
     Parameters
     ----------
-    x : ndarray, shape = (n_samples, n_feat)
-        Input matrix.
+    x : ndarray or path-like, shape = (n_samples, n_feat)
+        Input matrix, or a path to a ``.npy`` file containing one. Path-like
+        inputs are loaded lazily with :func:`numpy.load`.
+    vectorized : bool, optional
+        If True, treat the loaded array as the lower-triangular vector of a
+        symmetric matrix (as produced by
+        ``nilearn.connectome.ConnectivityMeasure(vectorize=True)``) and
+        reconstruct the square matrix before computing the affinity.
+        Default is False.
+    discard_diagonal : bool, optional
+        Only used when ``vectorized`` is True. Whether the diagonal was
+        discarded when vectorizing. Default is False.
     app : {'dm', 'le', 'pca'} or object
         Embedding approach. If object. it can be an instance of PCAMaps,
         LaplacianEigenmaps or DiffusionMaps.
@@ -41,6 +115,9 @@ def _fit_one(x, app, kernel, n_components, random_state, gamma=None,
     gradients_ : ndarray, shape (n_samples, n_components)
         Gradients (i.e., eigenvectors).
     """
+
+    x = _load_matrix(x, vectorized=vectorized,
+                     discard_diagonal=discard_diagonal)
 
     a = compute_affinity(x, kernel=kernel, sparsity=sparsity, gamma=gamma)
 
@@ -123,13 +200,16 @@ class GradientMaps(BaseEstimator):
         self.aligned_ = None
 
     def fit(self, x, gamma=None, sparsity=0.9, n_iter=10, reference=None,
-            **kwargs):
+            vectorized=False, discard_diagonal=False, **kwargs):
         """Compute gradients and alignment.
 
         Parameters
         ----------
-        x : ndarray or list of arrays, shape = (n_samples, n_feat)
-            Input matrix or list of matrices.
+        x : ndarray, path-like, or list of arrays/path-likes, shape = (n_samples, n_feat)
+            Input matrix or list of matrices. Each entry can be either a
+            NumPy array or a path-like object pointing to a ``.npy`` file.
+            Path-like inputs are loaded lazily, one at a time, so large
+            matrices need not all be held in memory simultaneously.
             If a single matrix is provided and ``reference`` is not None,
             ``n_iter`` is set to 1 (fixed reference alignment).
         gamma : float or None, optional
@@ -146,6 +226,15 @@ class GradientMaps(BaseEstimator):
             If provided, it is used as the reference for the first iteration.
             If ``n_iter > 1``, the reference is updated at each iteration
             (Generalized Procrustes Analysis).
+        vectorized : bool, optional
+            If True, treat each input as the lower-triangular vector of a
+            symmetric connectivity matrix (the format produced by
+            ``nilearn.connectome.ConnectivityMeasure(vectorize=True)``) and
+            reconstruct the square matrix before fitting. Halves the disk
+            footprint when combined with path-like inputs. Default is False.
+        discard_diagonal : bool, optional
+            Only used when ``vectorized`` is True. Whether the diagonal was
+            discarded when vectorizing. Default is False.
         kwargs : kwds, optional
             Additional keyword parameters passed to the embedding approach.
 
@@ -156,17 +245,20 @@ class GradientMaps(BaseEstimator):
         """
 
         align_single = False
+        is_listlike = isinstance(x, (list, tuple))
         if self.alignment is not None and self.alignment != 'joint' and \
-                not isinstance(x, list) and reference is not None:
+                not is_listlike and reference is not None:
             x = [x]
+            is_listlike = True
             n_iter = 1
             align_single = True
 
-        if isinstance(x, np.ndarray):  # or sp.issparse(x):
+        if not is_listlike:
             self.lambdas_, self.gradients_ = \
                 _fit_one(x, self.approach, self.kernel, self.n_components,
                          self.random_state, gamma=gamma, sparsity=sparsity,
-                         **kwargs)
+                         vectorized=vectorized,
+                         discard_diagonal=discard_diagonal, **kwargs)
             self.aligned_ = None
 
             return self
@@ -177,10 +269,14 @@ class GradientMaps(BaseEstimator):
         if self.alignment == 'joint':
             if n < 2:
                 raise ValueError('Joint alignment requires >=2 datasets.')
-            self.fit(np.vstack(x), gamma=gamma, sparsity=sparsity, **kwargs)
+            loaded = [_load_matrix(x1, vectorized=vectorized,
+                                   discard_diagonal=discard_diagonal)
+                      for x1 in x]
+            self.fit(np.vstack(loaded), gamma=gamma, sparsity=sparsity,
+                     **kwargs)
 
-            s = np.cumsum([0] + [x1.shape[0] for x1 in x])
-            for i, x1 in enumerate(x):
+            s = np.cumsum([0] + [m.shape[0] for m in loaded])
+            for i in range(n):
                 a, b = s[i], s[i+1]
                 lam[i], grad[i] = self.lambdas_[a:b], self.gradients_[a:b]
 
@@ -189,7 +285,9 @@ class GradientMaps(BaseEstimator):
 
         else:
             for i, x1 in enumerate(x):
-                self.fit(x1, gamma=gamma, sparsity=sparsity, **kwargs)
+                self.fit(x1, gamma=gamma, sparsity=sparsity,
+                         vectorized=vectorized,
+                         discard_diagonal=discard_diagonal, **kwargs)
                 lam[i], grad[i] = self.lambdas_, self.gradients_
             self.lambdas_, self.gradients_ = lam, grad
 
