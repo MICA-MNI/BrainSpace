@@ -24,7 +24,13 @@ from ..vtk_interface.decorators import wrap_input
 orientations = {'medial': (0, -90, -90),
                 'lateral': (0, 90, 90),
                 'ventral': (0, 180, 0),
-                'dorsal': (0, 0, 0)}
+                'dorsal': (0, 0, 0),
+                'anterior': (90, 90, 90),
+                'posterior': (270, 90, 90),
+                # 'flatL'/'flatR' assume an already-flattened surface; the
+                # camera angle alone does not flatten a folded mesh.
+                'flatL': (0, 180, 90),
+                'flatR': (0, 180, 270)}
 
 
 def _add_colorbar(ren, lut, location, **cb_kwds):
