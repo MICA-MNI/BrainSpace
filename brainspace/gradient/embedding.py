@@ -26,6 +26,34 @@ def _graph_is_connected(graph):
     return connected_components(graph)[0] == 1
 
 
+def _check_finite(adj, name='affinity'):
+    """Raise ValueError if `adj` contains NaN or Inf entries."""
+    if ssp.issparse(adj):
+        data = adj.data
+    else:
+        data = np.asarray(adj)
+    if data.size and (np.isnan(data).any() or np.isinf(data).any()):
+        raise ValueError(
+            'The {} matrix contains NaN or Inf values. Common causes '
+            'include NaNs/Infs or rows of zeros in the input matrix.'
+            .format(name))
+
+
+def _check_n_components(n_components, n):
+    """Validate that `n_components` is feasible for an n-by-n affinity."""
+    if n_components is None:
+        return
+    if n_components < 1:
+        raise ValueError(
+            'n_components must be >= 1; got {}.'.format(n_components))
+    # eigsh requires k < n, and we additionally compute k = n_components + 1.
+    if n_components + 1 >= n:
+        raise ValueError(
+            'n_components={} is too large for an affinity matrix of size '
+            '{}; n_components must be at most {}.'
+            .format(n_components, n, n - 2))
+
+
 def diffusion_mapping(adj, n_components=10, alpha=0.5, diffusion_time=0,
                       random_state=None):
     """Compute diffusion map of affinity matrix.
@@ -64,6 +92,9 @@ def diffusion_mapping(adj, n_components=10, alpha=0.5, diffusion_time=0,
 
     rs = check_random_state(random_state)
     use_sparse = ssp.issparse(adj)
+
+    _check_finite(adj)
+    _check_n_components(n_components, adj.shape[0])
 
     # Make symmetric
     if not is_symmetric(adj, tol=1E-10):
@@ -201,6 +232,9 @@ def laplacian_eigenmaps(adj, n_components=10, norm_laplacian=True,
     """
 
     rs = check_random_state(random_state)
+
+    _check_finite(adj)
+    _check_n_components(n_components, adj.shape[0])
 
     # Make symmetric
     if not is_symmetric(adj, tol=1E-10):
