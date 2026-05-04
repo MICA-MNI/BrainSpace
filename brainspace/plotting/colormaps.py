@@ -57,9 +57,31 @@ _BuGyRd_stops = np.array([
 ])
 BuGyRd = _interp_lut(_BuGyRd_stops, n=256)
 
+def _build_cat35():
+    """35-entry categorical palette (black + 34 distinguishable colors).
+
+    Built deterministically from matplotlib's ``tab20`` + ``tab20b`` (BSD
+    license) so we don't ship colors copied from a non-BSD-compatible
+    source. The 35-entry size is convenient for parcellations like
+    Desikan-Killiany (34 cortical labels + 1 unknown/medial-wall slot).
+    """
+    import matplotlib as _mpl
+    pick = _mpl.colormaps['tab20'](np.linspace(0, 1, 20))[:, :3]
+    extra = _mpl.colormaps['tab20b'](np.linspace(0, 1, 20))[:, :3][:14]
+    rgb = np.vstack([np.zeros((1, 3)), pick, extra])  # leading black slot
+    rgba = np.empty((rgb.shape[0], 4), dtype=np.uint8)
+    rgba[:, :3] = (rgb * 255).round().astype(np.uint8)
+    rgba[:, 3] = 255
+    return rgba
+
+
+cat35_colors = _build_cat35()
+
+
 colormaps = {
     'yeo7': yeo7_colors,
     'eco_kos': eco_kos_colors,
     'spec_5': spec_5_colors,
     'BuGyRd': BuGyRd,
+    'cat35': cat35_colors,
 }
