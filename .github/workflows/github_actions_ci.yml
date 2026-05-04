@@ -13,58 +13,41 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.8, 3.9, "3.10", "3.11"]
-        exclude:
-          - os: macos-latest
-            python-version: 3.7
-          - os: macos-latest
-            python-version: 3.8
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
 
-      - name: Test Windows
-        if: matrix.os == 'windows-latest'
+      - name: Set up headless display
+        if: matrix.os == 'ubuntu-latest'
+        uses: pyvista/setup-headless-display-action@v3
+
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest
-          python -m pip install -r requirements.txt
-          python -m pytest brainspace --ignore brainspace/tests/test_plotting.py
+          python -m pip install -e ".[test]"
 
-      - name: Prepare Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install pytest
-          python3 -m pip install -r requirements.txt
+      - name: Test (Linux / macOS)
+        if: matrix.os != 'windows-latest'
+        run: python -m pytest brainspace
 
-      - name: Test Linux
-        if: matrix.os == 'ubuntu-latest'
-        uses: GabrielBB/xvfb-action@v1.5
-        with:
-          options: -screen 0 1600x1200x24
-          run: python3 -m pytest brainspace
-
-      - name: Test macOS
-        if: matrix.os == 'macos-latest'
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install pytest
-          python3 -m pip install -r requirements.txt
-          python3 -m pytest brainspace
+      - name: Test (Windows, no plotting)
+        if: matrix.os == 'windows-latest'
+        run: python -m pytest brainspace --ignore brainspace/tests/test_plotting.py
 
   matlab_unittests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install MATLAB
-        uses: matlab-actions/setup-matlab@v0
+        uses: matlab-actions/setup-matlab@v2
       - name: Run tests
-        uses: matlab-actions/run-tests@v0
+        uses: matlab-actions/run-tests@v2
         with:
           source-folder: matlab
