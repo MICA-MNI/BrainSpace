@@ -109,7 +109,6 @@ def test_mesh_creation():
     assert isinstance(pd, BSPolyData)
 
 
-@pytest.mark.xfail
 def test_drop_cells():
     s = _generate_sphere()
 
@@ -149,7 +148,6 @@ def test_mask_cells():
     assert n_cells == np.count_nonzero(label_cells > 3)
 
 
-@pytest.mark.xfail
 def test_drop_points():
     s = _generate_sphere()
 
