@@ -17,6 +17,12 @@ try:
 except ImportError:
     ipy = None
 
+try:
+    import PyQt5  # noqa: F401
+    has_pyqt5 = True
+except ImportError:
+    has_pyqt5 = False
+
 
 from brainspace.vtk_interface.pipeline import to_data
 from brainspace.plotting.base import Plotter
@@ -142,3 +148,19 @@ def test_plot_hemispheres():
     s2 = to_data(vtk.vtkSphereSource())
 
     plot_hemispheres(s1, s2, offscreen=True)
+
+
+def test_try_qt_no_longer_warns_unsupported():
+    """try_qt=True must not emit the old 'Qt rendering is not supported' warning (#136).
+
+    We pass offscreen=True so no actual Qt window is built (that requires a
+    display and would crash on headless CI). The check is purely that the
+    warn-and-disable shim is gone.
+    """
+    import warnings as _warnings
+    with _warnings.catch_warnings(record=True) as w:
+        _warnings.simplefilter('always')
+        Plotter(offscreen=True, try_qt=True).close()
+    assert not any(
+        'Qt rendering is not supported' in str(x.message) for x in w
+    )
