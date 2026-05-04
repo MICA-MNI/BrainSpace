@@ -1,4 +1,111 @@
-v0.1.22, December 2025
+v0.2.0, May 2026 -- Issue cleanup, packaging refresh, repository hygiene
+
+This release closes every open issue at the time of writing (#66, #94, #98,
+#112, #136, #140) and lands a sweep of long-standing maintenance work
+(packaging metadata, CI modernization, validation consistency, optional-
+dependency cleanup). It is the largest release since v0.1.4.
+
+Python:
+  Features:
+  - GradientMaps.fit now accepts path-like objects (or lists of them)
+    pointing to .npy files; matrices are loaded lazily so large
+    connectivity matrices need not all live in memory at once. Also adds
+    `vectorized` / `discard_diagonal` kwargs that reconstruct symmetric
+    matrices from their lower-triangular form, halving disk usage when
+    paired with path-like inputs (Issue #140).
+  - GradientMaps now exposes `aligned_lambdas_`: heuristic eigenvalues
+    for the aligned gradients, computed by mapping each aligned gradient
+    to its dominant original gradient via the Procrustes rotation
+    (Issue #94).
+  - ProcrustesAlignment now exposes `transforms_`, the per-dataset
+    rotation matrices used in the final iteration. `procrustes()` and
+    `procrustes_alignment()` accept a `return_transform(s)` flag.
+  - New `aligned_lambdas(lambdas, transform)` helper in
+    brainspace.gradient.alignment.
+  - Plotter(try_qt=True) now actually renders via Qt instead of warning
+    and disabling itself; closing the Qt window terminates show()
+    cleanly (Issue #136).
+  - 4 new view orientations (`anterior`, `posterior`, `flatL`, `flatR`)
+    in plot_hemispheres / plot_surf.
+  - 4 new colormaps in `brainspace.plotting.colormaps`: `eco_kos`
+    (categorical 6-color), `spec_5` (ColorBrewer Spectral 5-step),
+    `BuGyRd` (256-row diverging blue->grey->red, generated
+    programmatically from 5 control points), and `cat35` (BSD-compatible
+    35-entry categorical palette built from matplotlib tab20+tab20b).
+
+  Fixes:
+  - The NaN/Inf affinity-matrix check and an n_components feasibility
+    check are now enforced inside `diffusion_mapping` and
+    `laplacian_eigenmaps` themselves, not only on the GradientMaps
+    fast-path. Direct callers of the embedding functions and
+    DiffusionMaps.fit / LaplacianEigenmaps.fit get the same clear errors
+    as GradientMaps users (Issue #147).
+  - compute_mem(spectrum='nonzero') no longer raises on weight matrices
+    without a zero eigenvalue (e.g. hippocampal-subfield surfaces with
+    no medial wall). spectrum='all' still requires a zero eigenvalue
+    and now points users at `spectrum='nonzero'` in the error message
+    (Issue #112).
+  - utils_qt.py no longer fails to import on systems without PyQt5;
+    PyQt5 is optional and the module exposes `MainWindow = None` as a
+    sentinel when unavailable (Issue #148).
+  - Removed stale @pytest.mark.xfail markers on test_drop_cells and
+    test_drop_points; they are now hard requirements (Issue #149).
+
+  Documentation:
+  - New "Plotting on a remote / headless server" section in the install
+    guide pointing at `vtk-osmesa` / `vtk-egl` wheels (Issue #66).
+  - Install guide now reflects the supported Python range (3.9-3.13)
+    and notes that nilearn moved to the `[examples]` extra.
+
+  Packaging:
+  - python_requires bumped from `>=3.5` to `>=3.9`; classifiers
+    rewritten to list 3.9-3.13 (matches CI). Development Status
+    classifier moved from Alpha to Beta.
+  - `pandas` and `pillow` removed from install_requires; neither is
+    imported anywhere under brainspace/. `nilearn` moved from base
+    requirements to `extras_require['examples']`.
+  - Dependency floors raised to versions that actually build on
+    supported Pythons: numpy>=1.20, scipy>=1.6, matplotlib>=3.3,
+    nibabel>=3.2.
+  - VTK upper bound widened from <9.6 to <9.7.
+  - requirements.txt now mirrors install_requires exactly.
+  - Fixed `description-file` -> `description_file` in setup.cfg
+    (silences the setuptools deprecation warning).
+
+  Tooling:
+  - GitHub Actions workflows fully refreshed: actions/checkout v2->v4,
+    actions/setup-python v2->v5, codecov-action v1->v4, matlab-actions
+    v0->v2. Replaced unmaintained GabrielBB/xvfb-action with
+    pyvista/setup-headless-display-action@v3. Test matrix now covers
+    Python 3.9, 3.10, 3.11, 3.12, 3.13 across Linux, macOS, Windows.
+    Coverage workflow moved from macOS to Ubuntu with a headless
+    display.
+  - New Dockerfile: minimal `python:3.11-slim` base, non-root user,
+    installs from in-repo source via `pip install .[examples]`,
+    swaps to `vtk-osmesa` for headless rendering, ships a Jupyter
+    Lab server. (Replaces the 4-year-old Neurodocker draft.)
+  - Added CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md.
+
+  Tests:
+  - 33 new tests covering path-like inputs, vectorized inputs,
+    embedding validation, aligned_lambdas, colormap registration,
+    and the Qt path. Total now: 165 passing, 1 xfail, 76% line
+    coverage.
+
+MATLAB:
+  - Fixed `diffusion_mapping`: now solves the eigenproblem on the
+    symmetric similar matrix Ms = D^{-1/2} L D^{-1/2} instead of the
+    asymmetric Markov matrix M = D^{-1} L. Eliminates the spurious
+    complex eigenvalues that broke `sort(eigval, 'descend')` on
+    cosine-similarity inputs (Issue #98).
+  - Removed the silent `n = floor(sqrt(N))` cap on n_components.
+    Previously, requesting more than sqrt(N) components on e.g. a
+    360x360 affinity silently truncated to 18 (Issue #94).
+  - Added zero-row-sum input validation; previously such inputs
+    silently produced Inf entries.
+  - New regression tests under matlab/tests/@diffusion_mapping_tests.
+
+
 Python:
   - Fixed VTK wrapper to handle non-callable attributes correctly for VTK 9.4+ compatibility (Issue #107).
   - Updated VTK requirement to allow versions >= 9.1.0 (removing upper limit for VTK 9.4+ support).
