@@ -8,11 +8,23 @@ from brainspace.plotting.colormaps import (
 
 
 def test_registered_names():
-    for name in ('yeo7', 'eco_kos', 'spec_5', 'BuGyRd'):
+    for name in ('yeo7', 'eco_kos', 'spec_5', 'BuGyRd', 'cat35'):
         assert name in colormaps
         cm = colormaps[name]
         assert cm.dtype == np.uint8
         assert cm.shape[1] == 4
+
+
+def test_cat35_shape_and_first_slot():
+    cm = colormaps['cat35']
+    assert cm.shape == (35, 4)
+    # First slot reserved for unknown/medial-wall: pure black, opaque.
+    np.testing.assert_array_equal(cm[0], [0, 0, 0, 255])
+    # All entries opaque.
+    assert np.all(cm[:, 3] == 255)
+    # All 35 colors should be distinct.
+    unique_rows = {tuple(row) for row in cm}
+    assert len(unique_rows) == 35
 
 
 def test_BuGyRd_is_256_smooth_lut():
