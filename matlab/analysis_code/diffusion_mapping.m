@@ -9,7 +9,7 @@ function [embedding, scaled_eigval] = diffusion_mapping(data, n_components, alph
 %   0 for automatic diffusion time estimation.
 %
 %   [embedding, scaled_eigval] = DIFFUSION_MAPPING(data,n_components,alpha, ...
-%   diffusion_time) also returns the eigenvalues scaled_eigval. 
+%   diffusion_time) also returns the eigenvalues scaled_eigval.
 %
 %   For complete documentation please consult our <a
 %   href="https://brainspace.readthedocs.io/en/latest/pages/matlab_doc/support_functions/diffusion_mapping.html">ReadTheDocs</a>.
@@ -18,50 +18,69 @@ if exist('random_state','var')
     rng(random_state);
 end
 
-% Parameter for later use.
-sz = size(data);
+% Reject zero-sum rows up front: ^-alpha or ^-0.5 of a zero row sum
+% silently produces Inf/NaN and corrupts the embedding.
+row_sum_data = sum(data, 2);
+if any(row_sum_data <= 0)
+    error('diffusion_mapping:zeroRowSum', ...
+          'Affinity matrix has rows that sum to zero or below.');
+end
 
-d = sum(data,2) .^ -alpha;
+d = row_sum_data .^ -alpha;
 L = data .* (d*d.');
 
-d2 = sum(L,2) .^ -1;
-M = bsxfun(@times, L, d2);
+row_sum_L = sum(L, 2);
+if any(row_sum_L <= 0)
+    error('diffusion_mapping:zeroRowSum', ...
+          'Normalized affinity has rows that sum to zero or below.');
+end
 
-% Get the eigenvectors and eigenvalues
-[eigvec,eigval] = eig(M);
-eigval = diag(eigval);
+% Markov matrix M = D^{-1} * L is asymmetric in general, so eig(M) can
+% return tiny imaginary parts and an unsorted spectrum (issue #98). Solve
+% the eigenproblem on the symmetric similar matrix
+%   Ms = D^{-1/2} * L * D^{-1/2}
+% which has the same (real) eigenvalues; eigenvectors map back via
+%   psi = D^{-1/2} * u.
+d_sqrt_inv = row_sum_L .^ -0.5;
+Ms = bsxfun(@times, bsxfun(@times, L, d_sqrt_inv), d_sqrt_inv.');
 
-% Sort eigenvectors and values.
-[eigval, idx] = sort(eigval,'descend');
-eigvec = eigvec(:,idx);
+% Ms is symmetric in exact arithmetic; symmetrize to suppress the small
+% asymmetry from finite-precision multiplication, but assert the gap is
+% genuinely numerical (catches upstream bugs that would otherwise hide).
+asym = norm(Ms - Ms.', 'fro');
+sym_tol = 1e-8 * max(norm(Ms, 'fro'), 1);
+assert(asym <= sym_tol, ...
+       'diffusion_mapping:asymmetry', ...
+       'Symmetric matrix has unexpected asymmetry (||Ms - Ms''||_F = %g).', asym);
+Ms = (Ms + Ms.') / 2;
 
-% Remove small eigenvalues.
-n = max(2, floor(sqrt(sz(1))));
-eigval = eigval(1:n);
-lambda = eigval(2:end); 
-eigvec = eigvec(:,1:n);
+% Symmetric eigendecomposition: eigenvalues are real.
+[eigvec_s, eigval] = eig(Ms, 'vector');
+eigvec = bsxfun(@times, eigvec_s, d_sqrt_inv);
+
+% Sort eigenvectors and values. eig(Ms,'vector') already returns reals,
+% but cast defensively in case of borderline 1e-300 imaginary residue.
+[eigval, idx] = sort(real(eigval), 'descend');
+eigvec = eigvec(:, idx);
 
 % Scale eigenvectors by the largest eigenvector.
 psi = bsxfun(@rdivide, eigvec, eigvec(:,1));
 
 % Automatically determines the diffusion time and scales the eigenvalues.
 if diffusion_time == 0
-    % diffusion_time = exp(1 - log(1 - eigval(2:end)) ./ log(eigval(2:end)));
     scaled_eigval = eigval(2:end) ./ (1 - eigval(2:end));
 else
     scaled_eigval = eigval(2:end) .^ diffusion_time;
 end
 
 % Calculate embedding and bring the data towards output format.
-try
-    embedding = bsxfun(@times, psi(:,2:(n_components+1)), scaled_eigval(1:n_components).');
-catch ME
-    if strcmp(ME.identifier,'MATLAB:badsubscript')
-        warning(['An error ocurred. Most likely you requested more components' ...
-                 ' than could be computed. Attempting to return all available ' ...
-                 'components.']);
-        embedding = bsxfun(@times, psi(:,2:end),scaled_eigval(1:end).');
-    else
-        rethrow(ME);
-    end
+n_available = numel(scaled_eigval);
+if n_components > n_available
+    warning(['You requested %d components but only %d are available; ' ...
+             'returning all available components.'], ...
+            n_components, n_available);
+    n_components = n_available;
+end
+embedding = bsxfun(@times, psi(:,2:(n_components+1)), ...
+                   scaled_eigval(1:n_components).');
 end
