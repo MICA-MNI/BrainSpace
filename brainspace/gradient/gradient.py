@@ -4,7 +4,7 @@ import numpy as np
 
 from sklearn.base import BaseEstimator
 
-from .alignment import ProcrustesAlignment
+from .alignment import ProcrustesAlignment, aligned_lambdas as _aligned_lambdas
 from .kernels import compute_affinity
 from .embedding import PCAMaps, LaplacianEigenmaps, DiffusionMaps
 
@@ -185,6 +185,13 @@ class GradientMaps(BaseEstimator):
     aligned_ : None or list of arrays, shape = (n_samples, n_components)
         Aligned gradients. None if ``alignment is None`` or only one dataset
         is used.
+    aligned_lambdas_ : None or list of arrays, shape = (n_components,)
+        Heuristic eigenvalues for the aligned gradients (issue #94). For
+        each aligned gradient, the dominant original gradient is
+        identified by the largest absolute value in the corresponding
+        column of the Procrustes rotation matrix; the proxy lambda is
+        the original lambda at that index. ``None`` if no Procrustes
+        alignment was performed.
     """
 
     def __init__(self, n_components=10, approach='dm', kernel='normalized_angle',
@@ -198,6 +205,7 @@ class GradientMaps(BaseEstimator):
         self.gradients_ = None
         self.lambdas_ = None
         self.aligned_ = None
+        self.aligned_lambdas_ = None
 
     def fit(self, x, gamma=None, sparsity=0.9, n_iter=10, reference=None,
             vectorized=False, discard_diagonal=False, **kwargs):
@@ -295,19 +303,31 @@ class GradientMaps(BaseEstimator):
                 pa = ProcrustesAlignment(n_iter=n_iter)
                 pa.fit(self.gradients_, reference=reference)
                 self.aligned_ = pa.aligned_
+                self.aligned_lambdas_ = [
+                    _aligned_lambdas(la, t)
+                    for la, t in zip(self.lambdas_, pa.transforms_)
+                ]
 
             elif isinstance(self.alignment, ProcrustesAlignment):
                 self.alignment.set_params(n_iter=n_iter)
                 self.alignment.fit(self.gradients_, reference=reference)
                 self.aligned_ = self.alignment.aligned_
+                self.aligned_lambdas_ = [
+                    _aligned_lambdas(la, t)
+                    for la, t in zip(self.lambdas_,
+                                     self.alignment.transforms_)
+                ]
 
             else:
                 self.aligned_ = None
+                self.aligned_lambdas_ = None
 
         if align_single:
             self.gradients_ = self.gradients_[0]
             self.lambdas_ = self.lambdas_[0]
             self.aligned_ = self.aligned_[0]
+            if self.aligned_lambdas_ is not None:
+                self.aligned_lambdas_ = self.aligned_lambdas_[0]
 
         return self
 
