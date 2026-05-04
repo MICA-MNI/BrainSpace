@@ -1,8 +1,6 @@
-numpy>=1.11.0
-scipy>=0.17.0
-scikit-learn>=0.22.0
-matplotlib>=2.0.0
-vtk>=9.1.0,<9.6.0
-nibabel
-nilearn
-
+numpy>=1.20
+scipy>=1.6
+scikit-learn>=0.22
+matplotlib>=3.3
+vtk>=9.1.0,<9.7.0
+nibabel>=3.2

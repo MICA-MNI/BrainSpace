@@ -15,14 +15,14 @@ TEST_REQUIRES = [
         'pytest', 'coverage', 'pytest-cov', 'coveralls',
     ]
 
-INSTALL_REQUIRES = ['numpy>=1.11.0',
-                    'scipy>=0.17.0',
-                    'scikit-learn>=0.20.0',
-                    'matplotlib>=2.0.0',
-                    'vtk>=9.1.0,<9.6.0',
-                    'nibabel',
-                    'pillow',
-                    'pandas']
+INSTALL_REQUIRES = ['numpy>=1.20',
+                    'scipy>=1.6',
+                    'scikit-learn>=0.22',
+                    'matplotlib>=3.3',
+                    'vtk>=9.1.0,<9.7.0',
+                    'nibabel>=3.2']
+
+EXAMPLES_REQUIRES = ['nilearn>=0.9']
 
 
 here = path.abspath(path.dirname(__file__))
@@ -49,24 +49,27 @@ setup(
     author='BrainSpace developers',
     author_email='enning.yang@mcgill.ca',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
         'Topic :: Scientific/Engineering',
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
         'Programming Language :: Python :: 3 :: Only',
     ],
     keywords='brain cortex gradient manifold',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    python_requires='>=3.5',
+    python_requires='>=3.9',
     install_requires=INSTALL_REQUIRES,
     extras_require={
-        'test': TEST_REQUIRES + INSTALL_REQUIRES,
+        'test': TEST_REQUIRES,
+        'examples': EXAMPLES_REQUIRES,
     },
     include_package_data=True,
     zip_safe=False,
