@@ -12,6 +12,7 @@ from itertools import product as iter_prod
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import Colormap
 
 from .base import Plotter
 from .colormaps import colormaps
@@ -128,8 +129,11 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
     label_text : dict[str, array-like], optional
         Label text for column/row. Possible keys are {'left', 'right',
         'top', 'bottom'}, which indicate the location. Default is None.
-    cmap : str or sequence of str, optional
-        Color map name (from matplotlib) for each array name.
+    cmap : str, matplotlib.colors.Colormap or sequence thereof, optional
+        Color map for each array name. Each entry is either a colormap name
+        (from matplotlib or one registered in
+        :mod:`brainspace.plotting.colormaps`) or a matplotlib ``Colormap``
+        instance (e.g. ``ListedColormap``, ``LinearSegmentedColormap``).
         Default is 'viridis'.
     nan_color : tuple
         Color for nan values. Default is (0, 0, 0, 1).
@@ -290,12 +294,26 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
 
             cm = cmap[i, j][ia]
             if cm is not None:
+                # Resolve cmap to either (a) a precomputed RGBA lookup
+                # registered in brainspace's `colormaps`, or (b) a
+                # matplotlib ``Colormap`` instance we can sample.
+                # Membership in ``colormaps`` (a dict) requires a hashable
+                # key, so guard with ``isinstance(cm, str)`` -- otherwise a
+                # ``ListedColormap`` / ``LinearSegmentedColormap`` argument
+                # raises ``TypeError: unhashable type``.
                 if isinstance(cm, str) and cm in colormaps:
                     table = colormaps[cm]
                 else:
-                    cm = plt.get_cmap(cm)
+                    if isinstance(cm, Colormap):
+                        cmap_obj = cm
+                    elif isinstance(cm, str):
+                        cmap_obj = plt.get_cmap(cm)
+                    else:
+                        raise TypeError(
+                            "cmap must be a string or a matplotlib Colormap "
+                            "instance, got %r" % type(cm).__name__)
                     nvals = lut['numberOfTableValues']
-                    table = cm(np.linspace(0, 1, nvals)) * 255
+                    table = cmap_obj(np.linspace(0, 1, nvals)) * 255
                     table = table.astype(np.uint8)
 
                 lut['table'] = table
@@ -370,8 +388,11 @@ def plot_surf(surfs, layout, array_name=None, view=None, color_bar=None,
     label_text : dict[str, array-like], optional
         Label text for column/row. Possible keys are {'left', 'right',
         'top', 'bottom'}, which indicate the location. Default is None.
-    cmap : str or sequence of str, optional
-        Color map name (from matplotlib) for each array name.
+    cmap : str, matplotlib.colors.Colormap or sequence thereof, optional
+        Color map for each array name. Each entry is either a colormap name
+        (from matplotlib or one registered in
+        :mod:`brainspace.plotting.colormaps`) or a matplotlib ``Colormap``
+        instance (e.g. ``ListedColormap``, ``LinearSegmentedColormap``).
         Default is 'viridis'.
     nan_color : tuple
         Color for nan values. Default is (0, 0, 0, 1).
@@ -506,8 +527,10 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
         Zoom applied to the surfaces in each layout entry.
     background : tuple
         Background color. Default is (1, 1, 1).
-    cmap : str, optional
-        Color map name (from matplotlib). Default is 'viridis'.
+    cmap : str or matplotlib.colors.Colormap, optional
+        Color map name (from matplotlib or registered in
+        :mod:`brainspace.plotting.colormaps`) or a ``Colormap`` instance.
+        Default is 'viridis'.
     size : tuple, optional
         Window size. Default is (800, 200).
     interactive : bool, optional
