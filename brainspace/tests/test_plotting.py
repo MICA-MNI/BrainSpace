@@ -150,6 +150,114 @@ def test_plot_hemispheres():
     plot_hemispheres(s1, s2, offscreen=True)
 
 
+# ---------------------------------------------------------------------------
+# Regression tests for cmap argument types (issue: ListedColormap unhashable).
+#
+# Earlier brainspace versions did ``if cm in colormaps:`` directly, which
+# requires the cmap argument to be hashable. Passing a matplotlib
+# ``ListedColormap`` / ``LinearSegmentedColormap`` instance therefore raised
+# ``TypeError: unhashable type: 'ListedColormap'``. The build_plotter path
+# must accept both string names and Colormap instances; these tests pin that
+# contract so it can't regress again.
+# ---------------------------------------------------------------------------
+
+def _sphere_with_scalar(name='val'):
+    """Sphere mesh with a per-point scalar so cmap-driven LUTs are exercised."""
+    s = to_data(vtk.vtkSphereSource())
+    n_pts = s.n_points
+    s.append_array(np.linspace(0, 1, n_pts).astype(np.float32), name=name,
+                   at='p')
+    return s
+
+
+def test_build_plotter_cmap_listedcolormap():
+    """ListedColormap instance must not raise (regression for unhashable cmap)."""
+    from matplotlib.colors import ListedColormap
+
+    s = _sphere_with_scalar()
+    surfs = {'s': s}
+    layout = np.array([['s']])
+    cmap = ListedColormap([[0, 0, 0, 1], [1, 0, 0, 1], [0, 1, 0, 1],
+                           [0, 0, 1, 1]])
+    p = build_plotter(surfs, layout, array_name='val', cmap=cmap,
+                      offscreen=True)
+    assert isinstance(p, Plotter)
+    p.close()
+
+
+def test_build_plotter_cmap_linearsegmentedcolormap():
+    """LinearSegmentedColormap instance must not raise either."""
+    from matplotlib.colors import LinearSegmentedColormap
+
+    s = _sphere_with_scalar()
+    surfs = {'s': s}
+    layout = np.array([['s']])
+    cmap = LinearSegmentedColormap.from_list(
+        'custom_div', ['#2c7bb6', '#ffffbf', '#d7191c'])
+    p = build_plotter(surfs, layout, array_name='val', cmap=cmap,
+                      offscreen=True)
+    assert isinstance(p, Plotter)
+    p.close()
+
+
+def test_build_plotter_cmap_matplotlib_string():
+    """Plain matplotlib colormap names continue to work."""
+    s = _sphere_with_scalar()
+    surfs = {'s': s}
+    layout = np.array([['s']])
+    p = build_plotter(surfs, layout, array_name='val', cmap='viridis',
+                      offscreen=True)
+    assert isinstance(p, Plotter)
+    p.close()
+
+
+def test_build_plotter_cmap_brainspace_registered():
+    """Names registered in brainspace.plotting.colormaps still resolve."""
+    s = _sphere_with_scalar()
+    surfs = {'s': s}
+    layout = np.array([['s']])
+    p = build_plotter(surfs, layout, array_name='val', cmap='BuGyRd',
+                      offscreen=True)
+    assert isinstance(p, Plotter)
+    p.close()
+
+
+def test_build_plotter_cmap_mixed_across_cells():
+    """Per-cell cmap list with mixed string and Colormap entries works."""
+    from matplotlib.colors import ListedColormap
+
+    s = _sphere_with_scalar()
+    surfs = {'s': s}
+    layout = np.array([['s', 's']])
+    cmap_obj = ListedColormap([[0, 0, 0, 1], [1, 1, 1, 1]])
+    p = build_plotter(surfs, layout, array_name='val',
+                      cmap=['viridis', cmap_obj], offscreen=True)
+    assert isinstance(p, Plotter)
+    p.close()
+
+
+def test_build_plotter_cmap_invalid_type_raises_clear_error():
+    """Non-str / non-Colormap cmap arg fails with a useful message."""
+    s = _sphere_with_scalar()
+    surfs = {'s': s}
+    layout = np.array([['s']])
+    with pytest.raises(TypeError, match='cmap must be a string'):
+        build_plotter(surfs, layout, array_name='val', cmap=42,
+                      offscreen=True)
+
+
+def test_plot_surf_cmap_listedcolormap_smoke():
+    """End-to-end plot_surf must accept a Colormap instance (the entry point
+    hippomaps.plotting.surfplot_canonical_foldunfold actually goes through)."""
+    from matplotlib.colors import ListedColormap
+
+    s = _sphere_with_scalar()
+    surfs = {'s': s}
+    layout = np.array([['s']])
+    cmap = ListedColormap([[0, 0, 0, 1], [1, 0.5, 0, 1]])
+    plot_surf(surfs, layout, array_name='val', cmap=cmap, offscreen=True)
+
+
 def test_try_qt_no_longer_warns_unsupported():
     """try_qt=True must not emit the old 'Qt rendering is not supported' warning (#136).
 
