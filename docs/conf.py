@@ -21,6 +21,13 @@ brainspace.OFF_SCREEN = True  # off screen rendering for examples
 
 from brainspace.plotting.sphinx_gallery_scrapper import _get_sg_image_scraper
 
+try:
+    from sphinx.application import Sphinx
+    if not hasattr(Sphinx, 'add_javascript'):
+        Sphinx.add_javascript = Sphinx.add_js_file
+except ImportError:
+    pass
+
 
 # -- Project information -----------------------------------------------------
 

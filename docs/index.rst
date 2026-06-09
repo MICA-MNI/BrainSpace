@@ -40,6 +40,7 @@ null models.
 
    pages/install
    pages/getting_started
+   pages/html_surface_reports
    python_doc/index_python
    pages/matlab_doc/index
    pages/references
