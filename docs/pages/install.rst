@@ -85,6 +85,18 @@ If you prefer ``conda``, equivalent OSMesa builds are published on
 After installing, set ``embed_nb=True`` (Jupyter) or pass
 ``offscreen=True`` to the plotting functions.
 
+For report export on headless systems, BrainSpace also provides an HTML
+surface-report path that does not initialize a VTK render window. Use
+``plot_hemispheres(..., backend="html", filename="report.html")`` or
+``brainspace.plotting.write_surface_report`` when the goal is to save a
+portable browser report rather than render through VTK. See
+:ref:`html_surface_reports` for details.
+
+Users who want to preserve Zhengchen Cai's original threemica viewer can
+install ``threemica`` as an optional dependency and call
+``brainspace.plotting.write_threemica_report`` or
+``brainspace.plotting.write_brainspace_threemica_report``.
+
 
 
 MATLAB installation

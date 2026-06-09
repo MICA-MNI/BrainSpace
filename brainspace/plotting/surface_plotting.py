@@ -495,7 +495,8 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
                      cmap='viridis', nan_color=(0, 0, 0, 1), zoom=1,
                      background=(1, 1, 1), size=(400, 400), interactive=True,
                      embed_nb=False, screenshot=False, filename=None,
-                     scale=(1, 1), transparent_bg=True, **kwargs):
+                     scale=(1, 1), transparent_bg=True, backend='vtk',
+                     title='BrainSpace Surface Report', **kwargs):
     """Plot left and right hemispheres in lateral and medial views.
 
     Parameters
@@ -548,6 +549,12 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     scale : tuple, optional
         Scale (magnification). Only used if ``screenshot==True``.
         Default is None.
+    backend : {'vtk', 'html'}, optional
+        Rendering backend. The default ``'vtk'`` preserves the existing VTK
+        behavior. ``'html'`` writes a display-independent HTML report to
+        ``filename`` and does not initialize VTK rendering.
+    title : str, optional
+        Title used when ``backend='html'``.
     kwargs : keyword-valued args
         Additional arguments passed to the plotter.
 
@@ -563,6 +570,18 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     :func:`plot_surf`
 
     """
+    if backend not in {'vtk', 'html'}:
+        raise ValueError("backend must be either 'vtk' or 'html'.")
+    if backend == 'html':
+        if filename is None:
+            raise ValueError("filename is required when backend='html'.")
+        from .surface_report import write_surface_report
+        return write_surface_report({'lh': surf_lh, 'rh': surf_rh},
+                                    arrays=array_name, filename=filename,
+                                    title=title, cmap=cmap,
+                                    color_range=color_range,
+                                    nan_color=nan_color)
+
     if color_bar is True:
         color_bar = 'right'
 
