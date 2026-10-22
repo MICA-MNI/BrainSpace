@@ -51,3 +51,16 @@ jobs:
         uses: matlab-actions/run-tests@v2
         with:
           source-folder: matlab
+
+  package_validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build and validate distributions
+        run: |
+          python -m pip install --upgrade build twine
+          python -m build
+          python -m twine check dist/*

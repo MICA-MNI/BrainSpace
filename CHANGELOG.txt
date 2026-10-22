@@ -1,3 +1,37 @@
+v0.3.0, October 2026 -- Surface reports, contour overlays and maintenance
+
+Python:
+  - Added a self-contained, display-independent WebGL HTML surface report
+    writer with map selection, rotation, pan and zoom, plus the optional
+    threemica bridge (Issue #166, PR #168). No viewer code is vendored from
+    threemica; its external GPL-3.0 dependency remains optional.
+  - Added contour line overlays and optional clipped-region fill to
+    build_plotter and plot_hemispheres, with reusable make_contour_actor and
+    add_contours_to_plotter helpers (Issue #165). Overlays inherit each
+    surface actor's transform across views, layouts and repeated maps.
+  - Fixed grid plotting with a single named map or no scalar map, and
+    mixed surface/empty layout validation.
+  - Added validation for HTML geometry, hemisphere map lengths and color
+    ranges; unsupported VTK-only HTML options now raise explicit errors.
+  - Preserved literal template-like text and escaped report payloads safely.
+  - Documented affinity construction, component ordering, reference/template
+    choices and Fisher-transform handling (Issues #167 and #169).
+
+MATLAB:
+  - Adopted the symmetric generalized diffusion eigenproblem solver from
+    PR #164 while preserving direct-call symmetry validation.
+  - Added equivalence tests against the symmetric normalized solver and an
+    asymmetric-input regression test.
+
+Release tooling:
+  - Validate the tag against the package version and check distribution
+    metadata before publishing. Attach files to the versioned release
+    instead of creating or overwriting a separate latest tag.
+
+v0.2.1, May 2026
+Python:
+  - Fixed Colormap-instance arguments and added regression coverage (#162).
+
 v0.2.0, May 2026 -- Issue cleanup, packaging refresh, repository hygiene
 
 This release closes every open issue at the time of writing (#66, #94, #98,

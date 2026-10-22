@@ -35,31 +35,18 @@ if any(row_sum_L <= 0)
           'Normalized affinity has rows that sum to zero or below.');
 end
 
-% Markov matrix M = D^{-1} * L is asymmetric in general, so eig(M) can
-% return tiny imaginary parts and an unsorted spectrum (issue #98). Solve
-% the eigenproblem on the symmetric similar matrix
-%   Ms = D^{-1/2} * L * D^{-1/2}
-% which has the same (real) eigenvalues; eigenvectors map back via
-%   psi = D^{-1/2} * u.
-d_sqrt_inv = row_sum_L .^ -0.5;
-Ms = bsxfun(@times, bsxfun(@times, L, d_sqrt_inv), d_sqrt_inv.');
-
-% Ms is symmetric in exact arithmetic; symmetrize to suppress the small
-% asymmetry from finite-precision multiplication, but assert the gap is
-% genuinely numerical (catches upstream bugs that would otherwise hide).
-asym = norm(Ms - Ms.', 'fro');
-sym_tol = 1e-8 * max(norm(Ms, 'fro'), 1);
+% Solve L*v = lambda*D*v directly. Positive row sums make D positive
+% definite, allowing the symmetric generalized eigensolver (PR #164).
+% Retain the direct-call symmetry check from the previous implementation.
+asym = norm(L - L.', 'fro');
+sym_tol = 1e-8 * max(norm(L, 'fro'), 1);
 assert(asym <= sym_tol, ...
        'diffusion_mapping:asymmetry', ...
-       'Symmetric matrix has unexpected asymmetry (||Ms - Ms''||_F = %g).', asym);
-Ms = (Ms + Ms.') / 2;
+       'Normalized affinity must be symmetric (||L - L''||_F = %g).', asym);
+L = (L + L.') / 2;
+[eigvec, eigval] = eig(L, diag(row_sum_L), 'vector');
 
-% Symmetric eigendecomposition: eigenvalues are real.
-[eigvec_s, eigval] = eig(Ms, 'vector');
-eigvec = bsxfun(@times, eigvec_s, d_sqrt_inv);
-
-% Sort eigenvectors and values. eig(Ms,'vector') already returns reals,
-% but cast defensively in case of borderline 1e-300 imaginary residue.
+% Sort the real eigenvalues and their corresponding eigenvectors.
 [eigval, idx] = sort(real(eigval), 'descend');
 eigvec = eigvec(:, idx);
 

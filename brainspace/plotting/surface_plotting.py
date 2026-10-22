@@ -16,6 +16,7 @@ from matplotlib.colors import Colormap
 
 from .base import Plotter
 from .colormaps import colormaps
+from .contours import make_contour_actor, add_contours_to_plotter
 from . import defaults_plotting as dp
 from .utils import _broadcast, _expand_arg, _grep_args, _gen_grid, _get_ranges
 
@@ -97,7 +98,10 @@ def _add_text(ren, text, location, **lt_kwds):
 def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
                   color_range=None, share=False, label_text=None,
                   cmap='viridis', nan_color=(0, 0, 0, 1), zoom=1,
-                  background=(1, 1, 1), size=(400, 400), **kwargs):
+                  background=(1, 1, 1), size=(400, 400), contour=None,
+                  contour_lwd=3, contour_lcol=(0, 0, 0), contour_lalpha=1,
+                  contour_col=(0, 0, 0), contour_alpha=0,
+                  contour_isovalue=0.5, **kwargs):
     """Build plotter arranged according to the `layout`.
 
     Parameters
@@ -143,6 +147,18 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
         Background color. Default is (1, 1, 1).
     size : tuple, optional
         Window size. Default is (400, 400).
+    contour : array-like, str or dict, optional
+        Contour values, one per vertex. Arrays concatenate left then right
+        hemisphere values. Strings select point data; dictionaries map surface
+        keys to arrays or point-data names. None disables overlays.
+    contour_lwd : float, optional
+        Positive contour line width in pixels. Default is 3.
+    contour_lcol, contour_col : tuple, optional
+        Line and fill RGB colors in [0, 1]. Default is black.
+    contour_lalpha, contour_alpha : float, optional
+        Line and fill opacity in [0, 1]. Defaults are 1 and 0 (no fill).
+    contour_isovalue : float, optional
+        Contour level. Fill covers values above this level. Default is 0.5.
     kwargs : keyword-valued args
         Additional arguments passed to the renderers, actors, mapper, color_bar
         or plotter. Keywords starting with:
@@ -179,7 +195,7 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
     """
 
     # Layout
-    for k in np.unique(layout):
+    for k in np.atleast_2d(layout).ravel():
         if k not in surfs and k is not None:
             raise ValueError("Key '%s' is not in 'surfs'" % k)
 
@@ -241,6 +257,7 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
 
     kwargs.update({'nrow': grid_row, 'ncol': grid_col, 'size': size})
     p = Plotter(**kwargs)
+    p._surface_entries = []
 
     for iren, jren in iter_prod(range(len(ridx)), range(len(cidx))):
         i, j = ridx[iren], cidx[jren]
@@ -262,6 +279,7 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
             continue
 
         s = surfs[layout[i, j]]
+        base_actor = None
         for ia, name in enumerate(array_name[i, j]):
             # change to: if None or True, plot surface without array data
             # if false: do not plot anything
@@ -329,8 +347,12 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
 
             mapper['lookuptable'] = lut
 
-            ren.AddActor(**actor, mapper=mapper)
+            surface_actor = ren.AddActor(**actor, mapper=mapper)
+            if base_actor is None:
+                base_actor = surface_actor
 
+        if base_actor is not None:
+            p._surface_entries.append((layout[i, j], s, ren, base_actor))
         ren.ResetCamera()
         ren.activeCamera.parallelProjection = True
         ren.activeCamera.Zoom(zoom[i, j])
@@ -347,6 +369,11 @@ def build_plotter(surfs, layout, array_name=None, view=None, color_bar=None,
             lut = ren_lut.actors.lastActor.mapper.lookupTable
             _add_colorbar(ren1, lut.VTKObject, e.loc, **cb_kwds)
 
+    if contour is not None:
+        add_contours_to_plotter(
+            p, contour, lwd=contour_lwd, lcol=contour_lcol,
+            lalpha=contour_lalpha, col=contour_col, alpha=contour_alpha,
+            isovalue=contour_isovalue)
     return p
 
 
@@ -495,7 +522,11 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
                      cmap='viridis', nan_color=(0, 0, 0, 1), zoom=1,
                      background=(1, 1, 1), size=(400, 400), interactive=True,
                      embed_nb=False, screenshot=False, filename=None,
-                     scale=(1, 1), transparent_bg=True, **kwargs):
+                     scale=(1, 1), transparent_bg=True, backend='vtk',
+                     title='BrainSpace Surface Report', contour=None,
+                     contour_lwd=3, contour_lcol=(0, 0, 0), contour_lalpha=1,
+                     contour_col=(0, 0, 0), contour_alpha=0,
+                     contour_isovalue=0.5, **kwargs):
     """Plot left and right hemispheres in lateral and medial views.
 
     Parameters
@@ -548,6 +579,24 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     scale : tuple, optional
         Scale (magnification). Only used if ``screenshot==True``.
         Default is None.
+    backend : {'vtk', 'html'}, optional
+        Rendering backend. The default ``'vtk'`` preserves the existing VTK
+        behavior. ``'html'`` writes a display-independent HTML report to
+        ``filename`` and does not initialize VTK rendering.
+    title : str, optional
+        Title used when ``backend='html'``.
+    contour : array-like, str or dict, optional
+        Contour values, one per vertex. Arrays concatenate left then right
+        hemisphere values. Strings select point data; dictionaries map surface
+        keys to arrays or point-data names. None disables overlays.
+    contour_lwd : float, optional
+        Positive contour line width in pixels. Default is 3.
+    contour_lcol, contour_col : tuple, optional
+        Line and fill RGB colors in [0, 1]. Default is black.
+    contour_lalpha, contour_alpha : float, optional
+        Line and fill opacity in [0, 1]. Defaults are 1 and 0 (no fill).
+    contour_isovalue : float, optional
+        Contour level. Fill covers values above this level. Default is 0.5.
     kwargs : keyword-valued args
         Additional arguments passed to the plotter.
 
@@ -563,6 +612,26 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     :func:`plot_surf`
 
     """
+    if backend not in {'vtk', 'html'}:
+        raise ValueError("backend must be either 'vtk' or 'html'.")
+    if layout_style not in {'row', 'grid'}:
+        raise ValueError("layout_style must be either 'row' or 'grid'.")
+    if backend == 'html':
+        if contour is not None:
+            raise ValueError("Contour overlays require backend='vtk'.")
+        if screenshot or kwargs.get('return_plotter', False):
+            raise ValueError("Screenshots and return_plotter require backend='vtk'.")
+        if layout_style != 'row' or label_text is not None or kwargs:
+            raise ValueError("HTML reports do not support VTK layouts, labels or plotter options.")
+        if filename is None:
+            raise ValueError("filename is required when backend='html'.")
+        from .surface_report import write_surface_report
+        return write_surface_report({'lh': surf_lh, 'rh': surf_rh},
+                                    arrays=array_name, filename=filename,
+                                    title=title, cmap=cmap,
+                                    color_range=color_range,
+                                    nan_color=nan_color)
+
     if color_bar is True:
         color_bar = 'right'
 
@@ -591,6 +660,9 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
         array_name = np.asarray(array_name2)[:, None]
 
     if layout_style == 'grid':
+        if array_name is None or isinstance(array_name, str):
+            array_name = np.array([[array_name]], dtype=object)
+            layout = [layout]
 
         # create 2x2 grid for each array_name and stack altogether
         n_arrays = len(array_name)
@@ -615,7 +687,10 @@ def plot_hemispheres(surf_lh, surf_rh, array_name=None, color_bar=False,
     if embed_nb:
         interactive = False
 
-    kwds = {'view': view, 'share': share}
+    kwds = {'view': view, 'share': share, 'contour': contour,
+            'contour_lwd': contour_lwd, 'contour_lcol': contour_lcol,
+            'contour_lalpha': contour_lalpha, 'contour_col': contour_col,
+            'contour_alpha': contour_alpha, 'contour_isovalue': contour_isovalue}
     kwds.update(kwargs)
     res = plot_surf(surfs, layout, array_name=array_name, color_bar=color_bar,
                     color_range=color_range, label_text=label_text, cmap=cmap,

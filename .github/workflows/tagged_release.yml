@@ -4,9 +4,14 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -16,27 +21,33 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Verify release version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          python -m pip install --upgrade pip
-          pip install build
+          python - <<'PY'
+          import os
+          import runpy
+          version = runpy.run_path('brainspace/_version.py')['__version__']
+          assert os.environ['RELEASE_TAG'] == 'v' + version, 'Release tag must match package version'
+          PY
 
-      - name: Build package
-        run: python -m build
+      - name: Install build dependencies
+        run: python -m pip install --upgrade build twine
 
-      - name: Create Github release.
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          automatic_release_tag: "latest"
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          files: |
-            LICENSE
-            dist/*
+      - name: Build and validate package
+        run: |
+          python -m build
+          python -m twine check dist/*
 
-      - name: Publish to PyPi
+      - name: Attach distributions to this release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" dist/* --repo "$GITHUB_REPOSITORY" --clobber
+
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
           user: __token__
           password: ${{ secrets.NEW_PYPI_API_TOKEN }}
-          verbose: true
