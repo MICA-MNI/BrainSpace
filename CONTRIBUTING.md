@@ -57,6 +57,10 @@ or run under `xvfb-run`.
 
 ## Releases
 
-Maintainers tag releases via `Release v0.X.Y` commits that bump
-`brainspace/_version.py`. The `tagged_release` workflow then publishes to
-PyPI. Contributors should not bump the version in PRs.
+Maintainers prepare a `Release v0.X.Y` commit updating
+`brainspace/_version.py` and `CHANGELOG.txt`. After the Python and MATLAB CI
+checks pass, create a matching version tag and publish a GitHub release.
+The `tagged_release` workflow verifies the tag, builds and checks the Python
+distributions, attaches them to that versioned release, and publishes to PyPI
+using the configured repository secret. Verify the workflow and the PyPI
+version after publication. Contributors should not bump the version in PRs.

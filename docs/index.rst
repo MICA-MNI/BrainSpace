@@ -41,6 +41,8 @@ null models.
    pages/install
    pages/getting_started
    pages/html_surface_reports
+   pages/contour_overlays
+   pages/gradient_faq
    python_doc/index_python
    pages/matlab_doc/index
    pages/references

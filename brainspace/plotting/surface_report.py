@@ -4,6 +4,7 @@
 # License: BSD 3 clause
 
 import json
+import re
 from html import escape
 from pathlib import Path
 
@@ -14,6 +15,8 @@ from .colormaps import colormaps
 
 def _rgba255(color):
     arr = np.asarray(color, dtype=float)
+    if arr.ndim != 1 or not np.isfinite(arr).all():
+        raise ValueError("Colors must be finite RGB or RGBA vectors.")
     if arr.size == 3:
         arr = np.append(arr, 1.0)
     if arr.size != 4:
@@ -41,7 +44,7 @@ def _n_points(surf):
 def _surface_payload(surf, name):
     if isinstance(surf, dict):
         points = np.asarray(surf["points"], dtype=np.float32)
-        cells = np.asarray(surf["cells"], dtype=np.int64)
+        cells = np.asarray(surf["cells"])
     else:
         points = np.asarray(surf.Points, dtype=np.float32)
         cells = np.asarray(surf.GetCells2D(), dtype=np.int64)
@@ -57,6 +60,12 @@ def _surface_payload(surf, name):
             "(n_points, 3); {} has points with shape {}.".format(name, points.shape)
         )
 
+    if not points.shape[0] or not np.isfinite(points).all():
+        raise ValueError("Surface coordinates must be nonempty and finite.")
+    if not cells.shape[0] or not np.issubdtype(cells.dtype, np.integer):
+        raise ValueError("Surface cells must contain integer triangle indices.")
+    if np.any(cells < 0) or np.any(cells >= points.shape[0]):
+        raise ValueError("Surface triangle indices are out of bounds.")
     return {
         "points": points.round(6).tolist(),
         "cells": cells.tolist(),
@@ -131,7 +140,8 @@ def _iter_maps(surfaces, arrays):
         return
 
     arr = np.asarray(arrays, dtype=object)
-    if arr.ndim == 1 and arr.size == n_total:
+    if arr.ndim == 1 and arr.size == n_total and not any(
+            isinstance(value, str) for value in arr):
         yield "Map 1", _split_values(surfaces, arrays), {}
         return
     if arr.ndim == 2 and arr.shape[1] == n_total:
@@ -170,12 +180,16 @@ def _map_range(values, color_range):
         np.asarray(values["rh"], dtype=float),
     ])
     finite = finite[np.isfinite(finite)]
-    if color_range == "sym":
+    if isinstance(color_range, str) and color_range == "sym":
         vmax = float(np.max(np.abs(finite))) if finite.size else 1.0
+        vmax = vmax or 1.0
         return [-vmax, vmax]
     if color_range is not None:
         lo, hi = color_range
-        return [float(lo), float(hi)]
+        lo, hi = float(lo), float(hi)
+        if not np.isfinite([lo, hi]).all() or lo >= hi:
+            raise ValueError("color_range must have finite bounds with min < max.")
+        return [lo, hi]
     if not finite.size:
         return [0.0, 1.0]
     lo, hi = float(np.min(finite)), float(np.max(finite))
@@ -257,13 +271,14 @@ def _html_template(payload):
 {metadata}
 <main>
   <canvas id="viewer"></canvas>
-  <div id="helpBar">H help · drag rotate · wheel zoom · [ ] switch map · R reset</div>
+  <div id="helpBar">H help · drag rotate · shift-drag pan · wheel zoom · [ ] switch map · R reset</div>
 </main>
 <div id="help" aria-hidden="true">
   <div id="helpPanel" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
     <h2 id="helpTitle">Viewer Controls</h2>
     <dl>
       <dt>DRAG</dt><dd>Rotate the surface in 3D.</dd>
+      <dt>SHIFT-DRAG</dt><dd>Pan the surface.</dd>
       <dt>WHEEL</dt><dd>Zoom in or out.</dd>
       <dt>[ ]</dt><dd>Switch between maps.</dd>
       <dt>R</dt><dd>Reset camera and zoom.</dd>
@@ -444,11 +459,11 @@ function matrix(rx, ry, zoom) {{
     cy * xScale, sx * sy * xScale, cx * sy * xScale, 0,
     0, cx * yScale, -sx * yScale, 0,
     -sy * xScale, sx * cy * xScale, cx * cy * xScale, 0,
-    0, 0, 0, 1
+    panX, panY, 0, 1
   ]);
 }}
 
-let rx = 0.0, ry = 0.0, zoom = 0.95;
+let rx = 0.0, ry = 0.0, zoom = 0.95, panX = 0, panY = 0;
 function resize() {{
   const ratio = window.devicePixelRatio || 1;
   const w = Math.floor(canvas.clientWidth * ratio);
@@ -463,17 +478,26 @@ function draw() {{
   gl.clearColor(0.965, 0.970, 0.978, 1);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.uniformMatrix4fv(uMatrix, false, matrix(rx, ry, zoom));
   gl.drawArrays(gl.TRIANGLES, 0, positions.length / 3);
 }}
 
-let dragging = false, lastX = 0, lastY = 0;
-canvas.addEventListener("pointerdown", e => {{ dragging = true; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId); }});
+let dragging = false, panning = false, lastX = 0, lastY = 0;
+canvas.addEventListener("pointerdown", e => {{ dragging = true; panning = e.shiftKey || e.button === 2; lastX = e.clientX; lastY = e.clientY; canvas.setPointerCapture(e.pointerId); }});
 canvas.addEventListener("pointerup", () => dragging = false);
+canvas.addEventListener("pointercancel", () => dragging = false);
+canvas.addEventListener("contextmenu", e => e.preventDefault());
 canvas.addEventListener("pointermove", e => {{
   if (!dragging) return;
-  ry += (e.clientX - lastX) * 0.01;
-  rx += (e.clientY - lastY) * 0.01;
+  if (panning) {{
+    panX += 2 * (e.clientX - lastX) / canvas.clientWidth;
+    panY -= 2 * (e.clientY - lastY) / canvas.clientHeight;
+  }} else {{
+    ry += (e.clientX - lastX) * 0.01;
+    rx += (e.clientY - lastY) * 0.01;
+  }}
   lastX = e.clientX; lastY = e.clientY;
   draw();
 }});
@@ -492,7 +516,7 @@ payload.maps.forEach((m, i) => {{
   select.appendChild(option);
 }});
 select.addEventListener("change", e => updateColors(Number(e.target.value)));
-document.getElementById("resetBtn").addEventListener("click", () => {{ rx = 0.0; ry = 0.0; zoom = 0.95; draw(); }});
+document.getElementById("resetBtn").addEventListener("click", () => {{ rx = 0.0; ry = 0.0; zoom = 0.95; panX = 0; panY = 0; draw(); }});
 function toggleHelp(show) {{
   const help = document.getElementById("help");
   const visible = show === undefined ? !help.classList.contains("visible") : show;
@@ -504,7 +528,7 @@ document.getElementById("helpClose").addEventListener("click", () => toggleHelp(
 document.getElementById("help").addEventListener("click", e => {{ if (e.target.id === "help") toggleHelp(false); }});
 window.addEventListener("keydown", e => {{
   if (e.key === "h" || e.key === "H") toggleHelp();
-  if (e.key === "r" || e.key === "R") {{ rx = 0.0; ry = 0.0; zoom = 0.95; draw(); }}
+  if (e.key === "r" || e.key === "R") {{ rx = 0.0; ry = 0.0; zoom = 0.95; panX = 0; panY = 0; draw(); }}
   if (e.key === "[") updateColors((Number(select.value) - 1 + payload.maps.length) % payload.maps.length);
   if (e.key === "]") updateColors((Number(select.value) + 1) % payload.maps.length);
   if (e.key === "Escape") toggleHelp(false);
@@ -515,7 +539,9 @@ updateColors(0);
 </html>
 """
     html = html.replace("{{", "{").replace("}}", "}")
-    return html.replace("{title}", title).replace("{data}", data).replace("{metadata}", metadata)
+    replacements = {"title": title, "data": data, "metadata": metadata}
+    return re.sub(r"\{(title|data|metadata)\}",
+                  lambda match: replacements[match.group(1)], html)
 
 
 def write_surface_report(surfaces, arrays=None, filename="surface_report.html",
@@ -555,6 +581,10 @@ def write_surface_report(surfaces, arrays=None, filename="surface_report.html",
     surfaces = _as_surface_dict(surfaces)
     maps = []
     for name, values, opts in _iter_maps(surfaces, arrays):
+        for hemi, surf in surfaces.items():
+            values[hemi] = np.asarray(values[hemi], dtype=float)
+            if values[hemi].ndim != 1 or values[hemi].size != _n_points(surf):
+                raise ValueError("Map {!r} must have one value per {} vertex.".format(name, hemi))
         map_cmap = opts.get("cmap", cmap)
         map_color_range = opts.get("color_range", color_range)
         maps.append({
@@ -569,6 +599,8 @@ def write_surface_report(surfaces, arrays=None, filename="surface_report.html",
             "description": str(opts.get("description", "")),
         })
 
+    if not maps:
+        raise ValueError("At least one surface map is required.")
     payload = {
         "title": str(title),
         "nanColor": _rgba255(nan_color),

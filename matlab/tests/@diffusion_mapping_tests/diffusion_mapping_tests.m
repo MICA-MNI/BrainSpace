@@ -43,6 +43,39 @@ classdef diffusion_mapping_tests < matlab.unittest.TestCase
                 'diffusion_mapping must honor n_components > sqrt(N).');
         end
 
+        function test_generalized_solver_matches_symmetric_reference(testCase)
+            rng(42);
+            X = rand(15, 25);
+            S = X * X.';
+            d = sum(S, 2) .^ -0.5;
+            L = S .* (d * d.');
+            invsqrt = sum(L, 2) .^ -0.5;
+            Ms = L .* (invsqrt * invsqrt.');
+            [U, values] = eig((Ms + Ms.') / 2, 'vector');
+            [values, order] = sort(values, 'descend');
+            V = U(:, order) .* invsqrt;
+            psi = V ./ V(:, 1);
+            for time = [0, 2]
+                if time == 0
+                    expected_values = values(2:end) ./ (1 - values(2:end));
+                else
+                    expected_values = values(2:end) .^ time;
+                end
+                expected = psi(:, 2:6) .* expected_values(1:5).';
+                [actual, actual_values] = diffusion_mapping(S, 5, 0.5, time);
+                testCase.verifyEqual(actual_values, expected_values, 'AbsTol', 1e-10);
+                % Independent eigensolvers may choose opposite column signs.
+                testCase.verifyEqual(abs(actual), abs(expected), 'AbsTol', 1e-9);
+            end
+        end
+
+        function test_asymmetric_input_rejected(testCase)
+            S = ones(5);
+            S(1, 2) = 2;
+            testCase.verifyError(@() diffusion_mapping(S, 2, 0.5, 0), ...
+                                 'diffusion_mapping:asymmetry');
+        end
+
         function test_zero_row_sum_rejected(testCase)
             % An all-zero row should raise rather than silently produce Inf.
             S = eye(5);

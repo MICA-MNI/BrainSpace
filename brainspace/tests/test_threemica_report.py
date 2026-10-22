@@ -134,3 +134,27 @@ def test_threemica_report_import_does_not_load_vtk_renderer():
         text=True,
     )
     assert proc.stdout.splitlines() == ["False", "False"]
+
+
+def test_bridge_preserves_existing_inputs_and_cleans_failed_export(tmp_path):
+    import pytest
+    existing = tmp_path / '_brainspace_threemica_input'
+    existing.mkdir()
+    marker = existing / 'keep.txt'
+    marker.write_text('user data', encoding='utf-8')
+    with pytest.raises(ValueError, match='Unknown BrainSpace'):
+        write_brainspace_threemica_report(tmp_path, maps=['unknown'])
+    assert marker.read_text(encoding='utf-8') == 'user data'
+    assert list(tmp_path.iterdir()) == [existing]
+    with pytest.raises(ValueError, match='BIDS label'):
+        write_brainspace_threemica_report(tmp_path, subject='../../outside')
+    assert list(tmp_path.iterdir()) == [existing]
+
+
+def test_bridge_rejects_colliding_map_tags(tmp_path):
+    import pytest
+    with pytest.raises(ValueError, match='unique'):
+        write_brainspace_threemica_report(
+            tmp_path, maps=[], custom_maps={'my map': np.zeros(64984),
+                                            'my-map': np.ones(64984)})
+    assert list(tmp_path.iterdir()) == []

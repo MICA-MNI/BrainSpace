@@ -35,15 +35,18 @@ if any(row_sum_L <= 0)
           'Normalized affinity has rows that sum to zero or below.');
 end
 
-% L is assumed to be symmetric (see line 281 in GradientMaps.m)
-% We can normalise for degree and solve the generalised eigenvalue problem
-% Lv = kDv (where k is the eigenvalue and v is the eigenvector).
-% Don't need to use any hacks or tricks, including to fix the eigenvectors. 
-% Keeps everything symmetric and nice. 
-[eigvec, eigval] = eig(L, diag(row_sum_L), 'vector'); 
+% Solve L*v = lambda*D*v directly. Positive row sums make D positive
+% definite, allowing the symmetric generalized eigensolver (PR #164).
+% Retain the direct-call symmetry check from the previous implementation.
+asym = norm(L - L.', 'fro');
+sym_tol = 1e-8 * max(norm(L, 'fro'), 1);
+assert(asym <= sym_tol, ...
+       'diffusion_mapping:asymmetry', ...
+       'Normalized affinity must be symmetric (||L - L''||_F = %g).', asym);
+L = (L + L.') / 2;
+[eigvec, eigval] = eig(L, diag(row_sum_L), 'vector');
 
-% Sort eigenvectors and values. eig(Ms,'vector') already returns reals,
-% but cast defensively in case of borderline 1e-300 imaginary residue.
+% Sort the real eigenvalues and their corresponding eigenvectors.
 [eigval, idx] = sort(real(eigval), 'descend');
 eigvec = eigvec(:, idx);
 

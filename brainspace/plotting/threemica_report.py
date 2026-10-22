@@ -3,7 +3,9 @@
 # Author: The BrainSpace developers
 # License: BSD 3 clause
 
+import re
 import shutil
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -100,7 +102,7 @@ def _datasets_root():
 
 
 def _select_builtin_maps(selection):
-    if selection is None or selection == "all":
+    if selection is None or (isinstance(selection, str) and selection == "all"):
         return list(_BRAINSPACE_MAPS)
     if isinstance(selection, str):
         if selection in {"markers", "gradients"}:
@@ -285,55 +287,60 @@ def write_brainspace_threemica_report(output_root, *, maps="all",
         Paths returned by threemica.
     """
     output_root = Path(output_root).resolve()
-    input_root = output_root / "_brainspace_threemica_input"
-    derivative = "brainspace"
-    base = input_root / "derivatives" / derivative / subject
-    surf_dir = base / "surf"
-    map_dir = base / "maps"
-
-    if input_root.exists():
-        shutil.rmtree(input_root)
-    surf_dir.mkdir(parents=True, exist_ok=True)
-    map_dir.mkdir(parents=True, exist_ok=True)
-
-    n_lh, n_rh = _prepare_surface_files(surfaces, surf_dir, subject, resolution)
-    selected = [_builtin_surface_map(tag) for tag in _select_builtin_maps(maps)]
-    selected.extend(_custom_surface_maps(custom_maps))
-    if not selected:
-        raise ValueError("No maps selected for threemica export.")
-
-    scope_maps = []
-    for item in selected:
-        values = np.asarray(item.values, dtype=np.float32).ravel()
-        if values.size != n_lh + n_rh:
-            raise ValueError(
-                "Map {!r} has {} values; expected {} ({} left + {} right).".format(
-                    item.tag, values.size, n_lh + n_rh, n_lh, n_rh
-                )
-            )
-        for hemi, hemi_values in [("L", values[:n_lh]), ("R", values[n_lh:])]:
-            path = map_dir / "{}_hemi-{}_surf-{}_label-{}.func.gii".format(
-                subject, hemi, resolution, item.tag
-            )
-            _write_func_gii(path, hemi_values)
-        scope_maps.append({
-            "tag": item.tag,
-            "label": item.label,
-            "unit": item.unit,
-            "cmap": item.cmap,
-            "scale": item.scale,
-        })
-
-    scope = {
-        "surface": {
-            "derivative": derivative,
-            "subdir": "surf",
-            "label": "midthickness",
-        },
-        derivative: {"maps": scope_maps},
-    }
-
+    if not re.fullmatch(r"sub-[A-Za-z0-9]+", subject):
+        raise ValueError("subject must be a BIDS label: sub- followed by letters or digits.")
+    output_root.mkdir(parents=True, exist_ok=True)
+    input_root = Path(tempfile.mkdtemp(prefix="_brainspace_threemica_input-",
+                                       dir=output_root))
     try:
+        derivative = "brainspace"
+        base = input_root / "derivatives" / derivative / subject
+        surf_dir = base / "surf"
+        map_dir = base / "maps"
+
+        surf_dir.mkdir(parents=True, exist_ok=True)
+        map_dir.mkdir(parents=True, exist_ok=True)
+
+        n_lh, n_rh = _prepare_surface_files(surfaces, surf_dir, subject, resolution)
+        selected = [_builtin_surface_map(tag) for tag in _select_builtin_maps(maps)]
+        selected.extend(_custom_surface_maps(custom_maps))
+        if not selected:
+            raise ValueError("No maps selected for threemica export.")
+
+        tags = [item.tag for item in selected]
+        if len(tags) != len(set(tags)):
+            raise ValueError("Surface map tags must be unique after normalization.")
+        scope_maps = []
+        for item in selected:
+            values = np.asarray(item.values, dtype=np.float32).ravel()
+            if values.size != n_lh + n_rh:
+                raise ValueError(
+                    "Map {!r} has {} values; expected {} ({} left + {} right).".format(
+                        item.tag, values.size, n_lh + n_rh, n_lh, n_rh
+                    )
+                )
+            for hemi, hemi_values in [("L", values[:n_lh]), ("R", values[n_lh:])]:
+                path = map_dir / "{}_hemi-{}_surf-{}_label-{}.func.gii".format(
+                    subject, hemi, resolution, item.tag
+                )
+                _write_func_gii(path, hemi_values)
+            scope_maps.append({
+                "tag": item.tag,
+                "label": item.label,
+                "unit": item.unit,
+                "cmap": item.cmap,
+                "scale": item.scale,
+            })
+
+        scope = {
+            "surface": {
+                "derivative": derivative,
+                "subdir": "surf",
+                "label": "midthickness",
+            },
+            derivative: {"maps": scope_maps},
+        }
+
         return write_threemica_report(
             bids_root=input_root,
             subjects=[subject],

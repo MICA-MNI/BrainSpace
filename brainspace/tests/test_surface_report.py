@@ -145,3 +145,58 @@ print("brainspace.plotting.base" in sys.modules)
         text=True,
     )
     assert proc.stdout.splitlines() == ["True", "False", "False"]
+
+
+def test_report_validates_hemisphere_lengths_and_empty_maps(tmp_path):
+    import pytest
+    left, right = _surfaces()
+    with pytest.raises(ValueError, match='one value per rh vertex'):
+        write_surface_report((left, right), {'bad': {'lh': [1, 2, 3], 'rh': [4]}},
+                             tmp_path / 'bad.html')
+    with pytest.raises(ValueError, match='At least one'):
+        write_surface_report((left, right), {}, tmp_path / 'empty.html')
+    assert not (tmp_path / 'bad.html').exists()
+
+
+def test_report_validates_geometry_and_ranges(tmp_path):
+    import pytest
+    surface = {'points': [[0, 0, 0], [0, 1, 0], [0, 0, 1]],
+               'cells': [[0, 1, 3]]}
+    with pytest.raises(ValueError, match='out of bounds'):
+        write_surface_report((surface, surface), filename=tmp_path / 'bad.html')
+    surface['cells'] = [[0.1, 1, 2]]
+    with pytest.raises(ValueError, match='integer'):
+        write_surface_report((surface, surface), filename=tmp_path / 'bad.html')
+    left, right = _surfaces()
+    for bounds in [(1, 0), (0, np.inf)]:
+        with pytest.raises(ValueError, match='finite bounds'):
+            write_surface_report((left, right), color_range=bounds,
+                                 filename=tmp_path / 'bad.html')
+    out = write_surface_report((left, right), color_range=np.array([-1., 1.]),
+                               filename=tmp_path / 'range.html')
+    assert _payload(out)['maps'][0]['range'] == [-1., 1.]
+
+
+def test_report_escapes_script_data_without_recursive_substitution(tmp_path):
+    left, right = _surfaces()
+    title = 'Literal {data} {metadata} </script><script>alert(1)</script>'
+    out = write_surface_report((left, right), {'{metadata}': np.zeros(6)},
+                               title=title, metadata={'note': '</script>'},
+                               color_range='sym', filename=tmp_path / 'safe.html')
+    payload = _payload(out)
+    assert payload['title'] == title
+    assert payload['maps'][0]['name'] == '{metadata}'
+    assert payload['maps'][0]['range'] == [-1., 1.]
+    assert '<script>alert(1)</script>' not in out.read_text(encoding='utf-8')
+
+
+def test_html_backend_rejects_vtk_only_options(tmp_path):
+    import pytest
+    from brainspace.plotting import plot_hemispheres
+    left, right = _surfaces()
+    for options in [{'contour': np.zeros(6)}, {'layout_style': 'grid'},
+                    {'screenshot': True}, {'return_plotter': True},
+                    {'view': 'dorsal'}]:
+        with pytest.raises(ValueError):
+            plot_hemispheres(left, right, backend='html',
+                             filename=tmp_path / 'report.html', **options)

@@ -43,6 +43,23 @@ report to ``filename`` and returns the output path. It is useful when the goal
 is to export a portable report rather than create a VTK window or screenshot.
 
 
+Viewer controls and scope
+-------------------------
+
+The native report is a self-contained WebGL viewer with embedded geometry,
+scalar maps and colormaps. It needs no network access or Python process after
+export. Use a browser with WebGL enabled. Drag to rotate, shift-drag or
+right-drag to pan, scroll to zoom, and use the map selector (or ``[`` / ``]``)
+to switch maps. ``R`` resets the camera and ``H`` opens help.
+
+The native viewer displays two hemispheres side by side with a shared color
+bar. It does not reproduce VTK row/grid layouts, text labels, contour overlays,
+screenshots or arbitrary actor/renderer options. The ``plot_hemispheres`` HTML
+path rejects these unsupported requests. VTK-specific window size, camera
+zoom, interaction and background settings do not configure the responsive
+HTML viewer; use the controls in the exported report.
+
+
 Write reports directly
 ----------------------
 
