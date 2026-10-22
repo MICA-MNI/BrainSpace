@@ -35,28 +35,12 @@ if any(row_sum_L <= 0)
           'Normalized affinity has rows that sum to zero or below.');
 end
 
-% Markov matrix M = D^{-1} * L is asymmetric in general, so eig(M) can
-% return tiny imaginary parts and an unsorted spectrum (issue #98). Solve
-% the eigenproblem on the symmetric similar matrix
-%   Ms = D^{-1/2} * L * D^{-1/2}
-% which has the same (real) eigenvalues; eigenvectors map back via
-%   psi = D^{-1/2} * u.
-d_sqrt_inv = row_sum_L .^ -0.5;
-Ms = bsxfun(@times, bsxfun(@times, L, d_sqrt_inv), d_sqrt_inv.');
-
-% Ms is symmetric in exact arithmetic; symmetrize to suppress the small
-% asymmetry from finite-precision multiplication, but assert the gap is
-% genuinely numerical (catches upstream bugs that would otherwise hide).
-asym = norm(Ms - Ms.', 'fro');
-sym_tol = 1e-8 * max(norm(Ms, 'fro'), 1);
-assert(asym <= sym_tol, ...
-       'diffusion_mapping:asymmetry', ...
-       'Symmetric matrix has unexpected asymmetry (||Ms - Ms''||_F = %g).', asym);
-Ms = (Ms + Ms.') / 2;
-
-% Symmetric eigendecomposition: eigenvalues are real.
-[eigvec_s, eigval] = eig(Ms, 'vector');
-eigvec = bsxfun(@times, eigvec_s, d_sqrt_inv);
+% L is assumed to be symmetric (see line 281 in GradientMaps.m)
+% We can normalise for degree and solve the generalised eigenvalue problem
+% Lv = kDv (where k is the eigenvalue and v is the eigenvector).
+% Don't need to use any hacks or tricks, including to fix the eigenvectors. 
+% Keeps everything symmetric and nice. 
+[eigvec, eigval] = eig(L, diag(row_sum_L), 'vector'); 
 
 % Sort eigenvectors and values. eig(Ms,'vector') already returns reals,
 % but cast defensively in case of borderline 1e-300 imaginary residue.
