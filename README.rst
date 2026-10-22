@@ -21,12 +21,8 @@ BrainSpace can export browser-readable HTML surface reports without opening a
 VTK render window. This is useful on remote servers, CI runners, notebooks, and
 containers where interactive VTK rendering is unavailable.
 
-.. raw:: html
-
-   <video src="docs/_static/brainspace_threemica_bridge_preview.mp4" controls muted loop playsinline style="max-width: 100%;"></video>
-
-If the video player is not shown, open the
-`BrainSpace threemica bridge preview video <docs/_static/brainspace_threemica_bridge_preview.mp4>`_.
+`Watch the BrainSpace threemica bridge preview video
+<https://raw.githubusercontent.com/MICA-MNI/BrainSpace/2636d2e30d64ea7499f939096f74a32c13b314b8/docs/_static/brainspace_threemica_bridge_preview.mp4>`_.
 The preview is generated from BrainSpace's bundled Conte69/fsLR-32k reference
 surfaces and maps; it does not contain participant data.
 
